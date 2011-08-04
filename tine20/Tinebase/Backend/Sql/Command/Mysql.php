@@ -31,4 +31,28 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
             $adapter->query('SET AUTOCOMMIT=0;');
         }
     }
+    
+	/**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @return string
+     */    
+    public static function getAggregateFunction($adapter,$field)
+    {
+ 		return "GROUP_CONCAT( DISTINCT $field)";   	
+    } 
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @param mixed $returnIfTrue
+     * @param mixed $returnIfFalse
+     */
+	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse)
+	{
+		return "IF(ISNULL($field), " . (string) $returnIfTrue . "," . (string) $returnIfFalse . ")";
+	}    
+    
 }

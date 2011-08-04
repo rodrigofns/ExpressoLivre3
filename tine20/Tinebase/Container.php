@@ -835,14 +835,16 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         
         $containerId = Tinebase_Model_Container::convertContainerIdToInt($_containerId);
         
-        $select = $this->_getSelect('*', TRUE)
+        $aggregateFunctionStatement = Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,'container_acl.account_grant');
+
+    	$select = $this->_getSelect(array('container.id'), TRUE)
             ->where("{$this->_db->quoteIdentifier('container.id')} = ?", $containerId)
             ->join(array(
                 /* table  */ 'container_acl' => SQL_TABLE_PREFIX . 'container_acl'), 
                 /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",
-                /* select */ array('*', 'account_grants' => "GROUP_CONCAT( DISTINCT container_acl.account_grant)")
+                /* select */ array('account_type','account_id', 'account_grants' => $aggregateFunctionStatement)
             )
-            ->group(array('container.id', 'container_acl.account_type', 'container_acl.account_id'));
+            ->group(array('container.id', 'container_acl.account_type', 'container_acl.account_id'));        
             
         $stmt = $this->_db->query($select);
 

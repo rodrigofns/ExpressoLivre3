@@ -29,4 +29,29 @@ class Tinebase_Backend_Sql_Command_Pgsql implements Tinebase_Backend_Sql_Command
             $adapter->query('SET AUTOCOMMIT=1;');
         }
     }
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @return string
+     */
+    public static function getAggregateFunction($adapter,$field)
+    {
+ 		return "array_to_string(ARRAY(SELECT unnest(array_agg($field)) 
+                                               ORDER BY 1),',')";   	
+    }
+
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @param mixed $returnIfTrue
+     * @param mixed $returnIfFalse
+     */
+	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse)
+	{
+		return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
+	}    
+    
 }

@@ -39,4 +39,34 @@ class Tinebase_Backend_Sql_Command implements Tinebase_Backend_Sql_Command_Inter
         
         $command->setAutocommit($adapter,$on);
     }
+    
+    /**
+     * 
+     * @param Tinebase_Container $container
+     * @param Zend_Db_Adapter_Abstract $adapter
+     */
+    public static function getAggregateFunction($adapter,$field)
+    {
+        $className = self::_getClassName($adapter);
+        $className = __CLASS__ . '_' . $className;
+        $command = new $className();
+	    	
+    	return $command->getAggregateFunction($adapter,$field);	
+    }
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @param mixed $returnIfTrue
+     * @param mixed $returnIfFalse
+     */
+    public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse)
+    {
+        $className = self::_getClassName($adapter);
+        $className = __CLASS__ . '_' . $className;
+        $command = new $className();
+	    	
+    	return $command->getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);    	
+    }
 }

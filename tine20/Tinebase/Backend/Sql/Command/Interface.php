@@ -20,7 +20,25 @@ interface Tinebase_Backend_Sql_Command_Interface
     /**
      * 
      * @param $adapter Zend_Db_Adapter_Abstract
-     * @param $on boolean
+     * @param $on boolean      
      */
     public static function setAutocommit($adapter,$on);
+    
+    /**
+     * 
+     * @param $adapter Zend_Db_Adapter_Abstract
+     * @param $field string
+     * @return string
+     */
+     public static function getAggregateFunction($adapter,$field);
+     
+     /**
+      * 
+      * @param $adapter Zend_Db_Adapter_Abstract
+      * @param $field string
+      * @param $returnIfTrue mixed
+      * @param $returnIfFalse mixed
+      * @return string
+      */
+	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);     
 }
