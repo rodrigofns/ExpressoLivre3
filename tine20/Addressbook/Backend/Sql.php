@@ -71,7 +71,19 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
      * @param array $_options
      */
     public function __construct($_dbAdapter = NULL, $_options = array())
-    {
+    {   
+    	// for executing correct SQL command, it's necessary to have an database adapter 
+		if (is_null($_dbAdapter))
+		{
+			$configData = include('config.inc.php');			
+			$config = new Zend_Config($configData);
+			$config = $config->toArray();
+			$adapter = $config['database']['adapter'];
+			$adapter = ucfirst(str_replace('pdo_','',$adapter));			
+			$_dbAdapter = Setup_Backend_Factory::factory($adapter);
+		}
+    	
+    	
     	parent::__construct($_dbAdapter,$_options);
     	$_foreignTables['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($_dbAdapter,'addressbook_image.contact_id',0,1));
     }
