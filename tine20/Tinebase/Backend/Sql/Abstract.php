@@ -251,14 +251,14 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	public function getByProperty($_value, $_property = 'name', $_getDeleted = FALSE)
 	{
 		$select = $this->_getSelect('*', $_getDeleted);
+		
 		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
-		->limit(1);
+		       ->limit(1);
 		 
 		//removes columns hidden in group by clause
-
 		$this->_removesHiddenColumnsInGroupBy($select);
 
-		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
+        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetch();
@@ -1198,39 +1198,35 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _removesHiddenColumnsInGroupBy(Zend_Db_Select $select)
 	{
-		$groups = $select->getPart(Zend_Db_Select::GROUP);
-		
-		if (empty($groups)) return;
-		
-		$cols = $select->getPart(Zend_Db_Select::COLUMNS);
-
-		// checks if there is a generic field selection and removes it but only if isn't the single one
-		$numberOfColumns = count($cols);
-		if (($cols[0][1] == '*') && ($numberOfColumns>1))
-		{
-			array_shift($cols);
-				
-			$numberOfColumns--;
-				
-			// 0 - table alias, 1 - field name, 2 - field alias
-			for ($i = 0; i<$numberOfColumns;$i++)
-			{
-				$cols[$i] = array($cols[2] => $cols[$i][0] . '.' . $cols[$i][1] );
-			}						
-
-			foreach($groups as $group)
-			{
-				$field = preg_split("/[.]/",$group);
-				// 0 - table alias, 1 - field name, 2 - field alias
-				$field[2] = $field[0] . '_' . $field[1];
-
-				$cols[] = array($field[2] => $field[0] . '.' . $field[1]);
-			}
-
-			$select->reset(Zend_Db_Select::COLUMNS);
-			$select->columns($cols);
-		}
-
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->assemble());    
+        $groups = $select->getPart(Zend_Db_Select::GROUP);
+        if (empty($groups)) return;
+        
+        $cols = $select->getPart(Zend_Db_Select::COLUMNS);
+        
+        // checks if there is a generic field selection and removes it but only if isn't the single one
+        if (($cols[0][1] == '*') && (count($cols)>1))
+        {
+            $adoptedCols = array();
+            array_shift($cols);
+            
+            // 0 - table alias, 1 - field name, 2 - field alias
+            foreach ($cols as $col) {
+                // 0 - table alias, 1 - field name, 2 - field alias
+                $adoptedCols[$col[2]] = "{$col[0]}.{$col[1]}";
+            }
+            
+            foreach($groups as $group)
+            {
+                $field = explode('.', $group);
+                
+                // 0 - table alias, 1 - field name, 2 - field alias
+                $adoptedCols["{$field[0]}_{$field[1]}"] = "{$field[0]}.{$field[1]}";
+            }
+            
+            $select->reset(Zend_Db_Select::COLUMNS);
+            $select->columns($adoptedCols);
+        }
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->assemble());    
 	}
 }
