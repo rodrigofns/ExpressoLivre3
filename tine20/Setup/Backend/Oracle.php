@@ -34,7 +34,7 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
             'defaultLength' => 1),
         'text' => array(
             'lengthTypes' => array(
-                256 => 'VARCHAR2', //@todo this should be 255 indeed but we have 256 in our setup.xml files
+                4000 => 'VARCHAR2',
                 4294967295 => 'CLOB'),
             'defaultType' => 'CLOB',
             'defaultLength' => null),
