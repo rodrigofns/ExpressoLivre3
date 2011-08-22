@@ -212,17 +212,16 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         
         // @todo move this to a 'disabled' contact filter
         if ($this->_getDisabledContacts !== true && ($_cols == '*' || array_key_exists('account_id', $_cols))) {
+            $where = '/* is no user */ ' . $this->_db->quoteIdentifier('accounts.id') . ' IS NULL OR /* is user */ (' . $this->_db->quoteIdentifier('accounts.id') . ' IS NOT NULL AND ' . 
+                $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . ' AND ';
+            
+            // is it really needed to check the model?
             if (Tinebase_Core::getUser() instanceof Tinebase_Model_FullUser) {
-                $where = "/* is no user */ ISNULL(accounts.id) OR /* is user */ (NOT ISNULL(accounts.id) AND " . 
-                    $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
-                    " AND " . 
-                    '('. $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . ' OR ' . $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.id') . ' = ?', Tinebase_Core::getUser()->getId()) . ')' .
+                $where .= '('. $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . ' OR ' . 
+                    $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.id') . ' = ?', Tinebase_Core::getUser()->getId()) . ')' .
                 ")";
             } else {
-                $where = "/* is no user */ ISNULL(accounts.id) OR /* is user */ (NOT ISNULL(accounts.id) AND " . 
-                    $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
-                    " AND " . 
-                    $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
+                $where .= $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
                 ")";
             }
             
