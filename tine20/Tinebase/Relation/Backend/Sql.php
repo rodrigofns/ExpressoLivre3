@@ -147,7 +147,7 @@ class Tinebase_Relation_Backend_Sql
     	);
     	
     	$this->_dbTable->update(array(
-    	    'is_deleted'   => true,
+    	    'is_deleted'   => 1,
     	    'deleted_by'   => Tinebase_Core::getUser()->getId(),
     	    'deleted_time' => Tinebase_DateTime::now()->get(Tinebase_Record_Abstract::ISO8601LONG)
     	), $where);
@@ -172,7 +172,7 @@ class Tinebase_Relation_Backend_Sql
             );
         
             $this->_dbTable->update(array(
-                'is_deleted'   => true,
+                'is_deleted'   => 1,
                 'deleted_by'   => Tinebase_Core::getUser()->getId(),
                 'deleted_time' => Tinebase_DateTime::now()->get(Tinebase_Record_Abstract::ISO8601LONG)
             ), $where);
@@ -200,7 +200,7 @@ class Tinebase_Relation_Backend_Sql
     	);
     	
     	if (!$_returnAll) {
-    	    $where[] = $this->_db->quoteIdentifier('is_deleted') . ' = FALSE';
+    	    $where[] = $this->_db->quoteIdentifier('is_deleted') . ' = 0';
     	}
     	if ($_degree) {
             $where[] = $this->_db->quoteInto($this->_db->quoteIdentifier('own_degree') . ' = ?', $_degree);
@@ -235,7 +235,7 @@ class Tinebase_Relation_Backend_Sql
             $this->_db->quoteInto($this->_db->quoteIdentifier('own_id') . ' = ?', $_ownId),
         );
         if ($_returnBroken !== true) {
-            $where[] = $this->_db->quoteIdentifier('is_deleted') . ' = FALSE';
+            $where[] = $this->_db->quoteIdentifier('is_deleted') . ' = 0';
         }
     	$relationRow = $this->_dbTable->fetchRow($where);
     	
@@ -298,7 +298,7 @@ class Tinebase_Relation_Backend_Sql
             'tableName' => 'relations',
         ));
         
-        $_filter->addFilter(new Tinebase_Model_Filter_Bool('is_deleted', 'equals', FALSE));
+        $_filter->addFilter(new Tinebase_Model_Filter_Bool('is_deleted', 'equals', 0));
         
         return $backend->search($_filter, $_pagination, $_onlyIds);
     }
