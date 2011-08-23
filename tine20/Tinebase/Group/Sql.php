@@ -122,7 +122,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $members = array();
 
             $select = $this->groupMembersTable->select();
-            $select->where('group_id = ?', $groupId);
+            $select->where($this->_db->quoteIdentifier('group_id') . ' = ?', $groupId);
 
             $rows = $this->groupMembersTable->fetchAll($select);
             
