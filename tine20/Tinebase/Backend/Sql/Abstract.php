@@ -254,7 +254,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		
 		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
 		       ->limit(1);
-		 
+		
 		//removes columns hidden in group by clause
 		$this->_removesHiddenColumnsInGroupBy($select);
 
@@ -661,9 +661,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			// don't fetch deleted objects
 			$select->where($this->_db->quoteIdentifier($this->_tableName . '.is_deleted') . ' = 0');
 		}
-
+		
 		$this->_addForeignTableJoins($select, $cols);
-
+		
 		return $select;
 	}
 
@@ -679,6 +679,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _addForeignTableJoins(Zend_Db_Select $_select, $_cols, $_groupBy = NULL)
 	{
 		if (! empty($this->_foreignTables)) {
+		    if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
+		    
 			$groupBy = ($_groupBy !== NULL) ? $_groupBy : $this->_tableName . '.' . $this->_identifier;
 			$_select->group($groupBy);
 
@@ -713,6 +715,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 		}
+		
+		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
 	}
 
 	/**
@@ -848,68 +852,68 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		}
 	}
 
-	/**
-	 * update foreign key values
-	 *
-	 * @param string $_mode create|update
-	 * @param Tinebase_Record_Abstract $_record
-	 */
-	protected function _updateForeignKeys($_mode, Tinebase_Record_Abstract $_record)
-	{
-		if (! empty($this->_foreignTables)) {
-
-			foreach ($this->_foreignTables as $modelName => $join) {
-
-				if (! array_key_exists('field', $join)) {
-					continue;
-				}
-
-				$idsToAdd    = array();
-				$idsToRemove = array();
-
-				if (!empty($_record->$modelName)) {
-					$idsToAdd = $this->_getIdsFromMixed($_record->$modelName);
-				}
-
-				$transactionId = Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
-
-				if ($_mode == 'update') {
-					$select = $this->_db->select();
-
-					$select->from(array($join['table'] => $this->_tablePrefix . $join['table']), array($join['field']))
-					->where($this->_db->quoteIdentifier($join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId());
-
-					$stmt = $this->_db->query($select);
-					$currentIds = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
-					$stmt->closeCursor();
-
-					$idsToRemove = array_diff($currentIds, $idsToAdd);
-					$idsToAdd    = array_diff($idsToAdd, $currentIds);
-				}
-
-				if (!empty($idsToRemove)) {
-					$where = '(' .
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) .
-                        ' AND ' . 
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
+    /**
+     * update foreign key values
+     *
+     * @param string $_mode create|update
+     * @param Tinebase_Record_Abstract $_record
+     */
+    protected function _updateForeignKeys($_mode, Tinebase_Record_Abstract $_record)
+    {
+        if (! empty($this->_foreignTables)) {
+            
+            foreach ($this->_foreignTables as $modelName => $join) {
+            
+                if (! array_key_exists('field', $join)) {
+                    continue;
+                }
+                
+                $idsToAdd    = array();
+                $idsToRemove = array();
+                
+                if (!empty($_record->$modelName)) {
+                    $idsToAdd = $this->_getIdsFromMixed($_record->$modelName);
+                }
+                
+                $transactionId = Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
+                
+                if ($_mode == 'update') {
+                    $select = $this->_db->select();
+                    
+                    $select->from(array($join['table'] => $this->_tablePrefix . $join['table']), array($join['field']))
+                    ->where($this->_db->quoteIdentifier($join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId());
+                    
+                    $stmt = $this->_db->query($select);
+                    $currentIds = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+                    $stmt->closeCursor();
+                    
+                    $idsToRemove = array_diff($currentIds, $idsToAdd);
+                    $idsToAdd    = array_diff($idsToAdd, $currentIds);
+                }
+                
+                if (!empty($idsToRemove)) {
+                    $where = '(' .
+                    $this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) . 
+                    ' AND ' . 
+                    $this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) . 
                     ')';
-
-					$this->_db->delete($this->_tablePrefix . $join['table'], $where);
-				}
-
-				foreach ($idsToAdd as $id) {
-					$recordArray = array (
-					$join['joinOn'] => $_record->getId(),
-					$join['field']  => $id
-					);
-					$this->_db->insert($this->_tablePrefix . $join['table'], $recordArray);
-				}
-
-
-				Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
-			}
-		}
-	}
+                    
+                    $this->_db->delete($this->_tablePrefix . $join['table'], $where);
+                }
+                
+                foreach ($idsToAdd as $id) {
+                    $recordArray = array (
+                        $join['joinOn'] => $_record->getId(),
+                        $join['field']  => $id
+                    );
+                    $this->_db->insert($this->_tablePrefix . $join['table'], $recordArray);
+                }
+                
+                
+                Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
+            }
+        }
+    }
 
 	/**
 	 * convert recordset, array of ids or records to array of ids
@@ -1023,29 +1027,29 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		return $this->_db->update($this->_tablePrefix . $this->_tableName, $recordArray, $where);
 	}
 
-	/**
-	 * Deletes entries
-	 *
-	 * @param string|integer|Tinebase_Record_Interface|array $_id
-	 * @return void
-	 * @return int The number of affected rows.
-	 */
-	public function delete($_id)
-	{
-		if (empty($_id)) {
-			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No records deleted.');
-			return 0;
-		}
-
-		$idArray = (! is_array($_id)) ? array($this->_convertId($_id)) : $_id;
-		$identifier = $this->_getRecordIdentifier();
-
-		$where = array(
-		$this->_db->quoteInto($this->_db->quoteIdentifier($identifier) . ' IN (?)', $idArray)
-		);
-
-		return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
-	}
+    /**
+     * Deletes entries
+     *
+     * @param string|integer|Tinebase_Record_Interface|array $_id
+     * @return void
+     * @return int The number of affected rows.
+     */
+    public function delete($_id)
+    {
+        if (empty($_id)) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No records deleted.');
+            return 0;
+        }
+        
+        $idArray = (! is_array($_id)) ? array($this->_convertId($_id)) : $_id;
+        $identifier = $this->_getRecordIdentifier();
+        
+        $where = array(
+            $this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $this->_tableName . '.' . $identifier) . ' IN (?)', $idArray)
+        );
+        
+        return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
+    }
 
 	/**
 	 * delete rows by property
@@ -1198,6 +1202,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _removesHiddenColumnsInGroupBy(Zend_Db_Select $select)
 	{
+	    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->assemble());
+	    return;
         $groups = $select->getPart(Zend_Db_Select::GROUP);
         if (empty($groups)) return;
         
