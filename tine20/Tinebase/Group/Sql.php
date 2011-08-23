@@ -504,7 +504,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $select->where($this->_db->quoteIdentifier($this->_tableName. '.name') . ' LIKE ?', '%' . $_filter . '%');
         }
         if($_sort !== NULL) {
-            $select->order("$_sort $_dir");
+            $select->order($this->_tableName . '.' . $_sort . ' ' . $_dir);
         }
         if($_start !== NULL) {
             $select->limit($_limit, $_start);
