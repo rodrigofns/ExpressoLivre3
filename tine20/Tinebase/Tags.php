@@ -368,7 +368,7 @@ class Tinebase_Tags
         $tags = new Tinebase_Record_RecordSet('Tinebase_Model_Tag');
         if (!empty($recordId)) {
             $select = $this->_getSelect($recordId, Tinebase_Application::getInstance()->getApplicationByName($_record->getApplication())->getId()); 
-            Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
+            Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
             foreach ($this->_db->fetchAssoc($select) as $tagArray){
                 $tags->addRecord(new Tinebase_Model_Tag($tagArray, true));
             }
@@ -408,7 +408,7 @@ class Tinebase_Tags
         
         $select = $this->_getSelect($recordIds, $appId);
         $select->group(array('tagging.tag_id', 'tagging.record_id'));
-        Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
+        Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
         
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
@@ -587,10 +587,10 @@ class Tinebase_Tags
        
         $quotedIdentifier = $this->_db->quoteIdentifier('occurrence');
         $data = array(
-            'occurrence' => new Zend_Db_Expr('IF((' . $quotedIdentifier . ' + ' . (int)$_toAdd . ') >= 0,' . $quotedIdentifier . ' + ' . (int)$_toAdd . ', 0)')
+            'occurrence' => new Zend_Db_Expr('(CASE WHEN ((' . $quotedIdentifier . ' + ' . (int)$_toAdd . ') >= 0 THEN ' . $quotedIdentifier . ' + ' . (int)$_toAdd . ' ELSE 0 END))')
         );
         
-        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto('id = ?', $tagId));
+        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $tagId));
     }
     
     /**
@@ -757,7 +757,7 @@ class Tinebase_Tags
     {
         $select = $this->_db->select()
             ->from(array('tagging' => SQL_TABLE_PREFIX . 'tagging'))
-            ->join(array('tags'    => SQL_TABLE_PREFIX . 'tags'), 'tagging.tag_id = tags.id')
+            ->join(array('tags'    => SQL_TABLE_PREFIX . 'tags'), $this->_db->quoteIdentifier('tagging.tag_id') . ' = ' . $this->_db->quoteIdentifier('tags.id'))
             ->where($this->_db->quoteIdentifier('application_id') . ' = ?', $_applicationId)
             ->where($this->_db->quoteIdentifier('record_id') . ' IN (?) ', (array) $_recordId)
             ->where($this->_db->quoteIdentifier('is_deleted') . ' = 0');
