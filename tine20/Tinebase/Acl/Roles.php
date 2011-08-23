@@ -157,13 +157,13 @@ class Tinebase_Acl_Roles
         $rightIdentifier = $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right');
         
         $select = $this->_db->select()
-            ->from(SQL_TABLE_PREFIX . 'role_rights', array())
-            ->join(SQL_TABLE_PREFIX . 'applications', 
+            ->distinct()
+            ->from(SQL_TABLE_PREFIX . 'applications')
+            ->join(SQL_TABLE_PREFIX . 'role_rights', 
                 $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.application_id') . 
-                ' = ' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.id'))            
+                ' = ' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.id'), array())            
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('role_id') . ' IN (?)', $roleMemberships))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.status') . ' = ?', Tinebase_Application::ENABLED))
-            ->group(SQL_TABLE_PREFIX . 'role_rights.application_id')
             ->order('order', 'ASC');
         
         if ($_anyRight) {
