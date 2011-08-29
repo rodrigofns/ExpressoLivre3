@@ -251,14 +251,13 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	public function getByProperty($_value, $_property = 'name', $_getDeleted = FALSE)
 	{
 		$select = $this->_getSelect('*', $_getDeleted);
-		
-		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
-		       ->limit(1);
-		 
-		//removes columns hidden in group by clause
-		$this->_removesHiddenColumnsInGroupBy($select);
 
-        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
+		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
+		->limit(1);
+
+		$this->_traitGroup($select);
+
+		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetch();
@@ -691,7 +690,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$selectArray = (array_key_exists('select', $join))
 					? $join['select']
 					: ((array_key_exists('field', $join) && (! array_key_exists('singleValue', $join) || ! $join['singleValue']))
-					? array($foreignColumn => 'GROUP_CONCAT(DISTINCT ' . $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) . ')')
+					//? array($foreignColumn => 'GROUP_CONCAT(DISTINCT ' . $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) . ')')
+					? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier($join['table'] . '.' . $join['field'])))
 					: array($foreignColumn => $join['table'] . '.id'));
 					$joinId = (array_key_exists('joinId', $join)) ? $join['joinId'] : $this->_identifier;
 
@@ -1191,42 +1191,54 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	}
 
 	/**
-	 * avoids fields in SQL SELECT that aren't in GORUP BY clause 
-	 *
-	 * @param Zend_Db_Table_Select $select
-	 * @return Zend_Db_Table_Select
+	 * ensures that columns in a select using
+	 * group by clause are into group
+	 * @param Zend_Db_Select $select
 	 */
-	protected function _removesHiddenColumnsInGroupBy(Zend_Db_Select $select)
+	protected function _traitGroup(Zend_Db_Select $select)
 	{
-        $groups = $select->getPart(Zend_Db_Select::GROUP);
-        if (empty($groups)) return;
-        
-        $cols = $select->getPart(Zend_Db_Select::COLUMNS);
-        
-        // checks if there is a generic field selection and removes it but only if isn't the single one
-        if (($cols[0][1] == '*') && (count($cols)>1))
-        {
-            $adoptedCols = array();
-            array_shift($cols);
-            
-            // 0 - table alias, 1 - field name, 2 - field alias
-            foreach ($cols as $col) {
-                // 0 - table alias, 1 - field name, 2 - field alias
-                $adoptedCols[$col[2]] = "{$col[0]}.{$col[1]}";
-            }
-            
-            foreach($groups as $group)
-            {
-                $field = explode('.', $group);
-                
-                // 0 - table alias, 1 - field name, 2 - field alias
-                $adoptedCols["{$field[0]}_{$field[1]}"] = "{$field[0]}.{$field[1]}";
-            }
-            
-            $select->reset(Zend_Db_Select::COLUMNS);
-            $select->columns($adoptedCols);
-        }
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->assemble());    
+		$group = $select->getPart(Zend_Db_Select::GROUP);
+
+		if (empty($group)) return;
+
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
+
+		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
+
+		//$column 0 - table, 1 - field, 2 - alias
+		foreach($columns as $column)
+		{
+			$field = explode('.',$column);
+			if (!in_array($group,$field))
+			{
+				// replaces * by each name of column
+				if ($column[1] == '*')
+				{
+					$tableFields = $this->_db->describeTable($this->_tablePrefix . $column[0]);
+					foreach($tableFields as $columnName => $schema)
+					{
+						// adds columns into group by clause (table.field)
+						// checks if field has a function (that must be an aggregation)
+						$element = "{$column[0]}.$columnName";
+						if (!in_array($group,$element) && !preg_match('/\(.*\)/',$element))
+						$group[] = $element;
+					}
+				}
+				else
+				{
+					// adds column into group by clause (table.field)
+					$element = "{$column[0]}.{$column[1]}";
+					if (!preg_match('/\(.*\)/',$element))
+					$group[] = $element;
+				}
+			}
+		}
+		$select->reset(Zend_Db_Select::GROUP);
+
+		$select->group($group);
+
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
+
 	}
+
 }
