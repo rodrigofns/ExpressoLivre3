@@ -122,7 +122,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $members = array();
 
             $select = $this->groupMembersTable->select();
-            $select->where('group_id = ?', $groupId);
+            $select->where($this->_db->quoteIdentifier('group_id') . ' = ?', $groupId);
 
             $rows = $this->groupMembersTable->fetchAll($select);
             
@@ -166,15 +166,12 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $this->groupMembersTable->delete($where);
         
         if(count($_groupMembers) > 0) {
-            $db = Tinebase_Core::getDb();
-            $stmt = $db->prepare('INSERT INTO ' . SQL_TABLE_PREFIX . 'group_members (group_id, account_id) VALUES (?,?)');
-            
             // add new members
             foreach ($_groupMembers as $accountId) {
                 $accountId = Tinebase_Model_User::convertUserIdToInt($accountId);        
-                $stmt->execute(array(
-                    $groupId, 
-                    $accountId
+                $this->_db->insert(SQL_TABLE_PREFIX . 'group_members', array(
+                    'group_id'    => $groupId,
+                    'account_id'  => $accountId
                 ));
             }
         }
@@ -504,7 +501,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $select->where($this->_db->quoteIdentifier($this->_tableName. '.name') . ' LIKE ?', '%' . $_filter . '%');
         }
         if($_sort !== NULL) {
-            $select->order("$_sort $_dir");
+            $select->order($this->_tableName . '.' . $_sort . ' ' . $_dir);
         }
         if($_start !== NULL) {
             $select->limit($_limit, $_start);

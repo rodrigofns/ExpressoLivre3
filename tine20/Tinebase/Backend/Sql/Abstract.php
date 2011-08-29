@@ -678,6 +678,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _addForeignTableJoins(Zend_Db_Select $_select, $_cols, $_groupBy = NULL)
 	{
 		if (! empty($this->_foreignTables)) {
+			if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
+
 			$groupBy = ($_groupBy !== NULL) ? $_groupBy : $this->_tableName . '.' . $this->_identifier;
 			$_select->group($groupBy);
 
@@ -713,6 +715,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 		}
+
+		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
 	}
 
 	/**
@@ -889,9 +893,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 				if (!empty($idsToRemove)) {
 					$where = '(' .
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) .
-                        ' AND ' . 
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
+					$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
+                    ' AND ' . 
+					$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
                     ')';
 
 					$this->_db->delete($this->_tablePrefix . $join['table'], $where);
@@ -1041,7 +1045,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$identifier = $this->_getRecordIdentifier();
 
 		$where = array(
-		$this->_db->quoteInto($this->_db->quoteIdentifier($identifier) . ' IN (?)', $idArray)
+		$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $this->_tableName . '.' . $identifier) . ' IN (?)', $idArray)
 		);
 
 		return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);

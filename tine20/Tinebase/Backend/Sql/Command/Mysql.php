@@ -38,9 +38,9 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
      * @param string $field
      * @return string
      */    
-    public static function getAggregateFunction($adapter,$field)
+    public static function getAggregateFunction($adapter, $field)
     {
- 		return "GROUP_CONCAT( DISTINCT $field)";   	
+        return "GROUP_CONCAT( DISTINCT $field)";
     } 
     
     /**
@@ -50,9 +50,9 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
      * @param mixed $returnIfTrue
      * @param mixed $returnIfFalse
      */
-	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse)
-	{
-		return "IF(ISNULL($field), " . (string) $returnIfTrue . "," . (string) $returnIfFalse . ")";
-	}    
+    public static function getIfIsNull($adapter, $field, $returnIfTrue, $returnIfFalse)
+    {
+        return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
+    }
     
 }

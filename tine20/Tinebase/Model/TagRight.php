@@ -87,15 +87,15 @@ class Tinebase_Model_TagRight extends Tinebase_Record_Abstract
         $db = Tinebase_Core::getDb();
         $currentAccountId = Tinebase_Core::getUser()->getId();
         $currentGroupIds = Tinebase_Group::getInstance()->getGroupMemberships($currentAccountId);
-        $groupCondition = ( !empty($currentGroupIds) ) ? ' OR (' . $db->quoteInto('acl.account_type = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_GROUP) . 
-            ' AND ' . $db->quoteInto('acl.account_id IN (?)', $currentGroupIds) . ' )' : '';
+        $groupCondition = ( !empty($currentGroupIds) ) ? ' OR (' . $db->quoteInto($db->quoteIdentifier('acl.account_type') . ' = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_GROUP) .
+            ' AND ' . $db->quoteInto($db->quoteIdentifier('acl.account_id') . ' IN (?)', $currentGroupIds) . ' )' : '';
         
         $where = $db->quoteInto($db->quoteIdentifier('acl.account_type') . ' = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_ANYONE) . ' OR (' .
-            $db->quoteInto('acl.account_type = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_USER) . ' AND ' . 
-            $db->quoteInto('acl.account_id = ?', $currentAccountId) . ' ) ' .
+            $db->quoteInto($db->quoteIdentifier('acl.account_type') . ' = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_USER) . ' AND ' .
+            $db->quoteInto($db->quoteIdentifier('acl.account_id')   . ' = ?', $currentAccountId) . ' ) ' .
             $groupCondition;
         
-        $_select->join(array('acl' => SQL_TABLE_PREFIX . 'tags_acl'), $_idProperty . ' = acl.tag_id', array() )
+        $_select->join(array('acl' => SQL_TABLE_PREFIX . 'tags_acl'), $_idProperty . ' = '. $db->quoteIdentifier('acl.tag_id'), array() )
             ->where($where)
             ->where($db->quoteIdentifier('acl.account_right') . ' = ?', $_right);
     }

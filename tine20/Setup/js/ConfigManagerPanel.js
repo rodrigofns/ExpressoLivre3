@@ -132,7 +132,7 @@ Tine.Setup.ConfigManagerPanel = Ext.extend(Tine.Tinebase.widgets.form.ConfigPane
             triggerAction: 'all',
             selectOnFocus: true,
             value: 'pdo_mysql',
-            store: [['pdo_mysql', 'MySQL'], ['pdo_pgsql','PostgreSQL']],
+            store: [['pdo_mysql', 'MySQL'], ['oracle', 'Oracle'], ['pdo_pgsql','PostgreSQL']],
             name: 'database_adapter',
             fieldLabel: this.app.i18n._('Adapter'),
             listeners: {
