@@ -407,7 +407,7 @@ class Tinebase_Tags
         $appId = Tinebase_Application::getInstance()->getApplicationByName($first->getApplication())->getId();
         
         $select = $this->_getSelect($recordIds, $appId);
-        $select->->distinct();
+        $select->distinct();
         Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select);
         $queryResult = $this->_db->fetchAll($select);
