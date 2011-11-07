@@ -197,7 +197,9 @@ class Tinebase_Group_Ldap extends Tinebase_Group_Sql implements Tinebase_Group_I
             array('cn', 'description', $this->_groupUUIDAttribute)
         );
         
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'getting groups from syncbackend... filter: ' . print_r($filter,true) . ' groupsDn: ' . $this->_options['groupsDn'] . 'groupSearchScope: ' . $this->_groupSearchScope . ' groupUUIDAttribute: ' . $this->_groupUUIDAttribute);        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'recovered groups from ldap: ' . print_r($groups));
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'getting groups from syncbackend... filter: ' . print_r($filter,true) . ' groupsDn: ' . $this->_options['groupsDn'] . ' groupSearchScope: ' . $this->_groupSearchScope . ' groupUUIDAttribute: ' . $this->_groupUUIDAttribute);        
                 
         $result = new Tinebase_Record_RecordSet('Tinebase_Model_Group');
         
