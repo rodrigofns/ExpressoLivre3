@@ -82,6 +82,8 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 
         // get primary key now because it is necessary in two places
         $primaryKey = $this->_getPrimaryKeyName($_table);
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " primaryKey : $primaryKey");
 
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
