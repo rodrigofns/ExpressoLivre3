@@ -78,7 +78,10 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         
         $enums = array();
         $statement = "CREATE TABLE " . SQL_TABLE_PREFIX . $_table->name . " (\n";
-        $statementSnippets = array();       
+        $statementSnippets = array();
+
+        // get primary key now because it is necessary in two places
+        $primaryKey = $this->_getPrimaryKeyName($indices);
 
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
@@ -90,7 +93,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 $fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
                 // replaces integer auto_increment with serial
-                $sequence = SQL_TABLE_PREFIX . $_table->name . '_seq';
+                $sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";                
                 $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);
                 $statementSnippets[] = $fieldDeclarations;
             }
@@ -101,9 +104,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         foreach ($_table->indices as $index) {
             if ($index->foreign) {
                 $statementSnippets[] = $this->getForeignKeyDeclarations($index);
-            } else {
-            	if ($index->primary)
-            		$primaryKey =  $index->name;
+            } else {            	
             	
                 $statementSnippet = $this->getIndexDeclarations($index,$_table->name);
                 if (strpos($statementSnippet, 'CREATE INDEX')!==false)
@@ -123,6 +124,15 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
+    
+    private function getPrimaryKeyName($indices)
+    {
+    	foreach ($_table->indices as $index) {
+    		if ($index->primary)
+    			return $index->name;    		
+    	}    	
+    	return null;
+    }
     
 
     /**
@@ -336,7 +346,9 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         try {
         	
         	// creates sequence
-        	$createSequence = 'CREATE SEQUENCE ' . SQL_TABLE_PREFIX . $_table->name .'_seq';
+        	$sequence = SQL_TABLE_PREFIX . $_table->name . '_' . $statements['primary'] . '_seq';
+        	
+        	$createSequence = 'CREATE SEQUENCE ' . $sequence;
         	
         	$this->execQueryVoid($createSequence);
         	
@@ -346,7 +358,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             // creates indexes
             if (!empty($statements['index'])) $this->execQueryVoid($statements['index']);
             
-            $alterSequence = 'ALTER SEQUENCE ' . SQL_TABLE_PREFIX . $_table->name . '_seq OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
+            $alterSequence = 'ALTER SEQUENCE ' . $sequence . ' OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
             
             $this->execQueryVoid($alterSequence);            
              
