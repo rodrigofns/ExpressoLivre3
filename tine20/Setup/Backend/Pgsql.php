@@ -95,7 +95,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 // replaces integer auto_increment with serial
                 $sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";
                 // don't create sequence if is field is not auto_increment
-                $primaryKey = strpos('auto_increment',$fieldDeclarations) !== false ? $primaryKey : null;
+                $primaryKey = strpos($fieldDeclarations,'auto_increment') !== false ? $primaryKey : null;
                 $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);                
                 $statementSnippets[] = $fieldDeclarations;
             }
