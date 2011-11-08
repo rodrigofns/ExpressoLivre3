@@ -95,7 +95,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 $fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
                 
-                if ($field->name == $primaryKey)
+                if (strpos($primaryKey,$field->name)!== false)
                 {
 	                // replaces integer auto_increment with serial
                 	$sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";
