@@ -93,8 +93,10 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 $fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
                 // replaces integer auto_increment with serial
-                $sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";                
-                $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);
+                $sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";
+                // don't create sequence if is field is not auto_increment
+                $primaryKey = strpos('auto_increment',$fieldDeclarations) !== false ? $primaryKey : null;
+                $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);                
                 $statementSnippets[] = $fieldDeclarations;
             }
         }
@@ -351,11 +353,14 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         try {
         	
         	// creates sequence
-        	$sequence = SQL_TABLE_PREFIX . $_table->name . '_' . $statements['primary'] . '_seq';
+        	if (!empty($statements['primary']))
+        	{
+        		$sequence = SQL_TABLE_PREFIX . $_table->name . '_' . $statements['primary'] . '_seq';
         	
-        	$createSequence = 'CREATE SEQUENCE ' . $sequence;
-        	
-        	$this->execQueryVoid($createSequence);
+	        	$createSequence = 'CREATE SEQUENCE ' . $sequence;
+        		
+        		$this->execQueryVoid($createSequence);
+        	}
         	
             // creates table
             $this->execQueryVoid($statements['table']);
@@ -363,7 +368,11 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             // creates indexes
             if (!empty($statements['index'])) $this->execQueryVoid($statements['index']);
             
-            $alterSequence = 'ALTER SEQUENCE ' . $sequence . ' OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
+            // alters sequence
+            if (!empty($statements['primary']))
+            {
+            	$alterSequence = 'ALTER SEQUENCE ' . $sequence . ' OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
+            }
             
             $this->execQueryVoid($alterSequence);            
              
