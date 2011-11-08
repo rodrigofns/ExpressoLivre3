@@ -128,7 +128,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
     private function _getPrimaryKeyName($indices)
     {
     	foreach ($_table->indices as $index) {
-    		if (!empty($index->primary))
+    		if ($index->primary === 'true')
     			return $index->name;    		
     	}    	
     	return null;
