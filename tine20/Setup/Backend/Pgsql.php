@@ -125,7 +125,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
     
-    private function getPrimaryKeyName($indices)
+    private function _getPrimaryKeyName($indices)
     {
     	foreach ($_table->indices as $index) {
     		if ($index->primary)
