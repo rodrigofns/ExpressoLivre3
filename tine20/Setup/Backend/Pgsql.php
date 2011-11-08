@@ -83,7 +83,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         // get primary key now because it is necessary in two places
         $primaryKey = $this->_getPrimaryKeyName($_table);
         
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " primaryKey : $primaryKey");
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " primaryKey before: $primaryKey");
 
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
@@ -94,11 +94,16 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 $fieldDeclarations = preg_replace('/integer\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
-                // replaces integer auto_increment with serial
-                $sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";
-                // don't create sequence if is field is not auto_increment
-                $primaryKey = strpos($fieldDeclarations,'auto_increment') !== false ? $primaryKey : null;
-                $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);                
+                
+                if ($field->name == $primaryKey)
+                {
+	                // replaces integer auto_increment with serial
+                	$sequence = SQL_TABLE_PREFIX . $_table->name . "_{$primaryKey}_seq";
+	                // don't create sequence if is field is not auto_increment
+    	            $primaryKey = (strpos($fieldDeclarations,'auto_increment') !== false) ? $primaryKey : null;      
+                	$fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);
+                }
+                	
                 $statementSnippets[] = $fieldDeclarations;
             }
         }
