@@ -122,7 +122,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 
         $statement .= implode(",\n", $statementSnippets) . "\n)";
 
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement);        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement . "\n primaryKey : $primaryKey");        
         
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
