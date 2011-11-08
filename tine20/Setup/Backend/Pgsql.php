@@ -343,10 +343,9 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             // creates indexes
             if (!empty($statements['index'])) $this->execQueryVoid($statements['index']);
             
-            $alterSequence = 'ALTER SEQUENCE ' . $_table->name . '_seq OWNED BY ' . $_table->name . '.' . $statements['primary'];
+            $alterSequence = 'ALTER SEQUENCE ' . SQL_TABLE_PREFIX . $_table->name . '_seq OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
             
-            $this->execQueryVoid($alterSequence);
-            
+            $this->execQueryVoid($alterSequence);            
              
         }
         catch (Exception $e)
