@@ -335,7 +335,10 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         
         try {
         	
+        	// creates sequence
         	$createSequence = 'CREATE SEQUENCE ' . SQL_TABLE_PREFIX . $_table->name .'_seq';
+        	
+        	$this->execQueryVoid($createSequence);
         	
             // creates table
             $this->execQueryVoid($statements['table']);
