@@ -81,7 +81,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         $statementSnippets = array();
 
         // get primary key now because it is necessary in two places
-        $primaryKey = $this->_getPrimaryKeyName($indices);
+        $primaryKey = $this->_getPrimaryKeyName($_table);
 
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
@@ -125,9 +125,14 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
     
-    private function _getPrimaryKeyName($indices)
+    /**
+     * 
+     * Gets the primary key name
+     * @param Setup_Backend_Schema_Table_Abstract $table
+     */
+    private function _getPrimaryKeyName($table)
     {
-    	foreach ($_table->indices as $index) {
+    	foreach ($table->indices as $index) {
     		if ($index->primary === 'true')
     			return $index->name;    		
     	}    	
