@@ -90,7 +90,8 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
                 $fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
                 $fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
                 // replaces integer auto_increment with serial
-                $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "serial NOT NULL", $fieldDeclarations);
+                $sequence = SQL_TABLE_PREFIX . $_table->name . '_seq';
+                $fieldDeclarations = str_replace('integer NOT NULL auto_increment', "integer NOT NULL DEFAULT nextval('" . $sequence . "')", $fieldDeclarations);
                 $statementSnippets[] = $fieldDeclarations;
             }
         }
@@ -101,6 +102,9 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             if ($index->foreign) {
                 $statementSnippets[] = $this->getForeignKeyDeclarations($index);
             } else {
+            	if ($index->primary)
+            		$primaryKey =  $index->name;
+            	
                 $statementSnippet = $this->getIndexDeclarations($index,$_table->name);
                 if (strpos($statementSnippet, 'CREATE INDEX')!==false)
                 {
@@ -115,9 +119,9 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 
         $statement .= implode(",\n", $statementSnippets) . "\n)";
 
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement);
-
-        return array('table'=>$statement,'index'=>$createIndexStatement);
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement);        
+        
+        return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
     
 
@@ -330,11 +334,20 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         $statements = $this->getCreateStatement($_table);
         
         try {
+        	
+        	$createSequence = 'CREATE SEQUENCE ' . SQL_TABLE_PREFIX . $_table->name .'_seq';
+        	
             // creates table
             $this->execQueryVoid($statements['table']);
             
             // creates indexes
-            if (!empty($statements['index'])) $this->execQueryVoid($statements['index']);           
+            if (!empty($statements['index'])) $this->execQueryVoid($statements['index']);
+            
+            $alterSequence = 'ALTER SEQUENCE ' . $statements['table'] . '_seq OWNED BY ' . $statements['table'] . '.' . $statements['primary'];
+            
+            $this->execQueryVoid($alterSequence);
+            
+             
         }
         catch (Exception $e)
         {
