@@ -413,6 +413,8 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             
             ->group('container.id')
             ->order('container.name');
+        
+       	Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $select);
             
         $this->addGrantsSql($select, $accountId, $grant, 'user');
         

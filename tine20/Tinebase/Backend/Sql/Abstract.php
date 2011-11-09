@@ -1244,5 +1244,18 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
 
 	}
+	
+	/**
+	 * 
+	 * Public service for grouping treatment
+	 * @param Zend_Db_Adapter $adapter
+	 * @param Zend_Db_Select $select
+	 */
+	public static function traitGroup($adapter, Zend_Db_Select $select)
+	{
+		$backend = new self($adapter);
+		return $backend->_traitGroup($select);
+		
+	}
 
 }
