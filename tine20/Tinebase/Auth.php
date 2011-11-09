@@ -194,6 +194,8 @@ class Tinebase_Auth
         $this->_backend->setIdentity($_username);
         $this->_backend->setCredential($_password);
         
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "backend " . print_r($this->_backend,true));
+        
         $result = Zend_Auth::getInstance()->authenticate($this->_backend);
         
         if($result->isValid()) {
