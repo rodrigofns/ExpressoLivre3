@@ -40,7 +40,7 @@ class Tinebase_Frontend_Json_Container
                 $containers = Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $application, Tinebase_Model_Grants::GRANT_READ);
                 break;
                 
-            case 'otherUsers':
+            case Tinebase_Model_Container::TYPE_OTHERUSERS:
                 $containers = Tinebase_Container::getInstance()->getOtherUsers(Tinebase_Core::getUser(), $application, Tinebase_Model_Grants::GRANT_READ);
                 break;
                 
@@ -214,9 +214,11 @@ class Tinebase_Frontend_Json_Container
      */
     public function setContainerGrants($containerId, $grants)
     {
+        $grants = ($grants) ? $grants : array();
+        
         $newGrants = new Tinebase_Record_RecordSet('Tinebase_Model_Grants', $grants);
         
-        $grants = Tinebase_Container::getInstance()->setGrants($containerId, $newGrants);
+        Tinebase_Container::getInstance()->setGrants($containerId, $newGrants);
                
         return $this->getContainerGrants($containerId);
     }

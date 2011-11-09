@@ -25,19 +25,19 @@ Tine.Sipgate.getPanel = function() {
 					i18n : translation
 				}
 			});
-
-	var editSipgateSettingsAction = new Ext.Action({
-				text : translation._('Edit phone settings'),
-				iconCls : 'SipgateIconCls',
-				handler : function() {
-					// TODO: options by user
-				},
-				scope : this
-			});
-
-	var contextMenu = new Ext.menu.Menu({
-				items : [editSipgateSettingsAction]
-			});
+// coming soon
+//	var editSipgateSettingsAction = new Ext.Action({
+//				text : translation._('Edit phone settings'),
+//				iconCls : 'SipgateIconCls',
+//				handler : function() {
+//					// TODO: options by user
+//				},
+//				scope : this
+//			});
+//
+//	var contextMenu = new Ext.menu.Menu({
+//				items : [editSipgateSettingsAction]
+//			});
 	/** ********* tree panel **************** */
 
 	var treePanel = new Ext.tree.TreePanel({
@@ -68,13 +68,13 @@ Tine.Sipgate.getPanel = function() {
 	treePanel.on('click', function(node, event) {
 				node.select();
 			}, this);
-
-	treePanel.on('contextmenu', function(node, event) {
-				this.ctxNode = node;
-				if (node.id != 'root') {
-					contextMenu.showAt(event.getXY());
-				}
-			}, this);
+// coming soon
+//	treePanel.on('contextmenu', function(node, event) {
+//				this.ctxNode = node;
+//				if (node.id != 'root') {
+//					contextMenu.showAt(event.getXY());
+//				}
+//			}, this);
 
 	treePanel.on('beforeexpand', function(panel) {
 				if (panel.getSelectionModel().getSelectedNode() === null) {
@@ -146,6 +146,7 @@ Tine.Sipgate.Main = {
 	 * init component function
 	 */
 	initComponent : function() {
+		
 		this.translation = new Locale.Gettext();
 		this.translation.textdomain('Sipgate');
 
@@ -461,9 +462,9 @@ Tine.Sipgate.Main = {
  * @return Ext.data.JsonStore with phones
  */
 Tine.Sipgate.loadSipgateStore = function(reload) {
-
+    
 	var store = Ext.StoreMgr.get('SipgateStore');
-
+//Tine.log.info('Loading Sipgate Store...');
 	if (!store) {
 		// create store (get from initial data)
 		store = new Ext.data.JsonStore({
@@ -473,9 +474,15 @@ Tine.Sipgate.loadSipgateStore = function(reload) {
 					autoLoad : true,
 					id : 'SipUri'
 				});
-		Ext.StoreMgr.add('SipgateStore', store);
-		Tine.Sipgate.updateSipgateTree(store);
+		
+
+		if(store.getTotalCount() > 0) {	
+            Ext.StoreMgr.add('SipgateStore', store);
+		    Tine.Sipgate.updateSipgateTree(store);
+		}
+		
 	}
+	
 	return store;
 };
 
@@ -529,20 +536,27 @@ Tine.Sipgate.dialPhoneNumber = function(number, contact) {
 
 	var info = { name : contact.data.n_fn, number : number };
 
-	var popUpWindow = Tine.Sipgate.CallStateWindow.openWindow({	info : info	});
+	var win = Tine.Sipgate.CallStateWindow.openWindow({  info : info });
 
 	var initRequest = Ext.Ajax.request({
 		url : 'index.php',
 		params : { method : 'Sipgate.dialNumber', _number : number },
 		success : function(_result, _request) {
+			Tine.log.debug('RES: ',_result);
 			sessionId = Ext.decode(_result.responseText).state.SessionID;
-			if(win = Ext.getCmp('callstate-window')) {
-				win.sessionId = sessionId;
+			
+			if(win2 = Ext.getCmp('callstate-window')) {
+				win2.sessionId = sessionId;
 				Tine.Sipgate.CallStateWindow.startTask(sessionId, contact);
 				Ext.getCmp('call-cancel-button').enable();
 			}
 		},
-		failure : function(result, request) {	}
+		failure : function(_result, _request) {
+		  Ext.Msg.alert(_('Configuration not set'), _('Please configure the Sipgate application'));
+		  win.close();
+		  
+          return false;
+		  }
 	});
 	return true;
 };

@@ -189,6 +189,9 @@ Ext.extend(Tine.Tinebase.data.RecordProxy, Ext.data.DataProxy, {
         options.params = options.params || {};
         options.params.method = this.appName + '.delete' + this.modelName + 's';
         options.params.ids = this.getRecordIds(records);
+
+        // increase timeout as this can take a long time (2 mins)
+        options.timeout = 120000;
         
         return this.doXHTTPRequest(options);
     },
@@ -381,23 +384,28 @@ Ext.extend(Tine.Tinebase.data.RecordProxy, Ext.data.DataProxy, {
             },
             // note incoming options are implicitly jsonprc converted
             failure: function (response, jsonrpcoptions) {
-                var responseData = Ext.decode(response.responseText),
-                    exception = responseData.data ? responseData.data : responseData;
+                try {
+                    var responseData = Ext.decode(response.responseText),
+                        exception = responseData.data ? responseData.data : responseData;
+                        
+                    exception.request = jsonrpcoptions.jsonData;
+                    exception.response = response.responseText;
                     
-                exception.request = jsonrpcoptions.jsonData;
-                exception.response = response.responseText;
-                
-                if (typeof options.failure == 'function') {
-                    var args = [];
-                    if (typeof options.beforeFailure == 'function') {
-                        args = options.beforeFailure.call(this, response);
+                    if (typeof options.failure == 'function') {
+                        var args = [];
+                        if (typeof options.beforeFailure == 'function') {
+                            args = options.beforeFailure.call(this, response);
+                        } else {
+                            args = [exception];
+                        }
+                    
+                        options.failure.apply(options.scope, args);
                     } else {
-                        args = [exception];
+                        this.handleRequestException(exception);
                     }
-                
-                    options.failure.apply(options.scope, args);
-                } else {
-                    this.handleRequestException(exception);
+                } catch (e) {
+                    Tine.log.err('Tine.Tinebase.data.RecordProxy::doXHTTPRequest::failure');
+                    Tine.log.err(e.stack ? e.stack : e);
                 }
             }
         };

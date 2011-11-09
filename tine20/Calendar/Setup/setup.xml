@@ -2,7 +2,7 @@
 <application>
     <name>Calendar</name>
     <!-- gettext('Calendar') -->   
-    <version>5.1</version>
+    <version>5.2</version>
     <order>15</order>
     <status>enabled</status>
     <tables>
@@ -374,7 +374,7 @@
             </declaration>
         </table>
         
-        <!-- resouces -->
+        <!-- resources -->
         <table>
             <name>cal_resources</name>
             <version>2</version>

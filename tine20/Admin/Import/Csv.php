@@ -31,6 +31,7 @@ class Admin_Import_Csv extends Tinebase_Import_Csv_Abstract
         'accountHomeDirectoryPrefix'    => '',
         'accountEmailDomain'            => '',
         'samba'                         => '',
+        'userNameSchema'			    => 1,
     );
     
     /**
@@ -64,20 +65,21 @@ class Admin_Import_Csv extends Tinebase_Import_Csv_Abstract
     /**
      * import single record (create password if in data)
      *
+     * @param Tinebase_Record_Abstract $_record
+     * @param string $_resolveStrategy
      * @param array $_recordData
-     * @param array $_result
      * @return Tinebase_Record_Interface
      * @throws Tinebase_Exception_Record_Validation
      */
-    protected function _importRecord($_recordData, &$_result)
+    protected function _importRecord($_record, $_resolveStrategy = NULL, $_recordData = array())
     {
-        if ($this->_options['model'] == 'Tinebase_Model_FullUser' && $this->_controller instanceof Admin_Controller_User) {
-        
-            $record = new $this->_options['model']($_recordData, TRUE);
+        if ($_record instanceof Tinebase_Model_FullUser && $this->_controller instanceof Admin_Controller_User) {
             
+            $record = $_record;
+        
             // create valid login name
             if (! isset($record->accountLoginName)) {
-                $record->accountLoginName = Tinebase_User::getInstance()->generateUserName($record);
+                $record->accountLoginName = Tinebase_User::getInstance()->generateUserName($record, $this->_options['userNameSchema']);
             }
             
             // add prefix to login name if given 
@@ -108,9 +110,11 @@ class Admin_Import_Csv extends Tinebase_Import_Csv_Abstract
             if (! empty($this->_options['password'])) {
                 $password = $this->_options['password'];
             }
-            if (isset($_recordData['password']) && !empty($_recordData['password'])) {
+            if (isset($_recordData['password']) && ! empty($_recordData['password'])) {
                 $password = $_recordData['password'];
             }
+            
+            $this->_addEmailUser($record, $password);
             
             //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Adding record: ' . print_r($record->toArray(), TRUE));
                 
@@ -119,15 +123,15 @@ class Admin_Import_Csv extends Tinebase_Import_Csv_Abstract
                 if (!$this->_options['dryrun']) {
                     $record = $this->_controller->create($record, $password, $password);
                 } else {
-                    $_result['results']->addRecord($record);
+                    $this->_importResult['results']->addRecord($record);
                 }
-                $_result['totalcount']++;
+                $this->_importResult['totalcount']++;
             } else {
                 Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Record invalid: ' . print_r($record->getValidationErrors(), TRUE));
                 throw new Tinebase_Exception_Record_Validation('Imported record is invalid.');
             }
         } else {
-            $record = parent::_importRecord($_recordData, $_result);
+            $record = parent::_importRecord($_record, $_resolveStrategy, $_recordData);
         }
         
         return $record;
@@ -152,6 +156,24 @@ class Admin_Import_Csv extends Tinebase_Import_Csv_Abstract
         ));
         
         $_record->sambaSAM = $samUser;
+    }
+    
+    /**
+     * add email users to record (if email set + config exists)
+     * 
+     * @param Tinebase_Model_FullUser $_record
+     * @param string $_password
+     */
+    protected function _addEmailUser(Tinebase_Model_FullUser $_record, $_password)
+    {
+        if (! empty($_record->accountEmailAddress)) {
+            $_record->imapUser = new Tinebase_Model_EmailUser(array(
+                'emailPassword' => $_password
+            ));
+            $_record->smtpUser = new Tinebase_Model_EmailUser(array(
+                'emailPassword' => $_password
+            ));
+        }
     }
     
     /**
