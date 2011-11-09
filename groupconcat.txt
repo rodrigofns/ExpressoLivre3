@@ -1,0 +1,15 @@
+tine20/Addressbook/Setup/Update/Release3.php:                /* select */ array('members' => 'GROUP_CONCAT(' . $this->_db->quoteIdentifier('accounts' . '.' . 'contact_id') . ')')
+tine20/Tinebase/EmailUser/Smtp/Postfix.php:            array($this->_propertyMapping['emailAliases'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailAliases']) . ')')); // Select
+tine20/Tinebase/EmailUser/Smtp/Postfix.php:            array($this->_propertyMapping['emailForwards'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailForwards']) . ')')); // Select
+tine20/Tinebase/Backend/Sql/Abstract.php:					//? array($foreignColumn => 'GROUP_CONCAT(DISTINCT ' . $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) . ')')
+tine20/Tinebase/Backend/Sql/Command/Mysql.php:        return "GROUP_CONCAT( DISTINCT $field)";
+tine20/Tinebase/Backend/Sql/Command/Oracle.php:     * @todo replace by equivalent function of MySQL GROUP_CONCAT in Oracle
+tine20/Tinebase/Backend/Sql/Command/Oracle.php:        return "GROUP_CONCAT( DISTINCT $field)";
+tine20/Tinebase/Acl/Roles.php:            ->from(SQL_TABLE_PREFIX . 'role_rights', array('account_rights' => 'GROUP_CONCAT(' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right') . ')'))
+tine20/Tinebase/Container.php:                    /* select */ array('*', 'account_grants' => "GROUP_CONCAT( DISTINCT container_acl.account_grant)")
+tine20/Tinebase/Container.php:                /* select */ array('*', 'account_grants' => "GROUP_CONCAT( DISTINCT container_acl.account_grant)")
+tine20/Tinebase/Tags.php:                 'account_right' => 'GROUP_CONCAT(DISTINCT account_right)'))
+tine20/Tinebase/Tags.php:            ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => 'GROUP_CONCAT(DISTINCT application_id)'))
+tine20/Tinebase/CustomField/Config.php:        $select = $this->_getAclSelect(array('id' => 'customfield_config.id', 'account_grants' => "GROUP_CONCAT(customfield_acl.account_grant)"));
+tine20/Calendar/Backend/Sql.php:            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));
+tine20/Calendar/Backend/Sql.php:            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));

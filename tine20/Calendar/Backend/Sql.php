@@ -159,7 +159,7 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $subselect->joinLeft(
             /* table  */ array('exdate' => $this->_tablePrefix . 'cal_exdate'),
             /* on     */ $this->_db->quoteIdentifier('exdate.cal_event_id') . ' = ' . $this->_db->quoteIdentifier($this->_tableName . '.id'),
-            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));
+            /* select */ array('exdate' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('exdate.exdate'))));
         
         // this attendee join has nothing to do with grants but is here for attendee/status/... filters
         $subselect->joinLeft(
@@ -315,7 +315,7 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $select->joinLeft(
             /* table  */ array('exdate' => $this->_tablePrefix . 'cal_exdate'), 
             /* on     */ $this->_db->quoteIdentifier('exdate.cal_event_id') . ' = ' . $this->_db->quoteIdentifier($this->_tableName . '.id'),
-            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));
+            /* select */ array('exdate' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('exdate.exdate'))));
         
         $select->group($this->_tableName . '.' . 'id');
         

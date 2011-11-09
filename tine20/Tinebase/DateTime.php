@@ -65,8 +65,7 @@ class Tinebase_DateTime extends DateTime
      * @see http://bugs.php.net/bug.php?id=46891
      */
     public function __wakeup() {
-        //$this->__construct($this->__sDT, new DateTimeZone($this->__sDTZ ? $this->__sDTZ : 'UTC'));
-    	$this->__construct($this->__sDT, new DateTimeZone('America/Sao_Paulo'));
+        $this->__construct($this->__sDT, new DateTimeZone($this->__sDTZ ? $this->__sDTZ : 'UTC'));    	
         $this->__sDT = $this->__sDTZ = NULL;
     }
     
@@ -90,7 +89,7 @@ class Tinebase_DateTime extends DateTime
         }
 
         // Normalize Timezonename, as sometimes +00:00 is taken
-        if (is_numeric($_time)) {
+        if (is_numeric($_time) || $_timezone->getName() == '+00:00') {
             $this->setTimezone('UTC');
         }
     }

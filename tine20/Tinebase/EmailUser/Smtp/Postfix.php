@@ -316,7 +316,7 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
             $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailUserId']) . // ON (right)
             ' AND ' . $userEmailMap . ' = ' . // AND ON (left)
             $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailForwards']) . ')', // AND ON (right)
-            array($this->_propertyMapping['emailAliases'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailAliases']) . ')')); // Select
+        	array($this->_propertyMapping['emailAliases'] => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailAliases'])))); // Select
         
         // select destination from alias table
         $select->joinLeft(
@@ -324,8 +324,8 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
             '(' . $userIDMap .  ' = ' . // ON (left)
             $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailUserId']) . // ON (right)
             ' AND ' . $userEmailMap . ' = ' . // AND ON (left)
-            $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailAliases']) . ')', // AND ON (right)
-            array($this->_propertyMapping['emailForwards'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailForwards']) . ')')); // Select
+            $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailAliases']) . ')', // AND ON (right)           
+            array($this->_propertyMapping['emailForwards'] => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailForwards'])))); // Select
             
             
         // append domain if set or domain IS NULL

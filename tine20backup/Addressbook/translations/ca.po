@@ -1,0 +1,604 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tine 2.0 - Addressbook\n"
+"POT-Creation-Date: 2008-05-17 22:12+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Damià Verger <dverger@joomla.cat>\n"
+"Language-Team: Tine 2.0 Translators <dverger@joomla.cat>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Language: Catalan\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: Acl/Rights.php:98
+msgid "manage shared addressbooks"
+msgstr "gestiona les llibretes d'adreces compartides"
+
+#: Acl/Rights.php:99
+msgid "Create new shared addressbook folders"
+msgstr "Crea noves llibretes d'adreces compartides"
+
+#: Acl/Rights.php:102
+#, fuzzy
+msgid "manage shared addressbook favorites"
+msgstr "gestiona els preferits"
+
+#: Acl/Rights.php:103
+#, fuzzy
+msgid "Create or update shared addressbook favorites"
+msgstr "Crea o actualitza preferits"
+
+#: Export/Pdf.php:37
+msgid "Business Contact Data"
+msgstr "Dades de contacte laborals"
+
+#: Export/Pdf.php:39
+msgid "Organisation / Unit"
+msgstr "Organització / Departament"
+
+#: Export/Pdf.php:44
+msgid "Business Address"
+msgstr "Adreça laboral"
+
+#: Export/Pdf.php:52 js/ContactGrid.js:124
+msgid "Email"
+msgstr "Correu electrònic"
+
+#: Export/Pdf.php:55
+msgid "Telephone Work"
+msgstr "Telèfon laboral"
+
+#: Export/Pdf.php:58
+msgid "Telephone Cellphone"
+msgstr "Telèfon mòbil"
+
+#: Export/Pdf.php:61
+msgid "Telephone Car"
+msgstr "Telèfon del cotxe"
+
+#: Export/Pdf.php:64
+msgid "Telephone Fax"
+msgstr "Fax"
+
+#: Export/Pdf.php:67
+msgid "Telephone Page"
+msgstr ""
+
+#: Export/Pdf.php:70
+msgid "URL"
+msgstr "URL"
+
+#: Export/Pdf.php:73
+msgid "Role"
+msgstr "Càrrec"
+
+#: Export/Pdf.php:76 js/ContactEditDialog.js:172 js/ContactGrid.js:113
+#: js/Model.js:33
+msgid "Room"
+msgstr "Sala"
+
+#: Export/Pdf.php:79
+msgid "Assistant"
+msgstr "Secretari -ària"
+
+#: Export/Pdf.php:82
+msgid "Assistant Telephone"
+msgstr "Telèfon secretari -ària"
+
+#: Export/Pdf.php:86
+msgid "Private Contact Data"
+msgstr "Dades de contacte personals"
+
+#: Export/Pdf.php:88 js/ContactEditDialog.js:289 js/Model.js:153
+#: js/Model.js:154 js/Model.js:155 js/Model.js:156 js/Model.js:157
+msgid "Private Address"
+msgstr "Adreça particular"
+
+#: Export/Pdf.php:96
+msgid "Email Home"
+msgstr "Correu electrònic particular"
+
+#: Export/Pdf.php:99
+msgid "Telephone Home"
+msgstr "Telèfon particular"
+
+#: Export/Pdf.php:102
+msgid "Telephone Cellphone Private"
+msgstr "Mòbil particular"
+
+#: Export/Pdf.php:105
+msgid "Telephone Fax Home"
+msgstr "Fax particular"
+
+#: Export/Pdf.php:108
+msgid "URL Home"
+msgstr "URL personal"
+
+#: Export/Pdf.php:112
+msgid "Other Data"
+msgstr "Informació addicional"
+
+#: Export/Pdf.php:114 js/ContactEditDialog.js:160 js/ContactGrid.js:139
+#: js/Model.js:26 js/Model.js:147
+msgid "Birthday"
+msgstr "Data de naixement"
+
+#: Export/Pdf.php:117 js/ContactEditDialog.js:154 js/ContactGrid.js:111
+#: js/Model.js:30 js/Model.js:142
+msgid "Job Title"
+msgstr "Professió"
+
+#: js/ContactEditDialog.js:35 js/ContactEditDialog.js:42
+msgid "Map"
+msgstr "Mapa"
+
+#: js/ContactEditDialog.js:65
+msgid "Personal Information"
+msgstr "Informació personal"
+
+#: js/ContactEditDialog.js:86 js/Model.js:29
+msgid "Salutation"
+msgstr "Salutació"
+
+#: js/ContactEditDialog.js:108 js/Model.js:22
+msgid "Title"
+msgstr "Títol"
+
+#: js/ContactEditDialog.js:116 js/ContactGrid.js:106 js/Model.js:20
+#: js/Model.js:137
+msgid "First Name"
+msgstr "Nom"
+
+#: js/ContactEditDialog.js:121 js/Model.js:21
+msgid "Middle Name"
+msgstr ""
+
+#: js/ContactEditDialog.js:126 js/ContactEditDialog.js:422
+#: js/ContactGrid.js:105 js/Model.js:19 js/Model.js:138
+msgid "Last Name"
+msgstr "Cognom"
+
+#: js/ContactEditDialog.js:135 js/ContactEditDialog.js:422
+#: js/ContactGridDetailsPanel.js:131 js/ContactGrid.js:109 js/Model.js:27
+#: js/Model.js:139 Setup/setup.xml:760
+msgid "Company"
+msgstr "Empresa"
+
+#: js/ContactEditDialog.js:140 js/ContactGrid.js:110 js/Model.js:28
+#: js/Model.js:140
+msgid "Unit"
+msgstr "Departament"
+
+#: js/ContactEditDialog.js:149 js/ContactGrid.js:108 js/Model.js:24
+msgid "Display Name"
+msgstr "Nom a mostrar"
+
+#: js/ContactEditDialog.js:164 js/Model.js:23
+msgid "Suffix"
+msgstr "Sufix"
+
+#: js/ContactEditDialog.js:168 js/ContactGrid.js:112 js/Model.js:31
+#: js/Model.js:143
+msgid "Job Role"
+msgstr "Càrrec"
+
+#: js/ContactEditDialog.js:179
+msgid "Contact Information"
+msgstr "Informació de contacte"
+
+#: js/ContactEditDialog.js:184 js/ContactGridDetailsPanel.js:139
+#: js/ContactGridDetailsPanel.js:163 js/ContactGrid.js:125 js/Model.js:47
+#: js/Model.js:141
+msgid "Phone"
+msgstr "Telèfon"
+
+#: js/ContactEditDialog.js:189 js/ContactGridDetailsPanel.js:140
+#: js/ContactGridDetailsPanel.js:164 js/ContactGrid.js:126 js/Model.js:48
+msgid "Mobile"
+msgstr "Mòbil"
+
+#: js/ContactEditDialog.js:194 js/ContactGridDetailsPanel.js:141
+#: js/ContactGridDetailsPanel.js:165 js/ContactGrid.js:127 js/Model.js:49
+msgid "Fax"
+msgstr "Fax"
+
+#: js/ContactEditDialog.js:199 js/ContactGrid.js:130 js/Model.js:53
+msgid "Phone (private)"
+msgstr "Telèfon particular"
+
+#: js/ContactEditDialog.js:204 js/ContactGrid.js:132 js/Model.js:55
+msgid "Mobile (private)"
+msgstr "Mòbil particular"
+
+#: js/ContactEditDialog.js:209 js/ContactGrid.js:131 js/Model.js:54
+msgid "Fax (private)"
+msgstr "Fax particular"
+
+#: js/ContactEditDialog.js:214 js/ContactGridDetailsPanel.js:142
+#: js/ContactGridDetailsPanel.js:166 js/Model.js:58 js/Model.js:145
+msgid "E-Mail"
+msgstr "Correu electrònic"
+
+#: js/ContactEditDialog.js:220 js/Model.js:59
+msgid "E-Mail (private)"
+msgstr "Correu electrònic particular"
+
+#: js/ContactEditDialog.js:227 js/ContactGridDetailsPanel.js:144
+#: js/ContactGridDetailsPanel.js:168 js/ContactGrid.js:134 js/Model.js:60
+msgid "Web"
+msgstr "Web"
+
+#: js/ContactEditDialog.js:260 js/Model.js:148 js/Model.js:149 js/Model.js:150
+#: js/Model.js:151 js/Model.js:152
+msgid "Company Address"
+msgstr "Adreça de l'empresa"
+
+#: js/ContactEditDialog.js:263 js/ContactEditDialog.js:292
+#: js/ContactGrid.js:114 js/Model.js:148 js/Model.js:153
+msgid "Street"
+msgstr "Carrer"
+
+#: js/ContactEditDialog.js:267 js/ContactEditDialog.js:296
+msgid "Street 2"
+msgstr "Carrer 2"
+
+#: js/ContactEditDialog.js:271 js/ContactEditDialog.js:300
+#: js/ContactGrid.js:116 js/Model.js:149 js/Model.js:154
+msgid "Region"
+msgstr "Província / Regió"
+
+#: js/ContactEditDialog.js:275 js/ContactEditDialog.js:304 js/Model.js:150
+#: js/Model.js:155
+msgid "Postal Code"
+msgstr "Codi postal"
+
+#: js/ContactEditDialog.js:279 js/ContactEditDialog.js:308
+#: js/ContactGrid.js:115 js/Model.js:151 js/Model.js:156
+msgid "City"
+msgstr "Població"
+
+#: js/ContactEditDialog.js:284 js/ContactEditDialog.js:313
+#: js/ContactGrid.js:118 js/Model.js:152 js/Model.js:157
+msgid "Country"
+msgstr "País"
+
+#: js/ContactEditDialog.js:334 js/Model.js:64
+msgid "Description"
+msgstr "Descripció"
+
+#: js/ContactEditDialog.js:348
+msgid "Enter description"
+msgstr "Introduïu una descripció"
+
+#: js/ContactEditDialog.js:397
+msgid "Export as pdf"
+msgstr "Exporta com a pdf"
+
+#: js/ContactEditDialog.js:422
+msgid "Either {0} or {1} must be given"
+msgstr "Cal introduir {0} o {1}"
+
+#: js/ContactGridDetailsPanel.js:62 js/Model.js:92
+msgid "Contacts"
+msgstr "Contactes"
+
+#: js/ContactGridDetailsPanel.js:65
+msgid "Select contact"
+msgstr "Selecciona un contacte"
+
+#: js/ContactGridDetailsPanel.js:155
+msgid "Private"
+msgstr "Particular"
+
+#: js/ContactGridDetailsPanel.js:178
+msgid "Info"
+msgstr "Informació"
+
+#: js/ContactGridDetailsPanel.js:214
+msgid "Insecure link"
+msgstr ""
+
+#: js/ContactGridDetailsPanel.js:214
+msgid "Please review this link in edit dialog."
+msgstr ""
+
+#: js/ListMemberFilterModel.js:37
+msgid "Member of List"
+msgstr ""
+
+#: js/Addressbook.js:22
+msgid "New Contact"
+msgstr ""
+
+#: js/Addressbook.js:32 js/Model.js:96 js/Model.js:213
+msgid "Addressbook"
+msgid_plural "Addressbooks"
+msgstr[0] "Llibreta d'adreces"
+msgstr[1] "Llibretes d'adreces"
+
+#: js/SearchCombo.js:95
+msgid "Searching..."
+msgstr "Cercant..."
+
+#: js/ContactGrid.js:103 js/Model.js:158
+msgid "Type"
+msgstr "Tipus"
+
+#: js/ContactGrid.js:104
+msgid "Tags"
+msgstr "Etiquetes"
+
+#: js/ContactGrid.js:107
+msgid "Full Name"
+msgstr "Nom complet"
+
+#: js/ContactGrid.js:117
+msgid "Postalcode"
+msgstr "Codi postal"
+
+#: js/ContactGrid.js:119
+msgid "Street (private)"
+msgstr "Carrer (particular)"
+
+#: js/ContactGrid.js:120
+msgid "City (private)"
+msgstr "Població (particular)"
+
+#: js/ContactGrid.js:121
+msgid "Region (private)"
+msgstr "Província / Regió (particular)"
+
+#: js/ContactGrid.js:122
+msgid "Postalcode (private)"
+msgstr "Codi postal (particular)"
+
+#: js/ContactGrid.js:123
+msgid "Country (private)"
+msgstr "País (particular)"
+
+#: js/ContactGrid.js:128
+msgid "Car phone"
+msgstr "Telèfon del cotxe"
+
+#: js/ContactGrid.js:129
+msgid "Pager"
+msgstr "Cercapersones"
+
+#: js/ContactGrid.js:133
+msgid "Email (private)"
+msgstr "Correu electrònic (particular)"
+
+#: js/ContactGrid.js:135
+msgid "URL (private)"
+msgstr "URL (particular)"
+
+#: js/ContactGrid.js:136 js/Model.js:144
+msgid "Note"
+msgstr "Nota"
+
+#: js/ContactGrid.js:137
+msgid "Timezone"
+msgstr "Zona horària"
+
+#: js/ContactGrid.js:138
+msgid "Geo"
+msgstr "Geoubicació"
+
+#: js/ContactGrid.js:149
+msgid "Export Contact"
+msgstr "Exporta el contacte"
+
+#: js/ContactGrid.js:157
+msgid "Export as PDF"
+msgstr "Exporta com a PDF"
+
+#: js/ContactGrid.js:164
+msgid "Export as CSV"
+msgstr "Exporta com a CSV"
+
+#: js/ContactGrid.js:171
+msgid "Export as ODS"
+msgstr "Exporta com a ODS"
+
+#: js/ContactGrid.js:178
+msgid "Export as XLS"
+msgstr "Exporta com a XLS"
+
+#: js/ContactGrid.js:185
+msgid "Export as ..."
+msgstr ""
+
+#: js/ContactGrid.js:197
+msgid "Import contacts"
+msgstr "Importa contactes"
+
+#: js/ContactGrid.js:289
+msgid "Internal Contact"
+msgstr "Contacte intern"
+
+#: js/Model.js:34
+msgid "Street (Company Address)"
+msgstr ""
+
+#: js/Model.js:35
+msgid "Street 2 (Company Address)"
+msgstr ""
+
+#: js/Model.js:36
+msgid "City (Company Address)"
+msgstr ""
+
+#: js/Model.js:37
+msgid "Region (Company Address)"
+msgstr ""
+
+#: js/Model.js:38
+msgid "Postal Code (Company Address)"
+msgstr ""
+
+#: js/Model.js:39
+msgid "Country (Company Address)"
+msgstr ""
+
+#: js/Model.js:41
+msgid "Street (Private Address)"
+msgstr ""
+
+#: js/Model.js:42
+msgid "Street 2 (Private Address)"
+msgstr ""
+
+#: js/Model.js:43
+msgid "City (Private Address)"
+msgstr ""
+
+#: js/Model.js:44
+msgid "Region (Private Address)"
+msgstr ""
+
+#: js/Model.js:45
+msgid "Postal Code (Private Address)"
+msgstr ""
+
+#: js/Model.js:46
+msgid "Country (Private Address)"
+msgstr ""
+
+#: js/Model.js:61
+msgid "Web (private)"
+msgstr ""
+
+#: js/Model.js:92 js/Model.js:131 js/ContactFilterModel.js:35
+msgid "Contact"
+msgid_plural "Contacts"
+msgstr[0] "Contacte"
+msgstr[1] "Contactes"
+
+#: js/Model.js:96 js/Model.js:213
+msgid "Addressbooks"
+msgstr "Llibretes d'adreces"
+
+#: js/Model.js:131
+msgid "User Account"
+msgstr "Compte d'usuari"
+
+#: js/Model.js:134
+msgid "Quick search"
+msgstr "Cerca ràpida"
+
+#: js/Model.js:159
+msgid "Last modified"
+msgstr "Modificat per darrera vegada"
+
+#: js/Model.js:160
+msgid "Last modifier"
+msgstr "Actualitzat per"
+
+#: js/Model.js:161
+msgid "Creation Time"
+msgstr "Data de creació"
+
+#: js/Model.js:162
+msgid "Creator"
+msgstr "Creador"
+
+#: js/Model.js:209
+msgid "List"
+msgid_plural "Lists"
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/Model.js:209
+msgid "Lists"
+msgstr ""
+
+#: Setup/Initialize.php:112 Setup/Update/Release3.php:37
+msgid "All contacts I have read grants for"
+msgstr "Tots els contactes sobre els quals tenc permís de lectura"
+
+#: Setup/Initialize.php:117
+msgid "My company"
+msgstr ""
+
+#: Setup/Initialize.php:118
+msgid "All coworkers in my company"
+msgstr ""
+
+#: Setup/Initialize.php:131
+msgid "My contacts"
+msgstr ""
+
+#: Setup/Initialize.php:132
+msgid "All contacts in my Addressbooks"
+msgstr ""
+
+#: Setup/Initialize.php:144
+msgid "Last modified by me"
+msgstr ""
+
+#: Setup/Initialize.php:145
+msgid "All contacts that I have last modified"
+msgstr ""
+
+#: Setup/setup.xml:690
+msgid "Internal Contacts"
+msgstr "Contactes interns"
+
+#: Setup/setup.xml:716
+msgid "Mr"
+msgstr "Sr."
+
+#: Setup/setup.xml:738
+msgid "Ms"
+msgstr "Sra."
+
+#: Controller.php:95
+#, python-format
+msgid "%s's personal addressbook"
+msgstr "llibreta d'adreces personal de %s"
+
+#: Preference.php:28
+msgid "All contacts"
+msgstr "Tots els contactes"
+
+#: Preference.php:65
+msgid "Default Addressbook"
+msgstr "Llibreta d'adreces per defecte"
+
+#: Preference.php:66
+msgid "The default addressbook for new contacts"
+msgstr "La llibreta d'adreces per defecte per a nous contactes"
+
+#: Preference.php:69
+#, fuzzy
+msgid "Default Favorite"
+msgstr "Preferit per defecte"
+
+#: Preference.php:70
+#, fuzzy
+msgid "The default favorite which is loaded on addressbook startup"
+msgstr "El preferit per defecte que es carrega a l'inici de la llibreta d'adreces"
+
+#~ msgid "Call contact"
+#~ msgstr "Truca al contacte"
+
+#~ msgid "Compose email"
+#~ msgstr "Redacta un correu electrònic"
+
+#~ msgid "Work"
+#~ msgstr "Feina"
+
+#~ msgid "Home"
+#~ msgstr "Casa"
+
+#~ msgid "Cell"
+#~ msgstr "Mòbil"
+
+#~ msgid "Cell private"
+#~ msgstr "Mòbil particular"
+
+#~ msgid "Last Modified Time"
+#~ msgstr "Data d'última modificació"

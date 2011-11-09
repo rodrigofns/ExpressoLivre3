@@ -1,0 +1,208 @@
+.CalendarIconCls {
+    background-image:url(../../images/oxygen/16x16/apps/korganizer.png);
+}
+.x-btn-medium .CalendarIconCls {
+    background-image:url(../../images/oxygen/22x22/apps/korganizer.png);
+}
+.x-btn-large .CalendarIconCls {
+    background-image:url(../../images/oxygen/32x32/apps/korganizer.png);
+}
+
+.PreferencesTreePanel-CalendarIconCls {
+    background-image:url(../../images/oxygen/16x16/apps/korganizer.png) !important;
+}
+.x-btn-medium .PreferencesTreePanel-CalendarIconCls {
+    background-image:url(../../images/oxygen/22x22/apps/korganizer.png) !important;
+}
+.x-btn-large .PreferencesTreePanel-CalendarIconCls {
+    background-image:url(../../images/oxygen/32x32/apps/korganizer.png) !important;
+}
+
+.cal-today-action {
+    background-image:url(../../images/oxygen/16x16/actions/go-jump-today.png) !important;
+}
+.x-btn-medium .cal-today-action {
+    background-image:url(../../images/oxygen/22x22/actions/go-jump-today.png) !important;
+}
+.x-btn-large .cal-today-action {
+    background-image:url(../../images/oxygen/32x32/actions/go-jump-today.png) !important;
+}
+
+
+.cal-day-view {
+    background-image:url(../../images/oxygen/16x16/actions/view-calendar-day.png) !important;
+}
+.x-btn-medium .cal-day-view {
+    background-image:url(../../images/oxygen/22x22/actions/view-calendar-day.png) !important;
+}
+.x-btn-large .cal-day-view {
+    background-image:url(../../images/oxygen/32x32/actions/view-calendar-day.png) !important;
+}
+
+
+.cal-week-view {
+    background-image:url(../../images/oxygen/16x16/actions/view-calendar-week.png) !important;
+}
+.x-btn-medium .cal-week-view {
+    background-image:url(../../images/oxygen/22x22/actions/view-calendar-week.png) !important;
+}
+.x-btn-large .cal-week-view {
+    background-image:url(../../images/oxygen/32x32/actions/view-calendar-week.png) !important;
+}
+
+
+.cal-month-view {
+    background-image:url(../../images/oxygen/16x16/actions/view-calendar-month.png) !important;
+}
+.x-btn-medium .cal-month-view {
+    background-image:url(../../images/oxygen/22x22/actions/view-calendar-month.png) !important;
+}
+.x-btn-large .cal-month-view {
+    background-image:url(../../images/oxygen/32x32/actions/view-calendar-month.png) !important;
+}
+
+
+.cal-resource {
+    background-image:url(../../images/oxygen/16x16/devices/video-projector.png) !important;
+}
+.x-btn-medium .cal-resource {
+    background-image:url(../../images/oxygen/22x22/devices/video-projector.png) !important;
+}
+.x-btn-large .cal-resource {
+    background-image:url(../../images/oxygen/32x32/devices/video-projector.png) !important;
+}
+
+
+.cal-attendee-type-resource {
+    background-image:url(../../images/oxygen/16x16/devices/video-projector.png) !important;
+    background-position:2px 2px;
+    background-repeat:no-repeat;
+}
+
+.cal-attendee-type-memberOf,
+.cal-attendee-type-groupmember {
+    background-image:url(../../images/groupmember.png) !important;
+    background-repeat: no-repeat;
+    background-position: 2px 2px;
+}
+
+.cal-response-action-NEEDS-ACTION {
+	background-image:url(../../images/oxygen/16x16/actions/mail-mark-unread-new.png) !important;
+}
+
+.cal-response-action-ACCEPTED {
+    background-image:url(../../images/oxygen/16x16/actions/ok.png) !important;
+}
+
+.cal-response-action-DECLINED {
+    background-image:url(../../images/oxygen/16x16/actions/dialog-cancel.png) !important;
+}
+
+.cal-response-action-TENTATIVE {
+    background-image:url(../../images/calendar-response-tentative.png) !important;
+}
+
+/**** calendar select widget ****/
+.cal-calselectwidget-faketriggerwrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.cal-calselectwidget-fakelist-item {
+	position: relative;
+	padding: 0;
+	border: 0;
+}
+
+.cal-calselectwidget-fakelist-calendar {
+    /*width: 290px;*/
+    float: left;
+    padding-left: 5px;
+}
+
+.cal-calselectwidget-fakelist-account {
+	width: 160px;
+	position: absolute;
+	right: 0;
+	border-left: 1px solid #B5B8C8;
+	padding-left: 5px;
+	background:url(../../images/trigger2-bg.gif) repeat-x #EFEFEF;
+}
+
+/*** container select widget
+ * @todo move to container
+ */
+span.tw-containerselect-trigger2 img.tw-containerselect-trigger2-bg {
+    background:url(../../images/trigger2-bg.gif) repeat-x;
+    width: 150px;
+    cursor:pointer;
+}
+.tw-containerselect-trigger2 {position: relative;}
+.x-form-trigger-over .tw-containerselect-trigger2-bg {background-position: 0 -24px;}
+.x-form-trigger-over .tw-containerselect-trigger2 {background-position: -17px 0;}
+
+.x-form-trigger-click .tw-containerselect-trigger2-bg {background-position: 0 -48px;}
+.x-form-trigger-click .tw-containerselect-trigger2 {background-position: -34px 0;}
+
+.x-form-field-wrap .x-form-arrow-trigger-rectangle {
+    background-image:url(../../images/trigger-rect.gif);
+    cursor:pointer;
+}
+
+.cal-calselectwdgt {
+	position: relative;
+}
+
+/**** date picker ****/
+.cal-tree .x-date-picker {
+    border: 0;
+}
+
+.cal-datepicker-background .x-panel-body {
+    background-color: #EEEEEF;
+}
+
+.cal-event-icon {
+    background-image:url(../../images/oxygen/16x16/actions/view-calendar-list.png) !important;
+    background-position: 8px;
+	background-repeat:no-repeat;
+	padding: 2px 0px 2px 26px;
+}
+
+/**** conflict window ****/
+.cal-conflict-heading {
+    height: 32px;
+}
+
+.cal-conflict-attendername {
+    font-weight: bold;
+}
+
+.cal-conflict-eventinfos {
+    margin-left: 15px;
+}
+
+/**** status icons ****/
+.cal-status-icon {
+	background-image:url(../../images/calendar-status-icons.gif) !important;
+    background-repeat:no-repeat;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+}
+
+.private-white      { background-position:   0px   0px; }
+.private-black      { background-position:   0px -10px; }
+.recur-white        { background-position: -10px   0px; }
+.recur-black        { background-position: -10px -10px; }
+.alarm-white        { background-position: -20px   0px; }
+.alarm-black        { background-position: -20px -10px; }
+.NEEDS-ACTION-white { background-position: -30px   0px; }
+.NEEDS-ACTION-black { background-position: -30px -10px; }
+.ACCEPTED-white     { background-position: -40px   0px; }
+.ACCEPTED-black     { background-position: -40px -10px; }
+.DECLINED-white     { background-position: -50px   0px; }
+.DECLINED-black     { background-position: -50px -10px; }
+.TENTATIVE-white    { background-position: -60px   0px; }
+.TENTATIVE-black    { background-position: -60px -10px; }

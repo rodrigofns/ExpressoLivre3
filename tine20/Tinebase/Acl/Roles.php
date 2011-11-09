@@ -202,7 +202,7 @@ class Tinebase_Acl_Roles
         $roleMemberships = $this->getRoleMemberships($_accountId);
                         
         $select = $this->_db->select()
-            ->from(SQL_TABLE_PREFIX . 'role_rights', array('account_rights' => 'GROUP_CONCAT(' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right') . ')'))
+        	->from(SQL_TABLE_PREFIX . 'role_rights', array('account_rights' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right'))))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.application_id') . ' = ?', $application->getId()))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('role_id') . ' IN (?)', $roleMemberships))
             ->group(SQL_TABLE_PREFIX . 'role_rights.application_id');

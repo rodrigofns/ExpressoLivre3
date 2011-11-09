@@ -600,7 +600,7 @@ class Tinebase_Tags
     {
         $select = $this->_db->select()
             ->from(SQL_TABLE_PREFIX . 'tags_acl', array('tag_id', 'account_type', 'account_id',
-                 'account_right' => 'GROUP_CONCAT(DISTINCT account_right)'))
+                 'account_right' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, 'account_right')))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
             ->group(array('tag_id', 'account_type', 'account_id'));
         $stmt = $this->_db->query($select);
@@ -668,7 +668,7 @@ class Tinebase_Tags
     public function getContexts($_tagId)
     {
         $select = $this->_db->select()
-            ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => 'GROUP_CONCAT(DISTINCT application_id)'))
+            ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, 'application_id')))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
             ->group('tag_id');
         $apps = $this->_db->fetchOne($select);
