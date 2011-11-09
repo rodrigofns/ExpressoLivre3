@@ -192,9 +192,7 @@ class Tinebase_Auth
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Trying to authenticate '. $_username);
         
         $this->_backend->setIdentity($_username);
-        $this->_backend->setCredential($_password);
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "backend " . print_r($this->_backend,true));
+        $this->_backend->setCredential($_password);    
         
         $result = Zend_Auth::getInstance()->authenticate($this->_backend);
         
