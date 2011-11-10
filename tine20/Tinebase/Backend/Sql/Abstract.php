@@ -1207,7 +1207,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _traitGroup(Zend_Db_Select $select)
 	{
-		$select = self::traitGroup($this->_db,$this->_tablePrefix, $select);
+		$select = self::traitGroup($this->_db,$this->_tablePrefix, $select);		
 	}
 	
 	/**
@@ -1222,6 +1222,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$group = $select->getPart(Zend_Db_Select::GROUP);
 		
 		if (empty($group)) return;
+		
+		$order = $select->getPart(Zend_Db_Select::ORDER);
 		
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
 		
@@ -1255,6 +1257,18 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 		}
+		
+		// find fields in order by clause that are not into group by 
+		foreach($order as $column)
+		{
+			$field = $column[0];
+			if (!in_array($group,$field))
+			{
+				// adds column into group by clause (table.field)
+				$group[] = $field;
+			}			
+		}
+		
 		$select->reset(Zend_Db_Select::GROUP);
 		
 		$select->group($group);
