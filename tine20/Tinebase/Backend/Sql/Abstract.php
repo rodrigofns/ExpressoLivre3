@@ -450,8 +450,10 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		if ($getIdValuePair) {
 			return $this->_fetch($select, self::FETCH_MODE_PAIR);
 		} else {
-			$ids = $this->_fetch($select);
+			$ids = $this->_fetch($select);			
 		}
+		
+		$this->_traitGroup($select);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Fetched ' . count($ids) .' ids.');
 
@@ -503,6 +505,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			$countSelect = $this->_getSelect($searchCountCols);
 			$this->_addFilter($countSelect, $_filter);
 		}
+		
+		$this->_traitGroup($select);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
 
@@ -613,6 +617,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
 	{
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
+		
+		$this->_traitGroup($_select);
 
 		$stmt = $this->_db->query($_select);
 
@@ -1201,14 +1207,26 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _traitGroup(Zend_Db_Select $select)
 	{
+		$select = self::traitGroup($this->_db,$this->_tablePrefix, $select);
+	}
+	
+	/**
+	 * 
+	 * Public service for grouping treatment
+	 * @param Zend_Db_Adapter $adapter
+	 * @param string $tablePrefix
+	 * @param Zend_Db_Select $select
+	 */
+	public static function traitGroup($adapter, $tablePrefix, Zend_Db_Select $select)
+	{
 		$group = $select->getPart(Zend_Db_Select::GROUP);
-
+		
 		if (empty($group)) return;
-
+		
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
-
+		
 		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
-
+		
 		//$column 0 - table, 1 - field, 2 - alias
 		foreach($columns as $column)
 		{
@@ -1218,7 +1236,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				// replaces * by each name of column
 				if ($column[1] == '*')
 				{
-					$tableFields = $this->_db->describeTable($this->_tablePrefix . $column[0]);
+					$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
 					foreach($tableFields as $columnName => $schema)
 					{
 						// adds columns into group by clause (table.field)
@@ -1238,24 +1256,12 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			}
 		}
 		$select->reset(Zend_Db_Select::GROUP);
-
-		$select->group($group);
-
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
-
-	}
-	
-	/**
-	 * 
-	 * Public service for grouping treatment
-	 * @param Zend_Db_Adapter $adapter
-	 * @param Zend_Db_Select $select
-	 */
-	public static function traitGroup($adapter, Zend_Db_Select $select)
-	{
-		$backend = new self($adapter);
-		return $backend->_traitGroup($select);
 		
+		$select->group($group);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
+		
+		return $select;
 	}
 
 }
