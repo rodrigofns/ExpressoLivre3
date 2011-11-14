@@ -955,6 +955,8 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         
         $this->addGrantsSql($select, $accountId, '*');
         
+        $this->_traitGroup($select);
+        
         $stmt = $this->_db->query($select);
         $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
         
