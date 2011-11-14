@@ -219,7 +219,8 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             $grantsFilter->appendFilterSql($select, $this);
         }
         $select->group($this->_tableName . '.' . 'id');
-        
+        $this->_traitGroup($select);
+	
         $stmt = null; // solve PHP bug @see {http://bugs.php.net/bug.php?id=35793}
         $stmt = $this->_db->query($select);
         $rows = (array)$stmt->fetchAll(Zend_Db::FETCH_ASSOC);
@@ -318,7 +319,8 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             /* select */ array('exdate' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('exdate.exdate'))));
         
         $select->group($this->_tableName . '.' . 'id');
-        
+        $this->_traitGroup($select);
+	
         return $select;
     }
     
@@ -386,15 +388,15 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         
         foreach ($allGrants as $grant) {
             if (in_array($grant, $this->_recordBasedGrants)) {
-                $_select->columns(array($grant => "\n MAX( \n" .
+                $_select->columns(array($grant => "\n MAX( case when ( \n" .
                     '  /* physgrant */' . $this->_getContainGrantCondition('physgrants', 'groupmemberships', $grant) . " OR \n" . 
                     '  /* implicit  */' . $this->_getImplicitGrantCondition($grant) . " OR \n" .
                     '  /* inherited */' . $this->_getInheritedGrantCondition($grant) . " \n" .
-                 ")"));
+                 ")then 1 else 0 end ) "));
             } else {
-                $_select->columns(array($grant => "\n MAX( \n" .
+                $_select->columns(array($grant => "\n MAX( case when ( \n" .
                     '  /* physgrant */' . $this->_getContainGrantCondition('physgrants', 'groupmemberships', $grant) . "\n" .
-                ")"));
+                ")then 1 else 0 end ) "));
             }
         }
     }
