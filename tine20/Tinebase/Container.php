@@ -953,8 +953,6 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             )
             ->group('container.id', 'container_acl.account_type', 'container_acl.account_id');
         
-        $this->_traitGroup($select);
-        
         $this->addGrantsSql($select, $accountId, '*');
         
         $this->_traitGroup($select);
