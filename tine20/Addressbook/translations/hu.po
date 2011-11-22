@@ -1,0 +1,612 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tine 2.0 - Addressbook\n"
+"POT-Creation-Date: 2008-05-17 22:12+0100\n"
+"PO-Revision-Date: 2011-01-09 21:48+0100\n"
+"Last-Translator: Faragó Tamás <admin@kemenyfem.hu>\n"
+"Language-Team: gump <admin@kemenyfem.hu>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Hungarian\n"
+"X-Poedit-Country: HUNGARY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: Acl/Rights.php:98
+msgid "manage shared addressbooks"
+msgstr "megosztott címjegyzékek kezelése"
+
+#: Acl/Rights.php:99
+msgid "Create new shared addressbook folders"
+msgstr "Új megosztott címjegyzék mappa készítése"
+
+#: Acl/Rights.php:102
+msgid "manage shared addressbook favorites"
+msgstr "kedvenc megosztott címjegyzék kezelése"
+
+#: Acl/Rights.php:103
+msgid "Create or update shared addressbook favorites"
+msgstr "Kedvenc megosztott címjegyzék készítése vagy frissítése"
+
+#: Controller.php:96
+#, python-format
+msgid "%s's personal addressbook"
+msgstr "%s személyes címjegyzéke"
+
+#: Export/Pdf.php:37
+msgid "Business Contact Data"
+msgstr "Üzleti Kapcsolati Adatok"
+
+#: Export/Pdf.php:39
+msgid "Organisation / Unit"
+msgstr "Szervezet / Egység"
+
+#: Export/Pdf.php:44
+msgid "Business Address"
+msgstr "Üzleti cím"
+
+#: Export/Pdf.php:52 js/ContactGrid.js:124
+msgid "Email"
+msgstr "Email"
+
+#: Export/Pdf.php:55
+msgid "Telephone Work"
+msgstr "Üzleti telefonszám"
+
+#: Export/Pdf.php:58
+msgid "Telephone Cellphone"
+msgstr "Mobil telefonszám"
+
+#: Export/Pdf.php:61
+msgid "Telephone Car"
+msgstr "Autó telefonszám"
+
+#: Export/Pdf.php:64
+msgid "Telephone Fax"
+msgstr "Faxszám"
+
+#: Export/Pdf.php:67
+msgid "Telephone Page"
+msgstr "Személyhívó telefonszám"
+
+#: Export/Pdf.php:70
+msgid "URL"
+msgstr "URL"
+
+#: Export/Pdf.php:73
+msgid "Role"
+msgstr "Szerep"
+
+#: Export/Pdf.php:76 js/ContactEditDialog.js:171 js/ContactGrid.js:113
+#: js/Model.js:33
+msgid "Room"
+msgstr "Szoba"
+
+#: Export/Pdf.php:79
+msgid "Assistant"
+msgstr "Aszisztens"
+
+#: Export/Pdf.php:82
+msgid "Assistant Telephone"
+msgstr "Aszisztens telefonszáma"
+
+#: Export/Pdf.php:86
+msgid "Private Contact Data"
+msgstr "Privát Kapcsolati Adatok"
+
+#: Export/Pdf.php:88 js/ContactEditDialog.js:288 js/Model.js:155
+#: js/Model.js:156 js/Model.js:157 js/Model.js:158 js/Model.js:159
+msgid "Private Address"
+msgstr "Privát cím"
+
+#: Export/Pdf.php:96
+msgid "Email Home"
+msgstr "Otthoni email"
+
+#: Export/Pdf.php:99
+msgid "Telephone Home"
+msgstr "Otthoni telefonszám"
+
+#: Export/Pdf.php:102
+msgid "Telephone Cellphone Private"
+msgstr "Privát mobil telefonszám"
+
+#: Export/Pdf.php:105
+msgid "Telephone Fax Home"
+msgstr "Otthoni faxszám"
+
+#: Export/Pdf.php:108
+msgid "URL Home"
+msgstr "Otthoni URL"
+
+#: Export/Pdf.php:112
+msgid "Other Data"
+msgstr "Egyéb adatok"
+
+#: Export/Pdf.php:114 js/ContactEditDialog.js:159 js/ContactGrid.js:139
+#: js/Model.js:26 js/Model.js:149
+msgid "Birthday"
+msgstr "Születésnap"
+
+#: Export/Pdf.php:117 js/ContactEditDialog.js:153 js/ContactGrid.js:111
+#: js/Model.js:30 js/Model.js:144
+msgid "Job Title"
+msgstr "Beosztás"
+
+#: js/Addressbook.js:22
+msgid "New Contact"
+msgstr ""
+
+#: js/Addressbook.js:32 js/Model.js:98 js/Model.js:215
+msgid "Addressbook"
+msgid_plural "Addressbooks"
+msgstr[0] "Címjegyzék"
+msgstr[1] "Címjegyzékek"
+
+#: js/ContactEditDialog.js:35 js/ContactEditDialog.js:41 js/MapPanel.js:31
+msgid "Map"
+msgstr "Térkép"
+
+#: js/ContactEditDialog.js:64
+msgid "Personal Information"
+msgstr "Személyes információk"
+
+#: js/ContactEditDialog.js:85 js/Model.js:29
+msgid "Salutation"
+msgstr "Megszólítás"
+
+#: js/ContactEditDialog.js:107 js/Model.js:22
+msgid "Title"
+msgstr "Előtag"
+
+#: js/ContactEditDialog.js:115 js/ContactGrid.js:106 js/Model.js:20
+#: js/Model.js:139
+msgid "First Name"
+msgstr "Kereszt név"
+
+#: js/ContactEditDialog.js:120 js/Model.js:21
+msgid "Middle Name"
+msgstr "Középső név"
+
+#: js/ContactEditDialog.js:125 js/ContactEditDialog.js:416
+#: js/ContactGrid.js:105 js/Model.js:19 js/Model.js:140
+msgid "Last Name"
+msgstr "Vezeték név"
+
+#: js/ContactEditDialog.js:134 js/ContactEditDialog.js:416
+#: js/ContactGrid.js:109 js/ContactGridDetailsPanel.js:131 js/Model.js:27
+#: js/Model.js:141 Setup/setup.xml:767
+msgid "Company"
+msgstr "Cég"
+
+#: js/ContactEditDialog.js:139 js/ContactGrid.js:110 js/Model.js:28
+#: js/Model.js:142
+msgid "Unit"
+msgstr "Egység"
+
+#: js/ContactEditDialog.js:148 js/ContactGrid.js:108 js/Model.js:24
+msgid "Display Name"
+msgstr "Kijelzett név"
+
+#: js/ContactEditDialog.js:163 js/Model.js:23
+msgid "Suffix"
+msgstr "Utótag"
+
+#: js/ContactEditDialog.js:167 js/ContactGrid.js:112 js/Model.js:31
+#: js/Model.js:145
+msgid "Job Role"
+msgstr "Szerepkör"
+
+#: js/ContactEditDialog.js:178
+msgid "Contact Information"
+msgstr "Kapcsolati információk"
+
+#: js/ContactEditDialog.js:183 js/ContactGrid.js:125
+#: js/ContactGridDetailsPanel.js:139 js/ContactGridDetailsPanel.js:163
+#: js/Model.js:51 js/Model.js:143
+msgid "Phone"
+msgstr "Telefon"
+
+#: js/ContactEditDialog.js:188 js/ContactGrid.js:126
+#: js/ContactGridDetailsPanel.js:140 js/ContactGridDetailsPanel.js:164
+#: js/Model.js:52
+msgid "Mobile"
+msgstr "Mobil"
+
+#: js/ContactEditDialog.js:193 js/ContactGrid.js:127
+#: js/ContactGridDetailsPanel.js:141 js/ContactGridDetailsPanel.js:165
+#: js/Model.js:53
+msgid "Fax"
+msgstr "Fax"
+
+#: js/ContactEditDialog.js:198 js/ContactGrid.js:130 js/Model.js:57
+msgid "Phone (private)"
+msgstr "Telefon (privát)"
+
+#: js/ContactEditDialog.js:203 js/ContactGrid.js:132 js/Model.js:59
+msgid "Mobile (private)"
+msgstr "Mobil (privát)"
+
+#: js/ContactEditDialog.js:208 js/ContactGrid.js:131 js/Model.js:58
+msgid "Fax (private)"
+msgstr "Fax (privát)"
+
+#: js/ContactEditDialog.js:213 js/ContactGridDetailsPanel.js:142
+#: js/ContactGridDetailsPanel.js:166 js/Model.js:62 js/Model.js:147
+msgid "E-Mail"
+msgstr "E-Mail"
+
+#: js/ContactEditDialog.js:219 js/Model.js:63
+msgid "E-Mail (private)"
+msgstr "E-Mail (privát)"
+
+#: js/ContactEditDialog.js:226 js/ContactGrid.js:134
+#: js/ContactGridDetailsPanel.js:144 js/ContactGridDetailsPanel.js:168
+#: js/Model.js:64
+msgid "Web"
+msgstr "Web"
+
+#: js/ContactEditDialog.js:259 js/Model.js:150 js/Model.js:151 js/Model.js:152
+#: js/Model.js:153 js/Model.js:154
+msgid "Company Address"
+msgstr "Céges cím"
+
+#: js/ContactEditDialog.js:262 js/ContactEditDialog.js:291
+#: js/ContactGrid.js:114 js/Model.js:150 js/Model.js:155
+msgid "Street"
+msgstr "Utca"
+
+#: js/ContactEditDialog.js:266 js/ContactEditDialog.js:295
+msgid "Street 2"
+msgstr "Utca 2"
+
+#: js/ContactEditDialog.js:270 js/ContactEditDialog.js:299
+#: js/ContactGrid.js:116 js/Model.js:151 js/Model.js:156
+msgid "Region"
+msgstr "Régió"
+
+#: js/ContactEditDialog.js:274 js/ContactEditDialog.js:303 js/Model.js:152
+#: js/Model.js:157
+msgid "Postal Code"
+msgstr "Irányítószám"
+
+#: js/ContactEditDialog.js:278 js/ContactEditDialog.js:307
+#: js/ContactGrid.js:115 js/Model.js:153 js/Model.js:158
+msgid "City"
+msgstr "Város"
+
+#: js/ContactEditDialog.js:283 js/ContactEditDialog.js:312
+#: js/ContactGrid.js:118 js/Model.js:154 js/Model.js:159
+msgid "Country"
+msgstr "Ország"
+
+#: js/ContactEditDialog.js:333 js/Model.js:68
+msgid "Description"
+msgstr "Leírás"
+
+#: js/ContactEditDialog.js:347
+msgid "Enter description"
+msgstr "Leírás megadása"
+
+#: js/ContactEditDialog.js:391
+msgid "Export as pdf"
+msgstr "Exportálás pdf-be"
+
+#: js/ContactEditDialog.js:416
+msgid "Either {0} or {1} must be given"
+msgstr "Vagy {0} vagy {1} megadása kötelező"
+
+#: js/ContactFilterModel.js:35 js/Model.js:94 js/Model.js:133
+msgid "Contact"
+msgid_plural "Contacts"
+msgstr[0] "Kapcsolat"
+msgstr[1] "Kapcsolatok"
+
+#: js/ContactGrid.js:103 js/Model.js:160
+msgid "Type"
+msgstr "Típus"
+
+#: js/ContactGrid.js:104
+msgid "Tags"
+msgstr "Címkék"
+
+#: js/ContactGrid.js:107
+msgid "Full Name"
+msgstr "Teljes név"
+
+#: js/ContactGrid.js:117
+msgid "Postalcode"
+msgstr "Irányítószám"
+
+#: js/ContactGrid.js:119
+msgid "Street (private)"
+msgstr "Utca (privát)"
+
+#: js/ContactGrid.js:120
+msgid "City (private)"
+msgstr "Város (privát)"
+
+#: js/ContactGrid.js:121
+msgid "Region (private)"
+msgstr "Régió (privát)"
+
+#: js/ContactGrid.js:122
+msgid "Postalcode (private)"
+msgstr "Irányítószám (privát)"
+
+#: js/ContactGrid.js:123
+msgid "Country (private)"
+msgstr "Ország (privát)"
+
+#: js/ContactGrid.js:128
+msgid "Car phone"
+msgstr "Autó telefon"
+
+#: js/ContactGrid.js:129
+msgid "Pager"
+msgstr "Személyhívó"
+
+#: js/ContactGrid.js:133
+msgid "Email (private)"
+msgstr "Email (privát)"
+
+#: js/ContactGrid.js:135
+msgid "URL (private)"
+msgstr "URL (privát)"
+
+#: js/ContactGrid.js:136 js/Model.js:146
+msgid "Note"
+msgstr "Leírás"
+
+#: js/ContactGrid.js:137
+msgid "Timezone"
+msgstr "Időzóna"
+
+#: js/ContactGrid.js:138
+msgid "Geo"
+msgstr "Geo"
+
+#: js/ContactGrid.js:149
+msgid "Export Contact"
+msgstr "Kapcsolat exportálása"
+
+#: js/ContactGrid.js:157
+msgid "Export as PDF"
+msgstr "Exportálás PDF-be"
+
+#: js/ContactGrid.js:164
+msgid "Export as CSV"
+msgstr "Exportálás CSV-be"
+
+#: js/ContactGrid.js:171
+msgid "Export as ODS"
+msgstr "Exportálás ODS-be"
+
+#: js/ContactGrid.js:178
+msgid "Export as XLS"
+msgstr "Exportálás XLS-be"
+
+#: js/ContactGrid.js:185
+msgid "Export as ..."
+msgstr "Exportálás mint ..."
+
+#: js/ContactGrid.js:197
+msgid "Import contacts"
+msgstr "Kapcsolatok importálása"
+
+#: js/ContactGrid.js:288
+msgid "Internal Contact"
+msgstr "Belső kapcsolatok"
+
+#: js/ContactGridDetailsPanel.js:62 js/Model.js:94
+msgid "Contacts"
+msgstr "Kapcsolatok"
+
+#: js/ContactGridDetailsPanel.js:65
+msgid "Select contact"
+msgstr "Kapcsolat kiválasztása"
+
+#: js/ContactGridDetailsPanel.js:155
+msgid "Private"
+msgstr "Privát"
+
+#: js/ContactGridDetailsPanel.js:178
+msgid "Info"
+msgstr "Info"
+
+#: js/ContactGridDetailsPanel.js:214
+msgid "Insecure link"
+msgstr "Nem biztonságos link"
+
+#: js/ContactGridDetailsPanel.js:214
+msgid "Please review this link in edit dialog."
+msgstr "Kérlek ellenőrizd ezt a linket a szerkesztő ablakban."
+
+#: js/ListMemberFilterModel.js:37
+msgid "Member of List"
+msgstr ""
+
+#: js/MapPanel.js:49
+msgid "Company address"
+msgstr ""
+
+#: js/MapPanel.js:56
+msgid "Private address"
+msgstr ""
+
+#: js/Model.js:34
+msgid "Street (Company Address)"
+msgstr "Utca (Céges cím)"
+
+#: js/Model.js:35
+msgid "Street 2 (Company Address)"
+msgstr "Utca 2 (Céges cím)"
+
+#: js/Model.js:36
+msgid "City (Company Address)"
+msgstr "Város (Céges cím)"
+
+#: js/Model.js:37
+msgid "Region (Company Address)"
+msgstr "Régió (Céges cím)"
+
+#: js/Model.js:38
+msgid "Postal Code (Company Address)"
+msgstr "Irányítószám (Céges cím)"
+
+#: js/Model.js:39
+msgid "Country (Company Address)"
+msgstr "Ország (Céges cím)"
+
+#: js/Model.js:43
+msgid "Street (Private Address)"
+msgstr "Utca (Privát cím)"
+
+#: js/Model.js:44
+msgid "Street 2 (Private Address)"
+msgstr "Utca 2 (Privát cím)"
+
+#: js/Model.js:45
+msgid "City (Private Address)"
+msgstr "Város (Privát cím)"
+
+#: js/Model.js:46
+msgid "Region (Private Address)"
+msgstr "Régió (Privát cím)"
+
+#: js/Model.js:47
+msgid "Postal Code (Private Address)"
+msgstr "Irányítószám (Privát cím)"
+
+#: js/Model.js:48
+msgid "Country (Private Address)"
+msgstr "Ország (Privát cím)"
+
+#: js/Model.js:65
+msgid "Web (private)"
+msgstr "Web (privát)"
+
+#: js/Model.js:98 js/Model.js:215
+msgid "Addressbooks"
+msgstr "Címjegyzékek"
+
+#: js/Model.js:133
+msgid "User Account"
+msgstr "Felhasználói fiók"
+
+#: js/Model.js:136
+msgid "Quick search"
+msgstr "Gyors keresés"
+
+#: js/Model.js:161
+msgid "Last modified"
+msgstr "Utolsó módosítás"
+
+#: js/Model.js:162
+msgid "Last modifier"
+msgstr "Utolsó módosító"
+
+#: js/Model.js:163
+msgid "Creation Time"
+msgstr "Készítés ideje"
+
+#: js/Model.js:164
+msgid "Creator"
+msgstr "Készítő"
+
+#: js/Model.js:211
+msgid "List"
+msgid_plural "Lists"
+msgstr[0] "Lista"
+msgstr[1] "Listák"
+
+#: js/Model.js:211
+msgid "Lists"
+msgstr "Listák"
+
+#: js/SearchCombo.js:97
+msgid "Searching..."
+msgstr "Keresés..."
+
+#: Preference.php:28
+msgid "All contacts"
+msgstr "Összes kapcsolat"
+
+#: Preference.php:65
+msgid "Default Addressbook"
+msgstr "Alapértelmezett címjegyzék"
+
+#: Preference.php:66
+msgid "The default addressbook for new contacts"
+msgstr "Alapértelmezett címjegyzék az új kapcsolatoknak"
+
+#: Preference.php:69
+msgid "Default Favorite"
+msgstr "Alapértelmezett kedvenc"
+
+#: Preference.php:70
+msgid "The default favorite which is loaded on addressbook startup"
+msgstr "Alapértelmezett kedvenc ami a címjegyzék indításakor betöltődik"
+
+#: Setup/Initialize.php:112 Setup/Update/Release3.php:37
+msgid "All contacts I have read grants for"
+msgstr "Összes kapcsolat, amihez olvasási engedélyem van"
+
+#: Setup/Initialize.php:117
+msgid "My company"
+msgstr "Saját cégem"
+
+#: Setup/Initialize.php:118
+msgid "All coworkers in my company"
+msgstr "Minden alkalmazott a saját cégemnél"
+
+#: Setup/Initialize.php:131
+msgid "My contacts"
+msgstr "Kapcsolataim"
+
+#: Setup/Initialize.php:132
+msgid "All contacts in my Addressbooks"
+msgstr "Minden kapcsolat a saját Címjegyzékemben"
+
+#: Setup/Initialize.php:144
+msgid "Last modified by me"
+msgstr "Utoljára módosítottam"
+
+#: Setup/Initialize.php:145
+msgid "All contacts that I have last modified"
+msgstr "Minden kapcsolat amit utoljára én módosítottam"
+
+#: Setup/setup.xml:697
+msgid "Internal Contacts"
+msgstr "Belső kapcsolatok"
+
+#: Setup/setup.xml:723
+msgid "Mr"
+msgstr "Úr"
+
+#: Setup/setup.xml:745
+msgid "Ms"
+msgstr "Asszony"
+
+#~ msgid "Call contact"
+#~ msgstr "Kapcsolat hívása"
+
+#~ msgid "Compose email"
+#~ msgstr "Email írása"
+
+#~ msgid "Work"
+#~ msgstr "Üzlet"
+
+#~ msgid "Home"
+#~ msgstr "Otthon"
+
+#~ msgid "Cell"
+#~ msgstr "Mobil"
+
+#~ msgid "Cell private"
+#~ msgstr "Mobil privát"
+
+#~ msgid "Last Modified Time"
+#~ msgstr "Utolsó módosítás ideje"
