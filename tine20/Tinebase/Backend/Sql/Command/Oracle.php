@@ -24,7 +24,7 @@ class Tinebase_Backend_Sql_Command_Oracle implements Tinebase_Backend_Sql_Comman
      */
     public static function setAutocommit($adapter, $on)
     {
-        // SET AUTOCOMMIT=0 is not supported for PostgreSQL
+        // SET AUTOCOMMIT=0 is not supported for Oracle
         if ($on) {
             $adapter->query('SET AUTOCOMMIT=1;');
         } else {
