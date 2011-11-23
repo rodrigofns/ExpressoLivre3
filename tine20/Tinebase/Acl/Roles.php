@@ -157,17 +157,17 @@ class Tinebase_Acl_Roles
         $rightIdentifier = $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right');
         
         $select = $this->_db->select()
-            ->distinct()
-            ->from(SQL_TABLE_PREFIX . 'applications')
-            ->join(SQL_TABLE_PREFIX . 'role_rights', 
+            ->distinct() 
+            ->from(SQL_TABLE_PREFIX . 'role_rights', array())
+            ->join(SQL_TABLE_PREFIX . 'applications', 
                 $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.application_id') . 
-                ' = ' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.id'), array())            
+                ' = ' . $this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.id'))            
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('role_id') . ' IN (?)', $roleMemberships))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'applications.status') . ' = ?', Tinebase_Application::ENABLED))
             ->order('order', 'ASC');
         
         if ($_anyRight) {
-            $select->where($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right') . " != ''");
+            $select->where($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right') . " IS NOT NULL");
         } else {
             $select->where($this->_db->quoteInto($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.right') . ' = ?', Tinebase_Acl_Rights::RUN));
         }
@@ -206,8 +206,7 @@ class Tinebase_Acl_Roles
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier(SQL_TABLE_PREFIX . 'role_rights.application_id') . ' = ?', $application->getId()))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('role_id') . ' IN (?)', $roleMemberships))
             ->group(SQL_TABLE_PREFIX . 'role_rights.application_id');
-            //->group(SQL_TABLE_PREFIX . 'role_rights.right');
-        
+       
         $stmt = $this->_db->query($select);
 
         $row = $stmt->fetch(Zend_Db::FETCH_ASSOC);
