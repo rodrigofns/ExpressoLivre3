@@ -53,7 +53,9 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
         'blob' => array(
             'defaultType' => 'BLOB'),
         'clob' => array(
-            'defaultType' => 'CLOB'),
+            //'defaultType' => 'CLOB'),
+            'defaultType' => 'VARCHAR2',
+            'defaultLength' => 4000), 
         'enum' => array(
             'defaultType' => 'VARCHAR2',
             'declarationMethod' => '_getSpecialFieldDeclarationEnum')
@@ -134,7 +136,7 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
     
     public function getIncrementTrigger($_tableName) 
     {
-        $statement = 'CREATE TRIGGER ' . $this->_db->quoteIdentifier($this->_getIncrementTriggerName($_tableName)) . '
+        $statement = 'CREATE OR REPLACE TRIGGER ' . $this->_db->quoteIdentifier($this->_getIncrementTriggerName($_tableName)) . '
             BEFORE INSERT ON "' .  SQL_TABLE_PREFIX . $_tableName . '"
             FOR EACH ROW
             BEGIN
@@ -165,7 +167,7 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
         
         if (isset($_table->comment)) {
             //@todo support comments
-            Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . '  ignoring comment because comments are currently not supported by oracle adapter.');
+            //Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . '  ignoring comment because comments are currently not supported by oracle adapter.');
         }
         
         $statement .= implode(",\n", $statementSnippets) . "\n)";
@@ -377,10 +379,10 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
     {
         parent::dropTable($_tableName);
         try {
-    	    $statement = 'DROP SEQUENCE ' . $this->_db->quoteIdentifier($this->_getIncrementSequenceName($_tableName));
-    	    $this->execQueryVoid($statement);
+            $statement = 'DROP SEQUENCE ' . $this->_db->quoteIdentifier($this->_getIncrementSequenceName($_tableName));
+            $this->execQueryVoid($statement);
         } catch (Zend_Db_Statement_Exception $e) {
-        	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " An exception was thrown while dropping sequence for table {$_tableName}: " . $e->getMessage() . "; This might be OK if the table had no sequencer.");
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " An exception was thrown while dropping sequence for table {$_tableName}: " . $e->getMessage() . "; This might be OK if the table had no sequencer.");
         }
     }
  
@@ -430,7 +432,7 @@ class Setup_Backend_Oracle extends Setup_Backend_Abstract
     protected function _addDeclarationUnsigned(array $_buffer, Setup_Backend_Schema_Field_Abstract $_field)
     {
         if (isset($_field->unsigned) && $_field->unsigned === true) {
-            Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' $_field has property unsgined set which is currently not supported by oracle adapter; unsigned property is ignored.');
+            //Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' $_field has property unsgined set which is currently not supported by oracle adapter; unsigned property is ignored.');
         }
         return $_buffer;
     }
