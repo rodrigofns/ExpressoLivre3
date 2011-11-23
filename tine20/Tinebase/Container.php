@@ -839,7 +839,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         
         $containerId = Tinebase_Model_Container::convertContainerIdToInt($_containerId);
         
-        $aggregateFunctionStatement = Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,'container_acl.account_grant');
+        $aggregateFunctionStatement = Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant'));
 
     	$select = $this->_getSelect(array('container.id'), TRUE)
             ->where("{$this->_db->quoteIdentifier('container.id')} = ?", $containerId)
@@ -895,14 +895,14 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
                 ->join(array(
                     /* table  */ 'container_acl' => SQL_TABLE_PREFIX . 'container_acl'), 
                     /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",
-            	    /* select */ array('*', 'account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, 'container_acl.account_grant'))                    
+            	    /* select */ array('*', 'account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('container_acl.account_grant')))                    
                 )
                 ->group('container_acl.account_grant');
             
             $select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);
     
             $this->addGrantsSql($select, $accountId, '*');
-            
+        
             $stmt = $this->_db->query($select);
             $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
 	        $grants = $this->_getGrantsFromArray($rows, $accountId, $_grantModel);
@@ -942,7 +942,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             ->join(array(
                 /* table  */ 'container_acl' => SQL_TABLE_PREFIX . 'container_acl'), 
                 /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",                
-                /* select */ array('*', 'account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,'container_acl.account_grant'))
+                /* select */ array('*', 'account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant')))
             )
             ->joinLeft(array(
                 /* table  */ 'owner' => SQL_TABLE_PREFIX . 'container_acl'), 
