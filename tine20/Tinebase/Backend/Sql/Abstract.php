@@ -1235,16 +1235,16 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		$order = $select->getPart(Zend_Db_Select::ORDER);
 
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
+		//Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
 
 		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
-
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Query columns: ' . print_r($columns,true));
 
 		//$column is an array where 0 is table, 1 is field and 2 is alias
 		foreach($columns as $column)
 		{
 			$field = implode('.',$column);
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Column: ' . print_r($column,true));
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Field: ' . $field);
 			if (!in_array($field, $group))
 			{
 				// replaces * by each name of column
@@ -1257,7 +1257,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 						// checks if field has a function (that must be an aggregation)
 						$element = "{$column[0]}.$columnName";
 						if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
-						$group[] = $element;
+						{
+							$group[] = $element;
+						}
 					}
 				}
 				else
@@ -1265,7 +1267,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					// adds column into group by clause (table.field)
 					$element = "{$column[0]}.{$column[1]}";
 					if (!preg_match('/\(.*\)/',$element))
-					$group[] = $element;
+					{
+						$group[] = $element;
+					}
 				}
 			}
 		}
@@ -1285,7 +1289,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		$select->group($group);
 
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
+		//Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
 
 		return $select;
 	}	
