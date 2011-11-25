@@ -1,0 +1,62 @@
+
+
+
+                    TINE 2.0 RELEASENOTES
+                    
+Release:    Maischa (2011/05)
+
+
+Contents
+--
+
+1. VCard import in addressbook
+2. API change Tinebase_Backend_Sql / Tinebase_Backend_Sql_Abstract
+3. Move to GIT
+4. js/css description and build via jsbuilder2/jsb2tk
+5. Move to Phing
+
+-----------------
+
+1. VCard import in addressbook
+
+- It is now possible to import vcards into the addressbook and the plugin is usable in the import framework (js client + CLI)
+- We use the vcardphp class by Frank Hellwig (http://vcardphp.sourceforge.net) to parse the file 
+and the import plugin by Yann Le Moigne <segfaultmaker@gmail.com>
+
+
+2. API change Tinebase_Backend_Sql / Tinebase_Backend_Sql_Abstract
+-----------------
+
+- The constructor API has changed: all options have moved to one options param
+    public function __construct($_dbAdapter = NULL, $_options = array())
+- you can use the following options:
+     *  - modelName
+     *  - tableName
+     *  - tablePrefix
+     *  - modlogActive
+     *  - useSubselectForCount
+     
+ 3. Move to GIT
+-----------------
+ 
+ - The Sourcecode-Management-System changed from Subversion to GIT.
+ - Several subprojects got their own repositories
+ - http://git.tine20.org/git/
+ - The main reasons for this change are the fast and reliable branching and merging capabilities of GIT. 
+ With this, we hope to reach an even higher level of development productivity.
+ 
+ 
+ 4. js/css description and build via jsbuilder2/jsb2tk
+----------------- 
+- js/css Files to be included are not longer to be defined in Appname/Fontend/Http.php
+- js/css Files to be included are now defined in Appname.jsb2
+- The name of the standard Tine 2.0 fat client is FAT a appname package has to be named Appname-FAT
+- compression and inclusion is done by the jsb2tk lib (library/jsb2tk)
+
+5. Move to Phing
+-----------------
+- release.php got deleted and replaced with a phing build.xml
+- see http://www.phing.info/trac/
+- a js/css build is done by just typeing phing in the tine20 root dir
+
+     
