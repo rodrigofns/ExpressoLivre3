@@ -64,6 +64,10 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      */
     record: null,
     /**
+     * @cfg GridPanel SelectionModel
+     */
+    sm: null,
+    /**
      * @cfg {String} saveAndCloseButtonText
      * text of save and close button
      */
@@ -92,6 +96,12 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      */
     editGrant: 'editGrant',
 
+    /**
+     * Shall the MultipleEditDialogPlugin be aplied?
+     * @type Boolean
+     */
+    useMultiple: false,
+    
     /**
      * @property window {Ext.Window|Ext.ux.PopupWindow|Ext.Air.Window}
      */
@@ -179,6 +189,8 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
         // init cf plugin
         this.plugins = this.plugins ? this.plugins : [];
         this.plugins.push(new Tine.widgets.customfields.EditDialogPlugin({}));
+               
+        if(this.useMultiple) this.plugins.push(new Tine.widgets.dialog.MultipleEditDialogPlugin({}));
         
         // init actions
         this.initActions();
