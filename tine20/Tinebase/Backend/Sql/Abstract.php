@@ -773,7 +773,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
 
 		if (!$this->_hasHashId()) {
-			$newId = $this->_db->lastInsertId($this->getTablePrefix() . $this->getTableName());
+			$newId = $this->_db->lastInsertId($this->getTablePrefix() . $this->getTableName() ,$recordArray['id']);
 		}
 
 		// if we insert a record without an id, we need to get back one
