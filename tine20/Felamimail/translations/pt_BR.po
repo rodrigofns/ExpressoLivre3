@@ -625,7 +625,7 @@ msgstr[1] "Contas de Email"
 
 #: js/Model.js:488
 msgid "INBOX"
-msgstr "Caixa de Entrada"
+msgstr "Entrada"
 
 #: js/Model.js:488
 msgid "Drafts"
@@ -951,7 +951,7 @@ msgstr[1] "{0} mensagem não lidas"
 
 #: Preference.php:59
 msgid "All inboxes"
-msgstr "Todas as caixa de entrada"
+msgstr "Todas as caixas de entrada"
 
 #: Preference.php:106
 msgid "Default Email Account"
