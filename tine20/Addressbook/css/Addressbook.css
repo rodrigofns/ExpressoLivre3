@@ -1,0 +1,26 @@
+.action_addList {
+	background-image:url(../../images/oxygen/16x16/actions/users.png) !important;
+}
+.x-btn-medium .action_addList {
+    background-image:url(../../images/oxygen/22x22/actions/users.png) !important;
+}
+.x-btn-large .action_addList {
+    background-image:url(../../images/oxygen/32x32/actions/users.png) !important;
+}
+
+
+.AddressbookIconCls {
+    background-image:url(../../images/oxygen/16x16/apps/kaddressbook.png) !important;
+}
+.x-btn-medium .AddressbookIconCls {
+    background-image:url(../../images/oxygen/22x22/apps/kaddressbook.png) !important;
+}
+.x-btn-large .AddressbookIconCls {
+    background-image:url(../../images/oxygen/32x32/apps/kaddressbook.png) !important;
+}
+
+
+.x-form-item-float-left {
+    float: left;
+    margin-right: 5px;
+}

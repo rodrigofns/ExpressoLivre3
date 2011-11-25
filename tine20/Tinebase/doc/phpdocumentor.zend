@@ -1,0 +1,17 @@
+;Configuration File made by Zend Studio PHPDocumentor Wizard, Mon Aug 13 19:35:00 CEST 2007
+directory=/home/lkneschke/Documents/officespot-cs/trunk/egroupware20
+
+output=HTML:frames:earthli
+
+javadocdesc=off
+
+parseprivate=off
+
+sourcecode=on
+
+target=/home/lkneschke/Documents/officespot-cs/trunk/phpdoc
+
+title=eGroupWare 2.0
+
+pear=off
+

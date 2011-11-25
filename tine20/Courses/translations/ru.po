@@ -1,0 +1,139 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tine 2.0 - Courses\n"
+"POT-Creation-Date: 2008-05-17 22:12+0100\n"
+"PO-Revision-Date: 2009-07-19 22:58+0300\n"
+"Last-Translator: Nikolay Parukhin <nik@sevpinro.ru>\n"
+"Language-Team: Tine 2.0 Translators\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: Controller/Course.php:107
+msgid "teacher"
+msgstr "преподаватель"
+
+#: Controller/Course.php:115
+msgid "Teacher"
+msgstr "Преподаватель"
+
+#: Controller/Course.php:116
+msgid "Teacher Account"
+msgstr "Учётная запись преподавателя"
+
+#: js/CourseGridPanel.js:49
+msgid "Quick search"
+msgstr ""
+
+#: js/CourseGridPanel.js:71
+msgid "Name"
+msgstr "Имя"
+
+#: js/CourseGridPanel.js:77
+msgid "Type"
+msgstr "Тип"
+
+#: js/CourseGridPanel.js:84 js/CourseEditDialog.js:178
+msgid "Internet Access"
+msgstr "Доступ в интернет"
+
+#: js/CourseGridPanel.js:92 js/CourseEditDialog.js:184
+msgid "Fileserver Access"
+msgstr "Доступ к файловому серверу"
+
+#: js/CourseGridPanel.js:118
+msgid "Internet Access On"
+msgstr "Доступ в интернет вкл."
+
+#: js/CourseGridPanel.js:129
+msgid "Internet Access Off"
+msgstr "Доступ в интернет выкл."
+
+#: js/CourseGridPanel.js:140
+msgid "Fileserver Access On"
+msgstr "Доступ к файловому серверу вкл."
+
+#: js/CourseGridPanel.js:151
+msgid "Fileserver Access Off"
+msgstr "Доступ к файловому серверу выкл."
+
+#: js/CourseGridPanel.js:211
+msgid "Failed"
+msgstr "Сбой"
+
+#: js/CourseGridPanel.js:212
+msgid "Some error occured while trying to update the courses."
+msgstr "Произошла ошибка при попытке обновить курсы."
+
+#: js/CourseEditDialog.js:31
+msgid "Import course members"
+msgstr "Импорт членов курса"
+
+#: js/CourseEditDialog.js:137 js/Models.js:41 Frontend/Json.php:254
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] "Курс"
+msgstr[1] "Курса"
+msgstr[2] "Курсов"
+
+#: js/CourseEditDialog.js:153
+msgid "Course Name"
+msgstr "Название курса"
+
+#: js/CourseEditDialog.js:160
+msgid "Course / School Type"
+msgstr "Тип курсов/школы"
+
+#: js/CourseEditDialog.js:171
+msgid "Description"
+msgstr "Описание"
+
+#: js/CourseEditDialog.js:215
+msgid "Members"
+msgstr "Члены"
+
+#: js/CourseEditDialog.js:241
+msgid "Login"
+msgstr "Вход"
+
+#: js/CourseEditDialog.js:245
+msgid "unknown"
+msgstr ""
+
+#: js/CourseEditDialog.js:250
+msgid "Reset Password"
+msgstr "Сброс пароля"
+
+#: js/CourseEditDialog.js:268
+msgid "Set new password"
+msgstr "Задать новый пароль"
+
+#: js/CourseEditDialog.js:268
+msgid "Please enter the new password:"
+msgstr "Пожалуйста, введите новый пароль:"
+
+#: js/Courses.js:32 Setup/setup.xml:4
+msgid "Courses"
+msgstr "Курсы"
+
+#: js/Courses.js:37
+msgid "All Courses"
+msgstr "Все курсы"
+
+#: js/Models.js:45
+msgid "record list"
+msgid_plural "record lists"
+msgstr[0] "список записей"
+msgstr[1] "списка записей"
+msgstr[2] "списков записей"
+
+#: js/Models.js:74
+msgid "Course Type"
+msgid_plural "Course Types"
+msgstr[0] "Тип курсов"
+msgstr[1] "Типа курсов"
+msgstr[2] "Типов курсов"
