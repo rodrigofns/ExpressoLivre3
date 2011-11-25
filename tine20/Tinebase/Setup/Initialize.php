@@ -45,7 +45,8 @@ class Tinebase_Setup_Initialize extends Setup_Initialize
     }
     
     /**
-     * 
+     * This method is necessary only if Oracle is used.
+     * @todo discover a way to replace this code for an equivalent in Tinebase_Backend_Sql_Command
      */
     protected function _initProcedures()
     {
