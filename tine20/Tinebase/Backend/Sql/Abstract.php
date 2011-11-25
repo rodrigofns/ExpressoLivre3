@@ -1244,7 +1244,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		//$column 0 - table, 1 - field, 2 - alias
 		foreach($columns as $column)
 		{
-			$field = explode('.',$column);
+			$field = implode('.',$column);
 			if (!in_array($group,$field))
 			{
 				// replaces * by each name of column

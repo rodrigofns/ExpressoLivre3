@@ -459,7 +459,7 @@ class Tinebase_Tags
         
         Tinebase_Backend_Sql_Abstract::traitGroup($this->_db,$tablePrefix,$select);
         
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Grouping used for tags of records: ' . print_r($select, TRUE));
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Grouping used for tags of records: ' . print_r($select->assemble(), TRUE));
 
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
