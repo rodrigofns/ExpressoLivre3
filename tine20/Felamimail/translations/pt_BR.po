@@ -48,7 +48,7 @@ msgstr "Rascunho"
 
 #: Controller/Message/Flags.php:28
 msgid "Flagged"
-msgstr "Marcado"
+msgstr "Marcada"
 
 #: Controller/Message/Send.php:236
 #: js/GridDetailsPanel.js:135
@@ -184,7 +184,7 @@ msgstr "Outras Configurações"
 
 #: js/AccountEditDialog.js:270
 msgid "Sent Folder Name"
-msgstr "Nome da pasta Enviados"
+msgstr "Nome da pasta Enviadas"
 
 #: js/AccountEditDialog.js:276
 msgid "Trash Folder Name"
@@ -438,7 +438,7 @@ msgstr "Id"
 #: js/GridPanel.js:480
 #: js/Model.js:146
 msgid "Flags"
-msgstr "Marcações"
+msgstr "Marcadores"
 
 #: js/GridPanel.js:493
 #: js/Model.js:141
@@ -463,12 +463,12 @@ msgstr "Destinatário"
 #: js/GridPanel.js:519
 #: js/Model.js:488
 msgid "Sent"
-msgstr "Enviado"
+msgstr "Enviadas"
 
 #: js/GridPanel.js:527
 #: js/Model.js:149
 msgid "Received"
-msgstr "Recebido"
+msgstr "Recebidas"
 
 #: js/GridPanel.js:542
 #: js/sieve/RuleConditionsPanel.js:73
@@ -477,7 +477,7 @@ msgstr "Tamanho"
 
 #: js/GridPanel.js:585
 msgid "Forwarded"
-msgstr "Encaminhado"
+msgstr "Encaminhadas"
 
 #: js/GridPanel.js:588
 msgid "Recent"
@@ -526,7 +526,7 @@ msgstr "Salvar nota de email"
 
 #: js/MessageEditDialog.js:174
 msgid "Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s)."
-msgstr "Ativar botão para salvar texto do email como uma nota anexada ao(s) respectivo(s) contato(s) do(s) destinatário(s)."
+msgstr "Ativar botão para salvar texto da mensagem como uma nota anexada ao(s) destinatário(s) no seu Catálogo de Endereços."
 
 #: js/MessageEditDialog.js:192
 msgid "Click to search for and add recipients from the Addressbook."
@@ -572,7 +572,7 @@ msgstr "Por favor corrija os erros encontrados."
 #: js/MessageEditDialog.js:607
 #: js/MessageEditDialog.js:869
 msgid "Compose email:"
-msgstr "Criar email:"
+msgstr "Compor mensagem:"
 
 #: js/MessageEditDialog.js:657
 msgid "Add Note"
