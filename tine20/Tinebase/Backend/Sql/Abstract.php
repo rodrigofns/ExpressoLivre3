@@ -775,7 +775,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
 
 		if (!$this->_hasHashId()) {
-			$newId = $this->_db->lastInsertId($this->getTablePrefix() . $this->getTableName() ,$recordArray['id']);
+			$fullTableName = $this->getTablePrefix() . $this->getTableName();
+			$newId = $this->_db->lastInsertId($fullTableName , $this->_getPrimaryKey($fullTableName));
 		}
 
 		// if we insert a record without an id, we need to get back one
@@ -1287,5 +1288,26 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
 
 		return $select;
-	}
+	}	
+	
+	/**
+	 * Get the primary key name through table metadata
+	 * @param full table name $table
+	 */
+	protected function _getPrimaryKey($table)
+	{
+		$metadata = $this->_db->describeTable($table);
+		
+		$primaryKey = NULL;
+		
+		foreach($metadata as $field => $description)
+		{
+			if ($description["PRIMARY"])
+			{
+				$primaryKey = $field;
+				break;
+			} 		
+		}
+		return $primaryKey;
+	} 
 }
