@@ -32,15 +32,15 @@ msgstr "Criar novas contas de email"
 #: Controller/Message/Flags.php:24
 #: js/GridPanel.js:582
 msgid "Answered"
-msgstr "Respondido"
+msgstr "Respondida"
 
 #: Controller/Message/Flags.php:25
 msgid "Seen"
-msgstr "Lido"
+msgstr "Lida"
 
 #: Controller/Message/Flags.php:26
 msgid "Deleted"
-msgstr "Excluído"
+msgstr "Excluída"
 
 #: Controller/Message/Flags.php:27
 msgid "Draft"
@@ -406,7 +406,7 @@ msgstr "Alternar destaque"
 
 #: js/GridPanel.js:283
 msgid "Mark read/unread"
-msgstr "Marcar lido/não lido"
+msgstr "Marcar lida/não lida"
 
 #: js/GridPanel.js:293
 #: js/GridPanel.js:294
