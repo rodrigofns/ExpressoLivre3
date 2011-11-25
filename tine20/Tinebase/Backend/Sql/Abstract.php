@@ -1206,4 +1206,86 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     {
         return $this->_db;
     }
+    
+	/**
+	 * ensures that columns in a select using
+	 * group by clause are into group
+	 * @param Zend_Db_Select $select
+	 */
+	protected function _traitGroup(Zend_Db_Select $select)
+	{
+		$select = self::traitGroup($this->_db,$this->_tablePrefix, $select);		
+	}
+	
+	/**
+	 * 
+	 * Public service for grouping treatment
+	 * @param Zend_Db_Adapter $adapter
+	 * @param string $tablePrefix
+	 * @param Zend_Db_Select $select
+	 */
+	public static function traitGroup($adapter, $tablePrefix, Zend_Db_Select $select)
+	{
+		$group = $select->getPart(Zend_Db_Select::GROUP);
+		
+		if (empty($group)) return;				
+		
+		$order = $select->getPart(Zend_Db_Select::ORDER);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
+		
+		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Query columns: ' . print_r($columns,true));
+		
+		//$column 0 - table, 1 - field, 2 - alias
+		foreach($columns as $column)
+		{
+			$field = explode('.',$column);
+			if (!in_array($group,$field))
+			{
+				// replaces * by each name of column
+				if ($column[1] == '*')
+				{
+					$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
+					foreach($tableFields as $columnName => $schema)
+					{
+						// adds columns into group by clause (table.field)
+						// checks if field has a function (that must be an aggregation)
+						$element = "{$column[0]}.$columnName";
+						if (!in_array($group,$element) && !preg_match('/\(.*\)/',$element))
+						$group[] = $element;
+					}
+				}
+				else
+				{
+					// adds column into group by clause (table.field)
+					$element = "{$column[0]}.{$column[1]}";
+					if (!preg_match('/\(.*\)/',$element))
+					$group[] = $element;
+				}
+			}
+		}
+		
+		// find fields in order by clause that are not into group by 
+		foreach($order as $column)
+		{
+			$field = $column[0];
+			if (!in_array($group,$field))
+			{
+				// adds column into group by clause (table.field)
+				$group[] = $field;
+			}			
+		}
+		
+		$select->reset(Zend_Db_Select::GROUP);
+		
+		$select->group($group);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
+		
+		return $select;
+	}
+
+}    
 }
