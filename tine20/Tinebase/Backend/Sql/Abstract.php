@@ -1241,11 +1241,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Query columns: ' . print_r($columns,true));
 
-		//$column 0 - table, 1 - field, 2 - alias
+		//$column is an array where 0 is table, 1 is field and 2 is alias
 		foreach($columns as $column)
 		{
 			$field = implode('.',$column);
-			if (!in_array($group,$field))
+			if (!in_array($field, $group))
 			{
 				// replaces * by each name of column
 				if ($column[1] == '*')
@@ -1256,7 +1256,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 						// adds columns into group by clause (table.field)
 						// checks if field has a function (that must be an aggregation)
 						$element = "{$column[0]}.$columnName";
-						if (!in_array($group,$element) && !preg_match('/\(.*\)/',$element))
+						if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
 						$group[] = $element;
 					}
 				}
@@ -1274,7 +1274,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		foreach($order as $column)
 		{
 			$field = $column[0];
-			if (!in_array($group,$field))
+			if (!in_array($field,$group))
 			{
 				// adds column into group by clause (table.field)
 				$group[] = $field;
