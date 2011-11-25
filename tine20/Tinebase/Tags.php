@@ -458,6 +458,8 @@ class Tinebase_Tags
         $tablePrefix = substr($from[0],0,strpos($from[0],'_')+1); // get the table prefix that ends in first occurrence of underscore
         
         Tinebase_Backend_Sql_Abstract::traitGroup($this->_db,$tablePrefix,$select);
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Grouping used for tags of records: ' . print_r($select, TRUE));
 
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
