@@ -81,9 +81,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         $statementSnippets = array();
 
         // get primary key now because it is necessary in two places
-        $primaryKey = $this->_getPrimaryKeyName($_table);
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " primaryKey before: $primaryKey");
+        $primaryKey = $this->_getPrimaryKeyName($_table);        
 
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
@@ -129,7 +127,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 
         $statement .= implode(",\n", $statementSnippets) . "\n)";
 
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement . "\n primaryKey : $primaryKey");        
+        //Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement . "\n primaryKey : $primaryKey");        
         
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
