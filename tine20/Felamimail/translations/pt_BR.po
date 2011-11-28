@@ -216,7 +216,7 @@ msgstr "Dependendo do content type (experimental)"
 
 #: js/AddressbookGridPanelHook.js:33
 msgid "Compose email"
-msgstr "Criar email"
+msgstr "Compor mensagem"
 
 #: js/ContactGrid.js:254
 msgid "Add as \"To\""
@@ -941,7 +941,7 @@ msgstr "Última atualização:"
 #: js/TreePanel.js:730
 #, python-format
 msgid "Fetching messages... ({0}% done)"
-msgstr "Fetching messages... ({0}% done)"
+msgstr "Trazendo mensagens... ({0}% done)"
 
 #: js/TreePanel.js:746
 msgid "{0} unread message"
@@ -975,7 +975,7 @@ msgstr "Usar no Catálogo de Endereços"
 
 #: Preference.php:115
 msgid "Compose Emails from the Addressbook with Felamimail."
-msgstr "Criar mensagens originadas no Catálogo de Endereços usando o Felamimail."
+msgstr "Compor mensagens originadas no Catálogo de Endereços usando o Felamimail."
 
 #: Preference.php:118
 msgid "Use for NOTES"
