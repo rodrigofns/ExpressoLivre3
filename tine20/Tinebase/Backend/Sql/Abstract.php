@@ -1250,15 +1250,12 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			foreach($columns as $column)
 			{
 				$field = implode('.',$column);
-				Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Column: ' . print_r($column,true));
-				Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Field: ' . $field);
 				if (!in_array($field, $group))
 				{
 					// replaces * by each name of column
 					if ($column[1] == '*')
 					{
-						$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
-						Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' table fields: ' . print_r($tableFields,true));
+						$tableFields = $adapter->describeTable($tablePrefix . $column[0]);						
 						foreach($tableFields as $columnName => $schema)
 						{
 							// adds columns into group by clause (table.field)
