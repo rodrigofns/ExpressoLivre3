@@ -257,7 +257,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$this->_traitGroup($select);
-		
+
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetch();
 		$stmt->closeCursor();
@@ -611,7 +611,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
 	{
 		Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix,$_select);
-		
+
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
 
 		$stmt = $this->_db->query($_select);
@@ -691,7 +691,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$selectArray = (array_key_exists('select', $join))
 					? $join['select']
 					: ((array_key_exists('field', $join) && (! array_key_exists('singleValue', $join) || ! $join['singleValue']))
-					? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier($join['table'] . '.' . $join['field'])))					
+					? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier($join['table'] . '.' . $join['field'])))
 					: array($foreignColumn => $join['table'] . '.id'));
 					$joinId = (array_key_exists('joinId', $join)) ? $join['joinId'] : $this->_identifier;
 
@@ -1012,21 +1012,21 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		$myFields = array();
 		$customFields = array();
-		 
+			
 		foreach($_data as $key => $value) {
 			if(stristr($key, '#')) $customFields[substr($key,1)] = $value;
 			else $myFields[$key] = $value;
 		}
-		 
+			
 		// handle CustomFields
-		 
+			
 		if(count($customFields)) {
 			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' CustomFields found.');
 			Tinebase_CustomField::getInstance()->saveMultipleCustomFields($this->_modelName, $_ids, $customFields);
 		}
-		 
+			
 		// handle StdFields
-		 
+			
 		if(!count($myFields)) { return 0; }
 
 		$identifier = $this->_getRecordIdentifier();
@@ -1234,6 +1234,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$group = $select->getPart(Zend_Db_Select::GROUP);
 
 		if (empty($group)) return;
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true));		
 
 		$order = $select->getPart(Zend_Db_Select::ORDER);
 
@@ -1241,61 +1243,68 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
 
-		//$column is an array where 0 is table, 1 is field and 2 is alias
-		foreach($columns as $column)
-		{
-			$field = implode('.',$column);
-			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Column: ' . print_r($column,true));
-			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Field: ' . $field);
-			if (!in_array($field, $group))
+
+		try {
+				
+			//$column is an array where 0 is table, 1 is field and 2 is alias
+			foreach($columns as $column)
 			{
-				// replaces * by each name of column
-				if ($column[1] == '*')
+				$field = implode('.',$column);
+				Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Column: ' . print_r($column,true));
+				Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Field: ' . $field);
+				if (!in_array($field, $group))
 				{
-					$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
-					foreach($tableFields as $columnName => $schema)
+					// replaces * by each name of column
+					if ($column[1] == '*')
 					{
-						// adds columns into group by clause (table.field)
-						// checks if field has a function (that must be an aggregation)
-						$element = "{$column[0]}.$columnName";
-						if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
+						$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
+						foreach($tableFields as $columnName => $schema)
+						{
+							// adds columns into group by clause (table.field)
+							// checks if field has a function (that must be an aggregation)
+							$element = "{$column[0]}.$columnName";
+							if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
+							{
+								$group[] = $element;
+							}
+						}
+					}
+					else
+					{
+						// adds column into group by clause (table.field)
+						$element = "{$column[0]}.{$column[1]}";
+						if (!preg_match('/\(.*\)/',$element))
 						{
 							$group[] = $element;
 						}
 					}
 				}
-				else
+			}
+
+			// find fields in order by clause that are not into group by
+			foreach($order as $column)
+			{
+				$field = $column[0];
+				if (!in_array($field,$group))
 				{
 					// adds column into group by clause (table.field)
-					$element = "{$column[0]}.{$column[1]}";
-					if (!preg_match('/\(.*\)/',$element))
-					{
-						$group[] = $element;
-					}
+					$group[] = $field;
 				}
 			}
+
+			$select->reset(Zend_Db_Select::GROUP);
+
+			$select->group($group);
+		} catch (Exception $e) {
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );
 		}
 
-		// find fields in order by clause that are not into group by
-		foreach($order as $column)
-		{
-			$field = $column[0];
-			if (!in_array($field,$group))
-			{
-				// adds column into group by clause (table.field)
-				$group[] = $field;
-			}
-		}
-
-		$select->reset(Zend_Db_Select::GROUP);
-
-		$select->group($group);
 
 		//Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
 
 		return $select;
-	}	
-	
+	}
+
 	/**
 	 * Get the primary key name through table metadata
 	 * @param full table name $table
@@ -1303,17 +1312,17 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _getPrimaryKey($table)
 	{
 		$metadata = $this->_db->describeTable($table);
-		
+
 		$primaryKey = NULL;
-		
+
 		foreach($metadata as $field => $description)
 		{
 			if ($description["PRIMARY"])
 			{
 				$primaryKey = $field;
 				break;
-			} 		
+			}
 		}
 		return $primaryKey;
-	} 
+	}
 }
