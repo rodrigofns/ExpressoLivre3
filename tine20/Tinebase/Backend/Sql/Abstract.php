@@ -1258,11 +1258,13 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					if ($column[1] == '*')
 					{
 						$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
+						Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' table fields: ' . print_r($tableFields,true));
 						foreach($tableFields as $columnName => $schema)
 						{
 							// adds columns into group by clause (table.field)
 							// checks if field has a function (that must be an aggregation)
 							$element = "{$column[0]}.$columnName";
+							Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' element: ' . $element);
 							if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
 							{
 								$group[] = $element;
@@ -1291,6 +1293,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$group[] = $field;
 				}
 			}
+			
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified Group: ' . print_r($group,true));
 
 			$select->reset(Zend_Db_Select::GROUP);
 
