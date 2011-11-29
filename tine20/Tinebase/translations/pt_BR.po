@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-11-29 11:52-0300\n"
+"PO-Revision-Date: 2011-11-29 11:56-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -1684,7 +1684,7 @@ msgstr "Enviar Relatório"
 #: js/ExceptionDialog.js:75
 #: Frontend/Http.php:385
 msgid "An error occurred, the program ended abnormal."
-msgstr "Um erro ocorreu, programa foi finalizado anormalmente."
+msgstr "Um erro ocorreu, programa foi finalizado de forma anormal."
 
 #: js/ExceptionDialog.js:76
 msgid "The last action you made was potentially not performed correctly."
