@@ -1238,7 +1238,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	{
 		$group = $select->getPart(Zend_Db_Select::GROUP);
 		
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true));		
+		$e = new Exception();
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Backtrace: ' . print_r(debug_backtrace(),true) );		
 
 		if (empty($group)) return;		
 
