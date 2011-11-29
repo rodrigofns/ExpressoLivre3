@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-11-29 11:30-0300\n"
+"PO-Revision-Date: 2011-11-29 11:37-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -615,7 +615,7 @@ msgstr "Recarregar {0}"
 #: js/widgets/grid/FilterToolbar.js:78
 #: js/widgets/grid/FilterToolbar.js:442
 msgid "Show"
-msgstr "Mostrar"
+msgstr "Exibir"
 
 #: js/widgets/grid/FilterToolbar.js:144
 msgid "add new filter"
@@ -745,11 +745,11 @@ msgstr "Não foi possível excluir {0}."
 
 #: js/widgets/grid/FilterToolbarQuickFilterPlugin.js:181
 msgid "show details"
-msgstr "mostrar detalhes"
+msgstr "exibir detalhes"
 
 #: js/widgets/grid/FilterToolbarQuickFilterPlugin.js:182
 msgid "Always show advanced filters"
-msgstr "Sempre mostrar filtros avançados"
+msgstr "Sempre exibir filtros avançados"
 
 #: js/widgets/grid/FilterToolbarQuickFilterPlugin.js:368
 msgid "Your view is limited by {0} criteria:"
@@ -1651,7 +1651,7 @@ msgstr "Excluir Imagem"
 
 #: js/ux/form/ImageField.js:212
 msgid "Show Original Image"
-msgstr "Mostrar Imagem Original"
+msgstr "Exibir Imagem Original"
 
 #: js/ux/form/ImageField.js:274
 msgid "Image Failed"
@@ -1968,7 +1968,7 @@ msgstr "Aplicação Padrão"
 
 #: Preference.php:96
 msgid "The default application to show after login."
-msgstr "A aplicação padrão a ser visualizada após o login."
+msgstr "A aplicação padrão a ser exibida após o login."
 
 #: Preference.php:99
 msgid "Window Type"
@@ -1984,7 +1984,7 @@ msgstr "Confirmar Saída"
 
 #: Preference.php:104
 msgid "Show confirmation dialog on logout."
-msgstr "Mostrar diálogo de confirmação ao sair."
+msgstr "Exibir diálogo de confirmação ao sair."
 
 #: Frontend/Http.php:358
 #, fuzzy
