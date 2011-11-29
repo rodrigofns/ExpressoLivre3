@@ -1237,10 +1237,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	public static function traitGroup($adapter, $tablePrefix, Zend_Db_Select $select)
 	{
 		$group = $select->getPart(Zend_Db_Select::GROUP);
-		
-		$e = new Exception();
-		
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Backtrace: ' . print_r(debug_backtrace(FALSE),true) );		
+
+		// Emulates an exception
+		try {throw new Exception();} catch (Exception $e) {
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Backtrace: ' .  $e->getTraceAsString());
+		}				
 
 		if (empty($group)) return;		
 
