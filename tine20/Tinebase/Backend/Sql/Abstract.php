@@ -501,6 +501,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			$countSelect = $this->_getSelect($searchCountCols);
 			$this->_addFilter($countSelect, $_filter);
 		}
+		
+		$this->_traitGroup($countSelect);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
 

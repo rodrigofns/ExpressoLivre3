@@ -456,9 +456,7 @@ class Tinebase_Tags
         
         $from = $select->getPart(Zend_Db_Select::FROM); // get FROM clause
         $tableName = $from['tagging']['tableName'];
-        $tablePrefix = substr($tableName,0,strpos($tableName,'_')+1); // get the table prefix that ends in first occurrence of underscore        
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'SELECT : '. print_r($select,true) . ' From: '. $from . ' Table prefix: ' . $tablePrefix);
+        $tablePrefix = substr($tableName,0,strpos($tableName,'_')+1); // get the table prefix that ends in first occurrence of underscore
         
         Tinebase_Backend_Sql_Abstract::traitGroup($this->_db,$tablePrefix,$select);        
 
