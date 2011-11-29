@@ -1,0 +1,962 @@
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2011-11-29 08:35-0300\n"
+"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: pt_BR\n"
+"X-Poedit-Country: BRAZIL\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: Controller/Container.php:185
+msgid "Your container has been changed"
+msgstr "Seu contêiner foi alterado"
+
+#: Controller/Container.php:186
+msgid "Your container has been changed by %1$s %2$sNote: %3$s"
+msgstr "Seu contêiner foi alterado por %1$s..."
+
+#: Acl/Rights.php:185
+msgid "manage access log"
+msgstr "Administrar log de acesso"
+
+#: Acl/Rights.php:186
+msgid "delete access log entries"
+msgstr "excluir entradas da log de acesso"
+
+#: Acl/Rights.php:189
+msgid "manage accounts"
+msgstr "administrar contas"
+
+#: Acl/Rights.php:190
+msgid "add and edit users and groups, add group members, change user passwords"
+msgstr "adicionar e editar usuários e grupos. adicionar membros a grupos, adcionar direitos sbre aplicações aos pepéis"
+
+#: Acl/Rights.php:193
+msgid "manage applications"
+msgstr "administrar aplicações"
+
+#: Acl/Rights.php:194
+msgid "enable and disable applications, edit application settings"
+msgstr "habilitar e desabilitar aplicações, editar definições de aplicações"
+
+#: Acl/Rights.php:197
+msgid "manage roles"
+msgstr "administrar papéis"
+
+#: Acl/Rights.php:198
+msgid "add and edit roles, add new members to roles, add application rights to roles"
+msgstr "adicionar e editar papéis, adicionar novos membros para papéis, adicionar direitos sobre aplicações a papéis"
+
+#: Acl/Rights.php:201
+msgid "manage shared tags"
+msgstr "administrar marcadores compartilhados"
+
+#: Acl/Rights.php:202
+msgid "add, delete and edit shared tags"
+msgstr "adicionar, excluir e editar marcadores compartilhados"
+
+#: Acl/Rights.php:205
+msgid "manage computers"
+msgstr "administrar computadores"
+
+#: Acl/Rights.php:206
+msgid "add, delete and edit (samba) computers"
+msgstr "adicionar, excluir e editar (samba) computadores"
+
+#: Acl/Rights.php:209
+msgid "manage containers"
+msgstr "administrar contêiners"
+
+#: Acl/Rights.php:210
+msgid "add, delete and edit containers and manage container grants"
+msgstr "adicionar,excluir e editar contêiners e administrar privilégios nos contêiners"
+
+#: Acl/Rights.php:213
+msgid "view access log"
+msgstr "visualizar log de acesso"
+
+#: Acl/Rights.php:214
+msgid "view access log list"
+msgstr "visualizar a lista de log de acesso"
+
+#: Acl/Rights.php:217
+msgid "view accounts"
+msgstr "visualizar contas"
+
+#: Acl/Rights.php:218
+msgid "view accounts list and details"
+msgstr "visualizar lista dos detalhes das contas"
+
+#: Acl/Rights.php:221
+msgid "view applications"
+msgstr "visualizar aplicações"
+
+#: Acl/Rights.php:222
+msgid "view applications list and details"
+msgstr "visualizar lista dods detalhes das aplicações"
+
+#: Acl/Rights.php:225
+msgid "view roles"
+msgstr "visualizar papéis"
+
+#: Acl/Rights.php:226
+msgid "view roles list and details"
+msgstr "visualizar lista de detalhes dos papéis"
+
+#: Acl/Rights.php:229
+msgid "view computers"
+msgstr "visualizar computadores"
+
+#: Acl/Rights.php:230
+msgid "view computers list and details"
+msgstr "visualizar lista de detalhes de computadores"
+
+#: Acl/Rights.php:233
+msgid "view containers"
+msgstr "visualizar contêiners"
+
+#: Acl/Rights.php:234
+msgid "view personal and shared containers"
+msgstr "visualizar cotêiners pessoal e compartilhado"
+
+#: js/SambaMachineGrid.js:61
+#: js/SambaMachineEditDialog.js:42
+msgid "Computer Name"
+msgstr "Nome do Computador"
+
+#: js/SambaMachineGrid.js:62
+#: js/SambaMachineGrid.js:92
+#: js/Groups.js:236
+#: js/RoleEditDialog.js:291
+#: js/user/GridPanel.js:99
+#: js/GroupEditDialog.js:135
+#: js/TagEditDialog.js:225
+#: js/Roles.js:239
+#: js/Tags.js:226
+msgid "Description"
+msgstr "Descrição"
+
+#: js/SambaMachineGrid.js:79
+#: js/container/GridPanel.js:70
+#: js/Groups.js:234
+#: js/user/GridPanel.js:175
+#: js/Roles.js:237
+msgid "ID"
+msgstr "ID"
+
+#: js/SambaMachineGrid.js:86
+#: js/container/EditDialog.js:122
+#: js/Groups.js:235
+#: js/user/EditDialog.js:278
+#: js/user/EditDialog.js:314
+#: js/Applications.js:278
+#: js/Roles.js:238
+#: js/Tags.js:225
+#: js/AccessLog.js:131
+msgid "Name"
+msgstr "Nome"
+
+#: js/container/Container.js:46
+#: js/container/GridPanel.js:103
+msgid "Container"
+msgid_plural "Containers"
+msgstr[0] "Contêiner"
+msgstr[1] "Contêiners"
+
+#: js/container/GridPanel.js:71
+msgid "Container Name"
+msgstr "Nome do Computador"
+
+#: js/container/GridPanel.js:72
+#: js/container/EditDialog.js:134
+#: js/ApplicationFilter.js:33
+#: js/Models.js:128
+msgid "Application"
+msgid_plural "Applications"
+msgstr[0] "Aplicação"
+msgstr[1] "Aplicações"
+
+#: js/container/GridPanel.js:73
+#: js/container/GridPanel.js:104
+#: js/container/EditDialog.js:141
+msgid "Type"
+msgstr "Tipo"
+
+#: js/container/EditDialog.js:142
+msgid "personal"
+msgstr "pessoal"
+
+#: js/container/EditDialog.js:142
+msgid "shared"
+msgstr "compartilhado"
+
+#: js/container/EditDialog.js:154
+#: js/TagEditDialog.js:231
+#: js/Tags.js:222
+msgid "Color"
+msgstr "Cor"
+
+#: js/container/EditDialog.js:159
+msgid "Note for Owner"
+msgstr "Nota do Proprietário"
+
+#: js/Groups.js:52
+#: js/Roles.js:47
+#: js/Tags.js:64
+msgid "Confirm"
+msgstr "Confirma"
+
+#: js/Groups.js:52
+msgid "Do you really want to delete the selected groups?"
+msgstr "Você tem certeza que quer excluir os grupos selecionados?"
+
+#: js/Groups.js:69
+msgid "Deleting group(s)..."
+msgstr "Deletando grup(s)..."
+
+#: js/Groups.js:74
+#: js/RoleEditDialog.js:106
+#: js/RoleEditDialog.js:134
+#: js/GroupEditDialog.js:72
+#: js/TagEditDialog.js:82
+#: js/Roles.js:69
+msgid "Failed"
+msgstr "Falhoe"
+
+#: js/Groups.js:74
+msgid "Some error occurred while trying to delete the group."
+msgstr "Alguns erros ocorreram quando tentava excluir o grupo."
+
+#: js/Groups.js:104
+msgid "add group"
+msgstr "adicionar grupo"
+
+#: js/Groups.js:112
+msgid "edit group"
+msgstr "editar grupo"
+
+#: js/Groups.js:120
+msgid "delete group"
+msgstr "excluir grupo"
+
+#: js/Groups.js:176
+#: js/Applications.js:183
+#: js/Roles.js:176
+#: js/Tags.js:169
+msgid "Search:"
+msgstr "Pesquisar:"
+
+#: js/Groups.js:223
+msgid "Displaying groups {0} - {1} of {2}"
+msgstr "Exibindo grupos {0} - {1} de {2}"
+
+#: js/Groups.js:224
+#: js/Groups.js:278
+msgid "No groups to display"
+msgstr "Nenhum grupo para exibir"
+
+#: js/SambaMachineModel.js:39
+msgid "Computer"
+msgid_plural "Computers"
+msgstr[0] "Computador"
+msgstr[1] "Computadores"
+
+#: js/RoleEditDialog.js:69
+#: js/GroupEditDialog.js:37
+#: js/TagEditDialog.js:37
+msgid "Please wait"
+msgstr "Aguarde"
+
+#: js/RoleEditDialog.js:69
+#: js/GroupEditDialog.js:37
+msgid "Updating Memberships"
+msgstr "Atualizando Participantes"
+
+#: js/RoleEditDialog.js:106
+msgid "Could not save role."
+msgstr "Não pode salvar o papel."
+
+#: js/RoleEditDialog.js:113
+#: js/GroupEditDialog.js:77
+#: js/TagEditDialog.js:87
+msgid "Errors"
+msgstr "Erros"
+
+#: js/RoleEditDialog.js:113
+#: js/GroupEditDialog.js:77
+#: js/TagEditDialog.js:87
+msgid "Please fix the errors noted."
+msgstr "Por favor, corrija os erros."
+
+#: js/RoleEditDialog.js:126
+msgid "Deleting role..."
+msgstr "Deletando papel..."
+
+#: js/RoleEditDialog.js:134
+#: js/Roles.js:69
+msgid "Some error occurred while trying to delete the role."
+msgstr "Alguns erros ocorreram enquanto tentava excluir o papel."
+
+#: js/RoleEditDialog.js:158
+msgid "Rights"
+msgstr "Direitos"
+
+#: js/RoleEditDialog.js:260
+msgid "Members"
+msgstr "Membros"
+
+#: js/RoleEditDialog.js:283
+msgid "Role Name"
+msgstr "Nome do Papel"
+
+#: js/RoleEditDialog.js:358
+#: js/GroupEditDialog.js:215
+#: js/TagEditDialog.js:289
+msgid "Transferring {0}..."
+msgstr "Transferindo {0}..."
+
+#: js/RoleEditDialog.js:358
+msgid "Role"
+msgstr "Papel"
+
+#: js/RoleEditDialog.js:368
+msgid "Add New Role"
+msgstr "Adicionar Novo Papel"
+
+#: js/RoleEditDialog.js:370
+msgid "Edit Role \"{0}\""
+msgstr "Editar Papel \"{0}\""
+
+#: js/user/GridPanel.js:56
+msgid "enable account"
+msgstr "Habilitar conta"
+
+#: js/user/GridPanel.js:66
+msgid "disable account"
+msgstr "desabilitar conta"
+
+#: js/user/GridPanel.js:76
+msgid "reset password"
+msgstr "redefinir senha"
+
+#: js/user/GridPanel.js:98
+#: js/user/Users.js:72
+#: js/Admin.js:23
+#: js/AccessLog.js:107
+msgid "User"
+msgid_plural "Users"
+msgstr[0] "Usuário"
+msgstr[1] "Usuários"
+
+#: js/user/GridPanel.js:176
+#: js/user/EditDialog.js:823
+#: js/Applications.js:279
+msgid "Status"
+msgstr "Estado"
+
+#: js/user/GridPanel.js:177
+msgid "Displayname"
+msgstr "Nome de exibição"
+
+#: js/user/GridPanel.js:178
+msgid "Loginname"
+msgstr "Nome de login"
+
+#: js/user/GridPanel.js:179
+msgid "Last name"
+msgstr "Último nome"
+
+#: js/user/GridPanel.js:180
+msgid "First name"
+msgstr "Primeiro nome"
+
+#: js/user/GridPanel.js:181
+msgid "Email"
+msgstr "Email"
+
+#: js/user/GridPanel.js:182
+#: js/user/EditDialog.js:800
+msgid "OpenID"
+msgstr "OpenID"
+
+#: js/user/GridPanel.js:183
+#: js/user/EditDialog.js:884
+msgid "Last login at"
+msgstr "Último login às"
+
+#: js/user/GridPanel.js:184
+#: js/user/EditDialog.js:888
+msgid "Last login from"
+msgstr "Último login de"
+
+#: js/user/GridPanel.js:185
+msgid "Password changed"
+msgstr "Senha alterada"
+
+#: js/user/GridPanel.js:186
+#: js/user/EditDialog.js:832
+msgid "Expires"
+msgstr "Expira"
+
+#: js/user/GridPanel.js:243
+msgid "Set new password"
+msgstr "Definir nova senha"
+
+#: js/user/GridPanel.js:243
+msgid "Please enter the new password:"
+msgstr "Por favor entre uma nova senha"
+
+#: js/user/Users.js:118
+msgid "Samba User"
+msgid_plural "Samba Users"
+msgstr[0] "Usuário Samba"
+msgstr[1] "Usuários Samba"
+
+#: js/user/Users.js:144
+msgid "Email User"
+msgid_plural "Email Users"
+msgstr[0] "Email do usuario"
+msgstr[1] "Email dos usuários"
+
+#: js/user/EditDialog.js:180
+msgid "Domain is not allowed. Check your SMTP domain configuration."
+msgstr "Domínio não permitido. Verifique a configuração de domínio do seu SMTP."
+
+#: js/user/EditDialog.js:227
+#: js/user/EditDialog.js:230
+#: js/user/EditDialog.js:680
+msgid "Passwords do not match!"
+msgstr "Senhas não são idênticas!"
+
+#: js/user/EditDialog.js:233
+msgid "Passwords match!"
+msgstr "Senhas idênticas!"
+
+#: js/user/EditDialog.js:279
+#: js/user/EditDialog.js:806
+msgid "Primary group"
+msgstr "Grupo primário"
+
+#: js/user/EditDialog.js:356
+msgid "Unix"
+msgstr "Unix"
+
+#: js/user/EditDialog.js:370
+msgid "Home Directory"
+msgstr "Diretório do usuário"
+
+#: js/user/EditDialog.js:374
+msgid "Login Shell"
+msgstr ""
+
+#: js/user/EditDialog.js:380
+msgid "Windows"
+msgstr ""
+
+#: js/user/EditDialog.js:394
+msgid "Home Drive"
+msgstr "Drive do usuário"
+
+#: js/user/EditDialog.js:399
+msgid "Logon Time"
+msgstr "Hora do logon"
+
+#: js/user/EditDialog.js:401
+#: js/user/EditDialog.js:886
+#: js/user/EditDialog.js:890
+msgid "never logged in"
+msgstr "Nunca logou"
+
+#: js/user/EditDialog.js:404
+msgid "Home Path"
+msgstr ""
+
+#: js/user/EditDialog.js:409
+msgid "Logoff Time"
+msgstr "Hora do logoff"
+
+#: js/user/EditDialog.js:411
+msgid "never logged off"
+msgstr "Nunca fez logoff"
+
+#: js/user/EditDialog.js:414
+msgid "Profile Path"
+msgstr ""
+
+#: js/user/EditDialog.js:419
+msgid "Password Last Set"
+msgstr "Última definição de senha"
+
+#: js/user/EditDialog.js:421
+#: js/user/EditDialog.js:834
+#: js/user/EditDialog.js:894
+msgid "never"
+msgstr "nunca"
+
+#: js/user/EditDialog.js:424
+msgid "Logon Script"
+msgstr ""
+
+#: js/user/EditDialog.js:429
+msgid "Password Can Change"
+msgstr "Pode alterar a senha"
+
+#: js/user/EditDialog.js:431
+#: js/user/EditDialog.js:436
+#: js/user/EditDialog.js:441
+msgid "not set"
+msgstr "não definido"
+
+#: js/user/EditDialog.js:434
+msgid "Password Must Change"
+msgstr "A senha deve ser alterada"
+
+#: js/user/EditDialog.js:439
+msgid "Kick Off Time"
+msgstr ""
+
+#: js/user/EditDialog.js:459
+msgid "IMAP Quota (MB)"
+msgstr "Cota IMAP (MB)"
+
+#: js/user/EditDialog.js:478
+#: js/user/EditDialog.js:516
+msgid "Quota"
+msgstr "Cota"
+
+#: js/user/EditDialog.js:479
+#: js/user/EditDialog.js:517
+msgid "no quota set"
+msgstr "Sem cota definida"
+
+#: js/user/EditDialog.js:489
+msgid "Current Mailbox size"
+msgstr "Tamanho da caixa de mensagens"
+
+#: js/user/EditDialog.js:497
+msgid "Sieve Quota (MB)"
+msgstr "COta Sieve (MB)"
+
+#: js/user/EditDialog.js:527
+msgid "Current Sieve size"
+msgstr "Tamanho do Sieve"
+
+#: js/user/EditDialog.js:536
+#: js/user/EditDialog.js:869
+msgid "Information"
+msgstr "iInformação"
+
+#: js/user/EditDialog.js:550
+msgid "Last Login"
+msgstr "Último login"
+
+#: js/user/EditDialog.js:587
+msgid "Email Alias"
+msgstr "Email alternativo"
+
+#: js/user/EditDialog.js:593
+msgid "Add an alias address..."
+msgstr "Adicionar um endereço alternativo..."
+
+#: js/user/EditDialog.js:606
+msgid "Email Forward"
+msgstr "Email de encaminhamento"
+
+#: js/user/EditDialog.js:612
+msgid "Add a forward address..."
+msgstr "Adicionar um endereço de encaminhamento"
+
+#: js/user/EditDialog.js:624
+msgid "Forward Only"
+msgstr "Sómente Encaminhar"
+
+#: js/user/EditDialog.js:647
+msgid "Password confirmation"
+msgstr "Confirmação da senha"
+
+#: js/user/EditDialog.js:664
+msgid "Repeat password"
+msgstr "Repita a senha"
+
+#: js/user/EditDialog.js:683
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: js/user/EditDialog.js:691
+msgid "Ok"
+msgstr "OK"
+
+#: js/user/EditDialog.js:728
+msgid "Account"
+msgstr "Conta"
+
+#: js/user/EditDialog.js:743
+msgid "First Name"
+msgstr "Primeiro Nome"
+
+#: js/user/EditDialog.js:753
+msgid "Last Name"
+msgstr "Último Nome"
+
+#: js/user/EditDialog.js:758
+#: js/user/EditDialog.js:801
+#: js/AccessLog.js:130
+msgid "Login Name"
+msgstr "Nome de login"
+
+#: js/user/EditDialog.js:763
+msgid "Password"
+msgstr "Senha"
+
+#: js/user/EditDialog.js:767
+msgid "no password set"
+msgstr "Senha não definida"
+
+#: js/user/EditDialog.js:794
+msgid "Emailaddress"
+msgstr "Endereço de Email"
+
+#: js/user/EditDialog.js:829
+#: js/Applications.js:229
+msgid "enabled"
+msgstr "habilitado"
+
+#: js/user/EditDialog.js:829
+#: js/Applications.js:226
+msgid "disabled"
+msgstr "desabilitado"
+
+#: js/user/EditDialog.js:829
+msgid "expired"
+msgstr "expirado"
+
+#: js/user/EditDialog.js:829
+msgid "blocked"
+msgstr "bloqueado"
+
+#: js/user/EditDialog.js:837
+#: js/GroupEditDialog.js:143
+msgid "Visibility"
+msgstr "Visibilidade"
+
+#: js/user/EditDialog.js:843
+#: js/GroupEditDialog.js:149
+msgid "Display in addressbook"
+msgstr "Exibir no catalogo de endereços"
+
+#: js/user/EditDialog.js:843
+#: js/GroupEditDialog.js:149
+msgid "Hide from addressbook"
+msgstr "Não exibir no catalogo de endereços"
+
+#: js/user/EditDialog.js:857
+#: js/GroupEditDialog.js:160
+msgid "Saved in Addressbook"
+msgstr "Salva no catalogo de endereços"
+
+#: js/user/EditDialog.js:886
+#: js/user/EditDialog.js:890
+msgid "don't know"
+msgstr "Não conhecido"
+
+#: js/user/EditDialog.js:892
+msgid "Password set"
+msgstr "Senha definida"
+
+#: js/user/EditDialog.js:899
+msgid "User groups"
+msgstr "Grupo de usuários"
+
+#: js/user/EditDialog.js:905
+msgid "User roles"
+msgstr "Papéis dos usuários"
+
+#: js/user/EditDialog.js:911
+msgid "Fileserver"
+msgstr "Servidor de arquivos"
+
+#: js/user/EditDialog.js:917
+msgid "IMAP"
+msgstr "IMAP"
+
+#: js/user/EditDialog.js:926
+msgid "SMTP"
+msgstr "SMPT"
+
+#: js/Admin.js:36
+#: js/Models.js:87
+msgid "Groups"
+msgstr "Grupos"
+
+#: js/Admin.js:49
+msgid "Roles"
+msgstr "Papéis"
+
+#: js/Admin.js:61
+msgid "Computers"
+msgstr "Computadores"
+
+#: js/Admin.js:74
+#: js/Models.js:128
+msgid "Applications"
+msgstr "Aplicações"
+
+#: js/Admin.js:87
+#: js/Models.js:51
+#: js/AccessLog.js:105
+msgid "Access Log"
+msgid_plural "Access Logs"
+msgstr[0] "Log de acesso"
+msgstr[1] "Logs de acesso"
+
+#: js/Admin.js:100
+msgid "Shared Tags"
+msgstr "Marcadores Compartilhados"
+
+#: js/Admin.js:113
+msgid "Containers"
+msgstr "Contêiners"
+
+#: js/Admin.js:149
+msgid "Admin"
+msgstr "Admin"
+
+#: js/Applications.js:43
+msgid "{0} Settings"
+msgstr "{0} Definições"
+
+#: js/Applications.js:144
+msgid "enable application"
+msgstr "habilitar aplicação"
+
+#: js/Applications.js:145
+msgid "disable application"
+msgstr "desabilitar aplicação"
+
+#: js/Applications.js:146
+msgid "settings"
+msgstr "definições"
+
+#: js/Applications.js:233
+msgid "unknown status ({0})"
+msgstr "estado desconhecido ({0})"
+
+#: js/Applications.js:267
+msgid "Displaying application {0} - {1} of {2}"
+msgstr "Exibindo aplicação {0} - {1} de {2}"
+
+#: js/Applications.js:268
+msgid "No applications to display"
+msgstr "Nenhuma aplicação para exibir"
+
+#: js/Applications.js:277
+msgid "Order"
+msgstr "Ordem"
+
+#: js/Applications.js:280
+msgid "Version"
+msgstr "Versão"
+
+#: js/AdminPanel.js:46
+msgid "Default Addressbook for new contacts and groups"
+msgstr "Catalogo de endereços default para novos contatos e grupos"
+
+#: js/GroupEditDialog.js:72
+msgid "Could not save group."
+msgstr "Não pode salvar o grupo."
+
+#: js/GroupEditDialog.js:108
+msgid "Group Members"
+msgstr "Membros do Grupo"
+
+#: js/GroupEditDialog.js:127
+msgid "Group Name"
+msgstr "Nome do Grupo"
+
+#: js/GroupEditDialog.js:215
+#: js/Models.js:87
+msgid "Group"
+msgid_plural "Groups"
+msgstr[0] "Grupo"
+msgstr[1] "Grupos"
+
+#: js/GroupEditDialog.js:220
+#: js/GroupEditDialog.js:231
+msgid "Add new group"
+msgstr "adicionar novo grupo"
+
+#: js/GroupEditDialog.js:233
+msgid "Edit Group \"{0}\""
+msgstr "Editar Grupo \"{0}\""
+
+#: js/TagEditDialog.js:37
+msgid "Updating Tag"
+msgstr "Atualizando marcador"
+
+#: js/TagEditDialog.js:82
+msgid "Could not save tag."
+msgstr "Não pode salvar marcador."
+
+#: js/TagEditDialog.js:168
+msgid "Allowed Contexts"
+msgstr "Contextos permitidos"
+
+#: js/TagEditDialog.js:174
+msgid "Context"
+msgstr "Contexto"
+
+#: js/TagEditDialog.js:187
+msgid "Account Rights"
+msgstr "Direitos da conta"
+
+#: js/TagEditDialog.js:195
+msgid "View"
+msgstr "Visualizar"
+
+#: js/TagEditDialog.js:200
+msgid "Use"
+msgstr "Usar"
+
+#: js/TagEditDialog.js:218
+msgid "Tag Name"
+msgstr "Nome do Marcador"
+
+#: js/TagEditDialog.js:289
+msgid "Tag"
+msgstr "Marcador"
+
+#: js/TagEditDialog.js:299
+msgid "Add New Tag"
+msgstr "Adicionar novo Marcador"
+
+#: js/TagEditDialog.js:301
+msgid "Edit Tag \"{0}\""
+msgstr "Editar Marcador \"{0}\""
+
+#: js/Roles.js:47
+msgid "Do you really want to delete the selected roles?"
+msgstr "Você deseja excluir os papéis selecionados?"
+
+#: js/Roles.js:64
+msgid "Deleting role(s)..."
+msgstr "Deletando papél(is)..."
+
+#: js/Roles.js:102
+msgid "add role"
+msgstr "adicionar papel"
+
+#: js/Roles.js:110
+msgid "edit role"
+msgstr "editar papel"
+
+#: js/Roles.js:118
+msgid "delete role"
+msgstr "excluir papel"
+
+#: js/Roles.js:226
+msgid "Displaying roles {0} - {1} of {2}"
+msgstr "Exibindo papéis {0} - {1} de {2}"
+
+#: js/Roles.js:227
+#: js/Roles.js:281
+msgid "No roles to display"
+msgstr "Nenhum papél para exibir"
+
+#: js/Tags.js:64
+msgid "Do you really want to delete the selected tags?"
+msgstr "Você deseja excluir os marcadores selecionados?"
+
+#: js/Tags.js:82
+msgid "Deleting tag(s)..."
+msgstr "Deletando marcador(es)..."
+
+#: js/Tags.js:97
+msgid "add tag"
+msgstr "adicionar marcador"
+
+#: js/Tags.js:105
+msgid "edit tag"
+msgstr "editar marcador"
+
+#: js/Tags.js:113
+msgid "delete tag"
+msgstr "excluir marcador"
+
+#: js/Tags.js:211
+msgid "Displaying tags {0} - {1} of {2}"
+msgstr "Exibindo marcadores {0} - {1} de {2}"
+
+#: js/Tags.js:212
+#: js/Tags.js:268
+msgid "No tags to display"
+msgstr "Nenhum marcador para exibir"
+
+#: js/AccessLog.js:106
+#: js/AccessLog.js:132
+msgid "IP Address"
+msgstr "Endereço IP"
+
+#: js/AccessLog.js:108
+#: js/AccessLog.js:133
+msgid "Login Time"
+msgstr "Hora de login"
+
+#: js/AccessLog.js:109
+#: js/AccessLog.js:134
+msgid "Logout Time"
+msgstr "Hora do logout"
+
+#: js/AccessLog.js:110
+#: js/AccessLog.js:136
+msgid "Client Type"
+msgstr "Tipo de Cliente"
+
+#: js/AccessLog.js:129
+msgid "Session ID"
+msgstr "ID da sessão"
+
+#: js/AccessLog.js:135
+msgid "Result"
+msgstr "Resultado"
+
+#: js/AccessLog.js:156
+msgid "user blocked"
+msgstr "usuário bloqueado"
+
+#: js/AccessLog.js:160
+msgid "password expired"
+msgstr "senha expirada"
+
+#: js/AccessLog.js:164
+msgid "user disabled"
+msgstr "usuario desabilitado"
+
+#: js/AccessLog.js:168
+msgid "invalid password"
+msgstr "senha inválida"
+
+#: js/AccessLog.js:172
+msgid "ambiguous username"
+msgstr "usuário desconhecido"
+
+#: js/AccessLog.js:176
+msgid "user not found"
+msgstr "Usuário não localizado"
+
+#: js/AccessLog.js:180
+msgid "failure"
+msgstr "falha"
+
+#: js/AccessLog.js:184
+msgid "success"
+msgstr "sucesso"
+
+msgid "Add"
+msgstr "Adicionar"
+
