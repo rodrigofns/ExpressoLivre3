@@ -1234,10 +1234,10 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	public static function traitGroup($adapter, $tablePrefix, Zend_Db_Select $select)
 	{
 		$group = $select->getPart(Zend_Db_Select::GROUP);
-
-		if (empty($group)) return;
 		
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true));		
+
+		if (empty($group)) return;		
 
 		$order = $select->getPart(Zend_Db_Select::ORDER);
 
@@ -1263,7 +1263,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 							// adds columns into group by clause (table.field)
 							// checks if field has a function (that must be an aggregation)
 							$element = "{$column[0]}.$columnName";
-							Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' element: ' . $element);
+							
 							if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
 							{
 								$group[] = $element;
