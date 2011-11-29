@@ -1240,7 +1240,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		
 		$e = new Exception();
 		
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Backtrace: ' . print_r(debug_backtrace(),true) );		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Backtrace: ' . print_r(debug_backtrace(FALSE),true) );		
 
 		if (empty($group)) return;		
 
