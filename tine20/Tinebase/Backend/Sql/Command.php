@@ -69,4 +69,20 @@ class Tinebase_Backend_Sql_Command implements Tinebase_Backend_Sql_Command_Inter
 	    	
     	return $command->getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);    	
     }
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $condition
+     * @param string $returnIfTrue
+     * @param string $returnIfFalse
+     */
+    public static function getIfElse($adapter,$condition,$returnIfTrue,$returnIfFalse)
+    {
+        $className = self::_getClassName($adapter);
+        $className = __CLASS__ . '_' . $className;
+        $command = new $className();
+	    	
+    	return $command->getIfElse($adapter,$condition,$returnIfTrue,$returnIfFalse);    	
+    }    
 }

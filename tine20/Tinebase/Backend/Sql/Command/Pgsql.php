@@ -48,10 +48,24 @@ class Tinebase_Backend_Sql_Command_Pgsql implements Tinebase_Backend_Sql_Command
      * @param string $field
      * @param mixed $returnIfTrue
      * @param mixed $returnIfFalse
+     * @return string* 
      */
     public static function getIfIsNull($adapter, $field, $returnIfTrue, $returnIfFalse)
     {
         return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
     }
+    
+	/**
+	 * 
+	 * @param Zend_Db_Adapter_Abstract $adapter
+	 * @param string $condition
+	 * @param string $returnIfTrue
+	 * @param string $returnIfFalse
+	 * @return string
+	 */
+	public static function getIfElse($adapter,$condition,$returnIfTrue,$returnIfFalse)
+	{
+		return "CASE WHEN $condition THEN $returnIfTrue ELSE $returnIfFalse END";
+	}    
     
 }
