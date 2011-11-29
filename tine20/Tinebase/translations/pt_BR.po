@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-11-29 11:37-0300\n"
+"PO-Revision-Date: 2011-11-29 11:52-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -795,12 +795,11 @@ msgstr "é após"
 
 #: js/widgets/grid/FilterModel.js:176
 msgid "is within"
-msgstr "está dentro"
+msgstr "está em"
 
 #: js/widgets/grid/FilterModel.js:177
-#, fuzzy
 msgid "is in week no."
-msgstr "está no nº da semana"
+msgstr "no nº da semana"
 
 #: js/widgets/grid/FilterModel.js:178
 msgid "starts with"
