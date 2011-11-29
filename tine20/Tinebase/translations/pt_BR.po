@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-11-28 19:18-0300\n"
+"PO-Revision-Date: 2011-11-29 11:30-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +68,7 @@ msgstr "Dados"
 #: Export/Pdf.php:222
 #: js/widgets/tags/TagsPanel.js:57
 msgid "Tags"
-msgstr "Marcações"
+msgstr "Etiquetas"
 
 #: Export/Pdf.php:443
 msgid "Created by"
@@ -213,17 +213,19 @@ msgstr "Senha"
 
 #: js/LoginPanel.js:137
 msgid "Tine 2.0 is made for you"
-msgstr "Tine 2.0 é feito para você"
+msgstr "Expresso 3.0 é feito para você"
 
 #: js/LoginPanel.js:139
 msgid "Tine 2.0 wants to make business collaboration easier and more enjoyable - for your needs! So you are warmly welcome to discuss with us, bring in ideas and get help."
-msgstr "Tine 2.0 quer facilitar e tornar a colaboração empresarial mais agradável - para suas necessidades! Então você é muito bem vindo para discutir conosco, trazer idéias e obter ajuda."
+msgstr "Expresso 3.0 quer facilitar e tornar a colaboração empresarial mais agradável - para suas necessidades! Então você é muito bem vindo para discutir conosco, trazer idéias e obter ajuda."
 
 #: js/LoginPanel.js:145
+#, fuzzy
 msgid "Tine 2.0 Homepage"
 msgstr "Tine 2.0 Homepage"
 
 #: js/LoginPanel.js:146
+#, fuzzy
 msgid "Tine 2.0 Forum"
 msgstr "Tine 2.0 Fórum"
 
@@ -233,13 +235,14 @@ msgstr "cerca de {0} minutes"
 
 #: js/LoginPanel.js:196
 #: js/LoginPanel.js:421
+#, fuzzy
 msgid "Tine 2.0 needs your help"
-msgstr "Tine 2.0 precisa de sua ajuda"
+msgstr "Expresso 3.0 precisa de sua ajuda"
 
 #: js/LoginPanel.js:198
 #: js/LoginPanel.js:423
 msgid "We regularly need your feedback to make the next Tine 2.0 releases fit your needs even better. Help us and yourself by participating:"
-msgstr "Nós regularmente necessitamos do seu retorno para fazer com que as próximas versões atendam às suas necessidades ainda melhor. Ajude-nos e a você participando:"
+msgstr "Nós regularmente necessitamos do seu retorno para fazer com que as próximas versões do Expresso 3.0 atendam às suas necessidades ainda melhor. Ajude-nos e a você participando:"
 
 #: js/LoginPanel.js:204
 msgid "participate!"
@@ -259,7 +262,7 @@ msgstr "Navegador incompatível"
 
 #: js/LoginPanel.js:270
 msgid "Your browser is not supported by Tine 2.0."
-msgstr "Seu navegador não é suportado pelo Tine 2.0."
+msgstr "Seu navegador não é suportado pelo Expresso 3.0."
 
 #: js/LoginPanel.js:275
 msgid "Browser incompatible?"
@@ -685,7 +688,7 @@ msgstr "Nenhum {0} para mostrar"
 
 #: js/widgets/grid/GridPanel.js:951
 msgid "Tagging"
-msgstr "Marcando"
+msgstr "Etiquetando"
 
 #: js/widgets/grid/GridPanel.js:992
 msgid "Creation Time"
@@ -1209,22 +1212,22 @@ msgstr "definindo nova linguagem..."
 #: js/widgets/tags/TagsPanel.js:92
 #: js/widgets/tags/TagsPanel.js:117
 msgid "Add a new personal tag"
-msgstr "Adicionar uma nova marcação pessoal"
+msgstr "Adicionar uma nova etiqueta pessoal"
 
 #: js/widgets/tags/TagsPanel.js:95
 #: js/widgets/tags/TagsPanel.js:120
 msgid "Add New Personal Tag"
-msgstr "Adicionar Nova Marcação Pessoal"
+msgstr "Adicionar Nova Etiqueta Pessoal"
 
 #: js/widgets/tags/TagsPanel.js:96
 #: js/widgets/tags/TagsPanel.js:121
 msgid "Please note: You create a personal tag. Only you can see it!"
-msgstr "Nota: Ao criar uma marcação pessoal. Apenas você pode vê-la!"
+msgstr "Nota: Ao criar uma etiqueta pessoal. Apenas você pode vê-la!"
 
 #: js/widgets/tags/TagsPanel.js:96
 #: js/widgets/tags/TagsPanel.js:121
 msgid "Enter tag name:"
-msgstr "Insira nome da marcação:"
+msgstr "Insira nome da etiqueta:"
 
 #: js/widgets/tags/TagsPanel.js:140
 #: js/widgets/tags/TagsPanel.js:449
@@ -1237,22 +1240,22 @@ msgstr "pessoal"
 
 #: js/widgets/tags/TagsPanel.js:162
 msgid "No Tags to display"
-msgstr "Sem Marcações para mostrar"
+msgstr "Sem Etiquetas para mostrar"
 
 #: js/widgets/tags/TagsPanel.js:185
 msgid "Detach tag"
 msgid_plural "Detach tags"
-msgstr[0] "Remover marcação"
-msgstr[1] "Remover marcações"
+msgstr[0] "Remover etiqueta"
+msgstr[1] "Remover etiqueta"
 
 #: js/widgets/tags/TagsPanel.js:195
 msgid "Edit tag"
-msgstr "Editar marcação"
+msgstr "Editar etiqueta"
 
 #: js/widgets/tags/TagsPanel.js:200
 #: js/widgets/tags/TagsPanel.js:205
 msgid "Rename Tag"
-msgstr "Renomear Marcação"
+msgstr "Renomear etiqueta"
 
 #: js/widgets/tags/TagsPanel.js:205
 msgid "Please enter a new name:"
@@ -1264,7 +1267,7 @@ msgstr "Editar Descrição"
 
 #: js/widgets/tags/TagsPanel.js:219
 msgid "Description for tag"
-msgstr "Descrição da marcação"
+msgstr "Descrição da etiqueta"
 
 #: js/widgets/tags/TagsPanel.js:219
 msgid "Please enter new description:"
@@ -1277,20 +1280,20 @@ msgstr "Alterar Cor"
 #: js/widgets/tags/TagsPanel.js:257
 msgid "Delete Tag"
 msgid_plural "Delete Tags"
-msgstr[0] "Excluir Marcação"
-msgstr[1] "Excluir Marcações"
+msgstr[0] "Excluir Etiqueta"
+msgstr[1] "Excluir Etiquetas"
 
 #: js/widgets/tags/TagsPanel.js:270
 msgid "Realy Delete Selected Tag?"
 msgid_plural "Realy Delete Selected Tags?"
-msgstr[0] "Realmente Excluir Marcação Selecionada?"
-msgstr[1] "Realmente Excluir Marcações Selecionadas?"
+msgstr[0] "Realmente Excluir Etiqueta Selecionada?"
+msgstr[1] "Realmente Excluir Etiquetas Selecionadas?"
 
 #: js/widgets/tags/TagsPanel.js:271
 msgid "the selected tag will be deleted and disapear for all entries"
 msgid_plural "The selected tags will be removed and disapear for all entries"
-msgstr[0] "a marcação selecionada será excluída e desaparecerá de todas as entradas"
-msgstr[1] "as marcações selecionadas serão removidas e desaparecerão de todas as entradas"
+msgstr[0] "a etiqueta selecionada será excluída e desaparecerá de todas as entradas"
+msgstr[1] "as etiquetas selecionadas serão removidas e desaparecerão de todas as entradas"
 
 #: js/widgets/tags/TagsPanel.js:275
 msgid "Please wait a moment..."
@@ -1299,12 +1302,12 @@ msgstr "Por favor, aguarde um momento..."
 #: js/widgets/tags/TagsPanel.js:275
 msgid "Deleting Tag"
 msgid_plural "Deleting Tags"
-msgstr[0] "Excluindo Marcação"
-msgstr[1] "Excluindo Marcações"
+msgstr[0] "Excluindo Etiqueta"
+msgstr[1] "Excluindo Etiquetas"
 
 #: js/widgets/tags/TagsPanel.js:291
 msgid "Could not delete Tag(s)."
-msgstr "Não foi possível excluir Marcação(ções)."
+msgstr "Não foi possível excluir Etiqueta(s)."
 
 #: js/widgets/tags/TagsPanel.js:353
 #: js/widgets/tags/TagsPanel.js:415
@@ -1315,20 +1318,20 @@ msgstr "Note"
 #: js/widgets/tags/TagsPanel.js:354
 #: js/widgets/tags/TagsPanel.js:416
 msgid "The minimum tag length is three."
-msgstr "O tamanho mínimo da marcação é três."
+msgstr "O tamanho mínimo da etiqueta é três."
 
 #: js/widgets/tags/TagsPanel.js:401
 msgid "Could not create tag."
-msgstr "Não foi possível criar marcação."
+msgstr "Não foi possível criar etiqueta."
 
 #: js/widgets/tags/TagsPanel.js:434
 msgid "Could not update tag."
-msgstr "Não foi possível atualizar marcação."
+msgstr "Não foi possível atualizar etiqueta."
 
 #: js/widgets/tags/TagsPanel.js:468
 #: js/widgets/tags/TagsPanel.js:526
 msgid "Enter tag name"
-msgstr "Insira nome de marcação"
+msgstr "Inserir nome da etiqueta"
 
 #: js/widgets/tags/TagsPanel.js:469
 #: js/widgets/form/RecordPickerComboBox.js:63
@@ -1345,25 +1348,24 @@ msgid "Color"
 msgstr "Cor"
 
 #: js/widgets/tags/TagCombo.js:48
-#, fuzzy
 msgid "tag name"
-msgstr "nome da tag"
+msgstr "nome da etiqueta"
 
 #: js/widgets/tags/TagsMassAttachAction.js:18
 msgid "Add Tag"
-msgstr "Adicionar Marcação"
+msgstr "Adicionar Etiqueta"
 
 #: js/widgets/tags/TagsMassAttachAction.js:73
 msgid "Attach the following tag to all selected items:"
-msgstr "Anexar a seguinte marcação para todos os itens selecionados:"
+msgstr "Anexar a seguinte etiqueta para todos os itens selecionados:"
 
 #: js/widgets/tags/TagsMassAttachAction.js:84
 msgid "Select Tag"
-msgstr "Selecionar Marcação"
+msgstr "Selecionar Etiqueta"
 
 #: js/widgets/tags/TagFilter.js:33
 msgid "Tag"
-msgstr "Marcação"
+msgstr "Etiqueta"
 
 #: js/widgets/persistentfilter/Model.js:38
 msgid "Favorite"
@@ -1459,12 +1461,12 @@ msgstr "Salvando favorito"
 #: js/widgets/VersionCheck.js:44
 #: js/widgets/VersionCheck.js:53
 msgid "New version of Tine 2.0 available"
-msgstr "Nova versão do Tine 2.0 disponível"
+msgstr "Nova versão do Expresso 3.0 disponível"
 
 #: js/widgets/VersionCheck.js:45
 #: js/widgets/VersionCheck.js:54
 msgid "Version \"{0}\" of Tine 2.0 is available."
-msgstr "Versão \"{0}\" do Tine 2.0 disponível"
+msgstr "Versão \"{0}\" do Expresso 3.0 disponível"
 
 #: js/widgets/VersionCheck.js:46
 msgid "It's a critical update and must be installed as soon as possible!"
@@ -1557,7 +1559,7 @@ msgstr "Instalar aplicação web"
 
 #: js/MainMenu.js:165
 msgid "Install Tine 2.0 as web app in your browser."
-msgstr "Instalar Tine 2.0 como aplicação web em seu navegador."
+msgstr "Instalar Expresso 3.0 como aplicação web em seu navegador."
 
 #: js/MainMenu.js:213
 msgid "Are you sure you want to logout?"
@@ -1906,7 +1908,7 @@ msgstr[1] "Listas de Tarefas"
 
 #: views/update.php:23
 msgid "Tine 2.0 needs to be updated or is not installed yet."
-msgstr "Tine 2.0 precisa ser atualizado ou ainda não foi instalado."
+msgstr "Expresso 3.0 precisa ser atualizado ou ainda não foi instalado."
 
 #: views/update.php:24
 msgid "Please wait or contact your administrator"
@@ -1954,11 +1956,11 @@ msgstr "registro alterado"
 
 #: Preference.php:88
 msgid "The timezone in which dates are shown in Tine 2.0."
-msgstr "O fuso horário cujas datas são mostradas pelo Tine 2.0."
+msgstr "O fuso horário cujas datas são exibidas pelo Expresso 3.0."
 
 #: Preference.php:92
 msgid "The language of the Tine 2.0 GUI."
-msgstr "A linguagem da GUI do Tine 2.0."
+msgstr "A linguagem da Interface do Expresso 3.0."
 
 #: Preference.php:95
 msgid "Default Application"
