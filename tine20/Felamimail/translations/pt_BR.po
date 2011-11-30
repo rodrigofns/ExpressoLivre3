@@ -621,7 +621,7 @@ msgstr "Bcc"
 msgid "Email Accounts"
 msgid_plural "Email Accounts"
 msgstr[0] "Contas de Email"
-msgstr[1] ""
+msgstr[1] "Contas de Email"
 
 #: js/Model.js:488
 msgid "INBOX"
