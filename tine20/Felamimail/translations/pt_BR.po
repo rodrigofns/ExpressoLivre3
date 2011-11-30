@@ -1011,7 +1011,7 @@ msgstr "Todas as mensagens destacadas"
 
 #: Setup/Initialize.php:50
 msgid "All highlighted mail of my email accounts"
-msgstr "Todas as mensagens destadas das minhas contas de email"
+msgstr "Todas as mensagens destacadas das minhas contas de email"
 
 #: Setup/Initialize.php:57
 msgid "All drafts"
