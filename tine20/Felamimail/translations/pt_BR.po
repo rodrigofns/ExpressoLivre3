@@ -498,7 +498,7 @@ msgstr "Sua cota"
 
 #: js/GridPanel.js:1125
 msgid "{0} available (total: {1})"
-msgstr "{0} disponível (total: {1})"
+msgstr "{0} disponíveis (total: {1})"
 
 #: js/MessageDisplayDialog.js:65
 msgid "Save"
@@ -620,8 +620,8 @@ msgstr "Bcc"
 #: js/Model.js:352
 msgid "Email Accounts"
 msgid_plural "Email Accounts"
-msgstr[0] "Conta de Email"
-msgstr[1] "Contas de Email"
+msgstr[0] "Contas de Email"
+msgstr[1] ""
 
 #: js/Model.js:488
 msgid "INBOX"
@@ -995,7 +995,7 @@ msgstr "Exibir mensagem de confirmação quando excluir mensagens."
 
 #: Setup/Initialize.php:34
 msgid "All inboxes of my email accounts"
-msgstr "Todas as caixas postais das minhas contas de email"
+msgstr "Todas as caixas de entradas das minhas contas de email"
 
 #: Setup/Initialize.php:41
 msgid "All unread mail"
