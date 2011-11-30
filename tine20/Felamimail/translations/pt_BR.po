@@ -995,7 +995,7 @@ msgstr "Exibir mensagem de confirmação quando excluir mensagens."
 
 #: Setup/Initialize.php:34
 msgid "All inboxes of my email accounts"
-msgstr "Todas as caixas de entradas das minhas contas de email"
+msgstr "Todas as caixas de entrada das minhas contas de email"
 
 #: Setup/Initialize.php:41
 msgid "All unread mail"
