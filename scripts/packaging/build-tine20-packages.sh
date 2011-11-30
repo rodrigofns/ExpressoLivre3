@@ -6,6 +6,9 @@
 # $ ./build-tine20-packages.sh -s "http://git.tine20.org/git/tine20" -b master -r "2011_01_beta3-1" -c "Neele"
 # $ ./build-tine20-packages.sh -s "http://git.tine20.org/git/tine20" -b 2011-01 -r "2011-01-3" -c "Neele"
 
+# $ ./build-tine20-packages.sh -s "ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git" -b master "V3" -c "Expresso-V3"
+
+
 ## GLOBAL VARIABLES ##
 BASEDIR="./tine20build"
 TEMPDIR="$BASEDIR/temp"
