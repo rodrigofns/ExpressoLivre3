@@ -621,7 +621,7 @@ msgstr "Bcc"
 msgid "Email Accounts"
 msgid_plural "Email Accounts"
 msgstr[0] "Contas de Email"
-msgstr[1] ""
+msgstr[1] "Contas de Email"
 
 #: js/Model.js:488
 msgid "INBOX"
@@ -995,7 +995,7 @@ msgstr "Exibir mensagem de confirmação quando excluir mensagens."
 
 #: Setup/Initialize.php:34
 msgid "All inboxes of my email accounts"
-msgstr "Todas as caixas de entradas das minhas contas de email"
+msgstr "Todas as caixas de entrada das minhas contas de email"
 
 #: Setup/Initialize.php:41
 msgid "All unread mail"
