@@ -30,24 +30,24 @@ class Tinebase_Translation
      * @var array
      */
     private static $SUPPORTED_LANGS = array(
-        'bg',      // Bulgarian            Dimitrina Mileva <d.mileva@metaways.de>
-        'ca',      // Catalan              Damià Verger - JUG Països Catalans <dverger@joomla.cat>
-        'cs',      // Czech                Michael Sladek <msladek@brotel.cz>
+        #'bg',      // Bulgarian            Dimitrina Mileva <d.mileva@metaways.de>
+        #'ca',      // Catalan              Damià Verger - JUG Països Catalans <dverger@joomla.cat>
+        #'cs',      // Czech                Michael Sladek <msladek@brotel.cz>
         'de',      // German               Cornelius Weiss <c.weiss@metaways.de>
         'en',      // English              Cornelius Weiss <c.weiss@metaways.de>
         'es',      // Spanish              Enrique Palacios <enriquepalaciosc@gmail.com>
-        'fr',      // French               Rémi Peltier <rpeltier@agglo-clermont.fr>
-        'hu',      // Hungarian            Gump <admin@kemenyfem.hu>
-        'it',      // Italian              Roberto Rossi <impiastro@gmail.com>
-        'ja',      // Japanese             Yuuki Kitamura <ykitamura@clasi-co.jp>
-        'nb',      // Norwegian Bokmål     Ronny Gonzales <gonzito@online.no>
+        #'fr',      // French               Rémi Peltier <rpeltier@agglo-clermont.fr>
+        #'hu',      // Hungarian            Gump <admin@kemenyfem.hu>
+        #'it',      // Italian              Roberto Rossi <impiastro@gmail.com>
+        #'ja',      // Japanese             Yuuki Kitamura <ykitamura@clasi-co.jp>
+        #'nb',      // Norwegian Bokmål     Ronny Gonzales <gonzito@online.no>
         //'nl',      // Dutch                Joost Venema <post@joostvenema.nl>
-        'pl',      // Polish               Wojciech Kaczmarek <wojciech_kaczmarek@wp.pl>
-        //'pt',      // Portuguese           Holger Rothemund <holger@rothemund.org>
-        'ru',      // Russian              Nikolay Parukhin <parukhin@gmail.com> 
-        'sv',      // Swedish              Andreas Storbjörk <andreas.storbjork@rambolo.net>
-        'zh_CN',   // Chinese Simplified   Jason Qi <qry@yahoo.com>
-        'zh_TW',   // Chinese Traditional  Frank Huang <frank.cchuang@gmail.com>
+        #'pl',      // Polish               Wojciech Kaczmarek <wojciech_kaczmarek@wp.pl>
+        'pt_BR',      // Portuguese           Holger Rothemund <holger@rothemund.org>
+        #'ru',      // Russian              Nikolay Parukhin <parukhin@gmail.com> 
+        #'sv',      // Swedish              Andreas Storbjörk <andreas.storbjork@rambolo.net>
+        #'zh_CN',   // Chinese Simplified   Jason Qi <qry@yahoo.com>
+        #'zh_TW',   // Chinese Traditional  Frank Huang <frank.cchuang@gmail.com>
     );
     
     /**
