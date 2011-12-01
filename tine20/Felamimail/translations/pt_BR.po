@@ -619,9 +619,11 @@ msgstr "Bcc"
 
 #: js/Model.js:352
 msgid "Email Accounts"
-msgid_plural "Email Accounts"
-msgstr[0] "Contas de Email"
-msgstr[1] "Contas de Email"
+msgstr "Contas de Email"
+
+#: js/Model.js:352
+msgid "Email Account"
+msgstr "Conta de Email"
 
 #: js/Model.js:488
 msgid "INBOX"
