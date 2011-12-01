@@ -1,0 +1,32 @@
+
+
+  - DISTRIBUÌÇÃO do EXPRESSO V3
+
+       Gerar arquivo (zip/tgz) para distribuição da RELEASE do Expresso V3.
+
+       Pré-requisito:
+
+                 Ter o php(5.3), o git e o phing(www.phing.info) instalados.
+
+ 
+       1 - Executar o comando git clone ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git
+
+       2 - O repositório é clonado na pasta expresso3.
+           Ir para a pasta expresso3/script/packging/build-Comunidade-Expresso 
+
+       3 - Executar o script build-ExpressoV3-packages.sh :
+            
+               Exemplo:  ./build-ExpressoV3-packages.sh -s ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git -c Milan -r Sprint-1 
+
+                   O parametro "-s" informa o repositório do git,
+                               "-c" informa o nome da distribuição. Este nome é interno no Tine20.
+                               "-r" informa o nome que será usado como sifixo na identificação dos arquivos gerados no processo. 
+
+
+       4 - Verificar o resultado gerado na pasta:
+
+                   expresso3/script/packging/build-Comunidade-Expresso/tine20build/packages/tine20/<valor do parametro "-s">  
+
+              É gerado um arquivo "tar.bz2" para cada módulo disponível no Tine20.
+              É gerado um arquivo tine20-allinone_<valor do parametro "-s">.tar.bz2 contendo todos os módulos disponíveis no Tine.
+              Este último é o arquivo que deve ser disponibilizado para uso em "produção".
