@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-12-01 10:32-0300\n"
+"PO-Revision-Date: 2011-12-01 15:50-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -227,7 +227,7 @@ msgstr "Deletando grup(s)..."
 #: js/TagEditDialog.js:82
 #: js/Roles.js:69
 msgid "Failed"
-msgstr "Falhoe"
+msgstr "Falhou"
 
 #: js/Groups.js:74
 msgid "Some error occurred while trying to delete the group."
@@ -350,9 +350,10 @@ msgstr "redefinir senha"
 #: js/Admin.js:23
 #: js/AccessLog.js:107
 msgid "User"
-msgid_plural "Users"
-msgstr[0] "Usuario"
-msgstr[1] "Usuarios"
+msgstr "Usuário"
+
+msgid "Users"
+msgstr "Usuários"
 
 #: js/user/GridPanel.js:176
 #: js/user/EditDialog.js:823
@@ -402,7 +403,7 @@ msgstr "Senha alterada"
 #: js/user/GridPanel.js:186
 #: js/user/EditDialog.js:832
 msgid "Expires"
-msgstr "Expira"
+msgstr "Expira em"
 
 #: js/user/GridPanel.js:243
 msgid "Set new password"
@@ -711,9 +712,7 @@ msgstr "Aplicações"
 #: js/Models.js:51
 #: js/AccessLog.js:105
 msgid "Access Log"
-msgid_plural "Access Logs"
-msgstr[0] "Log de acesso"
-msgstr[1] "Logs de acesso"
+msgstr "Log de acesso"
 
 #: js/Admin.js:100
 msgid "Shared Tags"
