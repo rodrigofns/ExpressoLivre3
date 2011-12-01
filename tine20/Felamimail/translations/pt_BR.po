@@ -335,7 +335,7 @@ msgstr "Pasta"
 #: js/TreeContextMenu.js:100
 #: js/TreeContextMenu.js:103
 #: js/TreeContextMenu.js:106
-msgid "Folder"
+msgid "Folders"
 msgstr "Pastas"
 
 #: js/FolderSelectPanel.js:75
