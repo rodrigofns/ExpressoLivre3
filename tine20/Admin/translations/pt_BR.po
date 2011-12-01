@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-12-01 15:50-0300\n"
+"PO-Revision-Date: 2011-12-01 16:28-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -955,7 +955,4 @@ msgstr "falha"
 #: js/AccessLog.js:184
 msgid "success"
 msgstr "sucesso"
-
-msgid "Add"
-msgstr "Adicionar"
 
