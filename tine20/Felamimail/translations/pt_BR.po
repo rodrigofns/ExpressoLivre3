@@ -325,9 +325,18 @@ msgstr "Não foi possível salvar script no servidor Sieve."
 #: js/TreeContextMenu.js:103
 #: js/TreeContextMenu.js:106
 msgid "Folder"
-msgid_plural "Folders"
-msgstr[0] "Pasta"
-msgstr[1] "Pastas"
+msgstr "Pasta"
+
+#: js/FolderFilterModel.js:30
+#: js/GridPanel.js:534
+#: js/Model.js:52
+#: js/Model.js:494
+#: js/TreeContextMenu.js:45
+#: js/TreeContextMenu.js:100
+#: js/TreeContextMenu.js:103
+#: js/TreeContextMenu.js:106
+msgid "Folder"
+msgstr "Pastas"
 
 #: js/FolderSelectPanel.js:75
 msgid "Cancel"
