@@ -3,10 +3,8 @@
 # Version: $Id$
 
 # examples
-# $ ./build-tine20-packages.sh -s "http://git.tine20.org/git/tine20" -b master -r "2011_01_beta3-1" -c "Neele"
-# $ ./build-tine20-packages.sh -s "http://git.tine20.org/git/tine20" -b 2011-01 -r "2011-01-3" -c "Neele"
 
-# $ ./build-tine20-packages.sh -s "ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git" -b master "V3" -c "Expresso-V3"
+# $ ./build-ExpressoV3-packages.sh -s ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git -c Milan -r Sprint-1 
 
 
 ## GLOBAL VARIABLES ##
@@ -14,10 +12,10 @@ BASEDIR="./tine20build"
 TEMPDIR="$BASEDIR/temp"
 MISCPACKAGESDIR="$BASEDIR/packages/misc"
 
-RELEASE="EXPRESSO-V3"
-CODENAME="Milan"
-GITURL="ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git"
-GITBRANCH="master"
+RELEASE="ExpressoV3" ( -r )
+CODENAME="Milan"      ( -c) 
+GITURL="ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git"   ( -s )
+GITBRANCH="master"    ( -b )
 PACKAGEDIR=""
 
 #
