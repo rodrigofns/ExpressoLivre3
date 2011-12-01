@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-11-29 08:35-0300\n"
+"PO-Revision-Date: 2011-12-01 08:50-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -55,11 +55,11 @@ msgstr "adicionar e editar papéis, adicionar novos membros para papéis, adicio
 
 #: Acl/Rights.php:201
 msgid "manage shared tags"
-msgstr "administrar marcadores compartilhados"
+msgstr "administrar etiquetas compartilhados"
 
 #: Acl/Rights.php:202
 msgid "add, delete and edit shared tags"
-msgstr "adicionar, excluir e editar marcadores compartilhados"
+msgstr "adicionar, excluir e editar etiquetas compartilhados"
 
 #: Acl/Rights.php:205
 msgid "manage computers"
@@ -717,7 +717,7 @@ msgstr[1] "Logs de acesso"
 
 #: js/Admin.js:100
 msgid "Shared Tags"
-msgstr "Marcadores Compartilhados"
+msgstr "Etiquetas Compartilhados"
 
 #: js/Admin.js:113
 msgid "Containers"
@@ -797,11 +797,11 @@ msgstr "Editar Grupo \"{0}\""
 
 #: js/TagEditDialog.js:37
 msgid "Updating Tag"
-msgstr "Atualizando marcador"
+msgstr "Atualizando etiqueta"
 
 #: js/TagEditDialog.js:82
 msgid "Could not save tag."
-msgstr "Não pode salvar marcador."
+msgstr "Não pode salvar etiqueta."
 
 #: js/TagEditDialog.js:168
 msgid "Allowed Contexts"
@@ -825,19 +825,19 @@ msgstr "Usar"
 
 #: js/TagEditDialog.js:218
 msgid "Tag Name"
-msgstr "Nome do Marcador"
+msgstr "Nome do Etiqueta"
 
 #: js/TagEditDialog.js:289
 msgid "Tag"
-msgstr "Marcador"
+msgstr "Etiqueta"
 
 #: js/TagEditDialog.js:299
 msgid "Add New Tag"
-msgstr "Adicionar novo Marcador"
+msgstr "Adicionar novo Etiqueta"
 
 #: js/TagEditDialog.js:301
 msgid "Edit Tag \"{0}\""
-msgstr "Editar Marcador \"{0}\""
+msgstr "Editar Etiqueta \"{0}\""
 
 #: js/Roles.js:47
 msgid "Do you really want to delete the selected roles?"
@@ -870,32 +870,32 @@ msgstr "Nenhum papél para exibir"
 
 #: js/Tags.js:64
 msgid "Do you really want to delete the selected tags?"
-msgstr "Você deseja excluir os marcadores selecionados?"
+msgstr "Você deseja excluir os etiquetas selecionados?"
 
 #: js/Tags.js:82
 msgid "Deleting tag(s)..."
-msgstr "Deletando marcador(es)..."
+msgstr "Deletando etiqueta(es)..."
 
 #: js/Tags.js:97
 msgid "add tag"
-msgstr "adicionar marcador"
+msgstr "adicionar etiqueta"
 
 #: js/Tags.js:105
 msgid "edit tag"
-msgstr "editar marcador"
+msgstr "editar etiqueta"
 
 #: js/Tags.js:113
 msgid "delete tag"
-msgstr "excluir marcador"
+msgstr "excluir etiqueta"
 
 #: js/Tags.js:211
 msgid "Displaying tags {0} - {1} of {2}"
-msgstr "Exibindo marcadores {0} - {1} de {2}"
+msgstr "Exibindo etiquetas {0} - {1} de {2}"
 
 #: js/Tags.js:212
 #: js/Tags.js:268
 msgid "No tags to display"
-msgstr "Nenhum marcador para exibir"
+msgstr "Nenhum etiqueta para exibir"
 
 #: js/AccessLog.js:106
 #: js/AccessLog.js:132

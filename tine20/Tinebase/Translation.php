@@ -33,7 +33,7 @@ class Tinebase_Translation
         #'bg',      // Bulgarian            Dimitrina Mileva <d.mileva@metaways.de>
         #'ca',      // Catalan              Damià Verger - JUG Països Catalans <dverger@joomla.cat>
         #'cs',      // Czech                Michael Sladek <msladek@brotel.cz>
-        'de',      // German               Cornelius Weiss <c.weiss@metaways.de>
+        #'de',      // German               Cornelius Weiss <c.weiss@metaways.de>
         'en',      // English              Cornelius Weiss <c.weiss@metaways.de>
         'es',      // Spanish              Enrique Palacios <enriquepalaciosc@gmail.com>
         #'fr',      // French               Rémi Peltier <rpeltier@agglo-clermont.fr>
