@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-12-01 08:50-0300\n"
+"PO-Revision-Date: 2011-12-01 09:34-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -351,8 +351,8 @@ msgstr "redefinir senha"
 #: js/AccessLog.js:107
 msgid "User"
 msgid_plural "Users"
-msgstr[0] "Usuário"
-msgstr[1] "Usuários"
+msgstr[0] "Usuario"
+msgstr[1] "Usuarios"
 
 #: js/user/GridPanel.js:176
 #: js/user/EditDialog.js:823
@@ -717,7 +717,7 @@ msgstr[1] "Logs de acesso"
 
 #: js/Admin.js:100
 msgid "Shared Tags"
-msgstr "Etiquetas Compartilhados"
+msgstr "Etiquetas Compartilhadas"
 
 #: js/Admin.js:113
 msgid "Containers"
@@ -825,7 +825,7 @@ msgstr "Usar"
 
 #: js/TagEditDialog.js:218
 msgid "Tag Name"
-msgstr "Nome do Etiqueta"
+msgstr "Nome da Etiqueta"
 
 #: js/TagEditDialog.js:289
 msgid "Tag"
@@ -833,7 +833,7 @@ msgstr "Etiqueta"
 
 #: js/TagEditDialog.js:299
 msgid "Add New Tag"
-msgstr "Adicionar novo Etiqueta"
+msgstr "Adicionar nova Etiqueta"
 
 #: js/TagEditDialog.js:301
 msgid "Edit Tag \"{0}\""
@@ -874,7 +874,7 @@ msgstr "Você deseja excluir os etiquetas selecionados?"
 
 #: js/Tags.js:82
 msgid "Deleting tag(s)..."
-msgstr "Deletando etiqueta(es)..."
+msgstr "Deletando etiqueta(s)..."
 
 #: js/Tags.js:97
 msgid "add tag"
@@ -895,7 +895,7 @@ msgstr "Exibindo etiquetas {0} - {1} de {2}"
 #: js/Tags.js:212
 #: js/Tags.js:268
 msgid "No tags to display"
-msgstr "Nenhum etiqueta para exibir"
+msgstr "Nenhuma etiqueta para exibir"
 
 #: js/AccessLog.js:106
 #: js/AccessLog.js:132
