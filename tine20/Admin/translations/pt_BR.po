@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-12-01 09:34-0300\n"
+"PO-Revision-Date: 2011-12-01 10:32-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -71,11 +71,11 @@ msgstr "adicionar, excluir e editar (samba) computadores"
 
 #: Acl/Rights.php:209
 msgid "manage containers"
-msgstr "administrar contêiners"
+msgstr "administrar contêineres"
 
 #: Acl/Rights.php:210
 msgid "add, delete and edit containers and manage container grants"
-msgstr "adicionar,excluir e editar contêiners e administrar privilégios nos contêiners"
+msgstr "adicionar,excluir e editar contêineres e administrar privilégios nos contêiners"
 
 #: Acl/Rights.php:213
 msgid "view access log"
@@ -119,11 +119,11 @@ msgstr "visualizar lista de detalhes de computadores"
 
 #: Acl/Rights.php:233
 msgid "view containers"
-msgstr "visualizar contêiners"
+msgstr "visualizar contêineres"
 
 #: Acl/Rights.php:234
 msgid "view personal and shared containers"
-msgstr "visualizar cotêiners pessoal e compartilhado"
+msgstr "visualizar cotêineres pessoal e compartilhado"
 
 #: js/SambaMachineGrid.js:61
 #: js/SambaMachineEditDialog.js:42
@@ -167,7 +167,7 @@ msgstr "Nome"
 msgid "Container"
 msgid_plural "Containers"
 msgstr[0] "Contêiner"
-msgstr[1] "Contêiners"
+msgstr[1] "Contêineres"
 
 #: js/container/GridPanel.js:71
 msgid "Container Name"
@@ -721,7 +721,7 @@ msgstr "Etiquetas Compartilhadas"
 
 #: js/Admin.js:113
 msgid "Containers"
-msgstr "Contêiners"
+msgstr "Contêineres"
 
 #: js/Admin.js:149
 msgid "Admin"
