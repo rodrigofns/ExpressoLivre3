@@ -12,10 +12,10 @@ BASEDIR="./tine20build"
 TEMPDIR="$BASEDIR/temp"
 MISCPACKAGESDIR="$BASEDIR/packages/misc"
 
-RELEASE="ExpressoV3" ( -r )
-CODENAME="Milan"      ( -c) 
-GITURL="ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git"   ( -s )
-GITBRANCH="master"    ( -b )
+RELEASE="ExpressoV3" #  ( -r )
+CODENAME="Milan"     #   ( -c) 
+GITURL="ssh://root@10.31.80.37/usr/local/git.repos/expresso3.git"  #  ( -s )
+GITBRANCH="master"  #  ( -b )
 PACKAGEDIR=""
 
 #
