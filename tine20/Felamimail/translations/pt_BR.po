@@ -1008,7 +1008,7 @@ msgid "All unread mail of my email accounts"
 msgstr "Todas as mensagens não lidas das minhas contas de email"
 
 #: Setup/Initialize.php:49
-msgid "All highlighted mail"
+msgid "All Highlighted mail"
 msgstr "Todas as mensagens destacadas"
 
 #: Setup/Initialize.php:50
