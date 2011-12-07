@@ -415,10 +415,9 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             
             ->group('container.id')
             ->order('container.name');
-        
-       	$select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);      	
-            
+
         $this->addGrantsSql($select, $accountId, $grant, 'user');
+        $select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);
         
         $stmt = $this->_db->query($select);
         $containersData = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
@@ -449,7 +448,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
      */
     public static function addGrantsSql($_select, $_accountId, $_grant, $_aclTableName = 'container_acl')
     {
-        $db = $_select->getAdapter();
+        $db = Tinebase_Core::getDb();
         
         $grants = is_array($_grant) ? $_grant : array($_grant);
         
@@ -539,6 +538,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             ->order('container.name');
         
         $this->addGrantsSql($select, $accountId, $grant);
+        $select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);
         
         $stmt = $this->_db->query($select);
 
@@ -899,10 +899,9 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
                 )
                 ->group('container_acl.account_grant');
             
+            $this->addGrantsSql($select, $accountId, '*');        
             $select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);
     
-            $this->addGrantsSql($select, $accountId, '*');
-        
             $stmt = $this->_db->query($select);
             $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
 	        $grants = $this->_getGrantsFromArray($rows, $accountId, $_grantModel);
