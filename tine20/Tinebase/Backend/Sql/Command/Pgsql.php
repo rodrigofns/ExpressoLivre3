@@ -48,7 +48,7 @@ class Tinebase_Backend_Sql_Command_Pgsql implements Tinebase_Backend_Sql_Command
      * @param string $field
      * @param mixed $returnIfTrue
      * @param mixed $returnIfFalse
-     * @return string* 
+     * @return string 
      */
     public static function getIfIsNull($adapter, $field, $returnIfTrue, $returnIfFalse)
     {
