@@ -254,9 +254,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
 		->limit(1);
 
-		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
-
 		$this->_traitGroup($select);
+		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetch();
@@ -374,6 +373,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				$select->where($this->_db->quoteIdentifier($this->_tableName . '.container_id') . ' in (?) /* add acl in getMultiple */', (array) $_containerIds);
 			}
 		}
+		
+		$this->_traitGroup($select);
+		
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
@@ -452,6 +454,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		} else {
 			$ids = $this->_fetch($select);
 		}
+		
+		$this->_traitGroup($select);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Fetched ' . count($ids) .' ids.');
 
@@ -686,6 +690,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		if (! empty($this->_foreignTables)) {
 			$groupBy = ($_groupBy !== NULL) ? $_groupBy : $this->_tableName . '.' . $this->_identifier;
 			$_select->group($groupBy);
+			
+			$this->_traitGroup($_select);
 
 			$cols = (array) $_cols;
 			foreach ($this->_foreignTables as $foreignColumn => $join) {
@@ -718,6 +724,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 		}
+
+		//if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
 	}
 
 	/**
@@ -895,9 +903,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 				if (!empty($idsToRemove)) {
 					$where = '(' .
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) .
+					$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
                         ' AND ' . 
-					$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
+					$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
                     ')';
 
 					$this->_db->delete($this->_tablePrefix . $join['table'], $where);
@@ -1068,7 +1076,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$identifier = $this->_getRecordIdentifier();
 
 		$where = array(
-		$this->_db->quoteInto($this->_db->quoteIdentifier($identifier) . ' IN (?)', $idArray)
+		$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $this->_tableName . '.' . $identifier) . ' IN (?)', $idArray)
 		);
 
 		return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
