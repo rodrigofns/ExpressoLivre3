@@ -85,6 +85,10 @@ class Tinebase_Model_TagRight extends Tinebase_Record_Abstract
     public static function applyAclSql($_select, $_right = self::VIEW_RIGHT, $_idProperty = 'id')
     {
         $db = Tinebase_Core::getDb();
+        // TODO: how quota default value
+        if($_idProperty == 'id'){
+        	$_idProperty = $db->quoteIdentifier('id');
+        }
         $currentAccountId = Tinebase_Core::getUser()->getId();
         $currentGroupIds = Tinebase_Group::getInstance()->getGroupMemberships($currentAccountId);
         $groupCondition = ( !empty($currentGroupIds) ) ? ' OR (' . $db->quoteInto($db->quoteIdentifier('acl.account_type') . ' = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_GROUP) .
