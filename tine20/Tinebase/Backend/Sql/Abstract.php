@@ -557,7 +557,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		foreach((array) $_pagination->sort as $sort) {
 			if (! array_key_exists($sort, $colsToFetch)) {
-				$colsToFetch[$sort] = $this->_tableName . '.' . $sort;
+                $colsToFetch[$sort] = (substr_count($sort, $this->_tableName) === 0) ? $this->_tableName . '.' . $sort : $sort;
 			}
 		}
 
@@ -592,33 +592,35 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _addSecondarySort(Tinebase_Model_Pagination $_pagination)
 	{
 		if (! empty($this->_defaultSecondarySort)) {
+            if (! is_array($_pagination->sort) || ! in_array($this->_defaultSecondarySort, $_pagination->sort)) {
 			$_pagination->sort = array_merge((array)$_pagination->sort, array($this->_defaultSecondarySort));
 		}
 	}
-
-	/**
-	 * adds 'id in (...)' where stmt
-	 *
-	 * @param Zend_Db_Select $_select
-	 * @param string|array $_ids
-	 * @return Zend_Db_Select
-	 */
-	protected function _addWhereIdIn(Zend_Db_Select $_select, $_ids)
-	{
-		$_select->where($this->_db->quoteInto($this->_db->quoteIdentifier($this->_tableName . '.' . $this->_identifier) . ' in (?)', (array) $_ids));
-
-		return $_select;
-	}
-
-	/**
-	 * fetch rows from db
-	 *
-	 * @param Zend_Db_Select $_select
-	 * @param string $_mode
-	 * @return array
-	 */
-	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
-	{
+    }
+    
+    /**
+     * adds 'id in (...)' where stmt
+     * 
+     * @param Zend_Db_Select $_select
+     * @param string|array $_ids
+     * @return Zend_Db_Select
+     */
+    protected function _addWhereIdIn(Zend_Db_Select $_select, $_ids)
+    {
+        $_select->where($this->_db->quoteInto($this->_db->quoteIdentifier($this->_tableName . '.' . $this->_identifier) . ' in (?)', (array) $_ids));
+        
+        return $_select;
+    }
+    
+    /**
+     * fetch rows from db
+     * 
+     * @param Zend_Db_Select $_select
+     * @param string $_mode
+     * @return array
+     */
+    protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
+    {
 		Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix,$_select);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
