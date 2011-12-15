@@ -155,6 +155,8 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         $folder = Felamimail_Controller_Cache_Message::getInstance()->updateCache($folderId, $time);
         
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Folder: ' . print_r($folder,true));
+        
         return $this->_recordToJson($folder);
     }
     
