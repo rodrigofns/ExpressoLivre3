@@ -1246,18 +1246,13 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	public static function traitGroup($adapter, $tablePrefix, Zend_Db_Select $select)
 	{
-		$group = $select->getPart(Zend_Db_Select::GROUP);
-
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original Group: ' . print_r($group,true) . ' Original Select: ' .  $select->assemble());
+		$group = $select->getPart(Zend_Db_Select::GROUP);		
 
 		if (empty($group)) return;		
 
 		$order = $select->getPart(Zend_Db_Select::ORDER);
 
-		//Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Original SQL Select: ' . $select->assemble());
-
 		$columns = $select->getPart(Zend_Db_Select::COLUMNS);
-
 
 		try {
 				
@@ -1314,9 +1309,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		} catch (Exception $e) {
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );
 		}
-
-
-		//Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified SQL Select: ' . $select->assemble());
 
 		return $select;
 	}
