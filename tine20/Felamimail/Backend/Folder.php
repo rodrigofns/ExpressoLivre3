@@ -61,6 +61,8 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
             ->where($this->_db->quoteIdentifier('felamimail_cache_message_flag.folder_id') . ' = ?', $folderId)
             ->where($this->_db->quoteIdentifier('felamimail_cache_message_flag.flag') . ' = ?', '\\Seen');
         
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder counter: ' . $select->assemble());        		
+        
         $stmt = $this->_db->query($select);
         $seenCount = $stmt->fetchColumn(0);
         $stmt->closeCursor();

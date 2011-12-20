@@ -1,4 +1,4 @@
-<?php
+fa<?php
 /**
  * Tine 2.0
  * 
@@ -116,6 +116,7 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
             $_select->joinLeft($what, $on, array());
             $_select->where($db->quoteInto($db->quoteIdentifier("$correlationName.account_id") . ' IN (?)', $accountIds));
         }
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' account filter: ' . $_select->assemble());
     }
     
     /**
