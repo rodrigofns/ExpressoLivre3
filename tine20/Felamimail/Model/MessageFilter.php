@@ -244,6 +244,6 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
                 $db->quoteInto($fieldEmail . ' LIKE ?', $value)
             );
         }        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter with LIKE: ' . $_select->assemble());
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' to/cc/bcc and flags custom filters using LIKE: ' . $_select->assemble());
     }
 }
