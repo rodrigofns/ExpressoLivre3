@@ -468,6 +468,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			$select = $this->_getSelect($_cols);
 			$this->_addWhereIdIn($select, $ids);
 			$_pagination->appendSort($select);
+			
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' search select: ' . $select->assemble());
 
 			$rows = $this->_fetch($select, self::FETCH_ALL);
 
