@@ -52,14 +52,14 @@
                 <include name="Setup" /> 
                 <include name="SimpleFAQ" /> 
                 <include name="Sipgate" /> 
-                <include name="Tasks" /> 
+                <include name="Tasks" />
+		<include name="themes" /> 
                 <include name="Timetracker" />  
                 <include name="Tinebase" /> 
                 <include name="Voipmanager" /> 
                 <exclude name="build/*" />
                 <exclude name="images/*" />
                 <exclude name="styles/*" />
-		<exclude name="themes/*" />
                 <exclude name="library/*" />
                 <exclude name="Zend/*" />
             </fileset>
