@@ -59,6 +59,7 @@
                 <exclude name="build/*" />
                 <exclude name="images/*" />
                 <exclude name="styles/*" />
+		<exclude name="themes/*" />
                 <exclude name="library/*" />
                 <exclude name="Zend/*" />
             </fileset>
