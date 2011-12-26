@@ -153,9 +153,13 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         // close session to allow other requests
         Zend_Session::writeClose(true);
         
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Calling updateCache... ');
+        
         $folder = Felamimail_Controller_Cache_Message::getInstance()->updateCache($folderId, $time);
         
         Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Folder: ' . print_r($folder,true));
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' record to Json... ' . $this->_recordToJson($folder));
         
         return $this->_recordToJson($folder);
     }
