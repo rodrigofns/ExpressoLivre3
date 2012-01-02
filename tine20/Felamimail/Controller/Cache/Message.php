@@ -201,6 +201,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 	protected function _initUpdate(Felamimail_Model_Folder $_folder)
 	{
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " status of folder {$_folder->globalname}: {$_folder->cache_status}");
+		
+		try {			
 
 		$this->_initialCacheStatus = $_folder->cache_status;
 
@@ -211,9 +213,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$_folder->cache_job_startuid         = 0;
 		}
 
-		$_folder = Felamimail_Controller_Cache_Folder::getInstance()->getIMAPFolderCounter($_folder);
-		
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' folder catched in updating: ' . print_r($_folder,true));		
+		$_folder = Felamimail_Controller_Cache_Folder::getInstance()->getIMAPFolderCounter($_folder);				
 
 		if (isset($_folder->cache_uidvalidity) && $_folder->imap_uidvalidity != $_folder->cache_uidvalidity) {
 			if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . print_r($_folder->toArray(), TRUE));
@@ -229,6 +229,12 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 		$_folder->cache_timestamp = Tinebase_DateTime::now();
 
 		$this->_timeStart = microtime(true);
+		
+		} catch (Exception $e) {
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' Exception when init update: ' . $e->getMessage() . ' Folder object: ' . print_r($_folder,true));
+			throw $e;			
+		}
+		
 	}
 
 	/**
