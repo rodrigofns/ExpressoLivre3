@@ -120,7 +120,7 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
                         );
                     }
                     $data['message_id'] = $_record->getId();
-                    $this->_db->insert($this->_tablePrefix . $foreign['table'], $data);
+                    $this->_insertWithProfile($this->_tablePrefix . $foreign['table'], $data);                    
                 }
             }
         }
@@ -144,7 +144,7 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
             'message_id'    => $_message->getId(),
             'folder_id'     => $_message->folder_id
         );
-        $this->_db->insert($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
+        $this->_insertWithProfile($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
     }
     
     /**
@@ -184,7 +184,7 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
                     'message_id'    => $id,
                     'folder_id'     => $folderId,
                 );
-                $this->_db->insert($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
+                $this->_insertWithProfile($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
             }
         }
         
@@ -283,6 +283,8 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
         )->where(
             $this->_db->quoteInto($this->_db->quoteIdentifier('flag') . ' = ?', '\Seen')
         );
+        
+        $this->_traitGroup($select);
 
         $seenCount = $this->_db->fetchOne($select);
                 
