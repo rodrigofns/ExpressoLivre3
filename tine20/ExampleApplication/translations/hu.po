@@ -3,43 +3,51 @@ msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Gump <gump@gump.hu>\n"
+"Last-Translator: Faragó Tamás <tamas@kemenyfem.hu>\n"
 "Language-Team: gump <admin@kemenyfem.hu>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Language: Hungarian\n"
 "X-Poedit-Country: HUNGARY\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: Config.php:31
 msgid "Status Available"
-msgstr ""
+msgstr "Állapot elérhető"
 
 #: Config.php:33
 msgid "Possible status. Please note that additional status might impact other ExampleApplication systems on export or syncronisation."
-msgstr ""
+msgstr "Lehetséges állapot. Kérlek jegyezd meg, hogy a további állapotok ütközhetnek a más Példa Alkalmazás rendszerekkel exportálások vagy szinkronizáláskor."
 
 #: Controller.php:74
 #, python-format
 msgid "%s's personal example records"
 msgstr "%s személyes példa rekordjai"
 
-#: js/ExampleApplication.js:24
-msgid "Example Application test"
-msgstr ""
+#: Setup/setup.xml:4
+msgid "ExampleApplication"
+msgstr "PéldaAlkalmazás"
 
-#: js/ExampleRecordEditDialog.js:87
-msgid "ExampleRecord"
-msgstr "PéldaRekord"
+#: Setup/Initialize.php:33
+msgid "Completed"
+msgstr "Teljesítve"
 
-#: js/ExampleRecordEditDialog.js:104 js/ExampleRecordGridPanel.js:83
+#: Setup/Initialize.php:34
+msgid "Cancelled"
+msgstr "Lemondva"
+
+#: Setup/Initialize.php:35
+msgid "In process"
+msgstr "Feldolgozás alatt"
+
+#: js/ExampleRecordGridPanel.js:83 js/ExampleRecordEditDialog.js:104
 msgid "Name"
 msgstr "Név"
 
-#: js/ExampleRecordEditDialog.js:110 js/ExampleRecordGridPanel.js:89
+#: js/ExampleRecordGridPanel.js:89 js/ExampleRecordEditDialog.js:110
 #: js/Model.js:71
 msgid "Status"
 msgstr "Státusz"
@@ -55,6 +63,14 @@ msgstr "Költség"
 #: js/ExampleRecordGridPanel.js:126
 msgid "Show closed"
 msgstr "Mutasd a lezártakat"
+
+#: js/ExampleRecordEditDialog.js:87
+msgid "ExampleRecord"
+msgstr "PéldaRekord"
+
+#: js/ExampleApplication.js:24
+msgid "Example Application test"
+msgstr "Példa Alkalmazás teszt"
 
 #: js/Model.js:31
 msgid "example record"
@@ -74,35 +90,19 @@ msgstr "Gyors keresés"
 
 #: js/Model.js:79
 msgid "Last modified"
-msgstr ""
+msgstr "Utoljára módosítva"
 
 #: js/Model.js:80
 msgid "Last modifier"
-msgstr ""
+msgstr "Utoljára módosította"
 
 #: js/Model.js:81
 msgid "Creation Time"
-msgstr ""
+msgstr "Készítés ideje"
 
 #: js/Model.js:82
 msgid "Creator"
-msgstr ""
-
-#: Setup/Initialize.php:33
-msgid "Completed"
-msgstr ""
-
-#: Setup/Initialize.php:34
-msgid "Cancelled"
-msgstr ""
-
-#: Setup/Initialize.php:35
-msgid "In process"
-msgstr ""
-
-#: Setup/setup.xml:4
-msgid "ExampleApplication"
-msgstr "PéldaAlkalmazás"
+msgstr "Készítő"
 
 #~ msgid "Example Application"
 #~ msgstr "Példa Alkalmazás"

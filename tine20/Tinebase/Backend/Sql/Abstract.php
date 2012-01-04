@@ -191,36 +191,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	public function get($_id, $_getDeleted = FALSE)
 	{
-		$id = $this->_convertId($_id);
-
+		$id = Tinebase_Record_Abstract::convertId($_id, $this->_modelName);
 		return $this->getByProperty($id, $this->_identifier, $_getDeleted);
-	}
-
-	/**
-	 * converts a int, string or Tinebase_Record_Interface to a id
-	 *
-	 * @param int|string|Tinebase_Record_Interface $_id the id to convert
-	 * @return int
-	 */
-	protected function _convertId($_id)
-	{
-		if($_id instanceof $this->_modelName) {
-			$identifier = $this->_getRecordIdentifier();
-			if(empty($_id->$identifier)) {
-				throw new Tinebase_Exception_InvalidArgument('No id set!');
-			}
-			$id = $_id->$identifier;
-		} elseif (is_array($_id)) {
-			throw new Tinebase_Exception_InvalidArgument('Id can not be an array!');
-		} else {
-			$id = $_id;
-		}
-
-		if($id === 0) {
-			throw new Tinebase_Exception_InvalidArgument($this->_modelName . '.id can not be 0!');
-		}
-
-		return $id;
 	}
 
 	/**
@@ -254,7 +226,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$select->where($this->_db->quoteIdentifier($this->_tableName . '.' . $_property) . ' = ?', $_value)
 		->limit(1);
 
-		$this->_traitGroup($select);
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
@@ -373,9 +344,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				$select->where($this->_db->quoteIdentifier($this->_tableName . '.container_id') . ' in (?) /* add acl in getMultiple */', (array) $_containerIds);
 			}
 		}
-
-		$this->_traitGroup($select);
-
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
 
 		$stmt = $this->_db->query($select);
@@ -406,8 +374,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$select->order($orderBy . ' ' . $_orderDirection);
 
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
-
-		$this->_traitGroup($select);
 
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetchAll();
@@ -455,8 +421,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			$ids = $this->_fetch($select);
 		}
 
-		$this->_traitGroup($select);
-
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Fetched ' . count($ids) .' ids.');
 
 		if ($_cols === self::IDCOL) {
@@ -468,8 +432,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			$select = $this->_getSelect($_cols);
 			$this->_addWhereIdIn($select, $ids);
 			$_pagination->appendSort($select);
-				
-			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' search select: ' . $select->assemble());
 
 			$rows = $this->_fetch($select, self::FETCH_ALL);
 
@@ -503,15 +465,12 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			// use normal search query as subselect to get count -> select count(*) from (select [...]) as count
 			$select = $this->_getSelect();
 			$this->_addFilter($select, $_filter);
-			$this->_traitGroup($select);
 			$countSelect = $this->_db->select()->from($select, $searchCountCols);
 
 		} else {
 			$countSelect = $this->_getSelect($searchCountCols);
 			$this->_addFilter($countSelect, $_filter);
 		}
-
-		$this->_traitGroup($countSelect);
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
 
@@ -623,8 +582,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
 	{
-		Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix,$_select);
-
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
 
 		$stmt = $this->_db->query($_select);
@@ -694,8 +651,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		if (! empty($this->_foreignTables)) {
 			$groupBy = ($_groupBy !== NULL) ? $_groupBy : $this->_tableName . '.' . $this->_identifier;
 			$_select->group($groupBy);
-				
-			$this->_traitGroup($_select);
 
 			$cols = (array) $_cols;
 			foreach ($this->_foreignTables as $foreignColumn => $join) {
@@ -706,7 +661,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$selectArray = (array_key_exists('select', $join))
 					? $join['select']
 					: ((array_key_exists('field', $join) && (! array_key_exists('singleValue', $join) || ! $join['singleValue']))
-							? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier($join['table'] . '.' . $join['field'])))
+							? array($foreignColumn => 'GROUP_CONCAT(DISTINCT ' . $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) . ')')
 							: array($foreignColumn => $join['table'] . '.id'));
 					$joinId = (array_key_exists('joinId', $join)) ? $join['joinId'] : $this->_identifier;
 
@@ -728,8 +683,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 		}
-
-		//if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select);
 	}
 
 	/**
@@ -796,7 +749,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		if (!$this->_hasHashId()) {
 			$fullTableName = $this->getTablePrefix() . $this->getTableName();
 			$newId = $this->_db->lastInsertId($fullTableName , $this->_getPrimaryKey($fullTableName));
-		}
+		}		
 
 		// if we insert a record without an id, we need to get back one
 		if (empty($_record->$identifier) && $newId == 0) {
@@ -844,7 +797,14 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _recordToRawData($_record)
 	{
-		return $_record->toArray();
+		$raw = $_record->toArray(FALSE);
+		foreach($raw as $key => $value) {
+			if ($value instanceof Tinebase_Record_Interface) {
+				$raw[$key] = $value->getId();
+			}
+		}
+
+		return $raw;
 	}
 
 	/**
@@ -907,9 +867,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 				if (!empty($idsToRemove)) {
 					$where = '(' .
-							$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
+							$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) .
 							' AND ' .
-							$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
+							$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
 							')';
 
 					$this->_db->delete($this->_tablePrefix . $join['table'], $where);
@@ -1029,21 +989,21 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 		$myFields = array();
 		$customFields = array();
-			
+		 
 		foreach($_data as $key => $value) {
 			if(stristr($key, '#')) $customFields[substr($key,1)] = $value;
 			else $myFields[$key] = $value;
 		}
-			
+		 
 		// handle CustomFields
-			
+		 
 		if(count($customFields)) {
 			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' CustomFields found.');
 			Tinebase_CustomField::getInstance()->saveMultipleCustomFields($this->_modelName, $_ids, $customFields);
 		}
-			
+		 
 		// handle StdFields
-			
+		 
 		if(!count($myFields)) {
 			return 0;
 		}
@@ -1078,11 +1038,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			return 0;
 		}
 
-		$idArray = (! is_array($_id)) ? array($this->_convertId($_id)) : $_id;
+		$idArray = (! is_array($_id)) ? array(Tinebase_Record_Abstract::convertId($_id, $this->_modelName)) : $_id;
 		$identifier = $this->_getRecordIdentifier();
 
 		$where = array(
-				$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $this->_tableName . '.' . $identifier) . ' IN (?)', $idArray)
+				$this->_db->quoteInto($this->_db->quoteIdentifier($identifier) . ' IN (?)', $idArray)
 		);
 
 		return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
@@ -1275,7 +1235,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 							// adds columns into group by clause (table.field)
 							// checks if field has a function (that must be an aggregation)
 							$element = "{$column[0]}.$columnName";
-								
+
 							if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
 							{
 								$group[] = $element;
@@ -1304,7 +1264,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$group[] = $field;
 				}
 			}
-				
+
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified Group: ' . print_r($group,true));
 
 			$select->reset(Zend_Db_Select::GROUP);
@@ -1337,25 +1297,25 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		}
 		return $primaryKey;
 	}
-	
+
 	protected function _enableDbProfiler()
 	{
 		$this->_db->getProfiler()->setEnabled(true);
 	}
-	
+
 	protected function _getLastProfile()
 	{
 		return $this->_db->getProfiler()->getLastQueryProfile();
 	}
-	
+
 	protected function _disableDbProfiler()
 	{
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' profile query: ' . $profile->getQuery() . ' profile params: ' . print_r($profile->getQueryParams(),true));
-		$this->_db->getProfiler()->setEnabled(false);		
+		$this->_db->getProfiler()->setEnabled(false);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $table
 	 * @param array $bind
 	 * @todo improve when PHP traits are available
@@ -1365,14 +1325,14 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$this->_enableDbProfiler();
 		$this->_db->insert($table, $bind);
 		$this->_disableDbProfiler();
-	}	
-	
+	}
+
 	/**
-	 * 
+	 *
 	 * @param string $table
 	 * @param array $bind
 	 * @param string $where
-	 * @todo improve when PHP traits are available 
+	 * @todo improve when PHP traits are available
 	 */
 	protected function _updateWithProfile($table, array $bind, $where)
 	{
@@ -1382,7 +1342,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $table
 	 * @param string $where
 	 * $todo improve when PHP traits are available
@@ -1394,6 +1354,5 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$profile = $this->_db->getProfiler()->getLastQueryProfile();
 		$this->_disableDbProfiler();
 	}
-	
 
 }

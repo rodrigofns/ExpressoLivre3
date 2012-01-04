@@ -5,7 +5,11 @@
  * @package     Tinebase
  * @subpackage	Export
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+<<<<<<< HEAD
  * @author      Philipp Sch¸le <p.schuele@metaways.de>
+=======
+ * @author      Philipp Sch√ºle <p.schuele@metaways.de>
+>>>>>>> master
  * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  * @todo        add alternating row styles again?

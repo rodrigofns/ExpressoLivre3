@@ -6,7 +6,11 @@
  * @subpackage  PersistentFilter
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+<<<<<<< HEAD
  * @author      Philipp Sch¸le <p.schuele@metaways.de>
+=======
+ * @author      Philipp Sch√ºle <p.schuele@metaways.de>
+>>>>>>> master
  */
 
 /**

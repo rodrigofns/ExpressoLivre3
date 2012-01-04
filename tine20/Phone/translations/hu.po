@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Phone\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-09-14 20:03+0100\n"
-"Last-Translator: Gump <gump@gump.hu>\n"
+"PO-Revision-Date: 2011-12-05 11:30+0100\n"
+"Last-Translator: Faragó Tamás <tamas@kemenyfem.hu>\n"
 "Language-Team: gump <admin@kemenyfem.hu>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -12,43 +12,17 @@ msgstr ""
 "X-Poedit-Language: Hungarian\n"
 "X-Poedit-Country: HUNGARY\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-
-#: js/AddressbookGridPanelHook.js:35
-msgid "Call contact"
-msgstr ""
-
-#: js/AddressbookGridPanelHook.js:172
-msgid "Work"
-msgstr ""
-
-#: js/AddressbookGridPanelHook.js:181
-msgid "Home"
-msgstr ""
-
-#: js/AddressbookGridPanelHook.js:190
-msgid "Cell"
-msgstr ""
-
-#: js/AddressbookGridPanelHook.js:199
-msgid "Cell private"
-msgstr ""
-
-#: js/Models.js:69 js/Phone.js:59 js/Phone.js:254
-msgid "Phone"
-msgid_plural "Phones"
-msgstr[0] "Telefon"
-msgstr[1] "Telefonok"
-
-#: js/Models.js:73
-msgid "phones list"
-msgid_plural "phones lists"
-msgstr[0] "telefon lista"
-msgstr[1] "telefon listák"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: js/Phone.js:29 js/Phone.js:479 js/Phone.js:480
 msgid "Edit phone settings"
 msgstr "Telefon beállítások szerkesztése"
+
+#: js/Phone.js:59 js/Phone.js:254 js/Models.js:69
+msgid "Phone"
+msgid_plural "Phones"
+msgstr[0] "Telefon"
+msgstr[1] "Telefonok"
 
 #: js/Phone.js:70
 msgid "Phones"
@@ -153,3 +127,29 @@ msgstr "Csörgés"
 #: js/Phone.js:701
 msgid "Call ID"
 msgstr "Hívás azonosító"
+
+#: js/Models.js:73
+msgid "phones list"
+msgid_plural "phones lists"
+msgstr[0] "telefon lista"
+msgstr[1] "telefon listák"
+
+#: js/AddressbookGridPanelHook.js:35
+msgid "Call contact"
+msgstr "Kapcsolat hívása"
+
+#: js/AddressbookGridPanelHook.js:172
+msgid "Work"
+msgstr "Munkahelyi"
+
+#: js/AddressbookGridPanelHook.js:181
+msgid "Home"
+msgstr "Otthoni"
+
+#: js/AddressbookGridPanelHook.js:190
+msgid "Cell"
+msgstr "Mobil"
+
+#: js/AddressbookGridPanelHook.js:199
+msgid "Cell private"
+msgstr "Mobil privát"

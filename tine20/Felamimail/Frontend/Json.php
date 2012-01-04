@@ -124,6 +124,19 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         return $this->_multipleRecordsToJson($result);
     }
     
+    /**
+     * get folder status
+     *
+     * @param array  $filterData
+     * @return array of folder status
+     */
+    public function getFolderStatus($filterData)
+    {
+        $filter = new Felamimail_Model_FolderFilter($filterData);
+        $result = Felamimail_Controller_Cache_Message::getInstance()->getFolderStatus($filter);
+        return $this->_multipleRecordsToJson($result);
+    }
+    
     /***************************** messages funcs *******************************/
     
     /**
@@ -324,6 +337,16 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
                     }
                 }
             }
+            
+            if ($_record->preparedParts instanceof Tinebase_Record_RecordSet) {
+                foreach ($_record->preparedParts as $preparedPart) {
+                    if ($preparedPart->preparedData instanceof Calendar_Model_iMIP) {
+                        $iMIPFrontend = new Calendar_Frontend_iMIP();
+                        $iMIPFrontend->prepareComponent($preparedPart->preparedData);
+                    }
+                }
+            }
+            
         } else if ($_record instanceof Felamimail_Model_Account) {
             // add usernames (imap + smtp)
             $_record->resolveCredentials();
@@ -355,6 +378,7 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         return $this->_recordToJson($folder);
     }
+    
     /***************************** accounts funcs *******************************/
     
     /**

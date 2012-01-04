@@ -31,6 +31,10 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
     getFormItems: function () {
         if (Tine.Tinebase.registry.get('mapPanel') && Tine.widgets.MapPanel) {
             this.mapPanel = new Tine.Addressbook.MapPanel({
+                listeners: {
+                    'add': this.addToDisableOnEditMultiple,
+                    scope: this
+                },
                 layout: 'fit',
                 title: this.app.i18n._('Map'),
                 disabled: (Ext.isEmpty(this.record.get('adr_one_lon')) || Ext.isEmpty(this.record.get('adr_one_lat'))) && (Ext.isEmpty(this.record.get('adr_two_lon')) || Ext.isEmpty(this.record.get('adr_two_lat')))
@@ -92,15 +96,15 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                                 triggerAction: 'all',
                                 forceSelection: true,
                                 listeners: {
-                                	scope: this,
-                                	'select': function (combo, record, index) {
-                                		var jpegphoto = this.getForm().findField('jpegphoto');
-                                		
-                                		// set new empty photo depending on chosen salutation only if user doesn't have own image
-                                		if (Ext.isEmpty(jpegphoto.getValue()) && ! Ext.isEmpty(record.get('image_path'))) {
-                                			jpegphoto.setDefaultImage(record.get('image_path'));
-                                		}
-                                	}
+                                    scope: this,
+                                    'select': function (combo, record, index) {
+                                        var jpegphoto = this.getForm().findField('jpegphoto');
+                                        
+                                        // set new empty photo depending on chosen salutation only if user doesn't have own image
+                                        if (Ext.isEmpty(jpegphoto.getValue()) && ! Ext.isEmpty(record.get('image_path'))) {
+                                            jpegphoto.setDefaultImage(record.get('image_path'));
+                                        }
+                                    }
                                 }
                             }, {
                                 columnWidth: 0.65,
@@ -431,7 +435,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
         var downloader = new Ext.ux.file.Download({
             params: {
                 method: 'Addressbook.exportContacts',
-                filter: this.record.id,
+                filter: Ext.encode([{field: 'id', operator: 'in', value: this.record.id}]),
                 options: Ext.util.JSON.encode({
                     format: 'pdf'
                 })
@@ -444,7 +448,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
         // NOTE: it comes again and again till 
         if (this.rendered) {
             var container;
-        	        	
+                        
             // handle default container
             if (! this.record.id) {
                 if (this.forceContainer) {
@@ -460,7 +464,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
             }
             
             if (this.mapPanel instanceof Tine.Addressbook.MapPanel) {
-            	this.mapPanel.onRecordLoad(this.record);
+                this.mapPanel.onRecordLoad(this.record);
             }
         }
         
@@ -476,7 +480,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
  * @return {Ext.ux.Window}
  */
 Tine.Addressbook.ContactEditDialog.openWindow = function (config) {
-	
+    
     // if a container is selected in the tree, take this as default container
     var treeNode = Ext.getCmp('Addressbook_Tree') ? Ext.getCmp('Addressbook_Tree').getSelectionModel().getSelectedNode() : null;
     if (treeNode && treeNode.attributes && treeNode.attributes.container.type) {

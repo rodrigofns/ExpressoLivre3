@@ -244,6 +244,7 @@ class Tinebase_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         foreach($changes as $f) {
             $data[preg_replace('/^customfield_/','#', $f['name'])] = $f['value'];
         }
+
         return $this->_updateMultiple($filter, $data, Tinebase_Core::getApplicationInstance($appName, $modelName), $filterModel);
     }
 
@@ -623,7 +624,6 @@ class Tinebase_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 
                     $registryData[$application->name] = $applicationJson->getRegistryData();
                     $registryData[$application->name]['rights'] = Tinebase_Core::getUser()->getRights($application->name);
-
                     $registryData[$application->name]['config'] = isset($clientConfig[$application->name]) ? $clientConfig[$application->name]->toArray() : array();
 
                     // @todo do we need this for all apps?

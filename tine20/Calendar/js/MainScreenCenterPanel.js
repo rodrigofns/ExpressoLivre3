@@ -976,8 +976,8 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
                                '</div>' +
                                busyAttendeeHTML,
                 options: [
-                    {text: this.app.i18n._('Ignore Conflict'), name: 'ignore', checked: true},
-                    {text: this.app.i18n._('Edit Event'), name: 'edit'},
+                    {text: this.app.i18n._('Ignore Conflict'), name: 'ignore'},
+                    {text: this.app.i18n._('Edit Event'), name: 'edit', checked: true},
                     {text: this.app.i18n._('Cancel this action'), name: 'cancel'}
                 ],
                 scope: this,
@@ -1084,7 +1084,7 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
         if (! this.calendarPanels[which]) {
             Tine.log.debug('Tine.Calendar.MainScreenCenterPanel::getCalendarPanel creating new calender panel for view ' + which);
             
-            var store = new Ext.data.Store({
+            var store = new Ext.data.JsonStore({
                 //autoLoad: true,
                 id: 'id',
                 fields: Tine.Calendar.Model.Event,

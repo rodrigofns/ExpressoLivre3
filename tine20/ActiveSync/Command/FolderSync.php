@@ -77,11 +77,13 @@ class ActiveSync_Command_FolderSync extends ActiveSync_Command_Wbxml
     /**
      * the constructor
      *
-     * @param ActiveSync_Model_Device $_device
+     * @param  mixed                    $_requestBody
+     * @param  ActiveSync_Model_Device  $_device
+     * @param  string                   $_policyKey
      */
-    public function __construct(ActiveSync_Model_Device $_device)
+    public function __construct($_requestBody, ActiveSync_Model_Device $_device = null, $_policyKey = null)
     {
-        parent::__construct($_device);
+        parent::__construct($_requestBody, $_device, $_policyKey);
         
         $this->_folderStateBackend   = new ActiveSync_Backend_FolderState();
         $this->_controller           = ActiveSync_Controller::getInstance();
@@ -97,7 +99,8 @@ class ActiveSync_Command_FolderSync extends ActiveSync_Command_Wbxml
         $xml = simplexml_import_dom($this->_inputDom);
         $this->_syncKey = (int)$xml->SyncKey;
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " synckey is $this->_syncKey");        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " synckey is $this->_syncKey");        
     }
     
     /**
@@ -111,7 +114,7 @@ class ActiveSync_Command_FolderSync extends ActiveSync_Command_Wbxml
     {
         $folderSync = $this->_outputDom->documentElement;
         
-        if($this->_syncKey > '0' && $this->_controller->validateSyncKey($this->_device, $this->_syncKey, 'FolderSync') !== true) {
+        if($this->_syncKey > '0' && $this->_controller->validateSyncKey($this->_device, $this->_syncKey, 'FolderSync') === false) {
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " INVALID synckey provided");
             $folderSync->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', self::STATUS_INVALID_SYNC_KEY));
         } else {
@@ -200,7 +203,7 @@ class ActiveSync_Command_FolderSync extends ActiveSync_Command_Wbxml
             $this->_controller->updateSyncKey($this->_device, $newSyncKey, $this->_syncTimeStamp, 'FolderSync');
         }
         
-        parent::getResponse($_keepSession);
+        return $this->_outputDom;
     }
     
     /**

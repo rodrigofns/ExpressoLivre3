@@ -10,15 +10,32 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
 
     editDialog : null,
 
+<<<<<<< HEAD
+=======
+    selectedRecords: null,
+    selectionFilter: null,
+    
+>>>>>>> master
     form : null,
     changes : null,
 
     init : function(editDialog) {
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> master
         this.editDialog = editDialog;
         this.app = Tine.Tinebase.appMgr.get(this.editDialog.app);
         this.form = this.editDialog.getForm();
 
+<<<<<<< HEAD
+=======
+        Tine.log.debug('TRE', this.editDialog.selectionFilter);
+        Tine.log.debug('TRE', this.editDialog.selectedRecords);
+        
+        
+>>>>>>> master
         this.editDialog.on('render', function() {this.onAfterRender();}, this);
 
         this.editDialog.onRecordLoad = this.editDialog.onRecordLoad.createInterceptor(this.onRecordLoad, this);
@@ -67,18 +84,36 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
 
         this.editDialog.getForm().clearInvalid();
 
+<<<<<<< HEAD
         this.editDialog.window.setTitle(String.format(_('Edit {0} {1}'), this.editDialog.sm.getCount(), this.editDialog.i18nRecordsName));
+=======
+        var length = (this.editDialog.selectedRecords.length) ? this.editDialog.selectedRecords.length : _('multiple');
+        
+        this.editDialog.window.setTitle(String.format(_('Edit {0} {1}'), length, this.editDialog.i18nRecordsName));
+>>>>>>> master
 
         Ext.each(this.form.record.store.fields.keys, function(fieldKey) {
             var field = this.form.findField(fieldKey);
             
             if (field) {
+<<<<<<< HEAD
 
                 var referenceSelectionData = false; 
                 field.isClearable = true;
                 return Ext.each(this.editDialog.sm.getSelections(), function(selection, index) {
                     if(!referenceSelectionData) {
                         referenceSelectionData = selection.data[fieldKey];
+=======
+                if(! this.editDialog.selectedRecords.length) {
+                    this.handleField(field, fieldKey, false);
+                } else {
+                var referenceSelectionData = false; 
+                field.isClearable = true;
+                return Ext.each(this.editDialog.selectedRecords, function(selection, index) {
+                    
+                    if(!referenceSelectionData) {
+                        referenceSelectionData = selection[fieldKey];
+>>>>>>> master
                         if(referenceSelectionData) {
                            if(typeof referenceSelectionData == 'object') {
                                 if(fieldKey == 'account_id') {
@@ -104,17 +139,29 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                         return true;
                     }
 
+<<<<<<< HEAD
                     if (Ext.encode(selection.data[fieldKey]) != Ext.encode(referenceSelectionData)) {
                         this.handleField(field, fieldKey, false);
                         return false;
                     } else {
                         if (index == this.editDialog.sm.selections.length) {
+=======
+                    if (Ext.encode(selection[fieldKey]) != Ext.encode(referenceSelectionData)) {
+                        this.handleField(field, fieldKey, false);
+                        return false;
+                    } else {
+                        if (index == this.editDialog.selectedRecords.length) {
+>>>>>>> master
                             this.handleField(field, fieldKey, true);
                             return false;
                         }
                     }
                 }, this);
             }
+<<<<<<< HEAD
+=======
+            }
+>>>>>>> master
 
         }, this);
 
@@ -123,6 +170,7 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
             var field = this.form.findField('customfield_' + fieldKey);
 
             if (field) {
+<<<<<<< HEAD
                 field.setValue(this.editDialog.record.data.customfields[fieldKey]);
                 var referenceSelectionData = false;
                 Ext.each(this.editDialog.sm.getSelections(), function(selection, index) {
@@ -136,11 +184,36 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                         return false;
                     } else {
                         if (index == this.editDialog.sm.selections.length) {
+=======
+                
+                if(! this.editDialog.selectedRecords.length) {
+                    this.handleField(field, fieldKey, false);
+                } else {
+                
+                field.setValue(this.editDialog.record.data.customfields[fieldKey]);
+                var referenceSelectionData = false;
+                Ext.each(this.editDialog.selectedRecords, function(selection, index) {
+                    Tine.log.err(selection);
+                    if(!referenceSelectionData) {
+                        referenceSelectionData = selection.customfields[fieldKey];
+                        return true;
+                    }
+
+                    if (Ext.encode(selection.customfields[fieldKey]) != Ext.encode(referenceSelectionData)) {
+                        this.handleField(field, fieldKey, false);
+                        return false;
+                    } else {
+                        if (index == this.editDialog.selectedRecords.length) {
+>>>>>>> master
                             this.handleField(field, fieldKey, true);
                             return false;
                         }
                     }
                 }, this);
+<<<<<<< HEAD
+=======
+            }
+>>>>>>> master
             }
         }, this);
 
@@ -162,7 +235,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
         });
         
         this.form.items.each(function(item) {
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> master
             if ((!(item instanceof Ext.form.TextField)) && (!(item instanceof Ext.form.Checkbox))) {
                 item.disable();
                 return true;
@@ -198,7 +275,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
 
                     button.on('click', function() {
                         if(button.hasClass('undo')) {
+<<<<<<< HEAD
                             this.setValue(this.originalValue)
+=======
+                            this.setValue(this.originalValue);
+>>>>>>> master
                             button.set({title: _('Delete value from all selected records')});
                             if (this.multi) this.cleared = false;
                         } else {
@@ -254,7 +335,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                     this.un('focus');
                 });
             } else {
+<<<<<<< HEAD
                 item.on('render', function() { this.on('check', function() { this.edited = true })});
+=======
+                item.on('render', function() { this.on('check', function() { this.edited = true; })});
+>>>>>>> master
             }
         });
     },
@@ -292,10 +377,17 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                     
             return false;
         } else {
+<<<<<<< HEAD
             var filter = this.editDialog.sm.getSelectionFilter();
             
             Ext.MessageBox.confirm(_('Confirm'), String.format(_('Do you really want to change these {0} records?')
             + this.changedHuman, this.editDialog.sm.getCount()), function(_btn) {
+=======
+            var filter = this.editDialog.selectionFilter;
+            
+            Ext.MessageBox.confirm(_('Confirm'), String.format(_('Do you really want to change these {0} records?')
+            + this.changedHuman, this.editDialog.selectedRecords.length), function(_btn) {
+>>>>>>> master
                 if (_btn == 'yes') {
                     Ext.MessageBox.wait(_('Please wait'),_('Applying changes'));
                     Ext.Ajax.request({
@@ -307,11 +399,26 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                             changes: this.changes,
                             filter: filter
                         },
+<<<<<<< HEAD
                         success: function(_result, _request) {
                             Ext.MessageBox.hide();
                             this.editDialog.fireEvent('update');
                             this.editDialog.purgeListeners();
                             this.editDialog.window.close();
+=======
+                        success: function(_result, _request) {                           
+                            Ext.MessageBox.hide();
+                            var resp = Ext.decode(_result.responseText);
+                            if(resp.failcount > 0) {
+                                Ext.MessageBox.prompt(_('Update Error'), String.format(_('There had been {0} Error(s) while updating {3} records. Please check: {1}'), resp.failcount, resp.exceptions, resp.totalcount), function(_btn, _text) {
+                                       // @TODO: onOK close Window
+                                });
+                            } else {
+                                this.editDialog.fireEvent('update');
+                                this.editDialog.purgeListeners();
+                                this.editDialog.window.close();
+                            }
+>>>>>>> master
                         },
                         scope: this
                     });
@@ -327,6 +434,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
     
     handleField: function(field, fieldKey, samevalue) {
 
+<<<<<<< HEAD
+=======
+        if(field.disabled) return true;
+        
+>>>>>>> master
         if (!samevalue) {
             field.setReadOnly(true);
             field.addClass('tinebase-editmultipledialog-noneedit');

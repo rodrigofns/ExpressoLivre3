@@ -392,20 +392,37 @@ class Felamimail_JsonTest extends PHPUnit_Framework_TestCase
      */
     public function testUpdateMessageCache()
     {
-        $messageToSend = $this->_getMessageData();
-        $message = $this->_json->saveMessage($messageToSend);
-        $this->_foldersToClear = array('INBOX', $this->_account->sent_folder);
-        
+        $message = $this->_sendMessage();
         $inbox = $this->_getFolder('INBOX');
-        
         // update message cache and check result
         $result = $this->_json->updateMessageCache($inbox['id'], 30);
         
         if ($result['cache_status'] == Felamimail_Model_Folder::CACHE_STATUS_COMPLETE) {
             $this->assertEquals($result['imap_totalcount'], $result['cache_totalcount'], 'totalcounts should be equal');
         } else if ($result['cache_status'] == Felamimail_Model_Folder::CACHE_STATUS_INCOMPLETE) {
-            $this->assertNotEquals(0, $result['cache_job_actions_estimate']);
+            $this->assertNotEquals(0, $result['cache_job_actions_est']);
         }
+    }
+    
+    /**
+     * test folder status
+     */
+    public function testGetFolderStatus()
+    {
+        $filter = $this->_getFolderFilter();
+        $result = $this->_json->searchFolders($filter);
+        $this->assertGreaterThan(1, $result['totalcount']);
+        $expectedFolders = array('INBOX', $this->_testFolderName, $this->_account->trash_folder, $this->_account->sent_folder);
+        
+        foreach ($result['results'] as $folder) {
+            $this->_json->updateMessageCache($folder['id'], 30);
+        }
+        
+        $message = $this->_sendMessage();
+        
+        $status = $this->_json->getFolderStatus(array(array('field' => 'account_id', 'operator' => 'equals', 'value' => $this->_account->getId())));
+        $this->assertEquals(1, count($status));
+        $this->assertEquals($this->_account->sent_folder, $status[0]['localname']);
     }
     
     /**

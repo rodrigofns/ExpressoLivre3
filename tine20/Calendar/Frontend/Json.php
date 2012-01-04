@@ -242,6 +242,40 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     }
     
     /**
+     * prepares an iMIP (RFC 6047) Message
+     * 
+     * @param array $iMIP
+     * @return array prepared iMIP part
+     */
+    public function iMIPPrepare($iMIP)
+    {
+        $iMIPMessage = $iMIP instanceof Calendar_Model_iMIP ? $iMIP : new Calendar_Model_iMIP($iMIP);
+        $iMIPFrontend = new Calendar_Frontend_iMIP();
+        
+        $iMIPMessage->preconditionsChecked = FALSE;
+        $iMIPFrontend->prepareComponent($iMIPMessage);
+        $iMIPMessage->setTimezone(Tinebase_Core::get(Tinebase_Core::USERTIMEZONE));
+        return $iMIPMessage->toArray();
+    }
+    
+    /**
+     * process an iMIP (RFC 6047) Message
+     * 
+     * @param array  $iMIP
+     * @pram  string $status
+     * @return array prepared iMIP part
+     */
+    public function iMIPProcess($iMIP, $status=null)
+    {
+        $iMIPMessage = new Calendar_Model_iMIP($iMIP);
+        $iMIPFrontend = new Calendar_Frontend_iMIP();
+        
+        $iMIPFrontend->process($iMIPMessage, $status);
+        
+        return $this->iMIPPrepare($iMIPMessage);
+    }
+    
+    /**
      * returns record prepared for json transport
      *
      * @param Tinebase_Record_Interface $_record
