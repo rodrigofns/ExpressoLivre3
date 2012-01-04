@@ -244,11 +244,17 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
         
         $this->_expungeCacheFolder($folder, $imap);
         $this->_initUpdate($folder);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _initUpdate");
         $this->_updateMessageSequence($folder, $imap);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _updateMessageSequences");
         $this->_deleteMessagesInCache($folder, $imap);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _deleteMessagesInCache");        
         $this->_addMessagesToCache($folder, $imap);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _addMessagesToCache");
         $this->_checkForMissingMessages($folder, $imap);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _checkForMissingMessages");
         $this->_updateFolderStatus($folder);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " called _updateFolderStatus");
         
         if (rand(1, $_updateFlagFactor) == 1) {
             $folder = $this->updateFlags($folder);
