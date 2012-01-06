@@ -157,6 +157,8 @@ class Tinebase_Group
         $groupBackend = Tinebase_Group::getInstance();
         
         $groups = $groupBackend->getGroupsFromSyncBackend(NULL, NULL, 'ASC', NULL, NULL, 'Tinebase_Model_FullUser');
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' groups from sync backend: ' . print_r($groups,true));
 
         foreach($groups as $group) {
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .' sync group: ' . $group->name);
