@@ -807,17 +807,9 @@ span:hover.tinebase-showheaders-link {
     padding-right: 4px;
 }*/
 
-/* multiple edit dialog */
-<<<<<<< HEAD
+.search-item {border: 1px solid white}
 
-.tinebase-editmultipledialog-apply, 
-textarea.tinebase-editmultipledialog-apply, 
-input.tinebase-editmultipledialog-apply {
-    background-color: #d7f4d3;
-    background-image:none!important;
-    }
-=======
->>>>>>> master
+/* multiple edit dialog */
     
 .tinebase-editmultipledialog-noneedit, 
 input.tinebase-editmultipledialog-noneedit, 
@@ -856,8 +848,6 @@ textarea.tinebase-editmultipledialog-noneedit {
 .tinebase-editmultipledialog-clearer.click {background-position: -33px 0}
 
 .tinebase-editmultipledialog-clearer.over {background-position: -67px 0}
-<<<<<<< HEAD
-=======
 
 .tine-wordbox {
 	border: 1px solid gray;
@@ -866,4 +856,38 @@ textarea.tinebase-editmultipledialog-noneedit {
 	padding: 0px 5px;
 	background-color: white;
 }
->>>>>>> master
+
+/* token mode edit dialog */
+.tinebase-tokenedit-textfield {
+    color: white;
+}
+
+.tinebase-tokenedit-tokenbox {
+    position: absolute;
+    background-color: white;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.tinebase-tokenedit-token {
+    border: 1px solid gray;
+    margin-right: 3px;
+}
+
+.tinebase-tokenedit-tokenbox-area .tinebase-tokenedit-token {
+    display: inline-block;
+    line-height: 13px;
+}
+
+.tinebase-tokenedit-token-selected {
+    background-color: #FFFFAE;
+}
+
+.tinebase-tokenedit-position {
+    display: none;
+    width: 0px;
+    border: 1px solid gray;
+    margin-right: 3px;
+    line-height: 13px;
+    overflow: hidden;
+}

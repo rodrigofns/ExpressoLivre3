@@ -986,6 +986,44 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             
             // lookup additional items
             items = items.concat(this.getContextMenuItems());
+
+            // New record of another app
+            this.newRecordMenu = new Ext.menu.Menu({
+                items: [],
+                plugins: [{
+                    ptype: 'ux.itemregistry',
+                    key:   this.app.appName + '-GridPanel-ContextMenu-New'
+                }]
+            });
+            
+            this.newRecordAction = new Ext.Action({
+                text: this.app.i18n._('New...'),
+                hidden: ! this.newRecordMenu.items.length,
+                iconCls: this.app.getIconCls(),
+                scope: this,
+                menu: this.newRecordMenu
+            });
+            
+            items.push(this.newRecordAction);
+
+            // Add to record of another app            
+            this.addToRecordMenu = new Ext.menu.Menu({
+                items: [],
+                plugins: [{
+                    ptype: 'ux.itemregistry',
+                    key:   this.app.appName + '-GridPanel-ContextMenu-Add'
+                }]
+            });
+            
+            this.addToRecordAction = new Ext.Action({
+                text: this.app.i18n._('Add to...'),
+                hidden: ! this.addToRecordMenu.items.length,
+                iconCls: this.app.getIconCls(),
+                scope: this,
+                menu: this.addToRecordMenu
+            });            
+            
+            items.push(this.addToRecordAction);
             
             this.contextMenu = new Ext.menu.Menu({
                 items: items,
@@ -1245,16 +1283,11 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             config = null,
             popupWindow = editDialogClass.openWindow(Ext.copyTo(
             this.editDialogConfig || {}, {
-<<<<<<< HEAD
-                useMultiple: ((this.selectionModel.getCount() > 1) && (this.multipleEdit) && (button.actionType == 'edit')),
-                sm: this.selectionModel,
-=======
                 /* multi edit stuff: NOTE: due to cross window restrictions, we can only pass strings here  */
                 useMultiple: useMultiple,
                 selectedRecords: Ext.encode(selectedRecords),
                 selectionFilter: Ext.encode(this.selectionModel.getSelectionFilter()),
                 /* end multi edit stuff */
->>>>>>> master
                 record: editDialogClass.prototype.mode == 'local' ? Ext.encode(record.data) : record,
                 copyRecord: (button.actionType == 'copy'),
                 listeners: {
