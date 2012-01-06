@@ -227,6 +227,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		->limit(1);
 
 		//if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select->__toString());
+		
+		$this->_traitGroup($select);
 
 		$stmt = $this->_db->query($select);
 		$queryResult = $stmt->fetch();
