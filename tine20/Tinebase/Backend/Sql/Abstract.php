@@ -1269,8 +1269,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 				}
 			}
 
-			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Modified Group: ' . print_r($group,true));
-
 			$select->reset(Zend_Db_Select::GROUP);
 
 			$select->group($group);

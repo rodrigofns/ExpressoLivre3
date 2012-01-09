@@ -106,8 +106,6 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
         $records = $_controller->search($filter, $pagination, $_getRelations);
 
         $result = $this->_multipleRecordsToJson($records, $filter);
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . ' (' . __LINE__ . ') recordsToJson: ' . print_r($result,true) );
 
         return array(
             'results'       => array_values($result),
