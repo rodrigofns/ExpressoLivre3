@@ -377,9 +377,8 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             if (!empty($statements['primary']))
             {
             	$alterSequence = 'ALTER SEQUENCE ' . $sequence . ' OWNED BY ' . SQL_TABLE_PREFIX .  $_table->name . '.' . $statements['primary'];
-            }
-            
-            $this->execQueryVoid($alterSequence);            
+            	$this->execQueryVoid($alterSequence);
+            }           
              
         }
         catch (Exception $e)
