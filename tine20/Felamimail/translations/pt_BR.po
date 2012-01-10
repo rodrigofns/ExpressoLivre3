@@ -871,7 +871,7 @@ msgstr "Avançado"
 
 #: js/sieve/VacationEditDialog.js:191
 msgid "Only send all X days to the same sender"
-msgstr "dsa"
+msgstr "Intervalo, em dias, para envio de mensagem de férias"
 
 #: js/TreeContextMenu.js:24
 msgid "Update {0} Cache"
