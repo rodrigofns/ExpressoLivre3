@@ -453,7 +453,6 @@ class Tinebase_User
 
         foreach($users as $user) {
             try {
-                //throw new Exception('ola');
                 $user = self::syncUser($user, $_syncContactData);
             } catch (Tinebase_Exception_NotFound $ten) {
                 Tinebase_Core::getLogger()->crit(__METHOD__ . '::' . __LINE__ . " User {$user->accountLoginName} not synced: "
