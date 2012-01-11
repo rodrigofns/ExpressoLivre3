@@ -251,9 +251,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                         if ($data->is_all_day_event == true) {
                             // whole day events ends at 23:59:59 in Tine 2.0 but 00:00 the next day in AS
                             $dtend = clone $data->dtend;
-                            if ($dtend->format('s') == '59') {
-                                $dtend->addSecond(1);
-                            }
+                            
+                            $dtend->addSecond($dtend->get('s') == 59 ? 1 : 0);
+                            $dtend->addMinute($dtend->get('i') == 59 ? 1 : 0);
+
                             $nodeContent = $dtend->format('Ymd\THis') . 'Z';
                         } else {
                             $nodeContent = $data->dtend->format('Ymd\THis') . 'Z';
@@ -320,11 +321,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
         if(!empty($data->alarms)) {
             $alarm = $data->alarms->getFirstRecord();
             if($alarm instanceof Tinebase_Model_Alarm) {
-                $start = $data->dtstart;
-                $reminder = $alarm->alarm_time;
-                $reminderMinutes = ($start->getTimestamp() - $reminder->getTimestamp()) / 60;
-                if ($reminderMinutes >= 0) {
-                    $_xmlNode->appendChild(new DOMElement('Reminder', $reminderMinutes, 'uri:Calendar'));
+                // NOTE: option minutes_before is always calculated by Calendar_Controller_Event::_inspectAlarmSet
+                $minutesBefore = (int) $alarm->getOption('minutes_before');
+                if ($minutesBefore >= 0) {
+                    $_xmlNode->appendChild(new DOMElement('Reminder', $minutesBefore, 'uri:Calendar'));
                 }
             }
         }
@@ -609,14 +609,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
         }
         
         // get body
-        if (isset($xmlData->body)) {
-            // ActiveSync 2.5
-            $event->description = (string)$xmlData->body;
-        } elseif(isset($airSyncBase->Body)) {
-            // ActiveSync >= 12.0
-            $event->description = (string)$airSyncBase->Body->Data;
+        if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+            $event->description = isset($airSyncBase->Body) ? (string)$airSyncBase->Body->Data : null;
         } else {
-            $event->description = null;
+            $event->description = isset($xmlData->Body) ? (string)$xmlData->Body : null;
         }
         
         // whole day events ends at 23:59:59 in Tine 2.0 but 00:00 the next day in AS
@@ -896,77 +892,5 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                 'until' => $to
             )));
         }
-    }
-    
-    /**
-     * return list of supported folders for this backend
-     *
-     * @return array
-     */
-    public function getSupportedFolders()
-    {
-        // device supports multiple folders ?
-        if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine'))) {
-        
-            // get the folders the user has access to
-            $allowedFolders = $this->_getSyncableFolders();
-            
-            $wantedFolders = null;
-            
-            try {
-                $persistentFilterId = $this->_device->{$this->_filterProperty} ? 
-                    $this->_device->{$this->_filterProperty} : 
-                    Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter;
-                    
-                $persistentFilter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
-                
-                foreach($persistentFilter as $filter) {
-                    if($filter instanceof Tinebase_Model_Filter_Container) {
-                        $wantedFolders = array_flip($filter->getContainerIds());
-                    }
-                }
-            } catch (Tinebase_Exception_NotFound $tenf) {
-                // filter got deleted already
-            }
-            
-            $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
-            
-        } else {
-            
-            $folders[$this->_specialFolderName] = array(
-                'folderId'      => $this->_specialFolderName,
-                'parentId'      => 0,
-                'displayName'   => $this->_applicationName,
-                'type'          => $this->_defaultFolderType
-            );
-            
-        }
-        
-        return $folders;
-    }
-    
-    /**
-     * get syncable folders
-     * 
-     * @return array
-     */
-    protected function _getSyncableFolders()
-    {
-        $folders = array();
-        
-        $containers = Tinebase_Container::getInstance()->getPersonalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Core::getUser(), Tinebase_Model_Grants::GRANT_SYNC)
-            ->merge(Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC));
-//            ->merge(Tinebase_Container::getInstance()->getOtherUsersContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC));
-        
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => (count($folders) == 0) ? $this->_defaultFolderType : $this->_folderType
-            );
-        }
-                
-        return $folders;
     }
 }

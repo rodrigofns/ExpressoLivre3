@@ -273,4 +273,72 @@ class Tinebase_Setup_Update_Release5 extends Setup_Update_Abstract
         $this->setTableVersion('filter', '3');
         $this->setApplicationVersion('Tinebase', '5.5');
     }
+    
+    /**
+    * update to 5.6
+    * - changed seq index in async_job table
+    */
+    public function update_5()
+    {
+        if ($this->_backend->tableVersionQuery('async_job') === '2') {
+            try {
+                $this->_backend->dropIndex('async_job', 'seq');
+            } catch (Exception $e) {
+                // already done
+            }
+            $declaration = new Setup_Backend_Schema_Field_Xml('
+                <field>
+                    <name>name</name>
+                    <type>text</type>
+                    <length>64</length>
+                </field>');
+            $this->_backend->alterCol('async_job', $declaration);
+            
+            $declaration = new Setup_Backend_Schema_Index_Xml('
+                <index>
+                    <name>name-seq</name>
+                    <unique>true</unique>
+                    <field>
+                        <name>name</name>
+                    </field>
+                    <field>
+                        <name>seq</name>
+                    </field>
+                </index>
+            ');
+            $this->_backend->addIndex('async_job', $declaration);
+            
+            $this->setTableVersion('async_job', '3');
+        }
+        $this->setApplicationVersion('Tinebase', '5.6');
+    }
+    
+    /**
+    * update to 5.7
+     * - add deleted file cleanup task to scheduler
+    */
+    public function update_6()
+    {
+        $scheduler = Tinebase_Core::getScheduler();
+        Tinebase_Scheduler_Task::addDeletedFileCleanupTask($scheduler);
+        $this->setApplicationVersion('Tinebase', '5.7');
+    }
+    
+    /**
+    * update to 5.8
+    * - add content_seq to container
+    */
+    public function update_7()
+    {
+        $declaration = new Setup_Backend_Schema_Field_Xml('
+            <field>
+                <name>content_seq</name>
+                <type>integer</type>
+                <length>64</length>
+            </field>');
+        $this->_backend->addCol('container', $declaration);
+            
+        $this->setTableVersion('container', '5');
+        $this->setApplicationVersion('Tinebase', '5.8');
+    }
 }

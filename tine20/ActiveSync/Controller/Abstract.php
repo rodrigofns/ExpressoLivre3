@@ -162,7 +162,43 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      *
      * @return array
      */
-    abstract public function getSupportedFolders();
+    public function getSupportedFolders()
+    {
+        // device supports multiple folders ?
+        if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine', 'windowsphone'))) {
+        
+            // get the folders the user has access to
+            $allowedFolders = $this->_getSyncableFolders();
+            
+            $wantedFolders = null;
+            // maybe the user has defined a filter to limit the search results
+            try {
+                if(!empty($this->_device->contactsfilter_id)) {
+                    $persistentFilter = Tinebase_PersistentFilter::getFilterById($this->_device->contactsfilter_id);
+                    
+                    foreach($persistentFilter as $filter) {
+                        if($filter instanceof Tinebase_Model_Filter_Container) {
+                            $wantedFolders = array_flip($filter->getContainerIds());
+                        }
+                    }
+                }
+            } catch (Tinebase_Exception_NotFound $tenf) {
+               // filter got deleted already
+            }
+            $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
+        } else {
+            
+            $folders[$this->_specialFolderName] = array(
+                'folderId'      => $this->_specialFolderName,
+                'parentId'      => 0,
+                'displayName'   => $this->_applicationName,
+                'type'          => $this->_defaultFolderType
+            );
+            
+        }
+        
+        return $folders;
+    }
     
     /**
      * Returns a set of records identified by their id's
@@ -373,6 +409,29 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     }
     
     /**
+     * get syncable folders
+     * 
+     * @return array
+     */
+    protected function _getSyncableFolders()
+    {
+        $folders = array();
+        
+        $containers = Tinebase_Container::getInstance()->getContainerByACL(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC);
+        
+        foreach ($containers as $container) {
+            $folders[$container->id] = array(
+                'folderId'      => $container->id,
+                'parentId'      => 0,
+                'displayName'   => $container->name,
+                'type'          => (count($folders) == 0) ? $this->_defaultFolderType : $this->_folderType
+            );
+        }
+                
+        return $folders;
+    }
+    
+    /**
      * get all entries changed between to dates
      *
      * @param unknown_type $_field
@@ -430,23 +489,36 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     {
         $filter = new $this->_contentFilterClass();
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
                 
-        try {
-            $persistentFilterId = $this->_device->{$this->_filterProperty} ? 
-                $this->_device->{$this->_filterProperty} : 
+        // apply the default search filter only to devices which do not support multiple folders
+        if($this->_specialFolderName == $_folderId) {
+            $persistentFilterId = $this->_device->{$this->_filterProperty} ?
+                $this->_device->{$this->_filterProperty} :
                 Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter;
-                
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " defaultpersistentfilter: " . Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter);
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter id: " . $persistentFilterId);
-            
-            $persistentFilter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
-            if ($persistentFilter) {
-                $filter = $persistentFilter;
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+                    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " defaultpersistentfilter: " . Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter);
+        } else {
+            $persistentFilterId = $this->_device->{$this->_filterProperty} ?
+                $this->_device->{$this->_filterProperty} :
+                null;
+        }
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter id: " . $persistentFilterId);
+
+        if (!empty($persistentFilterId)) {
+            try {
+                $persistentFilter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
+                // @todo is this if statement really needed? either the filter got found or a Tinebase_Exception_NotFound got thrown
+                if ($persistentFilter) {
+                    $filter = $persistentFilter;
+                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
+                }
+            } catch (Tinebase_Exception_NotFound $tenf) {
+                // filter got deleted already
             }
-        } catch (Tinebase_Exception_NotFound $tenf) {
-            // filter got deleted already
         }
         
         $this->_getContentFilter($filter, $_filterType);

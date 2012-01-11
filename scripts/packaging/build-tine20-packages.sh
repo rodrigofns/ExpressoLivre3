@@ -270,6 +270,26 @@ function buildChecksum()
     echo "done"
 }
 
+function prepareDebianPackaging()
+{
+    PACKAGEDIR="$BASEDIR/packages/debian/$RELEASE"
+    rm -rf $PACKAGEDIR
+    
+    # Replace all matches of - with .
+    DEBIANVERSION=${RELEASE//-/.}
+    DEBIANVERSION=${DEBIANVERSION//\~*/}
+
+    mkdir -p "$PACKAGEDIR/tine20-$DEBIANVERSION"
+    
+    echo -n "preparing debian packaging directory in $PACKAGEDIR/tine20-$DEBIANVERSION ... "
+    
+    (cd $PACKAGEDIR/tine20-$DEBIANVERSION; tar xf ../../../tine20/$RELEASE/tine20-allinone_$RELEASE.tar.bz2)
+    cp $BASEDIR/packages/tine20/$RELEASE/tine20-allinone_$RELEASE.tar.bz2 $PACKAGEDIR/tine20_$DEBIANVERSION.orig.tar.bz2
+    cp -r $BASEDIR/temp/debian $PACKAGEDIR/tine20-$DEBIANVERSION
+
+    echo "done"
+}
+
 getOptions $*
                  
 createDirectories
@@ -281,4 +301,4 @@ createArchives
 createSpecialArchives
 packageTranslations
 buildChecksum
-
+prepareDebianPackaging

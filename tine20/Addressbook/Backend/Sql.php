@@ -3,17 +3,17 @@
  * Tine 2.0
  *
  * @package     Addressbook
+ * @subpackage  Backend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
- * 
- * @todo        move visibility='displayed' check from getSelect to contact filter
  */
 
 /**
  * sql backend class for the addressbook
  *
  * @package     Addressbook
+ * @subpackage  Backend
  */
 class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
 {
@@ -198,6 +198,7 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         
         return $imageData;
     }
+<<<<<<< HEAD
     
     /**
      * get the basic select object to fetch records from the database
@@ -250,4 +251,6 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $result['account_id'] = 'accounts.id';
         return $result;
     }
+=======
+>>>>>>> master
 }

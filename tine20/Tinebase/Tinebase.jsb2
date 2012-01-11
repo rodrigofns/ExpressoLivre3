@@ -52,6 +52,10 @@
           "path": "js/widgets/"
         },
         {
+          "text": "RecordPickerManager.js",
+          "path": "js/widgets/form/"
+        },
+        {
           "text": "FieldLabeler.js",
           "path": "js/ux/"
         },
@@ -150,7 +154,7 @@
         {
           "text": "Download.js",
           "path": "js/ux/file/"
-        },
+        },    
         {
           "text": "ColorField.js",
           "path": "js/ux/form/"
@@ -356,10 +360,6 @@
           "path": "js/widgets/"
         },
         {
-          "text": "Priority.js",
-          "path": "js/widgets/"
-        },
-        {
           "text": "VersionCheck.js",
           "path": "js/widgets/"
         },
@@ -373,6 +373,14 @@
         },
         {
           "text": "MultipleEditDialogPlugin.js",
+          "path": "js/widgets/dialog/"
+        },
+         {
+          "text": "TabPanelKeyPlugin.js",
+          "path": "js/ux/"
+        },
+        {
+          "text": "TokenModeEditDialogPlugin.js",
           "path": "js/widgets/dialog/"
         },
         {

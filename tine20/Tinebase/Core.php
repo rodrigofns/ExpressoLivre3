@@ -537,7 +537,15 @@ class Tinebase_Core
             }
 
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " cache of backend type '{$backendType}' enabled");
-            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptions, TRUE));
+            
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) {
+                // logger is an object, that makes ugly traces :)
+                $backendOptionsWithoutLogger = $backendOptions;
+                if (isset($backendOptionsWithoutLogger['logger'])) {
+                    unset($backendOptionsWithoutLogger['logger']);
+                }
+                Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptionsWithoutLogger, TRUE));
+            }
 
         } else {
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . ' cache disabled');
@@ -632,6 +640,7 @@ class Tinebase_Core
      * 
      * @param array $_options
      * @param string $_namespace
+     * @throws Exception
      */
     public static function startSession($_options = array(), $_namespace = 'tinebase')
     {
@@ -640,11 +649,11 @@ class Tinebase_Core
         
         try {
             Zend_Session::start();
-        } catch (Zend_Session_Exception $zse) {
+        } catch (Exception $e) {
             Zend_Session::destroy();
-            self::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Session error: ' . $zse->getMessage());
-            self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $zse->getTraceAsString());
-            throw $zse;
+            self::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Session error: ' . $e->getMessage());
+            self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
+            throw $e;
         }
         
         $session = new Zend_Session_Namespace($_namespace);

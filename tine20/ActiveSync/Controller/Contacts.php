@@ -8,7 +8,7 @@
  *              NOTE: According to sec. 8 of the AFFERO GENERAL PUBLIC LICENSE (AGPL), 
  *              Version 1, the distribution of the Tine 2.0 ActiveSync module in or to the 
  *              United States of America is excluded from the scope of this license.
- * @copyright   Copyright (c) 2008-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2008-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -26,7 +26,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         #'AssistantName'         => 'assistantname',
         'AssistnamePhoneNumber' => 'tel_assistent',
         'Birthday'              => 'bday',
-        #'Body'                  => 'body',
+        #'Body'                  => 'note',
         #'BodySize'              => 'bodysize',
         #'BodyTruncated'         => 'bodytruncated',
         #'Business2PhoneNumber'  => 'business2phonenumber',
@@ -139,6 +139,8 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      */
     public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
     {
+        $_xmlNode->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Contacts', 'uri:Contacts');
+        
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
         foreach($this->_mapping as $key => $value) {
@@ -199,99 +201,40 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                 
             }
         }
-          
+        
+        if(!empty($data->note)) {
+            if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+                $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+                
+                $body->appendChild(new DOMElement('Type', 1, 'uri:AirSyncBase'));
+                
+                // create a new DOMElement ...
+                $dataTag = new DOMElement('Data', null, 'uri:AirSyncBase');
+
+                // ... append it to parent node aka append it to the document ...
+                $body->appendChild($dataTag);
+                
+                // ... and now add the content (DomText takes care of special chars)
+                $dataTag->appendChild(new DOMText($data->note));
+            } else {
+                // create a new DOMElement ...
+                $node = new DOMElement('Body', null, 'uri:Contacts');
+
+                // ... append it to parent node aka append it to the document ...
+                $_xmlNode->appendChild($node);
+                
+                // ... and now add the content (DomText takes care of special chars)
+                $node->appendChild(new DOMText($data->note));
+                
+            }
+        }
+        
         if(isset($data->tags) && count($data->tags) > 0) {
             $categories = $_xmlNode->appendChild(new DOMElement('Categories', null, 'uri:Contacts'));
             foreach($data->tags as $tag) {
                 $categories->appendChild(new DOMElement('Category', $tag, 'uri:Contacts'));
             }
         }
-    }
-    
-    /**
-     * get syncable folders
-     * 
-     * @return array
-     */
-    protected function _getSyncableFolders()
-    {
-        $folders = array();
-    	
-        $containers = Tinebase_Container::getInstance()->getPersonalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Core::getUser(), Tinebase_Model_Grants::GRANT_SYNC);
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => (count($folders) == 0) ? $this->_defaultFolderType : $this->_folderType
-           );
-        }
-	            
-        $containers = Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC);
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => $this->_folderType
-            );
-        }
-	    
-        #try {
-        #    $accountsFolder = Tinebase_Container::getInstance()->getInternalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC);
-        #    $folders[$accountsFolder->id] = array(
-        #        'folderId'      => $accountsFolder->id,
-        #        'parentId'      => 0,
-        #        'displayName'   => $accountsFolder->name,
-        #        'type'          => $this->_folderType
-        #    );
-        #} catch (Exception $e) {
-        #    Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " leaving out internal container as user has no GRANT_SYNC for it");
-        #}
-        
-        // we ignore the folders of others users for now
-	            
-        return $folders;
-    }
-    
-    /**
-     * return list of supported folders for this backend
-     *
-     * @return array
-     */
-    public function getSupportedFolders()
-    {
-        // device supports multiple folders ?
-        if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine'))) {
-        
-            // get the folders the user has access to
-            $allowedFolders = $this->_getSyncableFolders();
-            
-            $wantedFolders = null;
-            // maybe the user has defined a filter to limit the search results
-            if(!empty($this->_device->contactsfilter_id)) {
-                $persistentFilter = Tinebase_PersistentFilter::getFilterById($this->_device->contactsfilter_id);
-                
-                foreach($persistentFilter as $filter) {
-                    if($filter instanceof Tinebase_Model_Filter_Container) {
-                        $wantedFolders = array_flip($filter->getContainerIds());
-                    }
-                }
-            }
-            
-            $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
-        } else {
-            
-            $folders[$this->_specialFolderName] = array(
-                'folderId'      => $this->_specialFolderName,
-                'parentId'      => 0,
-                'displayName'   => $this->_applicationName,
-                'type'          => $this->_defaultFolderType
-            );
-            
-        }
-        
-        return $folders;
     }
     
     /**
@@ -302,7 +245,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      */
     public function toTineModel(SimpleXMLElement $_data, $_entry = null)
     {
-        if($_entry instanceof Addressbook_Model_Contact) {
+        if ($_entry instanceof Addressbook_Model_Contact) {
             $contact = $_entry;
         } else {
             $contact = new Addressbook_Model_Contact(null, true);
@@ -310,9 +253,10 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         unset($contact->jpegphoto);
         
         $xmlData = $_data->children('uri:Contacts');
-
+        $airSyncBase = $_data->children('uri:AirSyncBase');
+        
         foreach($this->_mapping as $fieldName => $value) {
-            switch($value) {
+            switch ($value) {
                 case 'jpegphoto':
                     // do not change if not set
                     if(isset($xmlData->$fieldName)) {
@@ -326,12 +270,13 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                             if (isset($currentPhoto) && $currentPhoto == $devicePhoto) {
                                 if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " photo did not change on device -> preserving server photo");
                             } else {
-                                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " takeing new contact photo from device (" . strlen($devicePhoto) . "KB)");
+                                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " using new contact photo from device (" . strlen($devicePhoto) . "KB)");
                                 $contact->jpegphoto = $devicePhoto;
                             }
-                        } else {
+                        } else if ($_entry && ! empty($_entry->jpegphoto)) {
                             $contact->jpegphoto = '';
-                            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " deleting contact photo on device request");
+                            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ 
+                                . ' Deleting contact photo on device request (contact id: ' . $contact->getId() . ')');
                         }
                     }
                     break;
@@ -398,6 +343,14 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                     break;
             }
         }
+        
+        // get body
+        if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+                $contact->note = isset($airSyncBase->Body) ? (string)$airSyncBase->Body->Data : null;
+        } else {
+            $contact->note = isset($xmlData->Body) ? (string)$xmlData->Body : null;
+        }
+        
         // force update of n_fileas and n_fn
         $contact->setFromArray(array(
             'n_given'   => $contact->n_given,

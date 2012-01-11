@@ -55,6 +55,13 @@ class Setup_Controller
     protected $_emailConfigKeys = array();
     
     /**
+     * number of updated apps
+     * 
+     * @var integer
+     */
+    protected $_updatedApplications = 0;
+    
+    /**
      * don't clone. Use the singleton.
      *
      */
@@ -291,15 +298,16 @@ class Setup_Controller
      */
     public function updateApplications(Tinebase_Record_RecordSet $_applications)
     {
+        $this->_updatedApplications = 0;
         $smallestMajorVersion = NULL;
         $biggestMajorVersion = NULL;
         
         //find smallest major version
-        foreach($_applications as $application) {
-            if($smallestMajorVersion === NULL || $application->getMajorVersion() < $smallestMajorVersion) {
+        foreach ($_applications as $application) {
+            if ($smallestMajorVersion === NULL || $application->getMajorVersion() < $smallestMajorVersion) {
                 $smallestMajorVersion = $application->getMajorVersion();
             }
-            if($biggestMajorVersion === NULL || $application->getMajorVersion() > $biggestMajorVersion) {
+            if ($biggestMajorVersion === NULL || $application->getMajorVersion() > $biggestMajorVersion) {
                 $biggestMajorVersion = $application->getMajorVersion();
             }
         }
@@ -328,8 +336,11 @@ class Setup_Controller
             }
         }
         
-        return $messages;
-    }
+        return array(
+            'messages' => $messages,
+            'updated'  => $this->_updatedApplications,
+        );
+    }    
         
     /**
      * load the setup.xml file and returns a simplexml object
@@ -442,6 +453,7 @@ class Setup_Controller
                 $updatedApp = Tinebase_Application::getInstance()->getApplicationById($_application->getId());
                 $_application->version = $updatedApp->version;
                 Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Updated ' . $_application->name . " successfully to " .  $_application->version);
+                $this->_updatedApplications++;
                 
                 break;
                 
@@ -455,6 +467,10 @@ class Setup_Controller
                 );
                 break;
         }
+        
+        Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Clearing cache after update ...');
+        $this->_enableCaching();
+        Tinebase_Core::getCache()->clean(Zend_Cache::CLEANING_MODE_ALL);
         
         return $messages;
     }
@@ -728,12 +744,10 @@ class Setup_Controller
             $filename = dirname(__FILE__) . '/../config.inc.php';
         }
         
-        $config = $this->writeConfigToFile($_data, $filename, $_merge);
+        $config = $this->writeConfigToFile($_data, $_merge, $filename);
         
-        // set as active config
         Setup_Core::set(Setup_Core::CONFIG, $config);
         
-        // init logger
         Setup_Core::setupLogger();
         
         if ($doLogin && isset($password)) {
@@ -816,7 +830,9 @@ class Setup_Controller
      */
     protected function _updateAuthentication($_authenticationData)
     {
-        //Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_authenticationData, TRUE));
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_authenticationData, TRUE));
+
+        $this->_enableCaching();
         
         if (isset($_authenticationData['authentication'])) {
             $this->_updateAuthenticationProvider($_authenticationData['authentication']);
@@ -833,6 +849,16 @@ class Setup_Controller
         if (isset($_authenticationData['acceptedTermsVersion'])) {
             $this->saveAcceptedTerms($_authenticationData['acceptedTermsVersion']);
         }
+    }
+    
+    /**
+     * enable caching to make sure cache gets cleaned if config options change
+     */
+    protected function _enableCaching()
+    {
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Activate caching backend if available ...');
+        
+        Tinebase_Core::setupCache();
     }
     
     /**
@@ -988,7 +1014,6 @@ class Setup_Controller
         return $return;
     }
 
-    
     /**
      * get email config
      *
@@ -1017,6 +1042,8 @@ class Setup_Controller
      */
     public function saveEmailConfig($_data)
     {
+        $this->_enableCaching();
+        
         foreach ($this->_emailConfigKeys as $configName => $configKey) {
             if (array_key_exists($configName, $_data)) {
                 Tinebase_Config::getInstance()->setConfigForApplication($configKey, Zend_Json::encode($_data[$configName]));
@@ -1200,13 +1227,12 @@ class Setup_Controller
      * @param  SimpleXMLElement $_xml
      * @param  array | optional $_options
      * @return void
-     * @throws Setup_Exception
      * @throws Tinebase_Exception_Backend_Database
      */
     protected function _installApplication($_xml, $_options = null)
     {
         if ($this->_backend === NULL) {
-            throw new Setup_Exception('Need configured and working database backend for install.');
+            throw new Tinebase_Exception_Backend_Database('Need configured and working database backend for install.');
         }
         
         try {

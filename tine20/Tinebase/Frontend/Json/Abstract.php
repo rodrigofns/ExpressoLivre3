@@ -52,6 +52,27 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
         return array();
     }
 
+    /**
+    * resolve containers, tags and users
+    *
+    * @param Tinebase_Record_RecordSet $_records
+    * @param array $_resolveUserFields
+    */
+    public static function resolveContainerTagsUsers(Tinebase_Record_RecordSet $_records, $_resolveUserFields = array())
+    {
+        if ($_records->getFirstRecord()->has('container_id')) {
+            Tinebase_Container::getInstance()->getGrantsOfRecords($_records, Tinebase_Core::getUser());
+        }
+    
+        if ($_records->getFirstRecord()->has('tags')) {
+            Tinebase_Tags::getInstance()->getMultipleTagsOfRecords($_records);
+        }
+    
+        if (array_key_exists($_records->getRecordClassName(), $_resolveUserFields)) {
+            Tinebase_User::getInstance()->resolveMultipleUsers($_records, $_resolveUserFields[$_records->getRecordClassName()], TRUE);
+        }
+    }
+    
     /************************** protected functions **********************/
 
     /**
@@ -179,7 +200,11 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
         $decodedData   = is_array($_data) ? $_data : Zend_Json::decode($_data);
         $filter = $this->_decodeFilter($_filter, $_filterModel, TRUE);
 
-        return $_controller->updateMultiple($filter, $decodedData);
+        $result = $_controller->updateMultiple($filter, $decodedData);
+        $result['results']     = $this->_multipleRecordsToJson($result['results']);
+        $result['exceptions']  = $this->_multipleRecordsToJson($result['exceptions']);
+        
+        return $result;
     }
 
     /**
@@ -284,11 +309,9 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
      */
     protected function _recordToJson($_record)
     {
-        $converter = new Tinebase_Convert_Json();
+        $converter = Tinebase_Convert_Factory::factory($_record);
         $result = $converter->fromTine20Model($_record);
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' record to JSON : ' . print_r($result,true));
-
         return $result;
     }
 
@@ -303,8 +326,6 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
     {
         $converter = new Tinebase_Convert_Json();
         $result = $converter->fromTine20RecordSet($_records, $this->_resolveUserFields);
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' records to JSON : ' . print_r($result,true));        
 
         return $result;
     }

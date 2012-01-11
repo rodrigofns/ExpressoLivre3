@@ -3,14 +3,17 @@
  * Tine 2.0
  * 
  * @package     Calendar
+ * @subpackage  Frontend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2007-2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
  * json interface for calendar
+ * 
  * @package     Calendar
+ * @subpackage  Frontend
  */
 class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 {
@@ -25,15 +28,15 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array       $recordData
      * @param  bool        $deleteInstance
      * @param  bool        $deleteAllFollowing
-     * @param  bool        $checkBusyConficts
+     * @param  bool        $checkBusyConflicts
      * @return array       exception Event | updated baseEvent
      */
-    public function createRecurException($recordData, $deleteInstance, $deleteAllFollowing, $checkBusyConficts = FALSE)
+    public function createRecurException($recordData, $deleteInstance, $deleteAllFollowing, $checkBusyConflicts = FALSE)
     {
         $event = new Calendar_Model_Event(array(), TRUE);
         $event->setFromJsonInUsersTimezone($recordData);
         
-        $returnEvent = Calendar_Controller_Event::getInstance()->createRecurException($event, $deleteInstance, $deleteAllFollowing, $checkBusyConficts);
+        $returnEvent = Calendar_Controller_Event::getInstance()->createRecurException($event, $deleteInstance, $deleteAllFollowing, $checkBusyConflicts);
         
         return $this->getEvent($returnEvent->getId());
     }
@@ -157,7 +160,7 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         $records = $controller->search($filter, $pagination, FALSE);
         
-        $result = $this->_multipleRecordsToJson($records, $clientFilter);
+        $result = $this->_multipleRecordsToJson($records, $clientFilter, $pagination);
         
         return array(
             'results'       => $result,
@@ -182,12 +185,12 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * creates/updates an event
      *
      * @param   array   $recordData
-     * @param   bool    $checkBusyConficts
+     * @param   bool    $checkBusyConflicts
      * @return  array   created/updated event
      */
-    public function saveEvent($recordData, $checkBusyConficts = FALSE)
+    public function saveEvent($recordData, $checkBusyConflicts = FALSE)
     {
-        return $this->_save($recordData, Calendar_Controller_Event::getInstance(), 'Event', 'id', array($checkBusyConficts));
+        return $this->_save($recordData, Calendar_Controller_Event::getInstance(), 'Event', 'id', array($checkBusyConflicts));
     }
     
     /**
@@ -225,18 +228,18 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * updated a recur series
      *
      * @param  array $recordData
-     * @param  bool  $checkBusyConficts
+     * @param  bool  $checkBusyConflicts
      * @noparamyet  JSONstring $returnPeriod NOT IMPLEMENTED YET
      * @return array 
      */
-    public function updateRecurSeries($recordData, $checkBusyConficts = FALSE /*, $returnPeriod*/)
+    public function updateRecurSeries($recordData, $checkBusyConflicts = FALSE /*, $returnPeriod*/)
     {
         $recurInstance = new Calendar_Model_Event(array(), TRUE);
         $recurInstance->setFromJsonInUsersTimezone($recordData);
         
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(print_r($recurInstance->toArray(), true));
         
-        $baseEvent = Calendar_Controller_Event::getInstance()->updateRecurSeries($recurInstance, $checkBusyConficts);
+        $baseEvent = Calendar_Controller_Event::getInstance()->updateRecurSeries($recurInstance, $checkBusyConflicts);
         
         return $this->getEvent($baseEvent->getId());
     }
@@ -262,7 +265,7 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * process an iMIP (RFC 6047) Message
      * 
      * @param array  $iMIP
-     * @pram  string $status
+     * @param string $status
      * @return array prepared iMIP part
      */
     public function iMIPProcess($iMIP, $status=null)
@@ -276,31 +279,17 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     }
     
     /**
-     * returns record prepared for json transport
-     *
-     * @param Tinebase_Record_Interface $_record
-     * @return array record data
-     */
-    protected function _recordToJson($_record)
-    {
-    	if ($_record instanceof Calendar_Model_Event) {
-	    	Calendar_Model_Attender::resolveAttendee($_record->attendee);
-	        $this->_resolveRrule($_record);
-	        $this->_resolveOrganizer($_record);
-    	}
-	        
-        $recordData = parent::_recordToJson($_record);
-        return $recordData;
-    }
-    
-    /**
      * returns multiple records prepared for json transport
      *
      * @param Tinebase_Record_RecordSet $_records Tinebase_Record_Abstract
-     * @param Tinebase_Model_Filter_FilterGroup
+     * @param Tinebase_Model_Filter_FilterGroup $_filter
+     * @param Tinebase_Model_Pagination $_pagination needed for sorting
      * @return array data
+     * 
+     * @todo perhaps we need to resolveContainerTagsUsers() before  mergeAndRemoveNonMatchingRecurrences(), but i'm not sure about that
+     * @todo use Calendar_Convert_Event_Json
      */
-    protected function _multipleRecordsToJson(Tinebase_Record_RecordSet $_records, $_filter=NULL)
+    protected function _multipleRecordsToJson(Tinebase_Record_RecordSet $_records, $_filter = NULL, $_pagination = NULL)
     {
     	if ($_records->getRecordClassName() == 'Calendar_Model_Event') {
 	    	if (is_null($_filter)) {
@@ -310,19 +299,15 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 	        Tinebase_Notes::getInstance()->getMultipleNotesOfRecords($_records);
 	        
 	        Calendar_Model_Attender::resolveAttendee($_records->attendee);
-	        $this->_resolveOrganizer($_records);
-	        $this->_resolveRrule($_records);
-	        
-            // get/resolve alarms
+	        Calendar_Convert_Event_Json::resolveOrganizer($_records);
+	        Calendar_Convert_Event_Json::resolveRrule($_records);
             Calendar_Controller_Event::getInstance()->getAlarms($_records);
-	        
-            //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(print_r($_records->toArray(), true));
-	        
+            
             Calendar_Model_Rrule::mergeAndRemoveNonMatchingRecurrences($_records, $_filter);
             
-	        // @todo sort (record set)
-	        $eventsData = parent::_multipleRecordsToJson($_records);
-	        foreach($eventsData as $eventData) {
+            $_records->sortByPagination($_pagination);
+            $eventsData = parent::_multipleRecordsToJson($_records);
+	        foreach ($eventsData as $eventData) {
 	            if (! array_key_exists(Tinebase_Model_Grants::GRANT_READ, $eventData) || ! $eventData[Tinebase_Model_Grants::GRANT_READ]) {
 	                $eventData['notes'] = array();
 	                $eventData['tags'] = array();
@@ -332,51 +317,6 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 	        return $eventsData;
     	}
           
-        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(print_r($_records->toArray(), true));
         return parent::_multipleRecordsToJson($_records);
-    }
-    
-    /**
-     * resolves organizer of given event
-     *
-     * @param Tinebase_Record_RecordSet|Calendar_Model_Event $_events
-     */
-    protected function _resolveOrganizer($_events)
-    {
-        $events = $_events instanceof Tinebase_Record_RecordSet ? $_events : array($_events);
-        
-        $organizerIds = array();
-        foreach ($events as $event) {
-            if ($event->organizer) {
-                $organizerIds[] = $event->organizer;
-            }
-        }
-
-        $organizers = Addressbook_Controller_Contact::getInstance()->getMultiple(array_unique($organizerIds), TRUE);
-        
-        foreach ($events as $event) {
-            if ($event->organizer) {
-                $idx = $organizers->getIndexById($event->organizer);
-                if ($idx !== FALSE) {
-                    $event->organizer = $organizers[$idx];
-                }
-            }
-        }
-    }
-    
-    /**
-     * resolves rrule of given event
-     *
-     * @param Tinebase_Record_RecordSet|Calendar_Model_Event $_events
-     */
-    protected function _resolveRrule($_events)
-    {
-        $events = $_events instanceof Tinebase_Record_RecordSet ? $_events : array($_events);
-        
-        foreach ($events as $event) {
-            if ($event->rrule) {
-                $event->rrule = Calendar_Model_Rrule::getRruleFromString($event->rrule);
-            }
-        }
     }
 }

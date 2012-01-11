@@ -70,11 +70,6 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     const ATTACHMENT_FILENAME_REGEXP = "/name=\"(.*)\"/";
     
     /**
-     * email address regexp
-     */
-    const EMAIL_ADDRESS_REGEXP = '/([a-z0-9_\+-\.]+@[a-z0-9-\.]+\.[a-z]{2,5})/i'; 
-    
-    /**
      * quote string ("> ")
      * 
      * @var string
@@ -522,7 +517,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
                     // get address 
                     // @todo get name here
                     //<*([a-zA-Z@_\-0-9\.]+)>*/
-                    if (preg_match(self::EMAIL_ADDRESS_REGEXP, $recipient, $matches) > 0) {
+                    if (preg_match(Tinebase_Mail::EMAIL_ADDRESS_REGEXP, $recipient, $matches) > 0) {
                         $recipient = $matches[1];
                     }
                     if (empty($recipient)) {
@@ -559,16 +554,32 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
      */
     public static function convertHTMLToPlainTextWithQuotes($_html, $_eol = "\n")
     {
-        $dom = new DOMDocument('1.0', 'utf-8');
-        // use a hack to make sure html is loaded as utf8 (@see http://php.net/manual/en/domdocument.loadhtml.php#95251)
-        $dom->loadHTML('<?xml encoding="UTF-8">' . $_html);
+        $html = $_html;
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Original body string: ' . $_html);
+        
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        
+        // body tag might be missing
+        if (strpos($html, '<body>') === FALSE) {
+            $html = '<body>' . $_html . '</body>';
+        }
+        // need to set meta tag to make sure that the encoding is done right (@see https://bugs.php.net/bug.php?id=32547)
+        if (strpos($html, '<html>') === FALSE) {
+            $html = '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head>' . $html;
+        }
+        // use a hack to make sure html is loaded as utf-8 (@see http://php.net/manual/en/domdocument.loadhtml.php#95251)
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' HTML (DOMDocument): ' . $dom->saveHTML());
+        
         $bodyElements = $dom->getElementsByTagName('body');
         if ($bodyElements->length > 0) {
-            $result = self::addQuotesAndStripTags($bodyElements->item(0), 0, $_eol);
+            $firstBodyNode = $bodyElements->item(0);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Before quoting: ' . $firstBodyNode->nodeValue);
+            $result = self::addQuotesAndStripTags($firstBodyNode, 0, $_eol);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' After quoting: ' . $result);
             $result = html_entity_decode($result, ENT_COMPAT, 'UTF-8');
-        } else {
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No body element found.');
-            $result = self::convertHTMLToPlainTextWithQuotes('<body>' . $_html . '</body>', 0, $_eol);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Entities decoded: ' . $result);
         }
         
         return $result;

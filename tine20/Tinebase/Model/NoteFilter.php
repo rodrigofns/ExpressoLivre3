@@ -38,6 +38,7 @@ class Tinebase_Model_NoteFilter extends Tinebase_Model_Filter_FilterGroup
         'record_id'      => array('filter' => 'Tinebase_Model_Filter_Text'),
         'record_model'   => array('filter' => 'Tinebase_Model_Filter_Text'),
         'record_backend' => array('filter' => 'Tinebase_Model_Filter_Text'),
+<<<<<<< HEAD
         'note_type_id'   => array('filter' => 'Tinebase_Model_Filter_Text'),
     
         //
@@ -50,5 +51,8 @@ class Tinebase_Model_NoteFilter extends Tinebase_Model_Filter_FilterGroup
             'record_backend'         => array(),        
             'note_type_id'           => array(),
         */
+=======
+        'note_type_id'   => array('filter' => 'Tinebase_Model_Filter_Id'),
+>>>>>>> master
     );
 }
