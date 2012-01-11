@@ -811,6 +811,8 @@ span:hover.tinebase-showheaders-link {
 
 .search-item {border: 1px solid white}
 
+.search-item {border: 1px solid white}
+
 /* multiple edit dialog */
     
 .tinebase-editmultipledialog-noneedit, 
@@ -861,6 +863,9 @@ textarea.tinebase-editmultipledialog-noneedit {
 }
 =======
 }
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 
 /* token mode edit dialog */

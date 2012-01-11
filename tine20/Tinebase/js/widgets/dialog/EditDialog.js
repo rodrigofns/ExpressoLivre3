@@ -435,7 +435,13 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
                     fn: function() {
                         // focus ok btn
 <<<<<<< HEAD
+<<<<<<< HEAD
                         this.action_saveAndClose.items[0].focus();
+=======
+                        if (this.action_saveAndClose.items) {
+                            this.action_saveAndClose.items[0].focus();
+                        }
+>>>>>>> master
 =======
                         if (this.action_saveAndClose.items) {
                             this.action_saveAndClose.items[0].focus();

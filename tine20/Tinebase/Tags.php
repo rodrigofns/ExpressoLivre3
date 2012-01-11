@@ -347,7 +347,7 @@ class Tinebase_Tags
                 'color'              => $_tag->color,
                 'last_modified_by'   => $currentAccountId,
                 'last_modified_time' => Tinebase_DateTime::now()->get(Tinebase_Record_Abstract::ISO8601LONG)
-            ), $this->_db->quoteInto($this->_db->quoteIdentifier('id').'= ?', $tagId));
+            ), $this->_db->quoteInto('id = ?', $tagId));
 
             $tags = $this->getTagsById($tagId);
             return $tags[0];
@@ -395,7 +395,7 @@ class Tinebase_Tags
             'is_deleted'   => true,
             'deleted_by'   => $currentAccountId,
             'deleted_time' => Tinebase_DateTime::now()->get(Tinebase_Record_Abstract::ISO8601LONG)
-        ), $this->_db->quoteInto($this->_db->quoteIdentifier('id').' IN (?)', $tags->getArrayOfIds()));
+        ), $this->_db->quoteInto('id IN (?)', $tags->getArrayOfIds()));
     }
 
     /**
@@ -413,7 +413,7 @@ class Tinebase_Tags
         $tags = new Tinebase_Record_RecordSet('Tinebase_Model_Tag');
         if (!empty($recordId)) {
             $select = $this->_getSelect($recordId, Tinebase_Application::getInstance()->getApplicationByName($_record->getApplication())->getId());
-            Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
+            Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
             foreach ($this->_db->fetchAssoc($select) as $tagArray){
                 $tags->addRecord(new Tinebase_Model_Tag($tagArray, true));
             }
@@ -453,13 +453,7 @@ class Tinebase_Tags
 
         $select = $this->_getSelect($recordIds, $appId);
         $select->group(array('tagging.tag_id', 'tagging.record_id'));
-        Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
-        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $select);
-        $from = $select->getPart(Zend_Db_Select::FROM); // get FROM clause
-        $tableName = $from['tagging']['tableName'];
-        $tablePrefix = substr($tableName,0,strpos($tableName,'_')+1); // get the table prefix that ends in first occurrence of underscore
-        
-        Tinebase_Backend_Sql_Abstract::traitGroup($this->_db,$tablePrefix,$select);        
+        Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
 
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
@@ -518,16 +512,9 @@ class Tinebase_Tags
         }
         foreach ($toDetach as $tagId) {
             $this->_db->delete(SQL_TABLE_PREFIX . 'tagging', array(
-<<<<<<< HEAD
-                $this->_db->quoteInto($this->_db->quoteIdentifier('tag_id'). ' = ?',         $tagId), 
-                $this->_db->quoteInto($this->_db->quoteIdentifier('application_id'). ' = ?', $appId), 
-                $this->_db->quoteInto($this->_db->quoteIdentifier('record_id'). ' = ?',      $recordId), 
-            // backend property not supported by record yet
-=======
                 $this->_db->quoteInto('tag_id = ?',         $tagId),
                 $this->_db->quoteInto('application_id = ?', $appId),
                 $this->_db->quoteInto('record_id = ?',      $recordId),
->>>>>>> master
             ));
             $this->_addOccurrence($tagId, -1);
         }
@@ -632,17 +619,10 @@ class Tinebase_Tags
 
             $attachedIds = array();
             $select = $this->_db->select()
-<<<<<<< HEAD
-            ->from(array('tagging' => SQL_TABLE_PREFIX . 'tagging'), 'record_id')
-            ->where($this->_db->quoteIdentifier('application_id') . ' = ?', $appId)
-            ->where($this->_db->quoteIdentifier('tag_id') . ' = ? ', $tagId)
-            ->where($this->_db->quoteIdentifier('record_id').' IN ( ' . $recordIdList . ' ) ');
-=======
                 ->from(array('tagging' => SQL_TABLE_PREFIX . 'tagging'), 'record_id')
                 ->where($this->_db->quoteIdentifier('application_id') . ' = ?', $appId)
                 ->where($this->_db->quoteIdentifier('tag_id') . ' = ? ', $tagId)
                 ->where('record_id IN ( ' . $recordIdList . ' ) ');
->>>>>>> master
 
             foreach ($this->_db->fetchAssoc($select) as $tagArray){
                 $attachedIds[] = $tagArray['record_id'];
@@ -717,10 +697,10 @@ class Tinebase_Tags
 
         $quotedIdentifier = $this->_db->quoteIdentifier('occurrence');
         $data = array(
-            'occurrence' => new Zend_Db_Expr('(CASE WHEN ((' . $quotedIdentifier . ' + ' . (int)$_toAdd . ') >= 0 THEN ' . $quotedIdentifier . ' + ' . (int)$_toAdd . ' ELSE 0 END))')
+            'occurrence' => new Zend_Db_Expr('IF((' . $quotedIdentifier . ' + ' . (int)$_toAdd . ') >= 0,' . $quotedIdentifier . ' + ' . (int)$_toAdd . ', 0)')
         );
 
-        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $tagId));
+        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto('id = ?', $tagId));
     }
 
     /**
@@ -741,7 +721,7 @@ class Tinebase_Tags
             'occurrence' => new Zend_Db_Expr('IF((' . $quotedIdentifier . ' - ' . (int)$_toDel . ') >= 0,' . $quotedIdentifier . ' - ' . (int)$_toDel . ', 0)')
         );
 
-        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $tagId));
+        $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto('id = ?', $tagId));
     }
 
     /**
@@ -754,10 +734,9 @@ class Tinebase_Tags
     {
         $select = $this->_db->select()
         ->from(SQL_TABLE_PREFIX . 'tags_acl', array('tag_id', 'account_type', 'account_id',
-                 'account_right' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('account_right'))))
+                 'account_right' => 'GROUP_CONCAT(DISTINCT account_right)'))
         ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
         ->group(array('tag_id', 'account_type', 'account_id'));
-		$select = Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, $this->_tablePrefix, $select);            
         $stmt = $this->_db->query($select);
         $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
 
@@ -796,9 +775,9 @@ class Tinebase_Tags
                 throw new Tinebase_Exception_Record_Validation('The given right is not valid!');
             }
             $this->_db->delete(SQL_TABLE_PREFIX . 'tags_acl', array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $right->tag_id),
-                $this->_db->quoteInto($this->_db->quoteIdentifier('account_type') . ' = ?', $right->account_type),
-                $this->_db->quoteInto($this->_db->quoteIdentifier('account_id') . ' = ?', $right->account_id)
+            $this->_db->quoteInto('tag_id = ?', $right->tag_id),
+            $this->_db->quoteInto('account_type = ?', $right->account_type),
+            $this->_db->quoteInto('account_id = ?', $right->account_id)
             ));
             foreach (array('view', 'use' ) as $availableRight) {
                 $rightField = $availableRight . '_right';
@@ -823,7 +802,7 @@ class Tinebase_Tags
     public function getContexts($_tagId)
     {
         $select = $this->_db->select()
-            ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('application_id'))))
+        ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => 'GROUP_CONCAT(DISTINCT application_id)'))
         ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
         ->group('tag_id');
         $apps = $this->_db->fetchOne($select);
@@ -909,7 +888,7 @@ class Tinebase_Tags
     {
         $select = $this->_db->select()
             ->from(array('tagging' => SQL_TABLE_PREFIX . 'tagging'), $_cols)
-            ->join(array('tags'    => SQL_TABLE_PREFIX . 'tags'), $this->_db->quoteIdentifier('tagging.tag_id') . ' = ' . $this->_db->quoteIdentifier('tags.id'))
+            ->join(array('tags'    => SQL_TABLE_PREFIX . 'tags'), 'tagging.tag_id = tags.id')
             ->where($this->_db->quoteIdentifier('application_id') . ' = ?', $_applicationId)
             ->where($this->_db->quoteIdentifier('record_id') . ' IN (?) ', (array) $_recordId)
             ->where($this->_db->quoteIdentifier('is_deleted') . ' = 0');

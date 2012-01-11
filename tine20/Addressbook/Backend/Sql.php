@@ -54,7 +54,7 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         'jpegphoto'    => array(
             'table'         => 'addressbook_image',
             'joinOn'        => 'contact_id',
-            'select'        => array(),
+            'select'        => array('jpegphoto' => 'IF(ISNULL(addressbook_image.contact_id), 0, 1)'),
             'singleValue'   => TRUE,
             'preserve'      => TRUE,
         ),
@@ -64,29 +64,6 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             'singleValue'   => TRUE,
         ),
     );
-
-    /**
-     * 
-     * @param Zend_Db_Adapter_Abstract $_dbAdapter
-     * @param array $_options
-     */
-    public function __construct($_dbAdapter = NULL, $_options = array())
-    {   
-    	// for executing correct SQL command, it's necessary to have an database adapter 
-		if (is_null($_dbAdapter))
-		{
-			$configData = include('config.inc.php');			
-			$config = new Zend_Config($configData);
-			$config = $config->toArray();
-			$adapter = $config['database']['adapter'];
-			$adapter = ucfirst(str_replace('pdo_','',$adapter));			
-			$_dbAdapter = Setup_Backend_Factory::factory($adapter);
-		}
-    	
-    	
-    	parent::__construct($_dbAdapter,$_options);
-    	$_foreignTables['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($_dbAdapter,'addressbook_image.contact_id',0,1));
-    }
     
     /**
      * fetch one contact of a user identified by his user_id
@@ -100,8 +77,6 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $select = $this->_getSelect()
             ->where($this->_db->quoteIdentifier('accounts.id') . ' = ?', $_userId)
             ->limit(1);
-        
-        $this->_traitGroup($select);        
         
         $stmt = $this->_db->query($select);
         $queryResult = $stmt->fetch();
@@ -198,59 +173,4 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         
         return $imageData;
     }
-<<<<<<< HEAD
-    
-    /**
-     * get the basic select object to fetch records from the database
-     *  
-     * @param array|string|Zend_Db_Expr $_cols columns to get, * per default
-     * @param boolean $_getDeleted get deleted records (if modlog is active)
-     * @return Zend_Db_Select
-     * 
-     * @todo remove this when visibility/status check is moved to contact filter
-     */
-    protected function _getSelect($_cols = '*', $_getDeleted = FALSE)
-    {        
-        $select = parent::_getSelect($_cols, $_getDeleted);
-        
-        // @todo move this to a 'disabled' contact filter
-        if ($this->_getDisabledContacts !== true && ($_cols == '*' || array_key_exists('account_id', $_cols))) {
-            $where = '/* is no user */ ' . $this->_db->quoteIdentifier('accounts.id') . ' IS NULL OR /* is user */ (' . $this->_db->quoteIdentifier('accounts.id') . ' IS NOT NULL AND ' . 
-                $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . ' AND ';
-            
-            // is it really needed to check the model?
-            if (Tinebase_Core::getUser() instanceof Tinebase_Model_FullUser) {
-                $where .= '('. $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . ' OR ' . 
-                    $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.id') . ' = ?', Tinebase_Core::getUser()->getId()) . ')' .
-                ")";
-            } else {
-                $where .= $this->_db->quoteInto($this->_db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
-                ")";
-            }
-            
-            $select->where($where);
-        }
-        
-        return $select;
-    }
-    
-    /**
-     * add columns from filter
-     * 
-     * @param array $_colsToFetch
-     * @param Tinebase_Model_Filter_FilterGroup $_filter
-     * @return array
-     * 
-     * @todo remove this when visibility/status check is moved to contact filter
-     */
-    protected function _addFilterColumns($_colsToFetch, Tinebase_Model_Filter_FilterGroup $_filter)
-    {
-        $result = parent::_addFilterColumns($_colsToFetch, $_filter);
-        
-        // add account.id column as we always need this filter for disabled/invisible users
-        $result['account_id'] = 'accounts.id';
-        return $result;
-    }
-=======
->>>>>>> master
 }
