@@ -655,9 +655,7 @@ class Tinebase_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 
         } else {
             $registryData['Tinebase'] = $this->getRegistryData();
-        }
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' registry data for app ' . $application->name . ': ' . print_r($registryData,true));        
+        }       
 
         return $registryData;
     }

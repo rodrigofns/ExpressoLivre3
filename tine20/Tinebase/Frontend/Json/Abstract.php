@@ -286,6 +286,8 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
     {
         $converter = new Tinebase_Convert_Json();
         $result = $converter->fromTine20Model($_record);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' record to JSON : ' . print_r($result,true));
 
         return $result;
     }
@@ -301,6 +303,8 @@ abstract class Tinebase_Frontend_Json_Abstract extends Tinebase_Frontend_Abstrac
     {
         $converter = new Tinebase_Convert_Json();
         $result = $converter->fromTine20RecordSet($_records, $this->_resolveUserFields);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' records to JSON : ' . print_r($result,true));        
 
         return $result;
     }
