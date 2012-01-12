@@ -485,7 +485,7 @@
                     <default>false</default>
                 </field>
                 <index>
-                    <name>account_id</name>
+                    <name>id</name>
                     <primary>true</primary>
                     <field>
                         <name>id</name>

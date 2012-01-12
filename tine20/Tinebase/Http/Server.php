@@ -145,7 +145,7 @@ class Tinebase_Http_Server extends Zend_Server_Abstract implements Zend_Server_I
 		                    throw new Zend_Json_Server_Exception('Error instantiating class ' . $class . ' to invoke method ' . $this->_functions[$this->_method]->getName(), 500);
 		                }
 
-		                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' call user object: ' . print_r(get_class($object)) . ' args: ' . print_r($calling_args,true));
+		                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' call user object: ' . get_class($object) . ' args: ' . print_r($calling_args,true));
 		                // the called function generates the needed output
 		                $this->_functions[$this->_method]->invokeArgs($object, $calling_args);
 					} else {
