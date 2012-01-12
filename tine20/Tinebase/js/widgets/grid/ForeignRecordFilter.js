@@ -213,7 +213,7 @@ Tine.widgets.grid.ForeignRecordFilter = Ext.extend(Tine.widgets.grid.FilterModel
             
             // get values of filters of our toolbar we are superfilter for (left hand stuff)
             this.ftb.filterStore.each(function(filter) {
-                var filterModel = this.ftb.getFilterModel(filter.get('field'));
+                var filterModel = this.ftb.getFilterModel(filter);
                 if (filterModel.superFilter && filterModel.superFilter == this) {
                     var filterData = this.ftb.getFilterData(filter);
                     value.push(filterData);
@@ -439,6 +439,9 @@ Tine.widgets.grid.ForeignRecordFilter = Ext.extend(Tine.widgets.grid.FilterModel
     onOperatorChange: function(filter, newOperator, keepValue) {
         if (this.isGeneric) {
             filter.foreignRecordDefinition = newOperator;
+        }
+        
+        if (filter.get('operator') != newOperator) {
             if (filter.toolbar) {
                 filter.toolbar.destroy();
                 delete filter.toolbar;
@@ -446,6 +449,7 @@ Tine.widgets.grid.ForeignRecordFilter = Ext.extend(Tine.widgets.grid.FilterModel
         }
         
         filter.set('operator', newOperator);
+
         if (! keepValue) {
             filter.set('value', '');
         }
