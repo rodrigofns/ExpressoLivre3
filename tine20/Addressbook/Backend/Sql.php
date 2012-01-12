@@ -54,7 +54,7 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         'jpegphoto'    => array(
             'table'         => 'addressbook_image',
             'joinOn'        => 'contact_id',
-            'select'        => array('jpegphoto' => 'IF(ISNULL(addressbook_image.contact_id), 0, 1)'),
+            'select'        => array('jpegphoto' => null),
             'singleValue'   => TRUE,
             'preserve'      => TRUE,
         ),
@@ -64,6 +64,12 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             'singleValue'   => TRUE,
         ),
     );
+    
+    public function __construct($_dbAdapter=null,array $_options)
+    {
+    	parent::__construct($_dbAdapter, $_options);
+    	$_foreignTables['jpegphoto'] ['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($_dbAdapter, 'addressbook_image.contact_id', 0, 1));    			    	
+    }
     
     /**
      * fetch one contact of a user identified by his user_id
