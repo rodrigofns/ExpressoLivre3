@@ -24,6 +24,7 @@
  * @property    array   $bcc            the bcc receipients
  * @property    array   $structure      the message structure
  * @property    string  $messageuid     the message uid on the imap server
+ * @property    integer $smime          true if is a digitaly signed message
  */
 class Felamimail_Model_Message extends Tinebase_Record_Abstract
 {
@@ -127,6 +128,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'note'                  => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => 0),
     // Felamimail_Message object
         'message'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'smime'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     );
     
     /**
@@ -394,6 +396,50 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         
         return $result;
     }
+
+    /**
+     * Verify if message is a signed Message
+     *
+     * @param array $_structure
+     * @return void
+     */
+     public function parseSmime(array $_structure)
+     {
+         
+        switch ($_structure['contentType'])
+        {
+            case 'multipart/signed':
+                $this->smime = 1;
+                break;
+            case 'application/x-pkcs7-mime':
+            case 'application/pkcs7-mime':
+                if (is_array($_structure['parameters']) && !empty($_structure['parameters']['smime-type']))
+                {
+                    $smime_type = $_structure['parameters']['smime-type'];
+                    switch ($smime_type)
+                    {
+                        case 'signed-data':
+                            $this->smime = 1;
+                            break;
+                        case 'enveloped-data':
+                            $this->smime = 2;
+                            break;
+                        case 'compressed-data':
+                            $this->smime = 3;
+                            break;
+                        case 'certs-only':
+                            $this->smime = 4;
+                            break;
+                    }
+                }
+                else
+                    {
+                        $this->smime = 5;
+                    }
+                break;
+            default: $this->smime = 0;
+        }
+     }
     
     /**
      * parse structure to get text_partid and html_partid
@@ -630,5 +676,5 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         }
         
         return $result;
-    }    
+    } 
 }

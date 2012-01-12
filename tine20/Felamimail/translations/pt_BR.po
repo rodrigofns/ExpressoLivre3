@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator:  <rommel.cysne@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-01-12 13:45-0300\n"
+"Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1031,4 +1031,29 @@ msgstr "Todos os rascunhos"
 #: Setup/Initialize.php:58
 msgid "All mails with the draft flag"
 msgstr "Todas as mensagens marcadas como rascunho"
+
+#: js/GridPanel.js:
+#: 472
+msgid "Security"
+msgstr "Segurança"
+
+#: js/GridPanel.js:
+#: 569
+msgid "Signed"
+msgstr "Assinado"
+
+#: js/GridPanel.js:
+#: 573
+msgid "Encrypted"
+msgstr "Criptografado"
+
+#: js/GridPanel.js:
+#: 577
+msgid "Compressed"
+msgstr "Compactado"
+
+#: js/GridPanel.js:
+#: 581
+msgid "Certs Only"
+msgstr "Apenas Certificados"
 

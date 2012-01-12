@@ -468,6 +468,13 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             dataIndex: 'id',
             hidden: true
         }, {
+            id: 'smime',
+            header: this.app.i18n._("Security"),
+            width: 12,
+            sortable: true,
+            dataIndex: 'smime',
+            renderer: this.smimeRenderer
+        }, {
             id: 'content_type',
             header: this.app.i18n._("Attachments"),
             width: 12,
@@ -546,7 +553,45 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             renderer: Ext.util.Format.fileSize
         }];
     },
-    
+
+    /**
+     * Smime renderer
+     *
+     * @param {String} value
+     * @return {String}
+     * @private
+     */
+    smimeRenderer: function(value) {
+        var icons = [], result = '';
+
+        if (value && value.match(/1/))
+        {
+            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-signature.png', qtip: _('Signed')});
+        }
+        if (value && value.match(/2/))
+        {
+            icons.push({src: 'images/oxygen/16x16/actions/encrypted.png', qtip: _('Encrypted')});
+        }
+        if (value && value.match(/3/))
+        {
+            icons.push({src: 'images/oxygen/16x16/mimetypes/application-zip.png', qtip: _('Compressed')});
+        }
+        if (value && value.match(/4/))
+        {
+            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png', qtip: _('Certs Only')});
+        }
+        if (value && value.match(/5/))
+        {
+            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png', qtip: _('pkcs7-mime')});
+        }
+
+        Ext.each(icons, function(icon) {
+            result += '<img class="FelamimailFlagIcon" src="' + icon.src + '" ext:qtip="' + icon.qtip + '">';
+        }, this);
+
+        return result;
+    },
+
     /**
      * attachment column renderer
      * 
