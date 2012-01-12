@@ -85,6 +85,9 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
                 ? Tinebase_Container::getInstance()->get($appConfigDefaults[Admin_Model_Config::DEFAULTINTERNALADDRESSBOOK])->toArray() 
                 : NULL,
         );        
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' registryData: ' . print_r($registryData, true));        
+        
         return $registryData;    
     }
     

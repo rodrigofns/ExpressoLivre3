@@ -316,14 +316,9 @@ Tine.Tinebase.tineInit = {
             
             // detect resoponse errors (e.g. html from xdebug) and convert into error response
             if (! options.isUpload && ! response.responseText.match(/^([{\[])|(<\?xml)+/)) {
-            	
-            	var exceptionMessage = response.responseText !== "" ? 'illegal json data in response' : 'empty response';
-            	
-            	console.log(response.responseText);
-            	            	
                 var exception = {
                     code: response.responseText !== "" ? 530 : 540,
-                    message: exceptionMessage,
+                    message: response.responseText !== "" ? 'illegal json data in response' : 'empty response',
                     traceHTML: response.responseText,
                     request: options.jsonData,
                     response: response.responseText
