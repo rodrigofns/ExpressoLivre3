@@ -129,6 +129,8 @@ class Tinebase_Http_Server extends Zend_Server_Abstract implements Zend_Server_I
 		                    // for some reason, invokeArgs() does not work the same as 
 		                    // invoke(), and expects the first argument to be an object. 
 		                    // So, using a callback if the method is static.
+		                	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' call user static method: ' . $class . ' method: ' . $this->_functions[$this->_method]->getName() . ' args: ' . print_r($calling_args,true));		                    
+		                	
 		                    $result = call_user_func_array(array($class, $this->_functions[$this->_method]->getName()), $calling_args);
 		                }
 		
@@ -142,10 +144,12 @@ class Tinebase_Http_Server extends Zend_Server_Abstract implements Zend_Server_I
 		                } catch (Exception $e) {
 		                    throw new Zend_Json_Server_Exception('Error instantiating class ' . $class . ' to invoke method ' . $this->_functions[$this->_method]->getName(), 500);
 		                }
-		                
+
+		                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' call user object: ' . print_r(get_class($object)) . ' args: ' . print_r($calling_args,true));
 		                // the called function generates the needed output
 		                $this->_functions[$this->_method]->invokeArgs($object, $calling_args);
 					} else {
+						if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' call user func: ' . $this->_functions[$this->_method]->getName() . ' args: ' . print_r($calling_args,true));
 		                // the called function generates the needed output
 						call_user_func_array($this->_functions[$this->_method]->getName(), $calling_args); //$result = $this->_functions[$this->_method]->invokeArgs($calling_args);
 					}
