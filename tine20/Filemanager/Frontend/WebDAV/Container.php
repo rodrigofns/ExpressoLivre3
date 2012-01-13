@@ -61,7 +61,7 @@ class Filemanager_Frontend_WebDAV_Container extends Tinebase_WebDav_Container_Ab
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG))
             Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' create directory: ' . $path);
     
-        Tinebase_FileSystem::getInstance()->mkDir($path);
+        Tinebase_FileSystem::getInstance()->mkdir($path);
     }
     
     /**
@@ -114,7 +114,7 @@ class Filemanager_Frontend_WebDAV_Container extends Tinebase_WebDav_Container_Ab
             $child->delete();
         }
     
-        if (!Tinebase_FileSystem::getInstance()->rmDir($this->_path)) {
+        if (!Tinebase_FileSystem::getInstance()->rmdir($this->_path)) {
             throw new Sabre_DAV_Exception_Forbidden('Permission denied to delete node');
         }
     
@@ -126,10 +126,6 @@ class Filemanager_Frontend_WebDAV_Container extends Tinebase_WebDav_Container_Ab
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
             Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' path: ' . $this->_path . '/' . $name);
     
-        if ($name[0]=='.')  {
-            throw new Sabre_DAV_Exception_FileNotFound('Access denied');
-        }
-        
         try {
             $childNode = Tinebase_FileSystem::getInstance()->stat($this->_path . '/' . $name);
         } catch (Tinebase_Exception_NotFound $tenf) {

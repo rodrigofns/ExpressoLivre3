@@ -301,11 +301,8 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         // check 'changed' systemnote
         $this->_checkChangedNote($record['id'], 'adr_one_region ( -> PHPUNIT_multipleUpdate) url ( -> http://www.phpunit.de) customfields ([] -> {');
         
-        /* TODO: check invalid records
         // check invalid data
         
-        $contact = $this->_addContact($company);
-        $contactId= $contact['id'];
         $changes = array(
             array('name' => 'n_family', 'value' => ''),
             array('name' => 'n_given',  'value' => ''),
@@ -313,8 +310,8 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         );
         $result = $json->updateMultipleRecords('Addressbook', 'Contact', $changes, $filter);
         
-        $this->assertEquals($record['url'],'http://www.phpunit.de','DefaultField "url" was not updated as expected');
-        */
+        $this->assertEquals($result['failcount'], 3, 'failcount does not show the correct number');
+        $this->assertEquals($result['totalcount'], 0, 'totalcount does not show the correct number');
     }
     
     /**
@@ -1088,13 +1085,11 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
     {
         $allContacts = $this->_instance->searchContacts(array(), array());
 
-        $filter = new Addressbook_Model_ContactFilter(array(
-            array(
-                'field'    => 'n_fileas',
-                'operator' => 'equals',
-                'value'    =>  Tinebase_Core::getUser()->accountDisplayName
-            )
-        ));
+        $filter = new Addressbook_Model_ContactFilter(array(array(
+            'field'    => 'n_fileas',
+            'operator' => 'equals',
+            'value'    =>  Tinebase_Core::getUser()->accountDisplayName
+        )));
         $sharedTagName = Tinebase_Record_Abstract::generateUID();
         $tag = new Tinebase_Model_Tag(array(
             'type'  => Tinebase_Model_Tag::TYPE_SHARED,
@@ -1115,6 +1110,41 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($allContacts['totalcount']-1, $allContactsWithoutTheTag['totalcount']);
 
         $sharedTagToDelete = Tinebase_Tags::getInstance()->getTagByName($sharedTagName);
+    }
+    
+    /**
+     * test search with tag filter with 'in' operator
+     */
+    public function testSearchContactsWithTagInFilter()
+    {
+        $filter = new Addressbook_Model_ContactFilter(array(array(
+            'field'    => 'n_fileas',
+            'operator' => 'equals',
+            'value'    =>  Tinebase_Core::getUser()->accountDisplayName
+        )));
+        $sharedTagName = Tinebase_Record_Abstract::generateUID();
+        $tag = new Tinebase_Model_Tag(array(
+                    'type'  => Tinebase_Model_Tag::TYPE_SHARED,
+                    'name'  => $sharedTagName,
+                    'description' => 'testImport',
+                    'color' => '#009B31',
+        ));
+        $tag = Tinebase_Tags::getInstance()->attachTagToMultipleRecords($filter, $tag);
+        $filter = array(array(
+            'field'    => 'tag',
+            'operator' => 'in',
+            'value'    => array($tag->getId())
+        ));
+        $allContactsWithTheTag = $this->_instance->searchContacts($filter, array());
+        $this->assertEquals(1, $allContactsWithTheTag['totalcount']);
+
+        $filter = array(array(
+            'field'    => 'tag',
+            'operator' => 'in',
+            'value'    => array()
+        ));
+        $emptyResult = $this->_instance->searchContacts($filter, array());
+        $this->assertEquals(0, $emptyResult['totalcount']);
     }
     
     /**

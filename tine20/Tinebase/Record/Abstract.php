@@ -967,4 +967,6 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
     {
         return $this->_readOnlyFields;
     }
+
 }
+

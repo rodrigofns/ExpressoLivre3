@@ -21,6 +21,7 @@
  */
 abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract implements Tinebase_Backend_Sql_Interface
 {
+
 	/**
 	 * placeholder for id column for search()/_getSelect()
 	 */
@@ -1315,6 +1316,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 	protected function _disableDbProfiler()
 	{
+		$profile = $this->_db->getProfiler()->getLastQueryProfile();
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' profile query: ' . $profile->getQuery() . ' profile params: ' . print_r($profile->getQueryParams(),true));
 		$this->_db->getProfiler()->setEnabled(false);
 	}
@@ -1355,8 +1357,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _deleteWithProfile($table, $where)
 	{
 		$this->_enableDbProfiler();
-		$this->_db->delete($table, $where);
-		$profile = $this->_db->getProfiler()->getLastQueryProfile();
+		$this->_db->delete($table, $where);		
 		$this->_disableDbProfiler();
 	}
 
