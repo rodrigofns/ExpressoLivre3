@@ -38,14 +38,14 @@ class Addressbook_Model_ContactDisabledFilter extends Tinebase_Model_Filter_Bool
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Only query visible and enabled account contacts.');
             
             if (Tinebase_Core::getUser() instanceof Tinebase_Model_FullUser) {
-            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', '1', '0') . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', '0', '1') . ' AND ' .
+            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'true', 'false') . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'false', 'true') . ' AND ' .
                     $db->quoteInto($db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
                     " AND " . 
                     '('. $db->quoteInto($db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
                     ' OR ' . $db->quoteInto($db->quoteIdentifier('accounts.id') . ' = ?', Tinebase_Core::getUser()->getId()) . ')' .
                 ")";
             } else {
-            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', '1', '0') . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', '0', '1') . ' AND ' . 
+            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'true', 'false') . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'false', 'true') . ' AND ' . 
                     $db->quoteInto($db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
                     " AND " . 
                     $db->quoteInto($db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
