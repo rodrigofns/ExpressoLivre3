@@ -312,12 +312,8 @@ Tine.Tinebase.tineInit = {
          *        Empty resonses (Ext.Decode can't deal with them) are maped to 540
          *        Memory exhausted to 550
          */
-        Ext.Ajax.on('requestcomplete', function (connection, response, options) {
-        	
-        	//patch to treat dirty responses        	
-        		
-        	response.responseText = response.responseText.substr(response.responseText.indexOf('{'));
-            
+        Ext.Ajax.on('requestcomplete', function (connection, response, options) {        	
+          
             // detect resoponse errors (e.g. html from xdebug) and convert into error response
             if (! options.isUpload && ! response.responseText.match(/^([{\[])|(<\?xml)+/)) {
                 var exception = {

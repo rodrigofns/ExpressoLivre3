@@ -1,4 +1,4 @@
-fa<?php
+<?php
 /**
  * Tine 2.0
  * 
