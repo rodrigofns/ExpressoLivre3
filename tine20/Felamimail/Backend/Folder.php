@@ -159,8 +159,8 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
                 // increment or decrement values
                 $intValue = (int) substr($value, 1);
                 $quotedIdentifier = $this->_db->quoteIdentifier($counter);
-                if ($value{0} == '-') {
-                    $data[$counter] = new Zend_Db_Expr(Tinebase_Backend_Sql_Command::getIfElse($this->_db,$quotedIdentifier . ' >= ' . $intValue,$quotedIdentifier . ' - ' . $intValue,'0'));                    
+                if ($value{0} == '-') {                                        
+                	$data[$counter] = new Zend_Db_Expr("CASE WHEN $quotedIdentifier  >= $intValue THEN $quotedIdentifier - $intValue ELSE 0 END");
                     $folder->{$counter} = ($folder->{$counter} >= $intValue) ? $folder->{$counter} - $intValue : 0;
                 } else {
                     $data[$counter] = new Zend_Db_Expr($this->_db->quoteIdentifier($counter) . ' + ' . $intValue);

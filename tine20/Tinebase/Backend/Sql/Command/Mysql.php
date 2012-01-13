@@ -53,21 +53,5 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
     public static function getIfIsNull($adapter, $field, $returnIfTrue, $returnIfFalse)
     {
         return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
-    }
-    
-	/**
-	 * 
-	 * @param Zend_Db_Adapter_Abstract $adapter
-	 * @param string $condition
-	 * @param string $returnIfTrue
-	 * @param string $returnIfFalse
-	 * @return string
-	 */
-	public static function getIfElse($adapter,$condition,$returnIfTrue,$returnIfFalse)
-	{
-		return "IF($condition,$returnIfTrue,$returnIfFalse)";
-	}
-	
-        
-    
+    }   
 }
