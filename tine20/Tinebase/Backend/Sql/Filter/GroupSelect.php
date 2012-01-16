@@ -126,4 +126,21 @@ class Tinebase_Backend_Sql_Filter_GroupSelect
         }
     }
     
+    /**
+     * 
+     * @param Zend_Db_Select $select
+     */
+    public function setSelect(Zend_Db_Select $select)
+    {
+    	$this->_select = $select;
+    }
+    
+    /**
+     * @return Zend_Db_Select
+     */
+    public function getSelect()
+    {
+    	return $this->_select;
+    }
+    
 }
