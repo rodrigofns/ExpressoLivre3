@@ -39,19 +39,24 @@ return array(
   ),
   'filesdir' => '',
   'mapPanel' => '',
-  'themes' => array(
-	'default' => 1,
-	'themelist' => array(
-		0 => array(
-			'name' =>'TineSkin',
-			'path' => 'styles/tine20.css',
-			'useBlueAsBase' => 1,
-		),
-		1 => array(
-			'name' =>'Expresso 3.0',
-			'path' => 'themes/expresso30/resources/css/ext-all.css',
-		),
-
-	),
-  ),
+  'themes' =>
+    array (
+        'default'     => 0,
+        'cookieTheme' => '',
+        'themelist'   =>
+    array (
+        0 =>
+            array (
+                'name' => 'Tine 2.0 Default Skin',
+                'path' => 'tine20',
+                'useBlueAsBase' => 1,
+            ),
+        1 =>
+            array (
+                'name' => 'Expresso 3.0',
+                'path' => 'expresso30',
+                'useBlueAsBase' => 1,
+            ),
+        ),
+    ),
 );
