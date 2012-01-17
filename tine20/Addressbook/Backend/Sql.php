@@ -68,7 +68,7 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
     public function __construct($_dbAdapter=null, array $_options = array())
     {
     	parent::__construct($_dbAdapter, $_options);
-    	$_foreignTables['jpegphoto'] ['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($this->_db, 'addressbook_image.contact_id', 0, 1));    			    	
+    	$_foreignTables['jpegphoto'] ['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($this->_db, $this->_db->quoteIdentifier('addressbook_image.contact_id'), 0, 1));    			    	
     }
     
     /**
