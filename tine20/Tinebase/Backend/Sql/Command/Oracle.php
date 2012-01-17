@@ -53,6 +53,6 @@ class Tinebase_Backend_Sql_Command_Oracle implements Tinebase_Backend_Sql_Comman
      */
     public static function getIfIsNull($adapter, $field, $returnIfTrue, $returnIfFalse)
     {
-        return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
+        return "(CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END)";
     }    
 }
