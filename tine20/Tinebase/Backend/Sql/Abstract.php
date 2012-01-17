@@ -751,7 +751,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$recordArray = array_intersect_key($recordArray, $this->_schema);
 
 		$this->_prepareData($recordArray);
-		$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
+		//$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
+		$this->_insertWithProfile($this->_tablePrefix . $this->_tableName, $recordArray);
 
 		if (!$this->_hasHashId()) {
 			$fullTableName = $this->getTablePrefix() . $this->getTableName();
