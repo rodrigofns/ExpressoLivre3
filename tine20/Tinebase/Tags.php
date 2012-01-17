@@ -454,6 +454,8 @@ class Tinebase_Tags
         $select = $this->_getSelect($recordIds, $appId);
         $select->group(array('tagging.tag_id', 'tagging.record_id'));
         Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
+        
+        Tinebase_Backend_Sql_Abstract::traitGroup($db, SQL_TABLE_PREFIX , $select);
 
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
