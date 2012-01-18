@@ -16,25 +16,25 @@
  * @package     Addressbook
  * @subpackage  Convert
  */
-class Addressbook_Convert_Contact_VCard_MacOSX extends Addressbook_Convert_Contact_VCard_Abstract
+class Addressbook_Convert_Contact_VCard_KDE extends Addressbook_Convert_Contact_VCard_Abstract
 {
-    // AddressBook/6.0 (1043) CardDAVPlugin/182 CFNetwork/520.0.13 Mac_OS_X/10.7.1 (11B26)
-    const HEADER_MATCH = '/^AddressBook.*Mac_OS_X\/(?P<version>.*) /';
+    // Mozilla/5.0 (X11; Linux i686) KHTML/4.7.3 (like Gecko) Konqueror/4.7
+    const HEADER_MATCH = '/Konqueror\/(?P<version>.*)/';
     
     protected $_emptyArray = array(
         'adr_one_countryname'   => null,
         'adr_one_locality'      => null,
         'adr_one_postalcode'    => null,
-        #'adr_one_region'        => null,
+        'adr_one_region'        => null,
         'adr_one_street'        => null,
-        #'adr_one_street2'       => null,
+        'adr_one_street2'       => null,
         'adr_two_countryname'   => null,
         'adr_two_locality'      => null,
         'adr_two_postalcode'    => null,
-        #'adr_two_region'        => null,
+        'adr_two_region'        => null,
         'adr_two_street'        => null,
-        #'adr_two_street2'       => null,
-        #'assistent'             => null,
+        'adr_two_street2'       => null,
+        'assistent'             => null,
         'bday'                  => null,
         #'calendar_uri'          => null,
         'email'                 => null,
@@ -42,28 +42,28 @@ class Addressbook_Convert_Contact_VCard_MacOSX extends Addressbook_Convert_Conta
         'jpegphoto'             => null,
         #'freebusy_uri'          => null,
         'note'                  => null,
-        #'role'                  => null,
+        'role'                  => null,
         #'salutation'            => null,
-        #'title'                 => null,
+        'title'                 => null,
         'url'                   => null,
         'url_home'              => null,
         'n_family'              => null,
         'n_fileas'              => null,
         #'n_fn'                  => null,
         'n_given'               => null,
-        #'n_middle'              => null,
-        #'n_prefix'              => null,
-        #'n_suffix'              => null,
+        'n_middle'              => null,
+        'n_prefix'              => null,
+        'n_suffix'              => null,
         'org_name'              => null,
-        #'org_unit'              => null,
+        'org_unit'              => null,
         #'pubkey'                => null,
-        #'room'                  => null,
+        'room'                  => null,
         #'tel_assistent'         => null,
         #'tel_car'               => null,
         'tel_cell'              => null,
         #'tel_cell_private'      => null,
         'tel_fax'               => null,
-        'tel_fax_home'          => null,
+        #'tel_fax_home'          => null,
         'tel_home'              => null,
         'tel_pager'             => null,
         'tel_work'              => null,
@@ -76,12 +76,13 @@ class Addressbook_Convert_Contact_VCard_MacOSX extends Addressbook_Convert_Conta
         'tags'                  => null,
         'notes'                 => null,
     );
-    
+        
     /**
      * converts Addressbook_Model_Contact to vcard
      * 
+     * @todo return all supported fields in correct format see http://forge.tine20.org/mantisbt/view.php?id=5346
      * @param  Addressbook_Model_Contact  $_record
-     * @return Sabre_VObject_Component
+     * @return string
      */
     public function fromTine20Model(Tinebase_Record_Abstract $_record)
     {
@@ -113,30 +114,24 @@ class Addressbook_Convert_Contact_VCard_MacOSX extends Addressbook_Convert_Conta
         $tel->add('TYPE', 'CELL');
         $card->add($tel);
         
-        #$tel = new Sabre_VObject_Property('TEL', $_record->tel_cell_private);
-        #$tel->add('TYPE', 'CELL');
-        #$tel->add('TYPE', 'HOME');
-        #$card->add($tel);
-        
-        $tel = new Sabre_VObject_Property('TEL', $_record->tel_fax);
-        $tel->add('TYPE', 'FAX');
-        $tel->add('TYPE', 'WORK');
-        $card->add($tel);
-        
-        $tel = new Sabre_VObject_Property('TEL', $_record->tel_fax_home);
-        $tel->add('TYPE', 'FAX');
-        $tel->add('TYPE', 'HOME');
-        $card->add($tel);
-        
         $tel = new Sabre_VObject_Property('TEL', $_record->tel_pager);
         $tel->add('TYPE', 'PAGER');
         $card->add($tel);
         
-        $adr = new Sabre_VObject_Element_MultiValue('ADR', array(null, null, $_record->adr_one_street, $_record->adr_one_locality, $_record->adr_one_region, $_record->adr_one_postalcode, $_record->adr_one_countryname));
+        $tel = new Sabre_VObject_Property('TEL', $_record->tel_fax);
+        $tel->add('TYPE', 'FAX');
+        $card->add($tel);
+        
+        #$tel = new Sabre_VObject_Property('TEL', $_record->tel_fax_home);
+        #$tel->add('TYPE', 'FAX');
+        #$tel->add('TYPE', 'HOME');
+        #$card->add($tel);
+        
+        $adr = new Sabre_VObject_Element_MultiValue('ADR', array(null, $_record->adr_one_street2, $_record->adr_one_street, $_record->adr_one_locality, $_record->adr_one_region, $_record->adr_one_postalcode, $_record->adr_one_countryname));
         $adr->add('TYPE', 'WORK');
         $card->add($adr);
-
-        $adr = new Sabre_VObject_Element_MultiValue('ADR', array(null, null, $_record->adr_two_street, $_record->adr_two_locality, $_record->adr_two_region, $_record->adr_two_postalcode, $_record->adr_two_countryname));
+        
+        $adr = new Sabre_VObject_Element_MultiValue('ADR', array(null, $_record->adr_two_street2, $_record->adr_two_street, $_record->adr_two_locality, $_record->adr_two_region, $_record->adr_two_postalcode, $_record->adr_two_countryname));
         $adr->add('TYPE', 'HOME');
         $card->add($adr);
         

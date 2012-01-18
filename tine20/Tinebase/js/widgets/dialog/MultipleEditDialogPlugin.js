@@ -81,7 +81,7 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
         this.editDialog.getForm().loadRecord(this.editDialog.record);
 
         Tine.log.debug('loading of the following record completed:');
-        Tine.log.debug(this.editDialog.record);
+        Tine.log.debug(Ext.decode(this.editDialog.record));
 
         this.editDialog.getForm().clearInvalid();
 
@@ -246,7 +246,6 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
 
                         if ((this.originalValue != this.getValue()) || this.cleared) {
                             this.removeClass('tinebase-editmultipledialog-noneedit');
-                            //this.addClass('tinebase-editmultipledialog-apply');
                             
                             var ar = this.el.parent().select('.tinebase-editmultipledialog-dirty');
                             if(ar.elements.length > 0) {
@@ -265,8 +264,6 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                             el.removeClass('hidden');
                         } else {
                             this.edited = false;
-//                            this.removeClass('tinebase-editmultipledialog-apply');
-
                             var ar = this.el.parent().select('.tinebase-editmultipledialog-dirty');
                             if(ar.elements.length > 0) {
                                 ar.setStyle('display','none');
@@ -341,13 +338,22 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                             Ext.MessageBox.hide();
                             var resp = Ext.decode(_result.responseText);
                             if(resp.failcount > 0) {
-                                Ext.MessageBox.alert(_('Update Error'), String.format(_('There had been {0} Error(s) while updating {1} records.'), resp.failcount, resp.totalcount), function(_btn, _text) {
-                                    if (_btn == 'ok') {
-                                        this.editDialog.fireEvent('update');
-                                        this.editDialog.purgeListeners();
-                                        this.editDialog.window.close();
-                                    }
-                                }, this);
+                                try {
+                                    var window = Tine.widgets.dialog.MultipleEditResultSummary.openWindow({
+                                        response: _result.responseText,
+                                        appName: this.app.appName,
+                                        recordClass: this.editDialog.recordClass
+                                    });
+                                } catch (e) {
+                                    Tine.log.err('Tine.widgets.dialog.MultipleEditDialogPlugin::onRecordUpdate::openSummaryWindow');
+                                    Tine.log.err(e.stack ? e.stack : e);
+                                }
+                                
+                                window.on('close', function() {
+                                    this.editDialog.fireEvent('update');
+                                    this.editDialog.purgeListeners();
+                                    this.editDialog.window.close();
+                                },this);
                             } else {
                                 this.editDialog.fireEvent('update');
                                 this.editDialog.purgeListeners();
