@@ -419,6 +419,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		}
 		$this->_addSecondarySort($_pagination);
 		$_pagination->appendPaginationSql($select);
+		
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' SQL used to search: ' . $select->assemble());
 
 		if ($getIdValuePair) {
 			return $this->_fetch($select, self::FETCH_MODE_PAIR);
