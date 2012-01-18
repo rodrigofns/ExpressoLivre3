@@ -59,8 +59,6 @@ class Addressbook_Model_ContactDisabledFilter extends Tinebase_Model_Filter_Bool
             Tinebase_Backend_Sql_Abstract::traitGroup($db, $_backend->getTablePrefix(), $select);
 
             $_select instanceof Zend_Db_Select ? $_select = $select : $_select->setSelect($select);
-            
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' contacts query ' . $_select->assemble());
         }
     }
 }

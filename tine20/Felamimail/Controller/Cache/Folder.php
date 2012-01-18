@@ -329,7 +329,7 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
         }
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' systemFolders: ' . print_r($systemFolders, TRUE));
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' folders: ' . print_r($_folders, TRUE));
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folders: ' . print_r($_folders, TRUE));
         
         // do some mapping and save folder in db (if it doesn't exist
         foreach ($_folders as $folderData) {
