@@ -37,6 +37,34 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         return $result;
     }
+      /**
+     * get ACLs for a folder
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @return array
+     */
+    public function getFolderAcls($accountId, $globalName)
+    {
+         $result = Felamimail_Controller_Folder::getInstance()->getAcls($accountId,$globalName);
+        
+        return $result;
+    }
+  
+    /**
+     * set ACLs for a folder
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @param array ACLs
+     * @return array
+     */
+    public function setFolderAcls($accountId, $globalName, $acls)
+    {
+        $result = Felamimail_Controller_Folder::getInstance()->setAcls($accountId,$globalName,$acls);
+        
+        return $result;
+    }
 
     /**
      * add new folder

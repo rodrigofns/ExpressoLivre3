@@ -260,6 +260,26 @@ Tine.Felamimail.setTreeContextMenus = function() {
         }
     };
     
+    
+    
+    var manageAclsAction = {
+        text: this.app.i18n._('Share Folders'),
+        iconCls: 'action_update_cache',
+        scope: this,
+        handler:function() {
+                if (this.ctxNode) {
+                    var node = this.ctxNode;
+                    var folderId = this.ctxNode.attributes.globalname;
+                    var account = this.ctxNode.attributes.account_id;
+                    var window = Tine.Felamimail.AclsEditDialog.openWindow({
+                        title: String.format(_('Manage Permissions for {0} "{1}"'), config.nodeName, Ext.util.Format.htmlEncode(node.attributes.name)),
+                        accountId: account,
+                        globalName: folderId
+                    });
+                }
+            }
+    };
+    
     // mutual config options
     var config = {
         nodeName: this.app.i18n.n_('Folder', 'Folders', 1),
@@ -269,15 +289,15 @@ Tine.Felamimail.setTreeContextMenus = function() {
     };
     
     // system folder ctx menu
-    config.actions = [markFolderSeenAction, 'add'];
+    config.actions = [manageAclsAction, markFolderSeenAction, 'add'];
     this.contextMenuSystemFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // user folder ctx menu
-    config.actions = [markFolderSeenAction, 'add', 'rename', 'delete'];
+    config.actions = [manageAclsAction, markFolderSeenAction, 'add', 'rename', 'delete'];
     this.contextMenuUserFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // trash ctx menu
-    config.actions = [markFolderSeenAction, 'add', emptyFolderAction];
+    config.actions = [manageAclsAction, markFolderSeenAction, 'add', emptyFolderAction];
     this.contextMenuTrash = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // account ctx menu

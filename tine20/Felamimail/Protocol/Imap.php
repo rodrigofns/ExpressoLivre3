@@ -188,7 +188,7 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                     // ignore
             }
         }
-
+        
         if ($tokens[0] != 'OK') {
             return false;
         }
@@ -222,6 +222,94 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
         }
         
         return $result;
+    }
+    
+     /**
+     * get acls for a folder
+     * 
+     * @param  string $box which folder to get the acls
+     * @return bool|array false if error, array with all users and the acls of this user for this folder.
+     * @throws Zend_Mail_Protocol_Exception
+     */
+    public function getFolderAcls($box = 'INBOX'){
+       
+        $this->sendRequest("GETACL", array($this->escapeString($box)), $tag);
+
+        $result = array();
+        while (!$this->readLine($tokens, $tag)) {
+            $result = $tokens;
+        }
+        
+        if ($tokens[0] != 'OK') {
+            return false;
+        }else{
+            $results = Array();
+            for($i = 2; $i < count($result); $i = $i+2){
+                $writeacl = false;
+                $readacl = false;
+                
+                if(stristr($result[$i+1],'w')){
+                    $writeacl = true;
+                }
+                if(stristr($result[$i+1],'r')){
+                    $readacl = true;
+                }   
+                try{    
+                $user =  Tinebase_User::getInstance()->getFullUserByLoginName($result[$i])->toArray();
+                
+                $account_name = Array('accountId' => $user['accountId'],
+                                     'accountDisplayName' => $user['accountDisplayName'], 
+                                     'accountFullName' => $user['accountFullName'],
+                                     'accountFirstName' => $user['accountFirstName'],
+                                     'accountLastName' => $user['accountLastName'],
+                                     'contact_id' => $user['contact_id']);
+                                     
+               
+                $results[] = Array('account_name' => $account_name, 'account_id' => $user['accountLoginName'], 'readacl' => $readacl, 'writeacl' => $writeacl);
+                }catch(Exception $e){
+                    
+                }
+                
+            }
+        }
+        $return = Array('results' => $results, 'totalcount' => count($results));
+        
+       
+        return $return;
+    
+    }
+    
+        
+     /**
+     * set acls for a folder
+     * 
+     * @param  string $box which folder to get the acls
+     * @param  array $acls the acls
+     * @return bool|array false if error, array with all users and the acls of this user for this folder.
+     * @throws Zend_Mail_Protocol_Exception
+     */
+    public function setFolderAcls($box = 'INBOX', $acls)
+    {
+       
+        foreach($acls as $user){
+            if($user['account_data']){
+                $tmpUser =  Tinebase_User::getInstance()->getFullUserById($user['account_id'])->toArray();
+                $login = $tmpUser['accountLoginName'];
+            }else{
+                $login = $user['account_id'];
+            }
+            if($user['writeacl'])
+                $setACL = $this->setACL($box, $login, 'lrswipcd');
+            elseif($user['readacl'])
+                $setACL = $this->setACL($box, $login, 'lrs');
+            else
+                $setACL = $this->setACL($box, $login, '');
+                
+        }
+        
+        
+        return $setACL;
+    
     }
     
     /**
