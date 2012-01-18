@@ -454,8 +454,6 @@ class Tinebase_Tags
         $select = $this->_getSelect($recordIds, $appId);
         $select->group(array('tagging.tag_id', 'tagging.record_id'));
         Tinebase_Model_TagRight::applyAclSql($select, $_right, 'tagging.tag_id');
-        
-        Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, SQL_TABLE_PREFIX , $select);
 
         $queryResult = $this->_db->fetchAll($select);
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($queryResult, TRUE));
@@ -736,7 +734,7 @@ class Tinebase_Tags
     {
         $select = $this->_db->select()
         ->from(SQL_TABLE_PREFIX . 'tags_acl', array('tag_id', 'account_type', 'account_id',
-                 'account_right' => 'GROUP_CONCAT(DISTINCT account_right)'))
+                 'account_right' => 'GROUP_CONCAT(account_right)'))
         ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
         ->group(array('tag_id', 'account_type', 'account_id'));
         $stmt = $this->_db->query($select);
@@ -804,7 +802,7 @@ class Tinebase_Tags
     public function getContexts($_tagId)
     {
         $select = $this->_db->select()
-        ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => 'GROUP_CONCAT(DISTINCT application_id)'))
+        ->from(SQL_TABLE_PREFIX . 'tags_context', array('application_id' => 'GROUP_CONCAT(application_id)'))
         ->where($this->_db->quoteInto($this->_db->quoteIdentifier('tag_id') . ' = ?', $_tagId))
         ->group('tag_id');
         $apps = $this->_db->fetchOne($select);

@@ -328,8 +328,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
             $systemFolders[5] = strtolower($_account->trash_folder);
         }
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' systemFolders: ' . print_r($systemFolders, TRUE));
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folders: ' . print_r($_folders, TRUE));
+        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($systemFolders, TRUE));
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_folders, TRUE));
         
         // do some mapping and save folder in db (if it doesn't exist
         foreach ($_folders as $folderData) {
@@ -345,7 +345,6 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Update cached folder ' . $folderData['globalName']);
                 
             } catch (Tinebase_Exception_NotFound $tenf) {
-            	Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Folder not found ' . $tenf->getMessage() . ' Trace:' . $tenf->getTraceAsString() );
                 // create new folder
                 if (empty($folderData['localName'])) {
                     // skip
@@ -380,10 +379,6 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
                     
                     $folder = $this->_backend->create($folder);
                 }
-            }
-            catch(Exception $e)
-            {
-            	Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Do not save folder ' . $e->getMessage() . ' Trace:' . $e->getTraceAsString() );            	
             }
             
             $result->addRecord($folder);

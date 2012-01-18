@@ -191,8 +191,6 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             array('field' => 'globalname', 'operator' => 'equals', 'value' => $_globalName),
         ));
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter for saved folder record ' . print_r($filter,true));
-        
         $folders = $this->_backend->search($filter);
         
         if (count($folders) > 0) {

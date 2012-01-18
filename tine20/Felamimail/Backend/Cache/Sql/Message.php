@@ -120,7 +120,7 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
                         );
                     }
                     $data['message_id'] = $_record->getId();
-                    $this->_db->insert($this->_tablePrefix . $foreign['table'], $data);                    
+                    $this->_insertWithProfile($this->_tablePrefix . $foreign['table'], $data);                    
                 }
             }
         }

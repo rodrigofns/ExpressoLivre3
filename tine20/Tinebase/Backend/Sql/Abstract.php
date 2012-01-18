@@ -590,8 +590,6 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
 	{
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
-		
-		$this->_traitGroup($_select);
 
 		$stmt = $this->_db->query($_select);
 
@@ -670,7 +668,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 					$selectArray = (array_key_exists('select', $join))
 					? $join['select']
 					: ((array_key_exists('field', $join) && (! array_key_exists('singleValue', $join) || ! $join['singleValue']))
-							? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,'DISTINCT ' . $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) ))
+							? array($foreignColumn => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier($join['table'] . '.' . $join['field']) ))
 							: array($foreignColumn => $join['table'] . '.id'));
 					$joinId = (array_key_exists('joinId', $join)) ? $join['joinId'] : $this->_identifier;
 
@@ -753,8 +751,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$recordArray = array_intersect_key($recordArray, $this->_schema);
 
 		$this->_prepareData($recordArray);
-		//$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
-		$this->_insertWithProfile($this->_tablePrefix . $this->_tableName, $recordArray);
+		$this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
 
 		if (!$this->_hasHashId()) {
 			$fullTableName = $this->getTablePrefix() . $this->getTableName();
@@ -880,9 +877,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 
 				if (!empty($idsToRemove)) {
 					$where = '(' .
-							$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) .
+							$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
 							' AND ' .
-							$this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
+							$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
 							')';
 
 					$this->_db->delete($this->_tablePrefix . $join['table'], $where);

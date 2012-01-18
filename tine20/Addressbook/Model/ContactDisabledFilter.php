@@ -38,14 +38,14 @@ class Addressbook_Model_ContactDisabledFilter extends Tinebase_Model_Filter_Bool
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Only query visible and enabled account contacts.');
             
             if (Tinebase_Core::getUser() instanceof Tinebase_Model_FullUser) {
-            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'true', 'false') . ' OR /* is user */ (' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'false', 'true') . ' AND ' .
+            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,$db->quoteIdentifier('accounts.id'), 1, 0) . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,$db->quoteIdentifier('accounts.id'), 0, 1) . ' AND ' .
                     $db->quoteInto($db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
                     " AND " . 
                     '('. $db->quoteInto($db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
                     ' OR ' . $db->quoteInto($db->quoteIdentifier('accounts.id') . ' = ?', Tinebase_Core::getUser()->getId()) . ')' .
                 ")";
             } else {
-            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'true', 'false') . ' OR /* is user */ (' . Tinebase_Backend_Sql_Command::getIfIsNull($db,'accounts.id', 'false', 'true') . ' AND ' . 
+            	$where = '/* is no user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,$db->quoteIdentifier('accounts.id'), 1, 0) . ' OR /* is user */ ' . Tinebase_Backend_Sql_Command::getIfIsNull($db,$db->quoteIdentifier('accounts.id'), 1, 0) . ' AND ' . 
                     $db->quoteInto($db->quoteIdentifier('accounts.status') . ' = ?', 'enabled') . 
                     " AND " . 
                     $db->quoteInto($db->quoteIdentifier('accounts.visibility') . ' = ?', 'displayed') . 
@@ -54,11 +54,14 @@ class Addressbook_Model_ContactDisabledFilter extends Tinebase_Model_Filter_Bool
             
             $_select->where($where);
             
+            
             $select = $_select instanceof Zend_Db_Select ? $_select : $_select->getSelect();
                         
             Tinebase_Backend_Sql_Abstract::traitGroup($db, $_backend->getTablePrefix(), $select);
 
             $_select instanceof Zend_Db_Select ? $_select = $select : $_select->setSelect($select);
+            
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' contacts query ' . $_select->assemble());
         }
     }
 }
