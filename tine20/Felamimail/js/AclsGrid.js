@@ -51,13 +51,13 @@ Tine.Felamimail.AclsGrid = Ext.extend(Tine.widgets.account.PickerGridPanel, {
         this.configColumns = [
             new Ext.ux.grid.CheckColumn({
                 header: _('Read'),
-                tooltip: _('The grant to read records of this container'),
+                tooltip: _('Read messages from folders'),
                 dataIndex: 'readacl',
                 width: 55
             }),
             new Ext.ux.grid.CheckColumn({
-                header: _('write'),
-                tooltip: _('The grant to add records to this container'),
+                header: _('Write'),
+                tooltip: _('Write and delete messages from folders'),
                 dataIndex: 'writeacl',
                 width: 55
             })

@@ -404,6 +404,8 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
         $this->_delimiter = $_account->delimiter;
         
+        $teste = $this->getSubfolders( $_accountId, $_globalName);
+        
         //$foldername = $this->_prepareFolderName($_globalName);
         $foldername = $_globalName;
        

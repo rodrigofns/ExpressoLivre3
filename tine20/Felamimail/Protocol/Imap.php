@@ -292,9 +292,11 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
      * @return bool|array false if error, array with all users and the acls of this user for this folder.
      * @throws Zend_Mail_Protocol_Exception
      */
-    public function setFolderAcls($box = 'INBOX', $acls)
+    public function setFolderAcls($box, $acls)
     {
        
+        $folderList = $this->listMailbox('INBOX');
+        
         foreach($acls as $user){
             if($user['account_data']){
                 $tmpUser =  Tinebase_User::getInstance()->getFullUserById($user['account_id'])->toArray();
@@ -302,15 +304,15 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
             }else{
                 $login = $user['account_id'];
             }
-            if($user['writeacl'])
-                $setACL = $this->setACL($box, $login, 'lrswipcd');
-            elseif($user['readacl'])
-                $setACL = $this->setACL($box, $login, 'lrs');
-            else
-                $setACL = $this->setACL($box, $login, '');
-                
+            foreach($folderList as $folder => $value){
+                if($user['writeacl'])
+                    $setACL = $this->setACL($folder, $login, 'lrswipcd');
+                elseif($user['readacl'])
+                    $setACL = $this->setACL($folder, $login, 'lrs');
+                else
+                    $setACL = $this->setACL($folder, $login, '');
+            }    
         }
-        
         
         return $setACL;
     

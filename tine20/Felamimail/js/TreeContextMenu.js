@@ -264,7 +264,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
     
     var manageAclsAction = {
         text: this.app.i18n._('Share mailbox'),
-        iconCls: 'action_update_cache',
+        iconCls: 'action_managePermissions',
         scope: this,
         handler:function() {
                 if (this.ctxNode) {
@@ -303,7 +303,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
     
     // account ctx menu
     if(Tine.Felamimail.registry.get('defaults').useSystemAccount == 1)
-        var actions = [manageAclsAction, addFolderToRootAction, updateFolderCacheAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
+        var actions = [addFolderToRootAction, updateFolderCacheAction, manageAclsAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
     else
         var actions = [addFolderToRootAction, updateFolderCacheAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
     
