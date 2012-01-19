@@ -101,6 +101,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
         } catch (Zend_Mail_Protocol_Exception $zmpe) {
             Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' IMAP Protocol Exception: ' . $zmpe->getMessage());
             $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder');
+        } catch (Exception $e) {
+       		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' unexpected Exception: ' . $e->getMessage());
         }
         
         return $result;
