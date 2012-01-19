@@ -256,6 +256,10 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                 }   
                 try{    
                 $user =  Tinebase_User::getInstance()->getFullUserByLoginName($result[$i])->toArray();
+                $current = Tinebase_Core::getUser()->toArray();
+                
+                if($current['accountId'] == $user['accountId'])
+                    continue;
                 
                 $account_name = Array('accountId' => $user['accountId'],
                                      'accountDisplayName' => $user['accountDisplayName'], 

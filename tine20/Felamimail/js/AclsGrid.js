@@ -33,8 +33,8 @@ Tine.Felamimail.AclsGrid = Ext.extend(Tine.widgets.account.PickerGridPanel, {
     /**
      * Tine.widgets.account.PickerGridPanel config values
      */
-    selectType: 'both',
-    selectTypeDefault: 'group',
+    selectType: 'user',
+    selectTypeDefault: 'user',
     hasAccountPrefix: true,
     recordClass: Tine.Felamimail.Model.Acl,
     
