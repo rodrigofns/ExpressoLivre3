@@ -589,6 +589,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 	 */
 	protected function _fetch(Zend_Db_Select $_select, $_mode = self::FETCH_MODE_SINGLE)
 	{
+		$this->_traitGroup($_select);
+		
 		if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_select->__toString());
 
 		$stmt = $this->_db->query($_select);
