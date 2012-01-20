@@ -62,7 +62,6 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
     
     /**
      * create new user session
-     * @todo fix this for posgresql
      *
      * @param   string $_loginname
      * @param   string $_password

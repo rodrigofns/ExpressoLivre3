@@ -6,22 +6,21 @@
  * @subpackage  Convert
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2011-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2012-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
 /**
- * class to convert a SOGO vcard to contact model and back again
+ * class to convert a kde vcalendar to event model and back again
  *
  * @package     Calendar
  * @subpackage  Convert
  */
-class Calendar_Convert_Event_VCalendar_MacOSX extends Calendar_Convert_Event_VCalendar_Abstract
+class Calendar_Convert_Event_VCalendar_KDE extends Calendar_Convert_Event_VCalendar_Abstract
 {
-    // DAVKit/4.0.3 (732.2); CalendarStore/4.0.4 (997.7); iCal/4.0.4 (1395.7); Mac OS X/10.6.8 (10K549)
-    // CalendarStore/5.0 (1127); iCal/5.0 (1535); Mac OS X/10.7.1 (11B26)
-    const HEADER_MATCH = '/CalendarStore\/(?P<version>\S+) .*Mac OS X\//';
-    
+    // Mozilla/5.0 (X11; Linux i686) KHTML/4.7.3 (like Gecko) Konqueror/4.7
+    const HEADER_MATCH = '/Konqueror\/(?P<version>.*)/';
+        
     protected $_supportedFields = array(
         'seq',
         'dtend',
