@@ -296,6 +296,23 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
     {
        
         $folderList = $this->listMailbox('INBOX');
+        $currentAcls = $this->getFolderAcls('INBOX');
+        $currentAcls = $currentAcls['results'];
+        
+        foreach($currentAcls as $index => $currentAcl){
+            $find = false;
+            foreach($acls as $acl){
+                if($currentAcl['account_id'] == $acl['account_id']){
+                    $find= true;
+                    break 1;
+                    }
+            }
+            if(!$find){
+               $currentAcls[$index]['writeacl'] = false;
+               $currentAcls[$index]['readacl'] = false;
+               $acls[]=$currentAcls[$index];
+            }
+        }
         
         foreach($acls as $user){
             if($user['account_data']){
@@ -305,16 +322,22 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                 $login = $user['account_id'];
             }
             foreach($folderList as $folder => $value){
-                if($user['writeacl'])
+                $currentUser = Tinebase_Core::getUser()->toArray();
+                $this->setACL($folder, $currentUser['accountId'], 'lrswipcda');
+                if($user['writeacl']){
                     $setACL = $this->setACL($folder, $login, 'lrswipcd');
-                elseif($user['readacl'])
+                    }
+                elseif($user['readacl']){
                     $setACL = $this->setACL($folder, $login, 'lrs');
-                else
+                    }
+                else{
                     $setACL = $this->setACL($folder, $login, '');
+                    
+                    }
             }    
         }
         
-        return $setACL;
+        return true;
     
     }
     
