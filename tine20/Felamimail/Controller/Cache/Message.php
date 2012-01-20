@@ -272,7 +272,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$this->_updateFolderQuota($folder, $imap);
 
 		} catch (Exception $e) {
-			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " Exception: " . $e->getMessage());
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " Exception: " . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 		}
 
 
