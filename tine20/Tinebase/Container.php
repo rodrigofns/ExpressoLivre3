@@ -505,7 +505,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
      */
     public static function addGrantsSql($_select, $_accountId, $_grant, $_aclTableName = 'container_acl')
     {
-        $db = Tinebase_Core::getDb();
+        $db = $_select->getAdapter();
         
         $grants = is_array($_grant) ? $_grant : array($_grant);
         

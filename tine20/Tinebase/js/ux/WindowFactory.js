@@ -83,13 +83,19 @@ Ext.ux.WindowFactory.prototype = {
         c.width = Math.min(Ext.getBody().getBox().width, c.width);
         
         c.layout = c.layout || 'fit';
-        c.items = this.getCenterPanel(c);
+        c.items = {
+            layout: 'card',
+            border: false,
+            activeItem: 0,
+            isWindowMainCardPanel: true,
+            items: [this.getCenterPanel(c)]
+        }
         
         // we can only handle one window yet
         c.modal = true;
         
         var win = new Ext.Window(c);
-        c.items.window = win;
+        c.items.items[0].window = win;
         
         // if initShow property is present and it is set to false don't show window, just return reference
         if (c.hasOwnProperty('initShow') && c.initShow === false) {
