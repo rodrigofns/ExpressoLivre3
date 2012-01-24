@@ -242,7 +242,7 @@ Ext.namespace('Tine.Felamimail');
             },
 
             showSignatureInfo: function(signature_info, messageData) {
-                var result = signature_info ? '<b>' + this.app.i18n._('Digitaly Signed Message') + ':</b> ' : '';
+                var result = signature_info ? '<b>' + this.app.i18n._('Digitally Signed Message') + ':</b> ' : '';
 
                 if (signature_info)
                 {

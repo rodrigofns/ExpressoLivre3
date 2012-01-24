@@ -64,7 +64,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: js/GridDetailsPanel.js:141 js/GridDetailsPanel.js:366
+#: js/GridDetailsPanel.js:141 js/GridDetailsPanel.js:385
 msgid "Show or hide header information"
 msgstr ""
 
@@ -978,4 +978,16 @@ msgstr ""
 
 #: js/GridPanel.js: 581
 msgid "Certs Only"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 245
+msgid "Digitally Signed Message"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 251
+msgid "Message Integrity Ok"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 255
+msgid "Message Integrity not Ok"
 msgstr ""
