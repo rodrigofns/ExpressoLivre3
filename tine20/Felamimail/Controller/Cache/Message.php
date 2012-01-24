@@ -1064,6 +1064,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 		));
 
 		$folder = Felamimail_Controller_Folder::getInstance()->update($folder);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Updating folder: ' . print_r($_folder));
 
 		return $folder;
 	}
