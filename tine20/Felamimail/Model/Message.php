@@ -129,6 +129,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     // Felamimail_Message object
         'message'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'smime'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'signature_info'        => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     );
     
     /**
@@ -409,7 +410,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         switch ($_structure['contentType'])
         {
             case 'multipart/signed':
-                $this->smime = 1;
+                $this->smime = Expresso_Smime::TYPE_SIGNED_DATA_VALUE;
                 break;
             case 'application/x-pkcs7-mime':
             case 'application/pkcs7-mime':
@@ -419,16 +420,16 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
                     switch ($smime_type)
                     {
                         case 'signed-data':
-                            $this->smime = 1;
+                            $this->smime = Expresso_Smime::TYPE_SIGNED_DATA_VALUE;
                             break;
                         case 'enveloped-data':
-                            $this->smime = 2;
+                            $this->smime = Expresso_Smime::TYPE_ENVELOPED_DATA_VALUE;
                             break;
                         case 'compressed-data':
-                            $this->smime = 3;
+                            $this->smime = Expresso_Smime::TYPE_COMPRESSED_DATA_VALUE;
                             break;
                         case 'certs-only':
-                            $this->smime = 4;
+                            $this->smime = Expresso_Smime::TYPE_CERTS_ONLY_VALUE;
                             break;
                     }
                 }
