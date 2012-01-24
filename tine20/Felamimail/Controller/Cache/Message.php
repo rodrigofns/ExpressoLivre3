@@ -1063,9 +1063,12 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 				'cache_unreadcount' => 0
 		));
 
-		$folder = Felamimail_Controller_Folder::getInstance()->update($folder);
+		try {
+			$folder = Felamimail_Controller_Folder::getInstance()->update($folder);
+		} catch (Exception $e) {
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when clearing cache of ' . $folder->globalname . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+		}
 		
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Updating folder: ' . print_r($_folder));
 
 		return $folder;
 	}
