@@ -339,12 +339,16 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$_folder->cache_job_startuid         = 0;
 		}
 
-		$_folder = Felamimail_Controller_Cache_Folder::getInstance()->getIMAPFolderCounter($_folder);
+		try {
+			$_folder = Felamimail_Controller_Cache_Folder::getInstance()->getIMAPFolderCounter($_folder);
+		} catch (Exception $e) {
+			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' getting IMAP folder counter exception: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
+		}		
 		
-		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' up-to-date folder: ' . print_r($_folder, TRUE));
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' up-to-date folder: ' . print_r($_folder, TRUE));
 
 		if ($this->_cacheIsInvalid($_folder)) {
-			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . print_r($_folder->toArray(), TRUE));
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . print_r($_folder->toArray(), TRUE));
 			$_folder = $this->clear($_folder);
 		}
 
