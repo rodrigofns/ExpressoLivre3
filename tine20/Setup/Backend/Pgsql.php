@@ -137,10 +137,17 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
      */
     private function _getPrimaryKeyName($table)
     {
+    	$primaryKeyName = '';
     	foreach ($table->indices as $index) {
-    		if ($index->primary === 'true')
-    			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' primary index: ' . print_r($index,true));
-    			return $index->name;    		
+    		if ($index->primary === 'true')    		
+    		{
+    			foreach($index->field as $field)
+    			{
+    				$primaryKeyName .= $field . '-';
+    			}
+    			$primaryKeyName = substr($primaryKeyName,0,strlen($primaryKeyName)-1);
+    			return $primaryKeyName;
+    		}    		
     	}    	
     	return null;
     }
