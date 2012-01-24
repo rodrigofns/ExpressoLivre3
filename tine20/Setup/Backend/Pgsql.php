@@ -125,9 +125,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
             }
         }
 
-        $statement .= implode(",\n", $statementSnippets) . "\n)";
-
-        //Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "\n" .  $statement . "\n" . $createIndexStatement . "\n primaryKey : $primaryKey");        
+        $statement .= implode(",\n", $statementSnippets) . "\n)";                
         
         return array('table'=>$statement,'index'=>$createIndexStatement,'primary'=>$primaryKey);
     }   
@@ -141,6 +139,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
     {
     	foreach ($table->indices as $index) {
     		if ($index->primary === 'true')
+    			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' primary index: ' . print_r($index,true));
     			return $index->name;    		
     	}    	
     	return null;
