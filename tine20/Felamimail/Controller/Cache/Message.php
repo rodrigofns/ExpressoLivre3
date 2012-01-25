@@ -1071,7 +1071,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 		} catch (Exception $e) {
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when clearing cache of ' . $folder->globalname . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 		}
-
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder after cleaning: ' . print_r($folder, true));
 
 		return $folder;
 	}
