@@ -80,6 +80,14 @@
           "path": "js/"
         },
         {
+          "text": "AclsEditDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "AclsGrid.js",
+          "path": "js/"
+        },
+        {
           "text": "AccountEditDialog.js",
           "path": "js/"
         },

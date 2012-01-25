@@ -368,6 +368,55 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         return $folder;
     }
     
+        /**
+     * Get Acls for a folder
+     *
+     * @param string $_accountId
+     * @param string $_globalName
+     * @return 
+     */
+    public function getAcls($_accountId, $_globalName)
+    {
+        $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $_account->delimiter;
+        
+        //$foldername = $this->_prepareFolderName($_globalName);
+        $foldername = $_globalName;
+       
+       // if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Renaming ... ' . $_oldGlobalName . ' -> ' . $newGlobalName);
+        
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        $return = $imap->getFolderAcls(Felamimail_Model_Folder::encodeFolderName($foldername));
+        
+        return $return;
+    }
+    
+    
+    /** Set Acls for a folder
+     *
+     * @param string $_accountId
+     * @param string $_globalName
+     * @param Array  $_acls
+     * @return 
+     */
+    public function setAcls($_accountId, $_globalName, $_acls)
+    {
+        $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $_account->delimiter;
+        
+        $teste = $this->getSubfolders( $_accountId, $_globalName);
+        
+        //$foldername = $this->_prepareFolderName($_globalName);
+        $foldername = $_globalName;
+       
+       // if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Renaming ... ' . $_oldGlobalName . ' -> ' . $newGlobalName);
+        
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        $return = $imap->setFolderAcls(Felamimail_Model_Folder::encodeFolderName($foldername),$_acls);
+        
+        return $return;
+    }
+    
     /**
      * remove old localname and build new globalname
      * 

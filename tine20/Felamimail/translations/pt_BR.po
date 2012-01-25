@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-01-24 17:46-0300\n"
+"PO-Revision-Date: 2012-01-25 09:08-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -1071,4 +1071,9 @@ msgstr "Integridade da Mensagem Ok"
 #: 255
 msgid "Message Integrity not Ok"
 msgstr "Mensagem não está Íntegra"
+
+#: js/TreecontexMenu.js:
+#: 266
+msgid "Share mailbox"
+msgstr "Compartilhar pastas"
 
