@@ -272,7 +272,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$this->_updateFolderQuota($folder, $imap);
 
 		} catch (Exception $e) {
-			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " Exception : " . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " update cache exception : " . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
 		}
 
 
@@ -356,6 +356,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " folder is empty on imap server => clear cache of folder {$_folder->globalname}");
 			$_folder = $this->clear($_folder);
 		}
+		
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder after cleaning: ' . print_r($_folder, TRUE));		
 
 		$_folder->cache_status    = Felamimail_Model_Folder::CACHE_STATUS_UPDATING;
 		$_folder->cache_timestamp = Tinebase_DateTime::now();
