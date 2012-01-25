@@ -343,8 +343,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$_folder = Felamimail_Controller_Cache_Folder::getInstance()->getIMAPFolderCounter($_folder);
 		} catch (Exception $e) {
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' getting IMAP folder counter exception: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
-		}		
-		
+		}
+
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' up-to-date folder: ' . print_r($_folder, TRUE));
 
 		if ($this->_cacheIsInvalid($_folder)) {
@@ -522,7 +522,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 				$begin = $_folder->cache_job_startuid > 0 ? $_folder->cache_job_startuid : $_folder->cache_totalcount;
 
 				$firstMessageSequence = 0;
-				 
+					
 				if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " $messagesToRemoveFromCache message to remove from cache. starting at $begin");
 
 				for ($i=$begin; $i > 0; $i -= $this->_importCountPerStep) {
@@ -1050,25 +1050,26 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 
 		Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Clearing cache of ' . $folder->globalname);
 
-		$this->deleteByFolder($folder);
-
-		$folder->cache_timestamp        = Tinebase_DateTime::now();
-		$folder->cache_status           = Felamimail_Model_Folder::CACHE_STATUS_EMPTY;
-		$folder->cache_job_actions_est = 0;
-		$folder->cache_job_actions_done = 0;
-
-		Felamimail_Controller_Folder::getInstance()->updateFolderCounter($folder, array(
-				'cache_totalcount'  => 0,
-				'cache_recentcount' => 0,
-				'cache_unreadcount' => 0
-		));
-
 		try {
+				
+			$this->deleteByFolder($folder);
+
+			$folder->cache_timestamp        = Tinebase_DateTime::now();
+			$folder->cache_status           = Felamimail_Model_Folder::CACHE_STATUS_EMPTY;
+			$folder->cache_job_actions_est = 0;
+			$folder->cache_job_actions_done = 0;
+
+			Felamimail_Controller_Folder::getInstance()->updateFolderCounter($folder, array(
+					'cache_totalcount'  => 0,
+					'cache_recentcount' => 0,
+					'cache_unreadcount' => 0
+			));
+			
 			$folder = Felamimail_Controller_Folder::getInstance()->update($folder);
 		} catch (Exception $e) {
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when clearing cache of ' . $folder->globalname . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 		}
-		
+
 
 		return $folder;
 	}
