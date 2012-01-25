@@ -116,6 +116,8 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
     {
         $filterValues = $this->_extractFilter($_filter);
         
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter values: ' . print_r($filterValues) );
+        
         if (empty($filterValues['account_id'])) {
             throw new Felamimail_Exception('No account id set in search filter. Check default account preference!');
         }
