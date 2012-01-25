@@ -114,9 +114,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Record_Interface $_pagination = NULL, $_getRelations = FALSE, $_onlyIds = FALSE)
     {
-        $filterValues = $this->_extractFilter($_filter);
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter values: ' . print_r($filterValues,true) );
+        $filterValues = $this->_extractFilter($_filter);        
         
         if (empty($filterValues['account_id'])) {
             throw new Felamimail_Exception('No account id set in search filter. Check default account preference!');
@@ -131,7 +129,9 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         if (count($result) == 0) {
             // try to get folders from imap server
             $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);
-        }             
+        }
+
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' result: ' . print_r($result,true) );        
         
         $this->_lastSearchCount[$this->_currentAccount->getId()][$filterValues['account_id']] = count($result);
         
@@ -570,9 +570,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             'globalname' => ''
         );
         
-        $filters = $_filter->getFilterObjects();
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter objects ' . print_r($filters,true));        
+        $filters = $_filter->getFilterObjects();     
         
         foreach($filters as $filter) {
             switch($filter->getField()) {
