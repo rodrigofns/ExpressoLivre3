@@ -571,6 +571,9 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         );
         
         $filters = $_filter->getFilterObjects();
+        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' filter objects ' . print_r($filters,true));        
+        
         foreach($filters as $filter) {
             switch($filter->getField()) {
                 case 'account_id':
