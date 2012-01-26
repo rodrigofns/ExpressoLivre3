@@ -345,7 +345,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' getting IMAP folder counter exception: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
 		}
 
-		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' up-to-date folder: ' . print_r($_folder, TRUE));
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " up-to-date folder {$_folder->globalname}");
 
 		if ($this->_cacheIsInvalid($_folder)) {
 			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . print_r($_folder->toArray(), TRUE));
@@ -1078,7 +1078,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when clearing cache of ' . $folder->globalname . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 		}
 
-		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder after cleaning: ' . print_r($folder, true));
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " folder after cleaning: {$folder->globalname}");
 
 		return $folder;
 	}

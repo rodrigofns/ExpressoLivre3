@@ -969,6 +969,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		);
 
 		$this->_db->update($this->_tablePrefix . $this->_tableName, $recordArray, $where);
+		
+		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " updating {$this->_tablePrefix}{$this->_tableName}");
 
 		// update custom fields
 		if ($_record->has('customfields')) {
