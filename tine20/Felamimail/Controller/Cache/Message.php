@@ -358,7 +358,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 			$_folder = $this->clear($_folder);
 		}
 
-		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder after cleaning: ' . print_r($_folder, TRUE));
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " folder after cleaning: {$_folder->globalname}");
 
 		$_folder->cache_status    = Felamimail_Model_Folder::CACHE_STATUS_UPDATING;
 		$_folder->cache_timestamp = Tinebase_DateTime::now();
@@ -445,8 +445,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 					));
 				}
 			} catch (Exception $e) {
-				if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when update message sequence: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );				
-			}				
+				if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when update message sequence: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );
+			}
 		}
 
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Cache status cache total count: {$_folder->cache_totalcount} imap total count: {$_folder->imap_totalcount} cache sequence: $this->_cacheMessageSequence imap sequence: $this->_imapMessageSequence");
@@ -664,21 +664,27 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
 				.  " cache sequence: {$this->_imapMessageSequence} / imap count: {$_folder->imap_totalcount}");
 
-		if ($this->_messagesToBeAddedToCache($_folder)) {
+		try {
+				
+			if ($this->_messagesToBeAddedToCache($_folder)) {
 
-			if ($this->_initialCacheStatus == Felamimail_Model_Folder::CACHE_STATUS_COMPLETE || $this->_initialCacheStatus == Felamimail_Model_Folder::CACHE_STATUS_EMPTY) {
-				$_folder->cache_job_actions_est += ($_folder->imap_totalcount - $this->_imapMessageSequence);
+				if ($this->_initialCacheStatus == Felamimail_Model_Folder::CACHE_STATUS_COMPLETE || $this->_initialCacheStatus == Felamimail_Model_Folder::CACHE_STATUS_EMPTY) {
+					$_folder->cache_job_actions_est += ($_folder->imap_totalcount - $this->_imapMessageSequence);
+				}
+
+				$_folder->cache_status = Felamimail_Model_Folder::CACHE_STATUS_INCOMPLETE;
+
+				if ($this->_fetchAndAddMessages($_folder, $_imap)) {
+					$_folder->cache_status = Felamimail_Model_Folder::CACHE_STATUS_UPDATING;
+				}
 			}
 
-			$_folder->cache_status = Felamimail_Model_Folder::CACHE_STATUS_INCOMPLETE;
-
-			if ($this->_fetchAndAddMessages($_folder, $_imap)) {
-				$_folder->cache_status = Felamimail_Model_Folder::CACHE_STATUS_UPDATING;
-			}
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
+					. " Cache status cache total count: {$_folder->cache_totalcount} imap total count: {$_folder->imap_totalcount} cache sequence: $this->_cacheMessageSequence imap sequence: $this->_imapMessageSequence");
+		} catch (Exception $e) {
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception when trying to add messages to cache: ' . $e->getMessage());
 		}
 
-		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
-				. " Cache status cache total count: {$_folder->cache_totalcount} imap total count: {$_folder->imap_totalcount} cache sequence: $this->_cacheMessageSequence imap sequence: $this->_imapMessageSequence");
 	}
 
 	/**
@@ -1073,7 +1079,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 					'cache_recentcount' => 0,
 					'cache_unreadcount' => 0
 			));
-				
+
 			$folder = Felamimail_Controller_Folder::getInstance()->update($folder);
 		} catch (Exception $e) {
 			Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Exception when clearing cache of {$folder->globalname}: {$e->getMessage()}");
