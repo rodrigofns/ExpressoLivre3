@@ -131,7 +131,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);            
         }
 
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' result: ' . print_r($result,true) );        
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder search result count: ' . count($result) );        
         
         $this->_lastSearchCount[$this->_currentAccount->getId()][$filterValues['account_id']] = count($result);
         

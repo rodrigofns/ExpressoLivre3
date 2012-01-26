@@ -154,6 +154,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 				try {
 					$this->_updateMessageSequence($folder, $imap);
 				} catch (Felamimail_Exception_IMAPMessageNotFound $feimnf) {
+					if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' Exception when updating message sequence: ' . $feimnf->getMessage());
 					$result->addRecord($folder);
 					continue;
 				}
