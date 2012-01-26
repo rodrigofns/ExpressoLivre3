@@ -967,10 +967,10 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 		$where  = array(
 				$this->_db->quoteInto($this->_db->quoteIdentifier($identifier) . ' = ?', $id),
 		);
-
-		$this->_db->update($this->_tablePrefix . $this->_tableName, $recordArray, $where);
 		
 		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " updating {$this->_tablePrefix}{$this->_tableName}");
+
+		$this->_db->update($this->_tablePrefix . $this->_tableName, $recordArray, $where);		
 
 		// update custom fields
 		if ($_record->has('customfields')) {
