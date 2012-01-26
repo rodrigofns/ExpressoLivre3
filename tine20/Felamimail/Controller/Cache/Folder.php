@@ -103,6 +103,7 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
             $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder');
         } catch (Exception $e) {
        		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' unexpected Exception: ' . $e->getMessage());
+       		$result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder');
         }
         
         return $result;

@@ -128,7 +128,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         $result = $this->_backend->search($filter);
         if (count($result) == 0) {
             // try to get folders from imap server
-            $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);
+            $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);            
         }
 
         Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' result: ' . print_r($result,true) );        
