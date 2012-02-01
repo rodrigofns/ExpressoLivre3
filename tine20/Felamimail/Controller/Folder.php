@@ -294,6 +294,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
      */
     public function updateFolderCounter($_folderId, array $_counters)
     {
+    	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " starting update of folder counter with id {$_folderId}");
         return $this->_backend->updateFolderCounter($_folderId, $_counters);
     }
     

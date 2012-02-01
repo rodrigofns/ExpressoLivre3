@@ -279,6 +279,8 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 
 		// reset max execution time to old value
 		Tinebase_Core::setExecutionLifeTime($oldMaxExcecutionTime);
+		
+		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " finished update cache of folder {$folder->globalname}");		
 
 		return $folder;
 	}
@@ -349,7 +351,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " up-to-date folder {$_folder->globalname}");
 
 		if ($this->_cacheIsInvalid($_folder)) {
-			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . print_r($_folder->toArray(), TRUE));
+			if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' uidvalidity changed => clear cache: ' . $_folder->globalname);
 			$_folder = $this->clear($_folder);
 		}
 
