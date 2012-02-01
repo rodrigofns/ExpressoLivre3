@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>GoogieSpell demo</title>
+  <script type="text/javascript" src="googiespell/AJS.js"></script>
+  <script type="text/javascript" src="googiespell/googiespell.js"></script>
+  <script type="text/javascript" src="googiespell/googiespell_multiple.js"></script>
+  <script type="text/javascript" src="googiespell/cookiesupport.js"></script>
+  <link href="googiespell/googiespell.css" rel="stylesheet" type="text/css" media="all" />
+  <style type="text/css">
+    body {
+      margin: 25px;
+      background-color: #EFEDE7;
+    }
+    h1, h2 {
+      font-size: 18px;
+      font-family: verdana, helvetica, sans-serif;
+      color: #333;
+      margin: 0px;
+      padding: 0px;
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 14px;
+      color: #333;
+      margin: 0px;
+      padding-top: 15px;
+      padding-bottom: 2px;
+    }
+
+    pre {
+      margin-top: 5px;
+      padding: 4px;
+      background-color: #e3e2c6;
+      border: 1px solid #999;
+    }
+
+    .textarea {
+      /*  START GoogieSpell requirements.  */
+      line-height: 12px;
+      font-size: 12px;
+      padding: 2px;
+      font-family: sans-serif;
+      /*  END GoogieSpell requirements.  */
+
+      width: 600px;
+      height: 150px;
+    }
+
+    .inputbox {
+      /*  START GoogieSpell requirements.  */
+      line-height: 12px;
+      font-size: 12px;
+      padding: 2px;
+      font-family: sans-serif;
+      /*  END GoogieSpell requirements.  */
+
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+
+<p>
+<img src="googiespell/logo.png" alt="" />
+<br />
+<span style="font-weight: bold; color: #333">Gmail like spell checker for your own application.</span>
+</p>
+
+<div>
+  <h2>Dependent text areas</h2>
+
+  <form>
+    <div id="global_spell_container" style="background-color: #ddd"></div>
+    <br />
+    <table>
+      <tr>
+        <td>This</td>
+        <td><textarea id="ta5_1" class="textarea">Ths Ths is a tst</textarea></td>
+        <td>Test</td>
+      </tr>
+    </table>
+    <textarea id="ta5_2" class="textarea" style="height: 50px;">Ths is a tst</textarea>
+    <div>A test</div>
+    <select></select>
+    <input type="text" class="inputbox" />
+    <span>test</span>
+    <table style="padding: 0; margin: 0">
+      <tr>
+        <td><input type="text" id="ta5_3" class="inputbox" value="ThsthsthsthsThsthsthsthsThsthsthsthsThsthsthsths" /></td>
+      </tr>
+      <tr>
+        <td><input type="text" id="ta5_4" class="inputbox" value="ths is a tst. ths is a tst. ths is a tst." /></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <table>
+      <tr>
+        <td>
+          <input type="text" id="ta5_6" class="inputbox" value="Scrol tst." />
+        </td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </form>
+  <script type="text/javascript">
+    var googie5 = new GoogieSpellMultiple("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+
+    //New menu item "Add"
+    var add_checker = function(elm) {
+      return true;
+    };
+    var add_item = function(elm, current_googie) {
+      googie5.ignoreAll(elm);
+    };
+    googie5.appendNewMenuItem("Add", add_item, add_checker);
+
+    var fn_no_more_errors = function(e) {
+      alert('no more errros');
+    }
+
+    googie5.setDependent();
+    googie5.setCustomAjaxError(function(req) {
+      alert('babu')
+    });
+    googie5.useCloseButtons();
+    googie5.noMoreErrorsCallback(fn_no_more_errors);
+    googie5.setSpellContainer("global_spell_container");
+    googie5.decorateTextareas("ta5_1", AJS.$("ta5_2"), "ta5_3", "ta5_6");
+  </script>
+</div>
+
+
+</body>
+</html>

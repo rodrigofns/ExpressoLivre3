@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>GoogieSpell demo</title>
+    <script type="text/javascript" src="googiespell/AJS.js"></script>
+    <script type="text/javascript" src="googiespell/googiespell.js"></script>
+    <script type="text/javascript" src="googiespell/cookiesupport.js"></script>
+    <link href="googiespell/googiespell.css" rel="stylesheet" type="text/css" media="all" />
+    <style type="text/css">
+        body {
+            margin: 25px;
+            background-color: #EFEDE7;
+        }
+        h1, h2 {
+            font-size: 18px;
+            font-family: verdana, helvetica, sans-serif;
+            color: #333;
+            margin: 0px;
+            padding: 0px;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: #333;
+            margin: 0px;
+            padding-top: 15px;
+            padding-bottom: 2px;
+        }
+
+        pre {
+            margin-top: 5px;
+            padding: 4px;
+            background-color: #e3e2c6;
+            border: 1px solid #999;
+        }
+
+        .textarea {
+            /*    START GoogieSpell reqs.*/
+            line-height: 13px;
+            font-size: 13px;
+            padding: 2px;
+            font-family: sans-serif;
+            /*    END GoogieSpell reqs.*/
+
+            width: 600px;
+            height: 335px;
+        }
+
+        .inputbox {
+            /*    START GoogieSpell reqs.*/
+            line-height: 13px;
+            font-size: 13px;
+            padding: 2px;
+            font-family: sans-serif;
+            /*    END GoogieSpell reqs.*/
+
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<p>
+<img src="googiespell/logo.png" alt="" />
+<br />
+<span style="font-weight: bold; color: #333">Gmail like spell checker for your own application.</span>
+</p>
+
+<div>
+    <h2>The most simple configuration</h2>
+    <ul>
+        <li>Decorate the text area</li>
+    </ul>
+
+    <h3>Code</h3>
+    <pre>var googie1 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+googie1.decorateTextarea("ta1");</pre>
+
+    <h3>Preview</h3>
+    <form>
+        <textarea id="ta1" class="textarea">Ths is a tst</textarea>
+    </form>
+    <script type="text/javascript">
+        var googie1 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie1.decorateTextarea("ta1");
+    </script>
+</div>
+
+<br />
+<br />
+
+<div>
+    <h2>Input boxes (new in 3.6)</h2>
+    <ul>
+        <li>Decorate an input box</li>
+    </ul>
+
+    <h3>Code</h3>
+    <pre>var googie_i1 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie_i1.decorateTextarea("ib1");
+        var googie_i2 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie_i2.decorateTextarea("ib2");</pre>
+
+    <h3>Preview</h3>
+    <form>
+        <table>
+            <tr>
+                <td><input type="text" class="inputbox" value="Ths is a tst" id="ib1" /></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="inputbox" value="Ths is a tst. Ths is a tst. Ths is a tst." id="ib2" /></td>
+            </tr>
+        </table>
+    </form>
+    <script type="text/javascript">
+        var googie_i1 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie_i1.decorateTextarea("ib1");
+        var googie_i2 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie_i2.decorateTextarea("ib2");
+    </script>
+</div>
+
+<br />
+<br />
+
+<div>
+    <h2>A little more advance configuration</h2>
+    <ul>
+        <li>Decorate the text area</li>
+        <li>Use another container</li>
+        <li>Support only Danish and English</li>
+        <li>Don't show close buttons</li>
+    </ul>
+
+    <h3>Code</h3>
+    <pre>var googie2 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+googie2.setLanguages({'da': 'Danish', 'en': 'English'});
+googie2.dontUseCloseButtons();
+googie2.setSpellContainer("spell_container");
+googie2.decorateTextarea("ta2");</pre>
+
+    <h3>Preview</h3>
+    <form>
+        <span id="spell_container" style="background-color: #ddd"></span><br />
+        <textarea id="ta2" class="textarea">Ths is a tst</textarea>
+    </form>
+    <script type="text/javascript">
+        var googie2 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie2.setLanguages({'da': 'Danish', 'en': 'English'});
+        googie2.dontUseCloseButtons();
+        googie2.setSpellContainer("spell_container");
+        googie2.decorateTextarea("ta2");
+    </script>
+</div>
+
+<br />
+<br />
+
+<div>
+    <h2>Interface in Greek</h2>
+    <ul>
+        <li>GoogieSpell interface in Greek</li>
+    </ul>
+
+    <h3>Code</h3>
+    <pre>var googie4 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+googie4.lang_chck_spell = "&#904;&#955;&#949;&#947;&#967;&#959;&#962; &#959;&#961;&#952;&#959;&#947;&#961;&#945;&#966;&#943;&#945;&#962;";
+googie4.lang_rsm_edt = "&#917;&#960;&#953;&#963;&#964;&#961;&#959;&#966;&#942; &#963;&#964;&#951;&#957; &#949;&#960;&#949;&#958;&#949;&#961;&#947;&#945;&#963;&#943;&#945;";
+googie4.lang_close = "&#922;&#955;&#949;&#943;&#963;&#953;&#956;&#959;";
+googie4.lang_no_error_found = "&#916;&#949; &#946;&#961;&#941;&#952;&#951;&#954;&#945;&#957; &#959;&#961;&#952;&#959;&#947;&#961;&#945;&#966;&#953;&#954;&#940; &#955;&#940;&#952;&#951;";
+googie4.lang_revert = "&#917;&#960;&#953;&#963;&#964;&#961;&#959;&#966;&#942; &#963;&#949;";
+googie4.setSpellContainer("spell_container4");
+googie4.decorateTextarea("ta4");
+    </pre>
+
+    <h3>Preview</h3>
+    <form>
+        <span id="spell_container4" style="background-color: #ddd"></span><br />
+        <textarea id="ta4" class="textarea">Ths is a tst</textarea>
+    </form>
+    <script type="text/javascript">
+        var googie4 = new GoogieSpell("googiespell/", "https://www.google.com/tbproxy/spell?lang=");
+        googie4.lang_chck_spell = "&#904;&#955;&#949;&#947;&#967;&#959;&#962; &#959;&#961;&#952;&#959;&#947;&#961;&#945;&#966;&#943;&#945;&#962;";
+        googie4.lang_rsm_edt = "&#917;&#960;&#953;&#963;&#964;&#961;&#959;&#966;&#942; &#963;&#964;&#951;&#957; &#949;&#960;&#949;&#958;&#949;&#961;&#947;&#945;&#963;&#943;&#945;";
+        googie4.lang_close = "&#922;&#955;&#949;&#943;&#963;&#953;&#956;&#959;";
+        googie4.lang_no_error_found = "&#916;&#949; &#946;&#961;&#941;&#952;&#951;&#954;&#945;&#957; &#959;&#961;&#952;&#959;&#947;&#961;&#945;&#966;&#953;&#954;&#940; &#955;&#940;&#952;&#951;";
+        googie4.lang_revert = "&#917;&#960;&#953;&#963;&#964;&#961;&#959;&#966;&#942; &#963;&#949;";
+        googie4.setSpellContainer("spell_container4");
+        googie4.decorateTextarea("ta4");
+    </script>
+</div>
+
+</body>
+</html>
