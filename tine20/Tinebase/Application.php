@@ -184,6 +184,8 @@ class Tinebase_Application
         $select = $this->_db->select();
         $select->from($this->_tableName)
                ->where($this->_db->quoteIdentifier('name') . ' = ?', $_applicationName);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' getting application by name: ' . $select->assemble());
 
         $stmt = $this->_db->query($select);
         $queryResult = $stmt->fetch();
