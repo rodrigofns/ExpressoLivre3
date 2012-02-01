@@ -85,6 +85,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
      */
     public function update($_accountId, $_folderName = '', $_recursive = FALSE)
     {
+    	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' getting (sub) folder and creating folders in db backend cache');
+    	
         $account = ($_accountId instanceof Felamimail_Model_Account) ? $_accountId : Felamimail_Controller_Account::getInstance()->get($_accountId);
         $this->_delimiter = $account->delimiter;
         
