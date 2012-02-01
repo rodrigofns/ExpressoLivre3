@@ -58,6 +58,14 @@
     
     <?php require 'Tinebase/views/includeJsAndCss.php'; ?>
         
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/AJS.js"></script>
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/googiespell.js"></script>                   
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/cookiesupport.js"></script>          
+    <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/googiespell/googiespell.css" />    
+    <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/css/htmleditorplugins.css" />
+    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.MidasCommand.js"></script>
+    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.SpellChecker.js"></script>
+
     <noscript><p>You need to enable javascript to use <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
 </body>
 </html>
