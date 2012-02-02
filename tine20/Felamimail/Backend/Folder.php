@@ -175,6 +175,8 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
         
         $where[] = $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $folder->getId());
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' update folder counter query: ' . $this->_tablePrefix . $this->_tableName . ' ' . print_r($data,true) . ' ' . print_r($where,true));        
+        
         try {
             $this->_db->update($this->_tablePrefix . $this->_tableName, $data, $where);
         } catch (Zend_Db_Statement_Exception $zdse) {
