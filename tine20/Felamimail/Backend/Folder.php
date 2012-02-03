@@ -146,7 +146,7 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
             throw new Tinebase_Exception_InvalidArgument('Missing folder or folder id.');
         }
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' starting update folder counter: ' . $_folderId . ' - ' . print_r($_counters, true));
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' starting update folder counter: ' . print_r($_folderId, true) );
         $folder = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId : $this->get($_folderId);
         if (empty($_counters)) {
             return $folder; // nothing todo
@@ -183,7 +183,8 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
             if (Tinebase_Core::isLogLevel(Zend_Log::WARN)) Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Could not update folder counts: ' . $zdse->getMessage());
         } catch (Exception $e)
         {
-        	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' unexpected exception: ' . $e->getMessage());        	
+        	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' unexpected exception: ' . $e->getMessage());
+        	throw $e;        	
         }
         
         // sanitize unreadcount
