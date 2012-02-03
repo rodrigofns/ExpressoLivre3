@@ -187,9 +187,14 @@ class Felamimail_Backend_Folder extends Tinebase_Backend_Sql_Abstract
         }
         
         // sanitize unreadcount
-        $updatedFolder = $this->get($folder->getId());
-        if ($updatedFolder->cache_totalcount === 0 && $updatedFolder->cache_unreadcount >= 0) {
-            $this->updateFolderCounter($folder, array('cache_unreadcount' => 0));
+        try {
+        	$updatedFolder = $this->get($folder->getId());
+        	if ($updatedFolder->cache_totalcount === 0 && $updatedFolder->cache_unreadcount >= 0) {
+        		$this->updateFolderCounter($folder, array('cache_unreadcount' => 0));
+        	}        	
+        } catch (Exception $e) {
+        	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' Exception when sanitize unreadcount: ' . $e->getMessage());
+        	throw $e;        	
         }
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " folder counter up-to-date");
