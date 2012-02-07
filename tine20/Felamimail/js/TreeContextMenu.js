@@ -326,7 +326,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
         });
        }, this);
 
-        Ext.MessageBox.wait(_('Please wait'),_('Uploading...'));
+        Ext.MessageBox.wait(_('Please wait'),_('Loading'));
         
         var files = fileSelector.getFileList();
         Ext.each(files, function (file) {

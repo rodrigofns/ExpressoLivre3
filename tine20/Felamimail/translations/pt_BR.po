@@ -1077,3 +1077,12 @@ msgstr "Mensagem não está Íntegra"
 msgid "Share mailbox"
 msgstr "Compartilhar pastas"
 
+#: js/TreecontexMenu.js:
+#: 284
+msgid "Import msg(eml)"
+msgstr "Importar msg(eml)"
+
+#: js/TreecontexMenu.js:
+#: 329
+msgid "Loading..."
+msgstr "Carregendo..."
