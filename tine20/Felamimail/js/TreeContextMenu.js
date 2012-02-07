@@ -261,7 +261,6 @@ Tine.Felamimail.setTreeContextMenus = function() {
     };
     
     
-    
     var manageAclsAction = {
         text: this.app.i18n._('Share mailbox'),
         iconCls: 'action_managePermissions',
@@ -280,7 +279,62 @@ Tine.Felamimail.setTreeContextMenus = function() {
                 }
             }
     };
-    
+
+    var manageEmlImportAction = {
+        text: this.app.i18n._('Import msg(eml)'),
+        iconCls: 'action_import',
+        scope: this,
+        plugins: [{
+                ptype: 'ux.browseplugin',
+                multiple: true,
+                dropElSelector: null
+            }],
+        handler: function (fileSelector, e) {
+        var uploader = new Ext.ux.file.Uploader({
+            maxFileSize: 67108864, // 64MB
+            fileSelector: fileSelector
+        });
+
+        uploader.on('uploadcomplete',function(x,fileRecord){
+            Ext.Ajax.request({
+            params: {
+                method: 'Felamimail.importMessageEml',
+                accountId:this.ctxNode.attributes.account_id,
+                folderId: this.ctxNode.attributes.folder_id,
+                file: fileRecord.get('path')
+            },
+            scope: this,
+            success: function(_result, _request){
+                Ext.MessageBox.hide();
+            },
+            failure: function(response, options) {
+                var responseText = Ext.util.JSON.decode(response.responseText);
+                if (responseText.data.code == 505) {
+                    Ext.Msg.show({
+                       title:   _('Error'),
+                       msg:     _('Error import message eml!'),
+                       icon:    Ext.MessageBox.ERROR,
+                       buttons: Ext.Msg.OK
+                    });
+
+                } else {
+                    // call default exception handler
+                    var exception = responseText.data ? responseText.data : responseText;
+                    Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+                }
+            }
+        });
+       }, this);
+
+        Ext.MessageBox.wait(_('Please wait'),_('Uploading...'));
+        
+        var files = fileSelector.getFileList();
+        Ext.each(files, function (file) {
+            var fileRecord = uploader.upload(file);
+         }, this);
+        }
+    };
+
     // mutual config options
     var config = {
         nodeName: this.app.i18n.n_('Folder', 'Folders', 1),
@@ -290,11 +344,11 @@ Tine.Felamimail.setTreeContextMenus = function() {
     };
     
     // system folder ctx menu
-    config.actions = [markFolderSeenAction, 'add'];
+    config.actions = [markFolderSeenAction, 'add', manageEmlImportAction];
     this.contextMenuSystemFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // user folder ctx menu
-    config.actions = [markFolderSeenAction, 'add', 'rename', 'delete'];
+    config.actions = [markFolderSeenAction, 'add', 'rename', 'delete', manageEmlImportAction];
     this.contextMenuUserFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // trash ctx menu
