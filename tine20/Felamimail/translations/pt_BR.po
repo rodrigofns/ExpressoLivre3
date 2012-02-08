@@ -1086,3 +1086,13 @@ msgstr "Confirmação de Leitura"
 #: 186
 msgid "Activate this toggle button to receive a reading confirmation."
 msgstr "Ative esta opção para receber uma confirmação de leitura dos destinatários deste email"
+
+#: js/TreecontexMenu.js:
+#: 284
+msgid "Import msg(eml)"
+msgstr "Importar msg(eml)"
+
+#: js/TreecontexMenu.js:
+#: 329
+msgid "Loading..."
+msgstr "Carregendo..."
