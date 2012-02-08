@@ -1077,3 +1077,12 @@ msgstr "Mensagem não está Íntegra"
 msgid "Share mailbox"
 msgstr "Compartilhar pastas"
 
+#: js/MessageEditDialog.js:
+#: 178
+msgid "Reading Confirmation"
+msgstr "Confirmação de Leitura"
+
+#: js/MessageEditDialog.js:
+#: 186
+msgid "Activate this toggle button to receive a reading confirmation."
+msgstr "Ative esta opção para receber uma confirmação de leitura dos destinatários deste email"

@@ -40,6 +40,7 @@ Tine.Felamimail.Model.Message = Tine.Tinebase.data.Record.create([
       { name: 'original_id' },
       { name: 'folder_id' },
       { name: 'note' },
+      { name: 'request_response' },
       { name: 'smime' },
       { name: 'signature_info' }
     ], {

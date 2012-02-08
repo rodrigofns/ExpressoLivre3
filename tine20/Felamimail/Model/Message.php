@@ -25,6 +25,7 @@
  * @property    array   $structure      the message structure
  * @property    string  $messageuid     the message uid on the imap server
  * @property    integer $smime          true if is a digitaly signed message
+ * @property    integer $reading_conf   true if it must send a reading confirmation
  */
 class Felamimail_Model_Message extends Tinebase_Record_Abstract
 {
@@ -129,6 +130,8 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     // Felamimail_Message object
         'message'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'smime'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'reading_conf'          => array(Zend_Filter_Input::ALLOW_EMPTY => true,
+                                         Zend_Filter_Input::DEFAULT_VALUE => 0),
         'signature_info'        => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     );
     

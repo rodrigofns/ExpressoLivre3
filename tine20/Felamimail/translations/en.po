@@ -1022,3 +1022,10 @@ msgstr "Confirm Delete"
 msgid "Show confirmation dialog when deleting mails."
 msgstr "Show confirmation dialog when deleting mails."
 
+#: js/MessageEditDialog.js:178
+msgid "Reading Confirmation"
+msgstr "Reading Confirmation"
+
+#: js/MessageEditDialog.js:186
+msgid "Activate this toggle button to receive a reading confirmation."
+msgstr "Activate this toggle button to receive a reading confirmation."
