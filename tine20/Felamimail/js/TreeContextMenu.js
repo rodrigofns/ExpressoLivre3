@@ -308,6 +308,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
                 Ext.MessageBox.hide();
             },
             failure: function(response, options) {
+                Ext.MessageBox.hide();
                 var responseText = Ext.util.JSON.decode(response.responseText);
                 if (responseText.data.code == 505) {
                     Ext.Msg.show({
