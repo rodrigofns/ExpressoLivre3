@@ -3,7 +3,7 @@ msgid "Out of Office reply from %1$s"
 msgstr ""
 
 #: Controller/Message/Send.php:216 js/GridDetailsPanel.js:135
-#: js/GridPanel.js:486 js/MessageEditDialog.js:858 js/Model.js:139
+#: js/GridPanel.js:493 js/MessageEditDialog.js:858 js/Model.js:142
 #: js/sieve/RuleConditionsPanel.js:72
 msgid "Subject"
 msgstr ""
@@ -12,7 +12,7 @@ msgstr ""
 msgid "Body"
 msgstr ""
 
-#: Controller/Message/Flags.php:24 js/GridPanel.js:581
+#: Controller/Message/Flags.php:24 js/GridPanel.js:622
 msgid "Answered"
 msgstr ""
 
@@ -64,11 +64,11 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: js/GridDetailsPanel.js:141 js/GridDetailsPanel.js:366
+#: js/GridDetailsPanel.js:141 js/GridDetailsPanel.js:385
 msgid "Show or hide header information"
 msgstr ""
 
-#: js/GridDetailsPanel.js:232 js/GridPanel.js:472 js/MessageEditDialog.js:698
+#: js/GridDetailsPanel.js:232 js/GridPanel.js:479 js/MessageEditDialog.js:698
 msgid "Attachments"
 msgstr ""
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "Add Account"
 msgstr ""
 
-#: js/GridPanel.js:311 js/GridPanel.js:1253 js/GridPanel.js:1269
+#: js/GridPanel.js:311 js/GridPanel.js:1298 js/GridPanel.js:1314
 #: js/MessageDisplayDialog.js:79
 msgid "Print Preview"
 msgstr ""
@@ -126,67 +126,67 @@ msgstr ""
 msgid "Id"
 msgstr ""
 
-#: js/GridPanel.js:479 js/Model.js:145
+#: js/GridPanel.js:486 js/Model.js:148
 msgid "Flags"
 msgstr ""
 
-#: js/GridPanel.js:492 js/Model.js:140 js/sieve/RuleConditionsPanel.js:69
+#: js/GridPanel.js:499 js/Model.js:143 js/sieve/RuleConditionsPanel.js:69
 msgid "From (Email)"
 msgstr ""
 
-#: js/GridPanel.js:498 js/Model.js:141
+#: js/GridPanel.js:505 js/Model.js:144
 msgid "From (Name)"
 msgstr ""
 
-#: js/GridPanel.js:504
+#: js/GridPanel.js:511
 msgid "Sender"
 msgstr ""
 
-#: js/GridPanel.js:511 js/Model.js:142
+#: js/GridPanel.js:518 js/Model.js:146
 msgid "To"
 msgstr ""
 
-#: js/GridPanel.js:518 js/Model.js:487
+#: js/GridPanel.js:525 js/Model.js:490
 msgid "Sent"
 msgstr ""
 
-#: js/GridPanel.js:526 js/Model.js:148
+#: js/GridPanel.js:533 js/Model.js:151
 msgid "Received"
 msgstr ""
 
-#: js/GridPanel.js:533 js/FolderFilterModel.js:30 js/TreeContextMenu.js:45
+#: js/GridPanel.js:540 js/FolderFilterModel.js:30 js/TreeContextMenu.js:45
 #: js/TreeContextMenu.js:100 js/TreeContextMenu.js:103
-#: js/TreeContextMenu.js:106 js/Model.js:52 js/Model.js:493
+#: js/TreeContextMenu.js:106 js/Model.js:55 js/Model.js:496
 msgid "Folder"
 msgid_plural "Folders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/GridPanel.js:541 js/sieve/RuleConditionsPanel.js:73
+#: js/GridPanel.js:548 js/sieve/RuleConditionsPanel.js:73
 msgid "Size"
 msgstr ""
 
-#: js/GridPanel.js:584
+#: js/GridPanel.js:625
 msgid "Forwarded"
 msgstr ""
 
-#: js/GridPanel.js:587
+#: js/GridPanel.js:628
 msgid "Recent"
 msgstr ""
 
-#: js/GridPanel.js:1096 js/GridPanel.js:1128
+#: js/GridPanel.js:1140 js/GridPanel.js:1172
 msgid "Quota unknown"
 msgstr ""
 
-#: js/GridPanel.js:1111
+#: js/GridPanel.js:1155
 msgid "{0} %"
 msgstr ""
 
-#: js/GridPanel.js:1119
+#: js/GridPanel.js:1163
 msgid "Your quota"
 msgstr ""
 
-#: js/GridPanel.js:1120
+#: js/GridPanel.js:1164
 msgid "{0} available (total: {1})"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 msgid "Update {0} Cache"
 msgstr ""
 
-#: js/TreeContextMenu.js:24 js/Model.js:48
+#: js/TreeContextMenu.js:24 js/Model.js:51
 msgid "Message"
 msgid_plural "Messages"
 msgstr[0] ""
@@ -402,7 +402,7 @@ msgstr ""
 msgid "Signature"
 msgstr ""
 
-#: js/AccountEditDialog.js:103 js/Model.js:347
+#: js/AccountEditDialog.js:103 js/Model.js:350
 msgid "Account"
 msgid_plural "Accounts"
 msgstr[0] ""
@@ -643,69 +643,69 @@ msgstr ""
 msgid "\"{0}\" recipients"
 msgstr ""
 
-#: js/Model.js:138
+#: js/Model.js:141
 msgid "Subject/From"
 msgstr ""
 
-#: js/Model.js:143
+#: js/Model.js:146
 msgid "Cc"
 msgstr ""
 
-#: js/Model.js:144
+#: js/Model.js:147
 msgid "Bcc"
 msgstr ""
 
-#: js/Model.js:351
+#: js/Model.js:354
 msgid "Email Accounts"
 msgid_plural "Email Accounts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/Model.js:487
+#: js/Model.js:490
 msgid "INBOX"
 msgstr ""
 
-#: js/Model.js:487
+#: js/Model.js:490
 msgid "Drafts"
 msgstr ""
 
-#: js/Model.js:487
+#: js/Model.js:490
 msgid "Templates"
 msgstr ""
 
-#: js/Model.js:487
+#: js/Model.js:490
 msgid "Junk"
 msgstr ""
 
-#: js/Model.js:487
+#: js/Model.js:490
 msgid "Trash"
 msgstr ""
 
-#: js/Model.js:496 js/Model.js:613 js/Model.js:678
+#: js/Model.js:499 js/Model.js:616 js/Model.js:681
 msgid "record list"
 msgid_plural "record lists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/Model.js:609
+#: js/Model.js:612
 msgid "Vacation"
 msgid_plural "Vacations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/Model.js:675
+#: js/Model.js:678
 msgid "Rule"
 msgid_plural "Rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/Model.js:801
+#: js/Model.js:804
 msgid "Flag"
 msgid_plural "Flags"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/Model.js:804
+#: js/Model.js:807
 msgid "Flag list"
 msgid_plural "Flag lists"
 msgstr[0] ""
@@ -958,4 +958,36 @@ msgstr ""
 
 #: Preference.php:123
 msgid "Show confirmation dialog when deleting mails."
+msgstr ""
+
+#: js/GridPanel.js: 472
+msgid "Security"
+msgstr ""
+
+#: js/GridPanel.js: 569
+msgid "Signed"
+msgstr ""
+
+#: js/GridPanel.js: 573
+msgid "Encrypted"
+msgstr ""
+
+#: js/GridPanel.js: 577
+msgid "Compressed"
+msgstr ""
+
+#: js/GridPanel.js: 581
+msgid "Certs Only"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 245
+msgid "Digitally Signed Message"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 251
+msgid "Message Integrity Ok"
+msgstr ""
+
+#: js/GridDetailsPanel.js: 255
+msgid "Message Integrity not Ok"
 msgstr ""

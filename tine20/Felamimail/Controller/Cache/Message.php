@@ -723,6 +723,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
         $message->parseStructure($_message['structure']);
         $message->parseHeaders($_message['header']);
         $message->parseBodyParts();
+        $message->parseSmime($_message['structure']);
         
         $attachments = $this->getAttachments($message);
         $message->has_attachment = (count($attachments) > 0) ? true : false;

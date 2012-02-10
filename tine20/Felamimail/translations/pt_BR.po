@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator:  <rommel.cysne@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-01-25 09:08-0300\n"
+"Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -54,7 +54,7 @@ msgstr "Marcada"
 #: js/GridDetailsPanel.js:135
 #: js/GridPanel.js:487
 #: js/MessageEditDialog.js:859
-#: js/Model.js:140
+#: js/Model.js:142
 #: js/sieve/RuleConditionsPanel.js:72
 msgid "Subject"
 msgstr "Assunto"
@@ -73,7 +73,7 @@ msgid "Signature"
 msgstr "Assinatura"
 
 #: js/AccountEditDialog.js:110
-#: js/Model.js:348
+#: js/Model.js:350
 msgid "Account"
 msgid_plural "Accounts"
 msgstr[0] "Conta"
@@ -318,8 +318,8 @@ msgstr "Não foi possível salvar script no servidor Sieve."
 
 #: js/FolderFilterModel.js:30
 #: js/GridPanel.js:534
-#: js/Model.js:52
-#: js/Model.js:494
+#: js/Model.js:54
+#: js/Model.js:496
 #: js/TreeContextMenu.js:45
 #: js/TreeContextMenu.js:100
 #: js/TreeContextMenu.js:103
@@ -329,8 +329,8 @@ msgstr "Pasta"
 
 #: js/FolderFilterModel.js:30
 #: js/GridPanel.js:534
-#: js/Model.js:52
-#: js/Model.js:494
+#: js/Model.js:54
+#: js/Model.js:496
 #: js/TreeContextMenu.js:45
 #: js/TreeContextMenu.js:100
 #: js/TreeContextMenu.js:103
@@ -372,7 +372,7 @@ msgid "Date"
 msgstr "Data"
 
 #: js/GridDetailsPanel.js:141
-#: js/GridDetailsPanel.js:366
+#: js/GridDetailsPanel.js:385
 msgid "Show or hide header information"
 msgstr "Exibir ou esconder informações do cabeçalho"
 
@@ -450,13 +450,13 @@ msgid "Flags"
 msgstr "Marcadores"
 
 #: js/GridPanel.js:493
-#: js/Model.js:141
+#: js/Model.js:143
 #: js/sieve/RuleConditionsPanel.js:69
 msgid "From (Email)"
 msgstr "De (Email)"
 
 #: js/GridPanel.js:499
-#: js/Model.js:142
+#: js/Model.js:144
 msgid "From (Name)"
 msgstr "De (Nome)"
 
@@ -465,17 +465,17 @@ msgid "Sender"
 msgstr "Remetente"
 
 #: js/GridPanel.js:512
-#: js/Model.js:143
+#: js/Model.js:145
 msgid "To"
 msgstr "Destinatário"
 
 #: js/GridPanel.js:519
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "Sent"
 msgstr "Enviadas"
 
 #: js/GridPanel.js:527
-#: js/Model.js:149
+#: js/Model.js:151
 msgid "Received"
 msgstr "Recebidas"
 
@@ -607,80 +607,80 @@ msgstr "Arquivos ainda estão sendo carregados."
 msgid "No recipients set."
 msgstr "Nenhum destinatário informado."
 
-#: js/Model.js:48
+#: js/Model.js:50
 #: js/TreeContextMenu.js:24
 msgid "Message"
 msgid_plural "Messages"
 msgstr[0] "Mensagem"
 msgstr[1] "Mensagens"
 
-#: js/Model.js:139
+#: js/Model.js:141
 msgid "Subject/From"
 msgstr "Assunto/De"
 
-#: js/Model.js:144
+#: js/Model.js:146
 msgid "Cc"
 msgstr "Cc"
 
-#: js/Model.js:145
+#: js/Model.js:147
 msgid "Bcc"
 msgstr "Bcc"
 
-#: js/Model.js:352
+#: js/Model.js:354
 msgid "Email Accounts"
 msgstr "Contas de Email"
 
-#: js/Model.js:352
+#: js/Model.js:354
 msgid "Email Account"
 msgstr "Conta de Email"
 
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "INBOX"
 msgstr "Entrada"
 
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "Drafts"
 msgstr "Rascunhos"
 
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "Templates"
 msgstr "Modelos"
 
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "Junk"
 msgstr "Lixo"
 
-#: js/Model.js:488
+#: js/Model.js:490
 msgid "Trash"
 msgstr "Lixeira"
 
-#: js/Model.js:497
-#: js/Model.js:614
-#: js/Model.js:679
+#: js/Model.js:499
+#: js/Model.js:616
+#: js/Model.js:681
 msgid "record list"
 msgid_plural "record lists"
 msgstr[0] "lista de registro"
 msgstr[1] "listas de registro"
 
-#: js/Model.js:610
+#: js/Model.js:612
 msgid "Vacation"
 msgid_plural "Vacations"
 msgstr[0] "Férias"
 msgstr[1] "Férias"
 
-#: js/Model.js:676
+#: js/Model.js:678
 msgid "Rule"
 msgid_plural "Rules"
 msgstr[0] "Regra"
 msgstr[1] "Regras"
 
-#: js/Model.js:802
+#: js/Model.js:804
 msgid "Flag"
 msgid_plural "Flags"
 msgstr[0] "Marca"
 msgstr[1] "Marcas"
 
-#: js/Model.js:805
+#: js/Model.js:807
 msgid "Flag list"
 msgid_plural "Flag lists"
 msgstr[0] "Lista de marcas"
@@ -1032,3 +1032,67 @@ msgstr "Todos os rascunhos"
 msgid "All mails with the draft flag"
 msgstr "Todas as mensagens marcadas como rascunho"
 
+#: js/GridPanel.js:
+#: 472
+msgid "Security"
+msgstr "Segurança"
+
+#: js/GridPanel.js:
+#: 569
+msgid "Signed"
+msgstr "Assinado"
+
+#: js/GridPanel.js:
+#: 573
+msgid "Encrypted"
+msgstr "Criptografado"
+
+#: js/GridPanel.js:
+#: 577
+msgid "Compressed"
+msgstr "Compactado"
+
+#: js/GridPanel.js:
+#: 581
+msgid "Certs Only"
+msgstr "Apenas Certificados"
+
+#: js/GridDetailsPanel.js:
+#: 245
+msgid "Digitally Signed Message"
+msgstr "Mensagem Assinada Digitalmente"
+
+#: js/GridDetailsPanel.js:
+#: 251
+msgid "Message Integrity Ok"
+msgstr "Integridade da Mensagem Ok"
+
+#: js/GridDetailsPanel.js:
+#: 255
+msgid "Message Integrity not Ok"
+msgstr "Mensagem não está Íntegra"
+
+#: js/TreecontexMenu.js:
+#: 266
+msgid "Share mailbox"
+msgstr "Compartilhar pastas"
+
+#: js/MessageEditDialog.js:
+#: 178
+msgid "Reading Confirmation"
+msgstr "Confirmação de Leitura"
+
+#: js/MessageEditDialog.js:
+#: 186
+msgid "Activate this toggle button to receive a reading confirmation."
+msgstr "Ative esta opção para receber uma confirmação de leitura dos destinatários deste email"
+
+#: js/TreecontexMenu.js:
+#: 284
+msgid "Import msg(eml)"
+msgstr "Importar msg(eml)"
+
+#: js/TreecontexMenu.js:
+#: 329
+msgid "Loading..."
+msgstr "Carregendo..."

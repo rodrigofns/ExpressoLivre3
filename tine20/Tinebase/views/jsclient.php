@@ -25,19 +25,32 @@
     
     <!-- EXT JS -->
      <?php
-        if(isset(Tinebase_Core::getConfig()->themes->default)) {
-            $path = Tinebase_Core::getConfig()->themes->themelist->get(Tinebase_Core::getConfig()->themes->default)->path;
-            if(1 || Tinebase_Core::getConfig()->themes->themelist->get(Tinebase_Core::getConfig()->themes->default)->useBlueAsBase==1) {
-                echo '<link rel="stylesheet" type="text/css" href="library/ExtJS/resources/css/ext-all.css" />';
-            } else {
-                echo '<link rel="stylesheet" type="text/css" href="library/ExtJS/resources/css/ext-all-notheme.css" />';
+        $extJS     = 'ext-all.css';
+        $pathTheme = 'tine20/resources/css/tine20.css';
+        if(isset(Tinebase_Core::getConfig()->themes->default))
+        {
+            $numDefaultTheme = Tinebase_Core::getConfig()->themes->default;
+            //seted the expressso array and the name of the cookie of the theme in the config AND
+            if ((isset(Tinebase_Core::getConfig()->themes->cookieTheme)) &&
+                (!empty(Tinebase_Core::getConfig()->themes->cookieTheme)) &&
+                (isset($_COOKIE[Tinebase_Core::getConfig()->themes->cookieTheme])))//the cookie of the theme is seted
+            {
+                $numDefaultTheme = $_COOKIE[Tinebase_Core::getConfig()->themes->cookieTheme];
             }
-            echo "\n".'<link rel="stylesheet" type="text/css" href="'.($path).'" />';
-            echo "\n";
-        } else {
-            echo '<link rel="stylesheet" type="text/css" href="library/ExtJS/resources/css/ext-all.css" />';
-            echo '<link rel="stylesheet" type="text/css" href="styles/tine20.css" />';
+            //the theme seted in the cookie exists in the config
+            if (isset(Tinebase_Core::getConfig()->themes->themelist->get($numDefaultTheme)->path))
+            {
+                $pathTheme = Tinebase_Core::getConfig()->themes->themelist->get($numDefaultTheme)->path;
+                if ((!isset(Tinebase_Core::getConfig()->themes->themelist->get($numDefaultTheme)->useBlueAsBase)) ||
+                        (Tinebase_Core::getConfig()->themes->themelist->get($numDefaultTheme)->useBlueAsBase == 0))
+                {
+                    $extJS = 'ext-all-notheme.css';
+                }                
+            }
         }
+        echo '<link rel="stylesheet" type="text/css" href="library/ExtJS/resources/css/'.$extJS.'" />';
+        echo '<link rel="stylesheet" type="text/css" href="themes/'.$pathTheme.'/resources/css/'.$pathTheme.'.css" />';
+        echo "\n";
      ?>
     
     <script type="text/javascript" src="library/ExtJS/adapter/ext/ext-base<?php echo TINE20_BUILDTYPE != 'RELEASE' ? '-debug' : '' ?>.js"></script>
@@ -45,6 +58,14 @@
     
     <?php require 'Tinebase/views/includeJsAndCss.php'; ?>
         
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/AJS.js"></script>
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/googiespell.js"></script>                   
+    <script type="text/javascript" src="library/ExtJS/plugins/googiespell/cookiesupport.js"></script>          
+    <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/googiespell/googiespell.css" />    
+    <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/css/htmleditorplugins.css" />
+    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.MidasCommand.js"></script>
+    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.SpellChecker.js"></script>
+
     <noscript><p>You need to enable javascript to use <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
 </body>
 </html>
