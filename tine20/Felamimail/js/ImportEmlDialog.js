@@ -130,7 +130,7 @@ Ext.namespace('Tine.Felamimail');
         this.fbar = [];
         
         this.action_cancel = new Ext.Action({
-            text: this.app.i18n._('cancel'),
+            text: this.app.i18n._('Cancel'),
             handler: this.onCancel,
             iconCls: 'action_cancel',
             disabled: false,
@@ -162,7 +162,7 @@ Ext.namespace('Tine.Felamimail');
        // });
 
         this.action_selectFile = new Ext.Action({
-            text: _('Selecionar Arquivo para importar'),
+            text: _('File to Import'),
             iconCls: 'action_import',
             scope: this,
             plugins: [{

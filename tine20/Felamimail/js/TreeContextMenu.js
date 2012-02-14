@@ -284,56 +284,18 @@ Tine.Felamimail.setTreeContextMenus = function() {
         text: this.app.i18n._('Import msg(eml)'),
         iconCls: 'action_import',
         scope: this,
-        plugins: [{
-                ptype: 'ux.browseplugin',
-                multiple: true,
-                dropElSelector: null
-            }],
-        handler: function (fileSelector, e) {
-        var uploader = new Ext.ux.file.Uploader({
-            maxFileSize: 67108864, // 64MB
-            fileSelector: fileSelector
-        });
-
-        uploader.on('uploadcomplete',function(x,fileRecord){
-            Ext.Ajax.request({
-            params: {
-                method: 'Felamimail.importMessageEml',
-                accountId:this.ctxNode.attributes.account_id,
-                folderId: this.ctxNode.attributes.folder_id,
-                file: fileRecord.get('path')
-            },
-            scope: this,
-            success: function(_result, _request){
-                Ext.MessageBox.hide();
-            },
-            failure: function(response, options) {
-                Ext.MessageBox.hide();
-                var responseText = Ext.util.JSON.decode(response.responseText);
-                if (responseText.data.code == 505) {
-                    Ext.Msg.show({
-                       title:   _('Error'),
-                       msg:     _('Error import message eml!'),
-                       icon:    Ext.MessageBox.ERROR,
-                       buttons: Ext.Msg.OK
+        handler:function() {
+                if (this.ctxNode) {
+                    var window = Tine.Felamimail.ImportEmlDialog.openWindow({
+                        title: String.format(_(this.ctxNode.attributes.globalname)),
+                        account: this.ctxNode.attributes.account_id,
+                        textName: this.ctxNode.text,
+                        folderId: this.ctxNode.attributes.folder_id,
+                        // Using 'INBOX', can use folderId
+                        globalName: this.ctxNode.attributes.globalname
                     });
-
-                } else {
-                    // call default exception handler
-                    var exception = responseText.data ? responseText.data : responseText;
-                    Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
                 }
             }
-        });
-       }, this);
-
-        Ext.MessageBox.wait(_('Please wait'),_('Loading'));
-        
-        var files = fileSelector.getFileList();
-        Ext.each(files, function (file) {
-            var fileRecord = uploader.upload(file);
-         }, this);
-        }
     };
 
     // mutual config options
