@@ -162,7 +162,7 @@ Ext.namespace('Tine.Felamimail');
        // });
 
         this.action_selectFile = new Ext.Action({
-            text: _('File to Import'),
+            text: this.app.i18n._('File to Import'),
             iconCls: 'action_import',
             scope: this,
             plugins: [{
@@ -1019,7 +1019,7 @@ Ext.namespace('Tine.Felamimail');
  */
 Tine.Felamimail.ImportEmlDialog.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
-        width: 230,
+        width: 240,
         height: 65,
         resizable: false,
         name: Tine.Felamimail.ImportEmlDialog.prototype.windowNamePrefix + Ext.id(),
