@@ -470,6 +470,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
 			// use normal search query as subselect to get count -> select count(*) from (select [...]) as count
 			$select = $this->_getSelect();
 			$this->_addFilter($select, $_filter);
+			$this->_traitGroup($select);
 			$countSelect = $this->_db->select()->from($select, $searchCountCols);
 
 		} else {
