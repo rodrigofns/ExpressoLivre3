@@ -66,7 +66,7 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         return $result;
     }
 
-        /**
+     /**
      * import message to folder from a file(eml)
      *
      * @param string $accountId
