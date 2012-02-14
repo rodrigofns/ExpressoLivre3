@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+    <name>Messenger</name>
+    <version>0.1</version>
+    <order>50</order>
+    <tables>
+        <table>
+            <name>messenger_users</name>
+            <version>1</version>
+            <declaration>
+                <field>
+                    <name>id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+                <field>
+                    <name>name</name>
+                    <type>text</type>
+                    <length>255</length>
+                    <notnull>true</notnull>
+                </field>
+                <index>
+                    <name>pk_id</name>
+                    <primary>true</primary>
+                    <field>
+                        <name>id</name>
+                    </field>
+                </index>
+            </declaration>
+        </table>
+    </tables>
+</application>
