@@ -339,6 +339,7 @@ msgid "Folders"
 msgstr "Pastas"
 
 #: js/FolderSelectPanel.js:75
+#: js/ImportEmlDialog.js:133
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -1121,3 +1122,8 @@ msgstr "Foi lida por:"
 #: 179
 msgid "in"
 msgstr "em"
+
+#: js/ImportEmlDialog.js:
+#: 165
+msgid "File to Import"
+msgstr "Selecionar Arquivo para importar"

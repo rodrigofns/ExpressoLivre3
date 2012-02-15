@@ -80,6 +80,10 @@
           "path": "js/"
         },
         {
+          "text": "ImportEmlDialog.js",
+          "path": "js/"
+        },
+        {
           "text": "AclsEditDialog.js",
           "path": "js/"
         },
