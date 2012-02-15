@@ -1029,3 +1029,28 @@ msgstr "Reading Confirmation"
 #: js/MessageEditDialog.js:186
 msgid "Activate this toggle button to receive a reading confirmation."
 msgstr "Activate this toggle button to receive a reading confirmation."
+
+#: Model/Message.php:
+#: 175
+msgid "Reading Confirmation:"
+msgstr "Reading Confirmation:"
+
+#: Model/Message.php:
+#: 176
+msgid "Your message:"
+msgstr "Your message:"
+
+#: Model/Message.php:
+#: 177
+msgid "Received in"
+msgstr "Received in"
+
+#: Model/Message.php:
+#: 178
+msgid "Was readed by:"
+msgstr "Was readed by:"
+
+#: Model/Message.php:
+#: 179
+msgid "in"
+msgstr "in"

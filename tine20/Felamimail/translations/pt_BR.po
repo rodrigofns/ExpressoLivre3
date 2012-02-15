@@ -1095,4 +1095,29 @@ msgstr "Importar msg(eml)"
 #: js/TreecontexMenu.js:
 #: 329
 msgid "Loading..."
-msgstr "Carregendo..."
+msgstr "Carregando..."
+
+#: Model/Message.php:
+#: 175
+msgid "Reading Confirmation:"
+msgstr "Confirmação de Leitura:"
+
+#: Model/Message.php:
+#: 176
+msgid "Your message:"
+msgstr "Sua mensagem"
+
+#: Model/Message.php:
+#: 177
+msgid "Received in"
+msgstr "Recebida em"
+
+#: Model/Message.php:
+#: 178
+msgid "Was readed by:"
+msgstr "Foi lida por:"
+
+#: Model/Message.php:
+#: 179
+msgid "in"
+msgstr "em"

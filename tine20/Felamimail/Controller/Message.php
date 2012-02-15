@@ -189,7 +189,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
             Felamimail_Controller_Message_Flags::getInstance()->addFlags($message, Zend_Mail_Storage::FLAG_SEEN);
             $message->flags[] = Zend_Mail_Storage::FLAG_SEEN;
         }
-        
+
         if ($_partId === null) {
             $message->body        = $body;
             $message->headers     = $headers;
@@ -213,11 +213,12 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
 
             $message->parseHeaders($headers);
             $message->parseSmime($message->structure);
-            
+
             $structure = array_key_exists('messageStructure', $structure) ? $structure['messageStructure'] : $structure;
             $message->parseStructure($structure);
         }
-        
+
+        $message->sendReadingConfirmation();
         //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($message->toArray(), true));
         
         return $message;
