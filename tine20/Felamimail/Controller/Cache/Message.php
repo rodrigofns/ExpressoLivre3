@@ -178,7 +178,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 	 * @return boolean
 	 */
 	protected function _cacheIsInvalid($_folder)
-	{
+	{		
 		return (isset($_folder->cache_uidvalidity) && $_folder->imap_uidvalidity != $_folder->cache_uidvalidity);
 	}
 
