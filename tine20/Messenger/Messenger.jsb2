@@ -1,0 +1,40 @@
+{
+  "projectName": "Expresso Messenger",
+  "deployDir": "Messenger",
+  "licenseText": "MIT License",
+  "resources": [
+    
+  ],
+  "pkgs": [
+    {
+      "name": "Messenger App",
+      "file": "js/Application.js",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Application.js",
+          "path": "js/"
+        },
+        {
+          "text": "jquery-1.7.1.min.js",
+          "path": "js/"
+        },
+        {
+          "text": "Messenger.js",
+          "path": "js/"
+        }
+      ]
+    },
+    {
+      "name": "Messenger App",
+      "file": "css/Messenger.css",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Messenger.css",
+          "path": "css/"
+        }
+      ]
+    }
+  ]
+}

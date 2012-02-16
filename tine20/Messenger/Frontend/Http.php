@@ -1,11 +1,4 @@
 <?php
-
-/**
-* This class handles all Http requests for the application
-*
-* @package     Application
-* @subpackage  Frontend
-*/
 class Messenger_Frontend_Http extends Tinebase_Frontend_Http_Abstract
 {
    protected $_applicationName = 'Messenger';
@@ -19,6 +12,7 @@ class Messenger_Frontend_Http extends Tinebase_Frontend_Http_Abstract
    {
        return array(
            'Messenger/js/Application.js',
+           'Messenger/js/jquery-1.7.1.min.js'
        );
    }
 }
