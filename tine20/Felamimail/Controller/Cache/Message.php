@@ -743,8 +743,6 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
 	 */
 	protected function _addMessagesToCacheAndIncreaseCounters($_messages, $_folder)
 	{
-		if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " Trying to add messages to cache");
-		
 		$incrementMessagesCounter = 0;
 		$incrementUnreadCounter   = 0;
 
