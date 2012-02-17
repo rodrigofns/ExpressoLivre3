@@ -22,6 +22,10 @@
         {
           "text": "Messenger.js",
           "path": "js/"
+        },
+        {
+          "text": "strophe.min.js",
+          "path": "js/"
         }
       ]
     },
