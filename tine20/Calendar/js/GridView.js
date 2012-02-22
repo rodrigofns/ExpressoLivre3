@@ -102,13 +102,20 @@ Tine.Calendar.GridView = Ext.extend(Ext.grid.GridPanel, {
                     return Tine.Tinebase.common.booleanRenderer(transp == 'PRIVATE');
                 }
             }, {
-                id: 'date',
+                id: 'tags',
+                header: this.app.i18n._("Tags"),
+                width: 50,
+                dataIndex: 'tags',
+                renderer: Tine.Tinebase.common.tagsRenderer
+                
+            }, {
+                id: 'dtstart',
                 header: this.app.i18n._("Start Time"),
                 width: 120,
                 dataIndex: 'dtstart',
                 renderer: Tine.Tinebase.common.dateTimeRenderer
             }, {
-                id: 'date',
+                id: 'dtend',
                 header: this.app.i18n._("End Time"),
                 width: 120,
                 dataIndex: 'dtend',
@@ -193,6 +200,9 @@ Tine.Calendar.GridView = Ext.extend(Ext.grid.GridPanel, {
             getTargetDateTime: Ext.emptyFn,
             getSelectionModel: function() {
                 return this.grid.getSelectionModel();
+            },
+            print: function() {
+                Ext.ux.Printer.print(this.grid);
             }
         }));
     },

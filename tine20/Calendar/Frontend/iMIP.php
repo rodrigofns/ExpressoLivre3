@@ -65,8 +65,8 @@ class Calendar_Frontend_iMIP
         $this->_checkPreconditions($_iMIP);
         
         Calendar_Convert_Event_Json::resolveRelatedData($_iMIP->event);
-        Tinebase_Model_Container::resolveContainer($_iMIP->event);
-        Tinebase_Model_Container::resolveContainer($_iMIP->getExistingEvent());
+        Tinebase_Model_Container::resolveContainerOfRecord($_iMIP->event);
+        Tinebase_Model_Container::resolveContainerOfRecord($_iMIP->getExistingEvent());
         
         return $_iMIP;
     }
@@ -264,14 +264,21 @@ class Calendar_Frontend_iMIP
         
         $existingEvent = $_iMIP->getExistingEvent();
         $organizer = $existingEvent ? $existingEvent->resolveOrganizer() : $_iMIP->getEvent()->resolveOrganizer();
+        
         if ($_assertExistence && ! $organizer) {
             $_iMIP->addFailedPrecondition(Calendar_Model_iMIP::PRECONDITION_ORGANIZER, "processing {$_iMIP->method} without organizer is not possible");
             $result = FALSE;
         }
         
+        // NOTE: originator might also be reply-to instead of from
+        // NOTE: originator might act on behalf of organizer ("SEND-BY")
+        // NOTE: an existing event might be updateable by an non organizer ("SEND-BY") originator
+        // NOTE: CUA might skip the SEND-BY param => bad luck
+        /*
         if ($_assertOriginator) {
             $result &= $this->_assertOriginator($_iMIP, $organizer, 'organizer');
         }
+        */
         
         if ($_assertAccount && (! $organizer || ! $organizer->account_id)) {
             $_iMIP->addFailedPrecondition(Calendar_Model_iMIP::PRECONDITION_ORGANIZER, "processing {$_iMIP->method} without organizer user account is not possible");

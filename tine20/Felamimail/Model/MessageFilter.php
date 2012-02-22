@@ -116,7 +116,6 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
             $_select->joinLeft($what, $on, array());
             $_select->where($db->quoteInto($db->quoteIdentifier("$correlationName.account_id") . ' IN (?)', $accountIds));
         }
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' account filter: ' . $_select->assemble());
     }
     
     /**
@@ -215,36 +214,35 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
                 $value[]      = '%' . $customValue . '%';
             }
         }
-                        
+        
         if ($_filterData['field'] == 'flags') {
             if ($_filterData['operator'] == 'equals' || $_filterData['operator'] == 'contains') {
-                $_select->having($db->quoteInto("'flags' LIKE ?", $value));
+                $_select->having($db->quoteInto('flags LIKE ?', $value));
             } else if ($_filterData['operator'] == 'in' || $_filterData['operator'] == 'notin') {
                 if (empty($value)) {
-                    $whereString = "'flags' IS NULL";
+                    $whereString = 'flags IS NULL';
                 } else {
                     $value = (array) $value;
                     $where = array();
                     $op = ($_filterData['operator'] == 'in') ? 'LIKE' : 'NOT LIKE';
                     $opImplode = ($_filterData['operator'] == 'in') ? ' OR ' : ' AND ';
                     foreach ($value as $flag) {
-                        $where[] = $db->quoteInto("'flags' " . $op . ' ?', $flag);
+                        $where[] = $db->quoteInto('flags ' . $op . ' ?', $flag);
                     }
                     $whereString = implode($opImplode, $where);
                     if ($_filterData['operator'] == 'notin') {
-                        $whereString = "($whereString) OR 'flags' IS NULL";
+                        $whereString = '(' . $whereString . ') OR flags IS NULL';
                     }
                 }
                 $_select->having($whereString);
             } else {
-                $_select->having($db->quoteInto("'flags' NOT LIKE ? OR 'flags' IS NULL", $value));
+                $_select->having($db->quoteInto('flags NOT LIKE ? OR flags IS NULL', $value));
             }
         } else {
             $_select->where(
                 $db->quoteInto($fieldName  . ' LIKE ?', $value) . ' OR ' .
                 $db->quoteInto($fieldEmail . ' LIKE ?', $value)
             );
-        }        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' to/cc/bcc and flags custom filters using LIKE: ' . $_select->assemble());
+        }
     }
 }

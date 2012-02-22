@@ -76,7 +76,7 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
     protected $_validators = array(
         'id'                => array('Digits', 'allowEmpty' => true),
         'name'              => array('presence' => 'required'),
-        'type'              => array('InArray' => array(self::TYPE_PERSONAL, self::TYPE_SHARED)),
+        'type'              => array(array('InArray', array(self::TYPE_PERSONAL, self::TYPE_SHARED))),
         'backend'           => array('presence' => 'required'),
         'color'             => array('allowEmpty' => true, array('regex', '/^#[0-9a-fA-F]{6}$/')),
         'application_id'    => array('Alnum', 'presence' => 'required'),
@@ -170,27 +170,50 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
     {
         switch ($this->type) {
             case Tinebase_Model_Container::TYPE_PERSONAL:
-                if (! $this->owner_id) {
-                    // we need to find out who has admin grant
-                    $allGrants = Tinebase_Container::getInstance()->getGrantsOfContainer($this, true);
-                    
-                    // pick the first user with admin grants
-                    foreach ($allGrants as $grants) {
-                        if ($grants->{Tinebase_Model_Grants::GRANT_ADMIN} === true) {
-                            $this->owner_id = $grants->account_id;
-                            break;
-                        }
-                    }
-                    if (! $this->owner_id) {
-                        throw new Exception('could not find container admin');
-                    }
-                }
-                
-                $this->path = "/{$this->type}/{$this->owner_id}/{$this->getId()}";
+                $this->path = "/{$this->type}/{$this->getOwner()}/{$this->getId()}";
                 break;
         }
         
         return $this->path;
+    }
+    
+    /**
+     * returns owner of this container
+     * 
+     * @throws Exception
+     */
+    public function getOwner()
+    {
+        if ($this->type == self::TYPE_SHARED) return NULL;
+        
+        if (! $this->owner_id) {
+            // we need to find out who has admin grant
+            $allGrants = Tinebase_Container::getInstance()->getGrantsOfContainer($this, true);
+            
+            // pick the first user with admin grants
+            foreach ($allGrants as $grants) {
+                if ($grants->{Tinebase_Model_Grants::GRANT_ADMIN} === true) {
+                    $this->owner_id = $grants->account_id;
+                    break;
+                }
+            }
+            if (! $this->owner_id) {
+                throw new Exception('could not find container admin');
+            }
+        }
+        
+        return $this->owner_id;
+    }
+    
+    /**
+     * checks if container is a personal container of given account
+     * 
+     * @param mixed $account
+     */
+    public function isPersonalOf($account)
+    {
+        return $this->type == Tinebase_Model_Container::TYPE_PERSONAL 
+            && $this->getOwner() == Tinebase_Model_User::convertUserIdToInt($account);
     }
     
     /**
@@ -215,21 +238,35 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
      * @param Tinebase_Record_Abstract $_record
      * @param string $_containerProperty
      */
-    public static function resolveContainer($_record, $_containerProperty = 'container_id')
+    public static function resolveContainerOfRecord($_record, $_containerProperty = 'container_id')
     {
         if (! $_record instanceof Tinebase_Record_Abstract) {
             return;
         }
         
-        $containerId = $_record->{$_containerProperty};
-        if ($containerId) {
-            $container = Tinebase_Container::getInstance()->getContainerById($containerId);
-            
-            $container->account_grants = Tinebase_Container::getInstance()->getGrantsOfAccount(Tinebase_Core::getUser(), $containerId)->toArray();
-            $container->path = $container->getPath();
-            
-            $_record->{$_containerProperty} = $container;
+        if (! $_record->has($_containerProperty) || empty($_record->{$_containerProperty})) {
+            return;
         }
+        
+        try {
+            $container = Tinebase_Container::getInstance()->getContainerById($_record->{$_containerProperty});
+        } catch (Tinebase_Exception_NotFound $tenf) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' . $tenf);
+            return;
+        }
+        
+        $container->resolveGrantsAndPath();
+        
+        $_record->{$_containerProperty} = $container;
+    }
+    
+    /**
+     * resolves container grants and path
+     */
+    public function resolveGrantsAndPath()
+    {
+        $this->account_grants = Tinebase_Container::getInstance()->getGrantsOfAccount(Tinebase_Core::getUser(), $this);
+        $this->path = $this->getPath();
     }
     
     /**

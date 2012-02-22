@@ -289,7 +289,7 @@ class Setup_Controller
         
         return $applications;
     }
-                 
+    
     /**
      * updates installed applications. does nothing if no applications are installed
      *
@@ -794,10 +794,10 @@ class Setup_Controller
     public function loadAuthenticationData()
     {
         return array(
-                'authentication'    => $this->_getAuthProviderData(),
-                'accounts'          => $this->_getAccountsStorageData(),
-                'redirectSettings'  => $this->_getRedirectSettings()
-            );
+            'authentication'    => $this->_getAuthProviderData(),
+            'accounts'          => $this->_getAccountsStorageData(),
+            'redirectSettings'  => $this->_getRedirectSettings()
+        );
     }
     
     /**
@@ -870,15 +870,16 @@ class Setup_Controller
     protected function _updateAuthenticationProvider($_data)
     {
         Tinebase_Auth::setBackendType($_data['backend']);
+        $config = (isset($_data[$_data['backend']])) ? $_data[$_data['backend']] : $_data;
         
         $excludeKeys = array('adminLoginName', 'adminPassword', 'adminPasswordConfirmation');
         foreach ($excludeKeys as $key) {
-            if (array_key_exists($key, $_data[$_data['backend']])) {
-                unset($_data[$_data['backend']][$key]);
+            if (array_key_exists($key, $config)) {
+                unset($config[$key]);
             }
         }
         
-        Tinebase_Auth::setBackendConfiguration($_data[$_data['backend']]);
+        Tinebase_Auth::setBackendConfiguration($config);
         Tinebase_Auth::saveBackendConfiguration();
     }
     
@@ -894,7 +895,8 @@ class Setup_Controller
         $newBackend = $_data['backend'];
         
         Tinebase_User::setBackendType($_data['backend']);
-        Tinebase_User::setBackendConfiguration($_data[$_data['backend']]);
+        $config = (isset($_data[$_data['backend']])) ? $_data[$_data['backend']] : $_data;
+        Tinebase_User::setBackendConfiguration($config);
         Tinebase_User::saveBackendConfiguration();
         
         if ($originalBackend != $newBackend && $this->isInstalled('Addressbook') && $originalBackend == Tinebase_User::SQL) {
@@ -928,9 +930,20 @@ class Setup_Controller
         Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Deleting all user accounts, groups, roles and rights');
         Tinebase_User::factory(Tinebase_User::SQL)->deleteAllUsers();
         
+        $contactSQLBackend = new Addressbook_Backend_Sql();
+        $allUserContactIds = $contactSQLBackend->search(new Addressbook_Model_ContactFilter(array('type' => 'user')), null, true);
+        if (count($allUserContactIds) > 0) {
+            $contactSQLBackend->delete($allUserContactIds);
+        }
+        
+        
         Tinebase_Group::factory(Tinebase_Group::SQL)->deleteAllGroups();
-        $lists = new Addressbook_Backend_List();
-        $lists->deleteAllLists();
+        $listsSQLBackend = new Addressbook_Backend_List();
+        $allGroupListIds = $listsSQLBackend->search(new Addressbook_Model_ListFilter(array('type' => 'group')), null, true);
+        if (count($allGroupListIds) > 0) {
+            $listsSQLBackend->delete($allGroupListIds);
+        }
+        
         
         $roles = Tinebase_Acl_Roles::getInstance();
         $roles->deleteAllRoles();
@@ -1042,6 +1055,8 @@ class Setup_Controller
      */
     public function saveEmailConfig($_data)
     {
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_data, TRUE));
+        
         $this->_enableCaching();
         
         foreach ($this->_emailConfigKeys as $configName => $configKey) {
@@ -1143,6 +1158,8 @@ class Setup_Controller
      */
     public function installApplications($_applications, $_options = null)
     {
+        $this->_clearCache();
+        
         // check requirements for initial install / add required apps to list
         if (! $this->isInstalled('Tinebase')) {
     
@@ -1281,7 +1298,8 @@ class Setup_Controller
             
             Setup_Initialize::initialize($application, $_options);
         } catch (Exception $e) {
-            Setup_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' error at installing: ' . $_xml->name . ' Table: ' . $currentTable  . 'Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            $table = (isset($currentTable)) ? ' Table: ' . $currentTable : '';
+            Setup_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' error at installing: ' . $_xml->name . $table . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             throw $e;
         }
     }
@@ -1553,5 +1571,8 @@ class Setup_Controller
         
         // clear cache
         $cache = Setup_Core::getCache()->clean(Zend_Cache::CLEANING_MODE_ALL);
+        
+        // deactivate cache again
+        Tinebase_Core::setupCache(FALSE);
     }
 }

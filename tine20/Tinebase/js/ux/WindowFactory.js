@@ -99,8 +99,8 @@ Ext.ux.WindowFactory.prototype = {
         
         // if initShow property is present and it is set to false don't show window, just return reference
         if (c.hasOwnProperty('initShow') && c.initShow === false) {
-	    	return win;
-	    }
+    return win;
+    }
         
         win.show();
         return win;
@@ -134,13 +134,13 @@ Ext.ux.WindowFactory.prototype = {
                     if (ls.hasOwnProperty(p) && p !== 'scope') {
                         // NOTE apply dosn't work here for some strange reason, so we hope that there are not more than 5 params
                         if (ls[p].fn) {
-							lsProxy[p] = function () {
-								ls[p].fn.call(ls[p].scope, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
-							};
+lsProxy[p] = function () {
+ls[p].fn.call(ls[p].scope, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+};
                         } else {
-							lsProxy[p] = function () {
-								ls[p].call(ls.scope, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
-							};
+lsProxy[p] = function () {
+ls[p].call(ls.scope, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+};
                         }
                     }
                 }
@@ -153,8 +153,8 @@ Ext.ux.WindowFactory.prototype = {
             
             // find the constructor in this context
             var parts = config.contentPanelConstructor.split('.'),
-            	ref = window;
-            	
+            ref = window;
+            
             for (var i = 0; i < parts.length; i += 1) {
                 ref = ref[parts[i]];
             }
@@ -181,7 +181,7 @@ Ext.ux.WindowFactory.prototype = {
         config.name = Ext.isString(config.name) ? config.name.replace(/[^a-zA-Z0-9_]/g, '') : config.name;
         
         if (! config.title && config.contentPanelConstructorConfig && config.contentPanelConstructorConfig.title) {
-        	config.title = config.contentPanelConstructorConfig.title;
+        config.title = config.contentPanelConstructorConfig.title;
             delete config.contentPanelConstructorConfig.title;
         }
         

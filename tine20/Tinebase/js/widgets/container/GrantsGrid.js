@@ -53,7 +53,7 @@ Tine.widgets.container.GrantsGrid = Ext.extend(Tine.widgets.account.PickerGridPa
     syncGrantTitle: 'Sync', // _('Sync')
     syncGrantDescription: 'The grant to synchronise records with this container', // _('The grant to synchronise records with this container')
     adminGrantTitle: 'Admin', // _('Admin')
-    adminGrantDescription: 'The grant to synchronise records with this container', // _('The grant to synchronise records with this container')
+    adminGrantDescription: 'The grant to administrate this container', // _('The grant to administrate this container')
     
     freebusyGrantTitle: 'Free Busy', // _('Free Busy')
     freebusyGrantDescription: 'The grant to access free busy information of events in this calendar', // _('The grant to access free busy information of events in this calendar')
@@ -83,27 +83,21 @@ Tine.widgets.container.GrantsGrid = Ext.extend(Tine.widgets.account.PickerGridPa
     },
 
     onStoreUpdate: function(store, record, operation) {
-        try {
-            if (this.alwaysShowAdminGrant || (this.grantContainer && this.grantContainer.type == 'shared')) {
-                if (record.get('adminGrant')) {
-                    // set all grants and mask other checkboxes
-                    Ext.each(this.getColumnModel().columns, function(col, colIdx) {
-                        var matches;
-                        if ((matches = col.dataIndex.match(/^([a-z]+)Grant$/)) && matches[1] != 'admin') {
+        if (this.alwaysShowAdminGrant || (this.grantContainer && this.grantContainer.type == 'shared')) {
+            if (record.get('adminGrant')) {
+                // set all grants and mask other checkboxes
+                Ext.each(this.getColumnModel().columns, function(col, colIdx) {
+                    var matches;
+                    if ((matches = col.dataIndex.match(/^([a-z]+)Grant$/)) && matches[1] != 'admin') {
 //                          //Ext.fly(this.getView().getCell(store.indexOf(record), colIdx)).mask('test');
-                            record.set(col.dataIndex, true);
-                        }
-                    }, this);
-                    
-                } else {
-                    // make sure grants are not masked
-                }
+                        record.set(col.dataIndex, true);
+                    }
+                }, this);
+                
+            } else {
+                // make sure grants are not masked
             }
-        } catch (e) {
-            Tine.log.err(e);
-            Tine.log.err(e.stack);
         }
-            
     },
     
     /**

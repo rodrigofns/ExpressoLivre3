@@ -63,6 +63,19 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
     }
     
     /**
+    * (non-PHPdoc)
+    * @see ActiveSync/ActiveSync_TestCase::setUp()
+    */
+    protected function setUp()
+    {
+        parent::setUp();
+        
+        $iphone = ActiveSync_Backend_DeviceTests::getTestDevice(Syncope_Model_Device::TYPE_IPHONE);
+        $iphone->owner_id   = $this->_testUser->getId();
+        $this->objects['deviceIPhone'] = ActiveSync_Controller_Device::getInstance()->create($iphone);
+    }
+    
+    /**
      * validate getFolders for IPhones
      */
     public function testGetFoldersIPhone()
@@ -78,7 +91,7 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
         $dom     = $this->_getOutputDOMDocument();
         $appData = $dom->getElementsByTagNameNS('uri:AirSync', 'ApplicationData')->item(0);
 
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM)); 
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS)); 
         
         $task = Tasks_TestCase::getTestRecord();
         $task->description = "Hello\r\nTask\nLars";
@@ -111,7 +124,7 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
     {
         $xml = simplexml_import_dom($this->_getInputDOMDocument());
         
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));   
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));   
         
         $task = $controller->toTineModel($xml->Collections->Collection->Commands->Change[0]->ApplicationData);
         
@@ -127,7 +140,9 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
      */
     public function testSearch()
     {
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));
+        $this->markTestIncomplete();
+        
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));
 
         $xml = simplexml_import_dom($this->_getInputDOMDocument());
         
@@ -142,25 +157,12 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
         $this->assertEquals('Testaufgabe auf mfe', $task[0]->summary);
     }
     
-    protected function _validateAddEntryToBackend(Tinebase_Record_Abstract $_record)
+    protected function _validateGetServerEntries($_recordId)
     {
-        $this->objects['tasks'][] = $_record;
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));
+        $records = $controller->getServerEntries($this->_specialFolderName, Syncope_Command_Sync::FILTER_NOTHING);
         
-        #var_dump($_record->toArray());
-        
-        $this->assertEquals('Testaufgabe auf mfe', $_record->summary);
-        $this->assertEquals(0,                     $_record->percent);
-        $this->assertEquals("test beschreibung zeile 1\r\nZeile 2\r\nZeile 3", $_record->description);
-    }
-    
-    protected function _validateGetServerEntries(Tinebase_Record_Abstract $_record)
-    {
-        $this->objects['tasks'][] = $_record;
-        
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));
-        $records = $controller->getServerEntries($this->_specialFolderName, ActiveSync_Command_Sync::FILTER_NOTHING);
-        
-        $this->assertContains($_record->getId(), $records);
+        $this->assertContains($_recordId, $records);
         #$this->assertNotContains($this->objects['unSyncableContact']->getId(), $entries);
     }
     
@@ -244,5 +246,21 @@ Zeile 3</AirSyncBase:Data></AirSyncBase:Body><Tasks:Subject>Testaufgabe auf mfe<
         $existing = $controller->search('addressbook-root', $xml->Collections->Collection->Commands->Add->ApplicationData);
         
         $this->assertEquals(count($existing), 1);
+    }
+    
+   /**
+    * test supported folders
+    */
+    public function testGetAllFolders()
+    {
+        $controller = new ActiveSync_Controller_Tasks($this->objects['deviceIPhone'], new Tinebase_DateTime(null, null, 'de_DE'));
+        
+        $syncable   = $this->_getContainerWithSyncGrant();
+        $unsyncable = $this->_getContainerWithoutSyncGrant();
+        $supportedFolders = $controller->getAllFolders();
+    
+        //$this->assertEquals(1, count($supportedFolders));
+        $this->assertTrue(isset($supportedFolders[$syncable->getId()]));
+        $this->assertFalse(isset($supportedFolders[$unsyncable->getId()]));
     }
 }

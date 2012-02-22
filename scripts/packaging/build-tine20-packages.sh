@@ -227,7 +227,7 @@ function createArchives()
                 *)
                     echo " $FILE"
                     echo -n "  cleanup "
-                    (cd $TEMPDIR/tine20/$FILE/js;  rm -rf $(ls | grep -v ${CLIENTBUILDFILTER} | grep -v "\-lang\-"))
+                    (cd $TEMPDIR/tine20/$FILE/js;  rm -rf $(ls | grep -v ${CLIENTBUILDFILTER} | grep -v "\-lang\-" | grep -v "empty\.js"))
                     (cd $TEMPDIR/tine20/$FILE/css; rm -rf $(ls | grep -v ${CLIENTBUILDFILTER}))
                     echo "building "
                     (cd $TEMPDIR/tine20; tar cjf ../../packages/tine20/$RELEASE/tine20-${UCFILE}_$RELEASE.tar.bz2 $FILE)
@@ -245,7 +245,7 @@ function createSpecialArchives()
     rm -rf $TEMPDIR/allinone
     mkdir $TEMPDIR/allinone
     
-    for ARCHIVENAME in calendar tinebase crm felamimail filemanager projects sales tasks timetracker; do
+    for ARCHIVENAME in activesync calendar tinebase crm felamimail filemanager projects sales tasks timetracker; do
         (cd $TEMPDIR/allinone; tar xjf ../../packages/tine20/$RELEASE/tine20-${ARCHIVENAME}_$RELEASE.tar.bz2)
     done
     
@@ -275,8 +275,8 @@ function setupPackageDir()
 function packageTranslations()
 {
     echo -n "building translation files for translators... "
-    php -d include_path=".:$TEMPDIR/tine20:$TEMPDIR/tine20/library"  -f $TEMPDIR/tine20/langHelper.php -- --package
-    mv $TEMPDIR/tine20/translations.zip $PACKAGEDIR
+    php -d include_path=".:$TEMPDIR/tine20:$TEMPDIR/tine20/library"  -f $TEMPDIR/tine20/langHelper.php -- --package=translations.tar.gz
+    mv $TEMPDIR/tine20/translations.tar.gz $PACKAGEDIR
     echo "done"
 }
 

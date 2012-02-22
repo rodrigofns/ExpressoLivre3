@@ -4,7 +4,7 @@
  * @package     Felamimail
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schüle <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
  
 Ext.ns('Tine.Felamimail');
@@ -202,29 +202,23 @@ Ext.ns('Tine.Felamimail');
      * @param {Tine.Felamimail.Model.Message} record
      */
     handlePreparedParts: function(record) {
-        try {
-            var firstPreparedPart = this.record.get('preparedParts')[0],
-                mimeType = String(firstPreparedPart.contentType).split(/[ ;]/)[0],
-                mainType = Tine.Felamimail.MimeDisplayManager.getMainType(mimeType);
-                
-            if (! mainType) {
-                Tine.log.info('Tine.Felamimail.GridDetailsPanel::handlePreparedParts nothing found to handle ' + mimeType);
-                return;
-            }
+        var firstPreparedPart = this.record.get('preparedParts')[0],
+            mimeType = String(firstPreparedPart.contentType).split(/[ ;]/)[0],
+            mainType = Tine.Felamimail.MimeDisplayManager.getMainType(mimeType);
             
-            var bodyEl = this.getMessageRecordPanel().getEl().query('div[class=preview-panel-felamimail-body]')[0],
-                detailsPanel = Tine.Felamimail.MimeDisplayManager.create(mainType, {
-                    preparedPart: firstPreparedPart
-                });
-                
-            // quick hack till we have a card body here 
-            Ext.fly(bodyEl).update('');
-            detailsPanel.render(bodyEl);
-
-        } catch (e) {
-            Tine.log.err('Tine.Felamimail.GridDetailsPanel::handlePreparedParts');
-            Tine.log.err(e.stack ? e.stack : e);
+        if (! mainType) {
+            Tine.log.info('Tine.Felamimail.GridDetailsPanel::handlePreparedParts nothing found to handle ' + mimeType);
+            return;
         }
+        
+        var bodyEl = this.getMessageRecordPanel().getEl().query('div[class=preview-panel-felamimail-body]')[0],
+            detailsPanel = Tine.Felamimail.MimeDisplayManager.create(mainType, {
+                preparedPart: firstPreparedPart
+            });
+            
+        // quick hack till we have a card body here 
+        Ext.fly(bodyEl).update('');
+        detailsPanel.render(bodyEl);
     },
     
     /**
@@ -240,7 +234,7 @@ Ext.ns('Tine.Felamimail');
                     '<b>' + this.i18n._('From') + ':</b>',
                     ' {[this.showFrom(values.from_email, values.from_name, "' + this.i18n._('Add') + '", "' 
                         + this.i18n._('Add contact to addressbook') + '")]}<br/>',
-                    '<b>' + this.i18n._('Date') + ':</b> {[this.encode(values.received)]}',
+                    '<b>' + this.i18n._('Date') + ':</b> {[Tine.Tinebase.common.dateTimeRenderer(values.received)]}',
                     '{[this.showRecipients(values.headers)]}',
                     '{[this.showHeaders("' + this.i18n._('Show or hide header information') + '")]}',
                 '</div>',

@@ -583,6 +583,10 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
         return this.activeEvent;
     },
     
+    /**
+     * returns the selectionModel of the active panel
+     * @return {}
+     */
     getSelectionModel: function() {
         return this.calPanel.getSelectionModel();
     },
@@ -666,6 +670,10 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
             height: Math.max(12, event.ui.getEls()[0].getHeight() -18),
             style: 'background-color: transparent; background: 0: border: 0; position: absolute; top: 0px;',
             value: this.newEventSummary,
+            maxLength: 255,
+            maxLengthText: this.app.i18n._('The summary must not be longer than 255 characters.'),
+            minLength: 1,
+            minLengthText: this.app.i18n._('The summary must have at least 1 character.'),
             enableKeyEvents: true,
             listeners: {
                 scope: this,
@@ -681,27 +689,44 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
     },
     
     endEditSummary: function(field, e) {
-    	var event   = field.event;
-    	var summary = field.getValue();
-    	
-        if (! this.editing) {
+        var event   = field.event;
+        var summary = field.getValue();
+
+        if (! this.editing || this.validateMsg || !Ext.isDefined(e)) {
             return;
         }
-        
+
         // abort edit on ESC key
-        if (e && e.getKey() == e.ESC) {
-            return this.abortCreateEvent(event);
+        if (e && (e.getKey() == e.ESC)) {
+            this.abortCreateEvent(event);
+            return;
         }
-        
+
         // only commit edit on Enter & blur
         if (e && e.getKey() != e.ENTER) {
             return;
         }
-        
-        if (! summary) {
-            return this.abortCreateEvent(event);
+
+        // Validate Summary maxLength
+        if (summary.length > field.maxLength) {
+            field.markInvalid();
+            this.validateMsg = Ext.Msg.alert(this.app.i18n._('Summary too Long'), field.maxLengthText, function(){
+                field.focus();
+                this.validateMsg = false;
+                }, this);
+            return;
         }
-        
+
+        // Validate Summary minLength
+        if (!summary || summary.length < field.minLength) {
+            field.markInvalid();
+            this.validateMsg = Ext.Msg.alert(this.app.i18n._('Summary too Short'), field.minLengthText, function(){
+                field.focus();
+                this.validateMsg = false;
+                }, this);
+            return;
+        }
+
         this.editing = false;
         event.summaryEditor = false;
         
@@ -818,8 +843,11 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
         
         var targetEvent = this.getTargetEvent(e);
         if (this.editing && this.editing.summaryEditor && (targetEvent != this.editing)) {
-            this.editing.summaryEditor.fireEvent('blur', this.editing.summaryEditor);
+            this.editing.summaryEditor.fireEvent('blur', this.editing.summaryEditor, null);
         }
+
+        var sm = this.getSelectionModel();
+        sm.select(targetEvent);
         
         var dtStart = this.getTargetDateTime(e);
         if (dtStart) {
@@ -944,12 +972,11 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
         var originalRegistry = (event.modified.hasOwnProperty('is_all_day_event') ? event.modified.is_all_day_event : event.get('is_all_day_event')) ? 
             this.parallelWholeDayEventsRegistry : 
             this.parallelScrollerEventsRegistry;
+
         var registry = event.get('is_all_day_event') ? this.parallelWholeDayEventsRegistry : this.parallelScrollerEventsRegistry;
         var originalDtstart = event.modified.hasOwnProperty('dtstart') ? event.modified.dtstart : event.get('dtstart');
         var originalDtend = event.modified.hasOwnProperty('dtend') ? event.modified.dtend : event.get('dtend');
-            
-        
-        
+
         var originalParallels = originalRegistry.getEvents(originalDtstart, originalDtend);
         for (var j=0; j<originalParallels.length; j++) {
             this.removeEvent(originalParallels[j]);

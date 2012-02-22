@@ -1,139 +1,21 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Phone\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2011-05-14 16:32+0100\n"
-"Last-Translator: Wojciech Kaczmarek <wojciech_kaczmarek@wp.pl>\n"
+"PO-Revision-Date: 2012-02-20 11:48+0000\n"
+"Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Launchpad-Export-Date: 2012-02-21 06:33+0000\n"
+"X-Generator: Launchpad (build 14838)\n"
 "X-Poedit-Language: Polish\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-
-#: js/Phone.js:29 js/Phone.js:479 js/Phone.js:480
-msgid "Edit phone settings"
-msgstr "Edytuj ustawienia telefonu"
-
-#: js/Phone.js:59 js/Phone.js:254 js/Models.js:69
-msgid "Phone"
-msgid_plural "Phones"
-msgstr[0] "Telefon"
-msgstr[1] "telefony"
-msgstr[2] "telefony"
-
-#: js/Phone.js:70
-msgid "Phones"
-msgstr "Telefony"
-
-#: js/Phone.js:277
-msgid "Line"
-msgstr "Łącze"
-
-#: js/Phone.js:286
-msgid "Number"
-msgstr "Numer"
-
-#: js/Phone.js:295
-msgid "Cancel"
-msgstr "Anuluj"
-
-#: js/Phone.js:305
-msgid "Dial"
-msgstr "Połącz"
-
-#: js/Phone.js:325
-msgid "Error"
-msgstr "Błąd"
-
-#: js/Phone.js:326
-msgid "Not possible to dial."
-msgstr "Nie można nawiązać połączenia."
-
-#: js/Phone.js:469
-msgid "Dial number"
-msgstr "Wybierz numer"
-
-#: js/Phone.js:470
-msgid "Initiate a new outgoing call"
-msgstr "Zestaw nowe połączenie wychodzące"
-
-#: js/Phone.js:531
-msgid "Incoming call"
-msgstr "Połączenie przychodzące"
-
-#: js/Phone.js:535
-msgid "Outgoing call"
-msgstr "Połączenie wychodzące"
-
-#: js/Phone.js:543
-msgid "unknown number"
-msgstr "nieznany numer"
-
-#: js/Phone.js:580
-msgid "Search:"
-msgstr "Znajdź:"
-
-#: js/Phone.js:665
-msgid "Source or Destination"
-msgstr "Źródło albo cel"
-
-#: js/Phone.js:681
-msgid "Displaying calls {0} - {1} of {2}"
-msgstr "Wyświetlane połączenia {0} - {1} z {2}"
-
-#: js/Phone.js:682 js/Phone.js:725
-msgid "No calls to display"
-msgstr "Brak połączeń"
-
-#: js/Phone.js:692
-msgid "Direction"
-msgstr "Kierunkowy"
-
-#: js/Phone.js:693
-msgid "Source"
-msgstr "Źródło"
-
-#: js/Phone.js:694
-msgid "Caller Id"
-msgstr "Własny numer telefonu"
-
-#: js/Phone.js:695
-msgid "Destination"
-msgstr "Rozmówca"
-
-#: js/Phone.js:696
-msgid "Start"
-msgstr "Początek połączenia"
-
-#: js/Phone.js:697
-msgid "Connected"
-msgstr "Połączony"
-
-#: js/Phone.js:698
-msgid "Disconnected"
-msgstr "Rozłączony"
-
-#: js/Phone.js:699
-msgid "Duration"
-msgstr "Czas połączenia"
-
-#: js/Phone.js:700
-msgid "Ringing"
-msgstr "Dzwoni"
-
-#: js/Phone.js:701
-msgid "Call ID"
-msgstr "ID połączenia"
-
-#: js/Models.js:73
-msgid "phones list"
-msgid_plural "phones lists"
-msgstr[0] "Lista nr telefonów"
-msgstr[1] "listy nr telefonów"
-msgstr[2] "listy nr telefonów"
 
 #: js/AddressbookGridPanelHook.js:35
 msgid "Call contact"
@@ -154,6 +36,128 @@ msgstr "Komórka"
 #: js/AddressbookGridPanelHook.js:199
 msgid "Cell private"
 msgstr "Prywatna komórka"
+
+#: js/Models.js:69 js/Phone.js:59 js/Phone.js:264
+msgid "Phone"
+msgid_plural "Phones"
+msgstr[0] "Telefon"
+msgstr[1] "telefony"
+msgstr[2] "telefony"
+
+#: js/Models.js:73
+msgid "phones list"
+msgid_plural "phones lists"
+msgstr[0] "Lista nr telefonów"
+msgstr[1] "listy nr telefonów"
+msgstr[2] "listy nr telefonów"
+
+#: js/Phone.js:29 js/Phone.js:489 js/Phone.js:490
+msgid "Edit phone settings"
+msgstr "Edytuj ustawienia telefonu"
+
+#: js/Phone.js:70
+msgid "Phones"
+msgstr "Telefony"
+
+#: js/Phone.js:287
+msgid "Line"
+msgstr "Łącze"
+
+#: js/Phone.js:296
+msgid "Number"
+msgstr "Numer"
+
+#: js/Phone.js:305
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: js/Phone.js:315
+msgid "Dial"
+msgstr "Połącz"
+
+#: js/Phone.js:335
+msgid "Error"
+msgstr "Błąd"
+
+#: js/Phone.js:336
+msgid "Not possible to dial."
+msgstr "Nie można nawiązać połączenia."
+
+#: js/Phone.js:479
+msgid "Dial number"
+msgstr "Wybierz numer"
+
+#: js/Phone.js:480
+msgid "Initiate a new outgoing call"
+msgstr "Zestaw nowe połączenie wychodzące"
+
+#: js/Phone.js:541
+msgid "Incoming call"
+msgstr "Połączenie przychodzące"
+
+#: js/Phone.js:545
+msgid "Outgoing call"
+msgstr "Połączenie wychodzące"
+
+#: js/Phone.js:553
+msgid "unknown number"
+msgstr "nieznany numer"
+
+#: js/Phone.js:590
+msgid "Search:"
+msgstr "Znajdź:"
+
+#: js/Phone.js:675
+msgid "Source or Destination"
+msgstr "Źródło albo cel"
+
+#: js/Phone.js:691
+msgid "Displaying calls {0} - {1} of {2}"
+msgstr "Wyświetlane połączenia {0} - {1} z {2}"
+
+#: js/Phone.js:692 js/Phone.js:735
+msgid "No calls to display"
+msgstr "Brak połączeń"
+
+#: js/Phone.js:702
+msgid "Direction"
+msgstr "Kierunkowy"
+
+#: js/Phone.js:703
+msgid "Source"
+msgstr "Źródło"
+
+#: js/Phone.js:704
+msgid "Caller Id"
+msgstr "Własny numer telefonu"
+
+#: js/Phone.js:705
+msgid "Destination"
+msgstr "Rozmówca"
+
+#: js/Phone.js:706
+msgid "Start"
+msgstr "Początek połączenia"
+
+#: js/Phone.js:707
+msgid "Connected"
+msgstr "Połączony"
+
+#: js/Phone.js:708
+msgid "Disconnected"
+msgstr "Rozłączony"
+
+#: js/Phone.js:709
+msgid "Duration"
+msgstr "Czas połączenia"
+
+#: js/Phone.js:710
+msgid "Ringing"
+msgstr "Dzwoni"
+
+#: js/Phone.js:711
+msgid "Call ID"
+msgstr "ID połączenia"
 
 #~ msgid "Dial phone number"
 #~ msgstr "Wybierz numer telefonu"

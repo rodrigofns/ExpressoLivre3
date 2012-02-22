@@ -99,7 +99,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_defaultFolderType   = ActiveSync_Command_FolderSync::FOLDERTYPE_CONTACT;
+    protected $_defaultFolderType   = Syncope_Command_FolderSync::FOLDERTYPE_CONTACT;
     
     /**
      * default container for new entries
@@ -113,7 +113,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_folderType          = ActiveSync_Command_FolderSync::FOLDERTYPE_CONTACT_USER_CREATED;
+    protected $_folderType          = Syncope_Command_FolderSync::FOLDERTYPE_CONTACT_USER_CREATED;
 
     /**
      * name of property which defines the filterid for different content classes
@@ -132,51 +132,42 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
     /**
      * append contact data to xml element
      *
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
      * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
+    public function appendXML(DOMElement $_domParrent, $_collectionData, $_serverId)
     {
-        $_xmlNode->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Contacts', 'uri:Contacts');
+        $_domParrent->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Contacts', 'uri:Contacts');
         
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
-        foreach($this->_mapping as $key => $value) {
-        	$nodeContent = null;
-            if(!empty($data->$value)) {
+        foreach ($this->_mapping as $key => $value) {
+            if(!empty($data->$value) || $data->$value == '0') {
+                $nodeContent = null;
+                
                 switch($value) {
                     case 'bday':
-                        
-                        if ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_PALM) {
-                            $userTimezone = Tinebase_Core::get(Tinebase_Core::USERTIMEZONE);
-                            $data->bday->setTimezone($userTimezone);
-                            $data->bday->addHour(12);
-                            $data->bday = new Tinebase_DateTime($data->bday->format(Tinebase_Record_Abstract::ISO8601LONG), 'UTC');
+                        if($data->$value instanceof DateTime) {
+                            $nodeContent = $data->bday->format("Y-m-d\TH:i:s") . '.000Z';
                         }
-                        
-                        $nodeContent = $data->bday->format("Y-m-d\TH:i:s") . '.000Z';
                         break;
                         
                     case 'jpegphoto':
-                        if(! empty($data->$value)) {
-                            try {
-                                $image = Tinebase_Controller::getInstance()->getImage('Addressbook', $data->getId());
-                                $jpegData = $image->getBlob('image/jpeg', 36000);
-                                $nodeContent = base64_encode($jpegData);
-                            } catch (Exception $e) {
-                                Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " Image for contact {$data->getId()} not found or invalid");
-                            }
-
-                            
+                        try {
+                            $image = Tinebase_Controller::getInstance()->getImage('Addressbook', $data->getId());
+                            $jpegData = $image->getBlob('image/jpeg', 36000);
+                            $nodeContent = base64_encode($jpegData);
+                        } catch (Exception $e) {
+                            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " Image for contact {$data->getId()} not found or invalid");
                         }
                         break;
                         
                     case 'adr_one_countryname':
                     case 'adr_two_countryname':
-                    	$nodeContent = Tinebase_Translation::getCountryNameByRegionCode($data->$value);
-                    	break;
+                        $nodeContent = Tinebase_Translation::getCountryNameByRegionCode($data->$value);
+                        break;
                         
                     default:
                         $nodeContent = $data->$value;
@@ -189,22 +180,21 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                     continue;
                 }
                 
-                // create a new DOMElement ...
-                $node = new DOMElement($key, null, 'uri:Contacts');
-
-                // ... append it to parent node aka append it to the document ...
-                $_xmlNode->appendChild($node);
+                // strip off any non printable control characters
+                if (!ctype_print($nodeContent)) {
+                    $nodeContent = $this->removeControlChars($nodeContent);
+                }
                 
-                // ... and now add the content (DomText takes care of special chars)
-                $node->appendChild(new DOMText($nodeContent));
+                $node = $_domParrent->ownerDocument->createElementNS('uri:Contacts', $key);
+                $node->appendChild($_domParrent->ownerDocument->createTextNode($nodeContent));
                 
-                
+                $_domParrent->appendChild($node);
             }
         }
         
         if(!empty($data->note)) {
             if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
-                $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+                $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
                 
                 $body->appendChild(new DOMElement('Type', 1, 'uri:AirSyncBase'));
                 
@@ -221,7 +211,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                 $node = new DOMElement('Body', null, 'uri:Contacts');
 
                 // ... append it to parent node aka append it to the document ...
-                $_xmlNode->appendChild($node);
+                $_domParrent->appendChild($node);
                 
                 // ... and now add the content (DomText takes care of special chars)
                 $node->appendChild(new DOMText($data->note));
@@ -230,7 +220,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         }
         
         if(isset($data->tags) && count($data->tags) > 0) {
-            $categories = $_xmlNode->appendChild(new DOMElement('Categories', null, 'uri:Contacts'));
+            $categories = $_domParrent->appendChild(new DOMElement('Categories', null, 'uri:Contacts'));
             foreach($data->tags as $tag) {
                 $categories->appendChild(new DOMElement('Category', $tag, 'uri:Contacts'));
             }
@@ -287,11 +277,11 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                         $contact->bday = new Tinebase_DateTime($isoDate);
                         
                         if (
-                            ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_PALM) ||
-                            ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_IPHONE && $this->_device->getMajorVersion() < 800) ||
+                            // ($this->_device->devicetype == Syncope_Model_Device::TYPE_WEBOS) || // only valid versions < 2.1
+                            ($this->_device->devicetype == Syncope_Model_Device::TYPE_IPHONE && $this->_device->getMajorVersion() < 800) ||
                             preg_match("/^\d{4}-\d{2}-\d{2}$/", $isoDate)
                         ) {
-                            // iOS < 4 & palm send birthdays to the entered date, but the time the birthday got entered on the device
+                            // iOS < 4 & webow < 2.1 send birthdays to the entered date, but the time the birthday got entered on the device
                             // acutally iOS < 4 somtimes sends the bday at noon but the timezone is not clear
                             // -> we don't trust the time part and set the birthdays timezone to the timezone the user has set in tine
                             $userTimezone = Tinebase_Core::get(Tinebase_Core::USERTIMEZONE);

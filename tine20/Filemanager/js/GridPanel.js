@@ -27,8 +27,8 @@ Ext.ns('Tine.Filemanager');
  * Create a new Tine.Filemanager.FileGridPanel
  */
 Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
-
-
+    
+    
     /**
      * @cfg filesProperty
      * @type String
@@ -54,7 +54,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     
     recordClass: Tine.Filemanager.Model.Node,
     hasDetailsPanel: false,
-    evalGrants: false,
+    evalGrants: true,
     
     /**
      * grid specific
@@ -76,16 +76,16 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @private
      */
     initComponent: function() {
-
+        
         this.recordProxy = Tine.Filemanager.fileRecordBackend;
-               
+        
         this.gridConfig.cm = this.getColumnModel();
-
+        
         this.defaultFilters = [
             {field: 'query', operator: 'contains', value: ''},
             {field: 'path', operator: 'equals', value: '/'}
         ];
-
+        
         this.filterToolbar = this.filterToolbar || this.getFilterToolbar();
         this.filterToolbar.getQuickFilterPlugin().criteriaIgnores.push({field: 'path'});
         
@@ -97,12 +97,11 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             scope: this,
             handler: this.onFilesSelect
         });
-
-        Tine.Filemanager.GridPanel.superclass.initComponent.call(this);      
+        
+        Tine.Filemanager.GridPanel.superclass.initComponent.call(this);
         this.getStore().on('load', this.onLoad);
         
         Tine.Tinebase.uploadManager.on('update', this.onUpdate);
-        
     },
     
     /**
@@ -110,11 +109,11 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      */
     afterRender: function() {
         
-        Tine.Filemanager.GridPanel.superclass.afterRender.call(this);  
+        Tine.Filemanager.GridPanel.superclass.afterRender.call(this);
         this.action_upload.setDisabled(true);
         this.initDropTarget();
         this.currentFolderNode = this.app.getMainScreen().getWestPanel().getContainerTreePanel().getRootNode();
-
+        
     },
     
     /**
@@ -140,7 +139,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 width: 40,
                 sortable: true,
                 dataIndex: 'size',
-                renderer: Ext.ux.file.Upload.fileSize               
+                renderer: Ext.ux.file.Upload.fileSize
             },{
                 id: 'contenttype',
                 header: this.app.i18n._("Contenttype"),
@@ -180,14 +179,14 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 sortable: true,
                 dataIndex: 'creation_time',
                 renderer: Tine.Tinebase.common.dateTimeRenderer
-    
+                
             },{
                 id: 'created_by',
                 header: this.app.i18n._("Created By"),
                 width: 50,
                 sortable: true,
                 dataIndex: 'created_by',
-                renderer: Tine.Tinebase.common.usernameRenderer                
+                renderer: Tine.Tinebase.common.usernameRenderer
             },{
                 id: 'last_modified_time',
                 header: this.app.i18n._("Last Modified Time"),
@@ -204,14 +203,14 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 renderer: Tine.Tinebase.common.usernameRenderer 
             }
         ];
-
+        
         
         return new Ext.grid.ColumnModel({ 
             defaults: {
                 sortable: true,
                 resizable: true
             },
-            columns: columns           
+            columns: columns
         });
     },
     
@@ -229,13 +228,13 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @private
      */
     getToolbarItems: function(){
-    	
+                
         this.action_showClosedToggle = new Tine.widgets.grid.FilterButton({
             text: this.app.i18n._('Show closed'),
             iconCls: 'action_showArchived',
             field: 'showClosed'
         });
-               
+        
         return [
             
             new Ext.Toolbar.Separator(),
@@ -273,7 +272,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      */
     getAddAction: function () {
         return {
-        	requiredGrant: 'addGrant',
+            requiredGrant: 'addGrant',
             actionType: 'add',
             text: this.app.i18n._('Upload'),
             handler: this.onFilesSelect,
@@ -285,7 +284,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 enableFileDrop: false,
                 disable: true
             }],
-            iconCls: this.app.appName + 'IconCls'            
+            iconCls: this.app.appName + 'IconCls'
         };
     },
     
@@ -294,9 +293,9 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @private
      */
     initActions: function() {
-
+        
         this.action_upload = new Ext.Action(this.getAddAction());
-
+        
         this.action_createFolder = new Ext.Action({
             requiredGrant: 'addGrant',
             actionType: 'reply',
@@ -307,7 +306,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             disabled: true,
             scope: this
         });
-
+        
         this.action_goUpFolder = new Ext.Action({
 //            requiredGrant: 'readGrant',
             allowMultiple: true,
@@ -318,19 +317,18 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             disabled: true,
             scope: this
         });
-
+        
         this.action_download = new Ext.Action({
-            requiredGrant: 'exportGrant',
+            requiredGrant: 'readGrant',
             allowMultiple: false,
             actionType: 'saveLocaly',
             text: this.app.i18n._('Save locally'),
-            actionUpdater: this.updateSaveAction,
             handler: this.onDownload,
             iconCls: 'action_filemanager_save_all',
             disabled: true,
             scope: this
         });
-//             
+        
         this.action_deleteRecord = new Ext.Action({
             requiredGrant: 'deleteGrant',
             allowMultiple: true,
@@ -371,9 +369,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             handler: this.onResume
         });
         
-        
-        Ext.apply(Tine.widgets.tree.ContextMenu, Tine.Filemanager.GridContextMenu);
-        this.contextMenu = Tine.widgets.tree.ContextMenu.getMenu({
+        this.contextMenu = Tine.Filemanager.GridContextMenu.getMenu({
             nodeName: this.app.i18n._(this.app.getMainScreen().getWestPanel().getContainerTreePanel().containerName),
             actions: ['delete', 'rename', 'download', 'resume', 'pause'],
             scope: this,
@@ -382,15 +378,14 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         }); 
         
         this.actionUpdater.addActions(this.contextMenu.items);
-
+        
         this.actionUpdater.addActions([
-                                       this.action_createFolder,
-                                       this.action_goUpFolder,
-                                       this.action_download,
-//                                       this.action_renameItem,
-                                       this.action_deleteRecord
-                                       ]);
-
+           this.action_createFolder,
+           this.action_goUpFolder,
+           this.action_download,
+//           this.action_renameItem,
+           this.action_deleteRecord
+       ]);
     },
     
     /**
@@ -452,62 +447,34 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     },
     
     /**
-     * updates context menu
-     * 
-     * @param {Ext.Action} action
-     * @param {Object} grants grants sum of grants
-     * @param {Object} records
-     */
-    updateSaveAction: function(action, grants, records) {
-        for(var i=0; i<records.length; i++) {
-            if(records[i].data.type === 'folder') {
-                action.setDisabled(true);
-                return;
-            }
-        }
-        action.setDisabled(false);
-        
-        var grid = this;
-        var selectedRows = grid.selectionModel.getSelections(); 
-        
-        if(selectedRows.length > 1) {
-            action.setDisabled(true);
-        }
-        else {
-            action.setDisabled(false);
-        }
-    },
-    
-    
-    /**
      * create folder in current position
      * 
      * @param {Ext.Component} button
      * @param {Ext.EventObject} event
      */
     onCreateFolder: function(button, event) {
-
-    	var app = this.app,
-    	nodeName = app.i18n._('user file folder');
-
-    	Ext.MessageBox.prompt(String.format(_('New {0}'), nodeName), String.format(_('Please enter the name of the new {0}:'), nodeName), function(_btn, _text) {
-
-    		var currentFolderNode = app.mainScreen.GridPanel.currentFolderNode;
-    		if(currentFolderNode && _btn == 'ok') {
-    			if (! _text) {
-    				Ext.Msg.alert(String.format(_('No {0} added'), nodeName), String.format(_('You have to supply a {0} name!'), nodeName));
-    				return;
-    			}
-
-    			var filename = currentFolderNode.attributes.path + '/' + _text;
-    			Tine.Filemanager.fileRecordBackend.createFolder(filename);
-
-    		}
-    	}, this);
+        
+        var app = this.app,
+            nodeName = Tine.Filemanager.Model.Node.getContainerName();
+        
+        Ext.MessageBox.prompt(_('New Folder'), _('Please enter the name of the new folder:'), function(_btn, _text) {
+            
+            var currentFolderNode = app.mainScreen.GridPanel.currentFolderNode;
+            if(currentFolderNode && _btn == 'ok') {
+                if (! _text) {
+                    Ext.Msg.alert(String.format(_('No {0} added'), nodeName), String.format(_('You have to supply a {0} name!'), nodeName));
+                    return;
+                }
+                
+                var filename = currentFolderNode.attributes.path + '/' + _text;
+                Tine.Filemanager.fileRecordBackend.createFolder(filename);
+                
+            }
+        }, this);
         
         
     },
-
+    
     /**
      * delete selected files / folders
      * 
@@ -515,51 +482,53 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param {Ext.EventObject} event
      */
     onDeleteRecords: function(button, event) {
-
+        
         var app = this.app,
-        	nodeName = '',
-        	sm = app.getMainScreen().getCenterPanel().selectionModel,
-        	nodes = sm.getSelections();
+            nodeName = '',
+            sm = app.getMainScreen().getCenterPanel().selectionModel,
+            nodes = sm.getSelections();
         
         if(nodes && nodes.length) {
-        	for(var i=0; i<nodes.length; i++) {
-        		var currNodeData = nodes[i].data;
-
-        		if(typeof currNodeData.name == 'object') {
-        			nodeName += currNodeData.name.name + '<br />';    
-        		}
-        		else {
-        			nodeName += currNodeData.name + '<br />';  
-        		}
-        	}
+            for(var i=0; i<nodes.length; i++) {
+                var currNodeData = nodes[i].data;
+                
+                if(typeof currNodeData.name == 'object') {
+                    nodeName += currNodeData.name.name + '<br />';
+                }
+                else {
+                    nodeName += currNodeData.name + '<br />';  
+                }
+            }
         }
-    	       
+        
         this.conflictConfirmWin = Tine.widgets.dialog.FileListDialog.openWindow({
-			modal: true,
-			allowCancel: false,
-			height: 180,
-			width: 300,
-			title: app.i18n._('Do you really want to delete the following files?'),
-			text: nodeName,
-			scope: this,
-			handler: function(button){
-				if (nodes && button == 'yes') {	                
-	                Tine.Filemanager.fileRecordBackend.deleteItems(nodes);
-	            }
-				
-				for(var i=0; i<nodes.length; i++) {
-					var node = nodes[i];
-					
-					if(node.fileRecord) {
-						var upload = Tine.Tinebase.uploadManager.getUpload(node.fileRecord.get('uploadKey'));
-			            upload.setPaused(true);
-			            Tine.Tinebase.uploadManager.unregisterUpload(upload.id);
-					}
-					
-				}
-        	}
+            modal: true,
+            allowCancel: false,
+            height: 180,
+            width: 300,
+            title: app.i18n._('Do you really want to delete the following files?'),
+            text: nodeName,
+            scope: this,
+            handler: function(button){
+                if (nodes && button == 'yes') {
+                    this.store.remove(nodes);
+                    this.pagingToolbar.refresh.disable();
+                    Tine.Filemanager.fileRecordBackend.deleteItems(nodes);
+                }
+                
+                for(var i=0; i<nodes.length; i++) {
+                    var node = nodes[i];
+                    
+                    if(node.fileRecord) {
+                        var upload = Tine.Tinebase.uploadManager.getUpload(node.fileRecord.get('uploadKey'));
+                        upload.setPaused(true);
+                        Tine.Tinebase.uploadManager.unregisterUpload(upload.id);
+                    }
+                    
+                }
+            }
         }, this);
-
+        
     },
     
     /**
@@ -569,14 +538,14 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param {Ext.EventObject} event
      */
     onLoadParentFolder: function(button, event) {
-     
+        
         var app = this.app,
-        	currentFolderNode = app.mainScreen.GridPanel.currentFolderNode;
+            currentFolderNode = app.mainScreen.GridPanel.currentFolderNode;
         
         if(currentFolderNode && currentFolderNode.parentNode) {
             app.mainScreen.GridPanel.currentFolderNode = currentFolderNode.parentNode;
             currentFolderNode.parentNode.select();
-        }       
+        }
     },
     
     /**
@@ -587,11 +556,10 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param {Ext.EventObjet} e
      */
     onRowDblClick: function(grid, row, e) {
-        
         var app = this.app;
         var rowRecord = grid.getStore().getAt(row);
-
-
+        
+        
         if(rowRecord.data.type == 'file') {
             var downloadPath = rowRecord.data.path;
             var downloader = new Ext.ux.file.Download({
@@ -602,27 +570,23 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 }
             }).start();
         }
-
+        
         else if (rowRecord.data.type == 'folder'){
             var treePanel = app.getMainScreen().getWestPanel().getContainerTreePanel();
-
+            
             var currentFolderNode;
             if(rowRecord.data.path == '/personal/system') {
                 currentFolderNode = treePanel.getNodeById('personal');
-
             }
             else if(rowRecord.data.path == '/shared') {
                 currentFolderNode = treePanel.getNodeById('shared');
-
             }
             else if(rowRecord.data.path == '/personal') {
                 currentFolderNode = treePanel.getNodeById('otherUsers');
-
             }
             else {
                 currentFolderNode = treePanel.getNodeById(rowRecord.id);
             }
-
             if(currentFolderNode) {
                 currentFolderNode.select();
                 currentFolderNode.expand();
@@ -645,7 +609,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         ).setIcon(Ext.MessageBox.ERROR);
         
         var app = Tine.Tinebase.appMgr.get('Filemanager'),
-    		grid = app.getMainScreen().getCenterPanel();
+            grid = app.getMainScreen().getCenterPanel();
         grid.pagingToolbar.refresh.enable();
     },
     
@@ -656,7 +620,6 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param {} event
      */
     onRemove: function (button, event) {
-        
         var selectedRows = this.selectionModel.getSelections();
         for (var i = 0; i < selectedRows.length; i += 1) {
             this.store.remove(selectedRows[i]);
@@ -664,7 +627,6 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             upload.setPaused(true);
         }
     },
-    
     
     /**
      * populate grid store
@@ -690,11 +652,11 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param file  {Ext.ux.file.Upload.file} 
      */
     onUploadComplete: function(upload, file) {
-              
         var app = Tine.Tinebase.appMgr.get('Filemanager'),
             grid = app.getMainScreen().getCenterPanel(); 
-
-        Tine.Tinebase.uploadManager.onUploadComplete();
+        
+        // check if we are responsible for the upload
+        if (upload.fmDirector != grid) return;
         
         // $filename, $type, $tempFileId, $forceOverwrite
         Ext.Ajax.request({
@@ -721,7 +683,6 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param upload
      */
     onNodeCreated: function(response, request, upload) {
-       
         var record = Ext.util.JSON.decode(response.responseText);
                 
         var fileRecord = upload.fileRecord;
@@ -741,8 +702,8 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         upload.fireEvent('update', 'uploadfinished', upload, fileRecord);
         
         var app = Tine.Tinebase.appMgr.get('Filemanager'),
-        	grid = app.getMainScreen().getCenterPanel();
-
+            grid = app.getMainScreen().getCenterPanel();
+        
         var allRecordsComplete = true;
         var storeItems = grid.getStore().getRange();
         for(var i=0; i<storeItems.length; i++) {
@@ -751,7 +712,7 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 break;
             }
         }
-
+        
         if(allRecordsComplete) {
             grid.pagingToolbar.refresh.enable();
         }
@@ -774,9 +735,9 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             addToGrid = true,
             dropAllowed = false,
             nodeRecord = null;
-
+        
         if(event && event.getTarget()) {
-        	rowIndex = grid.getView().findRowIndex(event.getTarget());
+            rowIndex = grid.getView().findRowIndex(event.getTarget());
         }
         
         
@@ -792,43 +753,48 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 nodeRecord = new Tine.Filemanager.Model.Node(newTargetNode.data);
             }
         }
-
+        
         if(!nodeRecord.isDropFilesAllowed()) {
             Ext.MessageBox.alert(
                     _('Upload Failed'), 
                     app.i18n._('Putting files in this folder is not allowed!')
             ).setIcon(Ext.MessageBox.ERROR);
-
+            
             return;
         }    
-
+        
         var files = fileSelector.getFileList();
-
+        
         if(files.length > 0) {
             grid.pagingToolbar.refresh.disable();
         }
         
-        
         var filePathsArray = [], uploadKeyArray = [];
         
         Ext.each(files, function (file) {
-
-            var fileName = file.name || file.fileName;
-            var filePath = targetFolderPath + '/' + fileName;
+            var fileRecord = Tine.Filemanager.Model.Node.createFromFile(file),
+                filePath = targetFolderPath + '/' + fileRecord.get('name');
+            
+            fileRecord.set('path', filePath);
+            var existingRecordIdx = gridStore.find('name', fileRecord.get('name'));
+            if(existingRecordIdx < 0) {
+                gridStore.add(fileRecord);
+            }
             
             var upload = new Ext.ux.file.Upload({
+                fmDirector: grid,
                 file: file,
                 fileSelector: fileSelector,
                 id: filePath
             });
-
-            var uploadKey = Tine.Tinebase.uploadManager.queueUpload(upload);   
+            
+            var uploadKey = Tine.Tinebase.uploadManager.queueUpload(upload);
             
             filePathsArray.push(filePath);
             uploadKeyArray.push(uploadKey);
-                                    
+            
         }, this);
-
+        
         var params = {
                 filenames: filePathsArray,
                 type: "file",
@@ -836,8 +802,6 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 forceOverwrite: false
         };
         Tine.Filemanager.fileRecordBackend.createNodes(params, uploadKeyArray, true);
-
-        
     },
     
     /**
@@ -849,8 +813,8 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     onDownload: function(button, event) {
         
         var app = Tine.Tinebase.appMgr.get('Filemanager'),
-        	grid = app.getMainScreen().getCenterPanel(),
-        	selectedRows = grid.selectionModel.getSelections();
+            grid = app.getMainScreen().getCenterPanel(),
+            selectedRows = grid.selectionModel.getSelections();
         
         var fileRow = selectedRows[0];
                
@@ -872,19 +836,18 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param options
      */
     onLoad: function(store, records, options){
-
-    	var app = Tine.Tinebase.appMgr.get('Filemanager'),
-			grid = app.getMainScreen().getCenterPanel();
-    	
+        var app = Tine.Tinebase.appMgr.get('Filemanager'),
+            grid = app.getMainScreen().getCenterPanel();
+        
         for(var i=records.length-1; i>=0; i--) {
             var record = records[i];
             if(record.get('type') == 'file' && (!record.get('size') || record.get('size') == 0)) {
                 var upload = Tine.Tinebase.uploadManager.getUpload(record.get('path'));
-
+                
                 if(upload) {
                       if(upload.fileRecord && record.get('name') == upload.fileRecord.get('name')) {
-                    	  grid.updateNodeRecord(record, upload.fileRecord);
-                    	  record.afterEdit();
+                          grid.updateNodeRecord(record, upload.fileRecord);
+                          record.afterEdit();
                     }
                 }
             }
@@ -898,11 +861,10 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @param fileRecord
      */
     updateNodeRecord: function(nodeRecord, fileRecord) {
-    	
-    	for(var field in fileRecord.fields) {
-    		nodeRecord.set(field, fileRecord.get(field));
-    	}
-    	nodeRecord.fileRecord = fileRecord;
+        for(var field in fileRecord.fields) {
+            nodeRecord.set(field, fileRecord.get(field));
+        }
+        nodeRecord.fileRecord = fileRecord;
     },
     
     /**
@@ -914,60 +876,52 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * 
      */
     onUpdate: function(change, upload, fileRecord) {
-    	
-    	var app = Tine.Tinebase.appMgr.get('Filemanager'),
-    		grid = app.getMainScreen().getCenterPanel(),
-    		rowsToUpdate = grid.getStore().query('name', fileRecord.get('name'));
-    	
-    	if(change == 'uploadstart') {
-    		Tine.Tinebase.uploadManager.onUploadStart();
-    	}
-    	else if(change == 'uploadfailure') {
-    		grid.onUploadFail();
-    	}
-    	
-    	if(rowsToUpdate.get(0)) {
-    		if(change == 'uploadcomplete') {   			
-    			grid.onUploadComplete(upload, fileRecord);
-    		}
-    		else if(change == 'uploadfinished') {
-    			rowsToUpdate.get(0).set('size', upload.fileSize);	
-    			rowsToUpdate.get(0).set('contenttype', fileRecord.get('contenttype'));	
-    		}
-    		rowsToUpdate.get(0).afterEdit();
-    		rowsToUpdate.get(0).commit(false);
-    	}   	
+        var app = Tine.Tinebase.appMgr.get('Filemanager'),
+            grid = app.getMainScreen().getCenterPanel(),
+            rowsToUpdate = grid.getStore().query('name', fileRecord.get('name'));
+        
+        if(change == 'uploadstart') {
+            Tine.Tinebase.uploadManager.onUploadStart();
+        }
+        else if(change == 'uploadfailure') {
+            grid.onUploadFail();
+        }
+        
+        if(rowsToUpdate.get(0)) {
+            if(change == 'uploadcomplete') {
+                grid.onUploadComplete(upload, fileRecord);
+            }
+            else if(change == 'uploadfinished') {
+                rowsToUpdate.get(0).set('size', upload.fileSize);    
+                rowsToUpdate.get(0).set('contenttype', fileRecord.get('contenttype'));
+            }
+            rowsToUpdate.get(0).afterEdit();
+            rowsToUpdate.get(0).commit(false);
+        }
     },
     
     /**
      * init grid drop target
+     * 
+     * @TODO DRY cleanup
      */
     initDropTarget: function(){
-              
-        var ddrow = new Ext.dd.DropTarget(this.getEl(), {  
+        var ddrow = new Ext.dd.DropTarget(this.getEl(), {
             ddGroup : 'fileDDGroup',  
             
             notifyDrop : function(dragSource, e, data){  
-
-	        	if(data.node && data.node.attributes && !data.node.attributes.nodeRecord.isDragable()) {
-	        		return false;
-	        	}
-	        	
-	        	var app = Tine.Tinebase.appMgr.get(Tine.Filemanager.fileRecordBackend.appName),
-	                grid = app.getMainScreen().getCenterPanel(),
-	                treePanel = app.getMainScreen().getWestPanel().getContainerTreePanel(),
-	                dropIndex = grid.getView().findRowIndex(e.target),
-	                dragData = data,
-	                target; 
-
-                if(data.selections) {
-                    nodes = data.selections;                   
+                
+                if(data.node && data.node.attributes && !data.node.attributes.nodeRecord.isDragable()) {
+                    return false;
                 }
-                else {
-                    nodes = [data.node];
-                }
-
-                target = grid.getStore().getAt(dropIndex);    
+                
+                var app = Tine.Tinebase.appMgr.get(Tine.Filemanager.fileRecordBackend.appName),
+                    grid = app.getMainScreen().getCenterPanel(),
+                    treePanel = app.getMainScreen().getWestPanel().getContainerTreePanel(),
+                    dropIndex = grid.getView().findRowIndex(e.target),
+                    target = grid.getStore().getAt(dropIndex),
+                    nodes = data.selections ? data.selections : [data.node];
+                
                 if((!target || target.data.type === 'file') && grid.currentFolderNode) {
                     target = grid.currentFolderNode;
                 }
@@ -992,29 +946,20 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             },
             
             notifyOver : function( dragSource, e, data ) {
-                     
-            	if(data.node && data.node.attributes && !data.node.attributes.nodeRecord.isDragable()) {
-            		return false;
-            	}
-            	
+                if(data.node && data.node.attributes && !data.node.attributes.nodeRecord.isDragable()) {
+                    return false;
+                }
+                
                 var app = Tine.Tinebase.appMgr.get(Tine.Filemanager.fileRecordBackend.appName),
                     grid = app.getMainScreen().getCenterPanel(),
                     dropIndex = grid.getView().findRowIndex(e.target),
                     treePanel = app.getMainScreen().getWestPanel().getContainerTreePanel(),
-                    dragData = data,
-                    target; 
-                                
-                if(data.selections) {
-                    nodes = data.selections;                   
-                }
-                else {
-                    nodes = [data.node];
-                }
-
-                target = grid.getStore().getAt(dropIndex);    
+                    target= grid.getStore().getAt(dropIndex),
+                    nodes = data.selections ? data.selections : [data.node];
+                
                 if((!target || (target.data && target.data.type === 'file')) && grid.currentFolderNode) {
                     target = grid.currentFolderNode;
-                }                
+                }
                 
                 if(!target) {
                     return false;
@@ -1030,12 +975,9 @@ Tine.Filemanager.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 if(targetNode && targetNode.isAncestor(nodes[0])) {
                     return false;
                 }
-                               
-                return this.dropAllowed;               
+                
+                return this.dropAllowed;
             }
         });  
-        
-
     }
-
 });

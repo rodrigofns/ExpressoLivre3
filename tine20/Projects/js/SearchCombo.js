@@ -57,9 +57,6 @@ Tine.Projects.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPickerCo
      */
     onBeforeQuery: function(qevent){
         Tine.Projects.SearchCombo.superclass.onBeforeQuery.apply(this, arguments);
-        
-        var filter = this.store.baseParams.filter;
-
     },
     
     /**
@@ -99,3 +96,5 @@ Tine.Projects.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPickerCo
     }
 
 });
+
+Tine.widgets.form.RecordPickerManager.register('Projects', 'Project', Tine.Projects.SearchCombo);

@@ -18,12 +18,18 @@
  */
 class Tinebase_Server_WebDAV implements Tinebase_Server_Interface
 {
+   /**
+    * @var Sabre_DAV_Server
+    */
+    protected static $_server;
+    
     public function handle()
     {
         try {
             Tinebase_Core::initFramework();
         } catch (Zend_Session_Exception $exception) {
-            Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' invalid session. Delete session cookie.');
+            if (Tinebase_Core::isLogLevel(Zend_Log::WARN))
+                Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' invalid session. Delete session cookie.');
             Zend_Session::expireSessionCookie();
             
             header('WWW-Authenticate: Basic realm="WebDAV for Tine 2.0"');
@@ -32,11 +38,11 @@ class Tinebase_Server_WebDAV implements Tinebase_Server_Interface
             return;
         }
         
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' is CardDav request.');
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO))
+            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .' is CalDav, CardDAV or WebDAV request.');
         
         if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['REMOTE_USER']) && empty($_SERVER['REDIRECT_REMOTE_USER'])) {
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' ' . print_r($_SERVER, true));
-        	header('WWW-Authenticate: Basic realm="WebDav for Tine 2.0"');
+            header('WWW-Authenticate: Basic realm="WebDav for Tine 2.0"');
             header('HTTP/1.1 401 Unauthorized');
             
             return;
@@ -55,33 +61,42 @@ class Tinebase_Server_WebDAV implements Tinebase_Server_Interface
             return;                            
         }
         
-        $server = new Sabre_DAV_Server(new Tinebase_WebDav_Root());
+        self::$_server = new Sabre_DAV_Server(new Tinebase_WebDav_Root());
         
         // compute base uri
-        #$decodedUri = Sabre_DAV_URLUtil::decodePath($server->getRequestUri());
-        #$baseUri = substr($decodedUri, 0, strpos($decodedUri, 'carddav/') + strlen('carddav/'));
-        $server->setBaseUri('/');
+        $request = new Zend_Controller_Request_Http();
+        self::$_server->setBaseUri($request->getBaseUrl());
         
         $tempDir = Tinebase_Core::getTempDir();
         if (!empty($tempDir)) {
             $lockBackend = new Sabre_DAV_Locks_Backend_File($tempDir . '/webdav.lock');
             $lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
-            $server->addPlugin($lockPlugin);
+            self::$_server->addPlugin($lockPlugin);
         }
         
         $authPlugin = new Sabre_DAV_Auth_Plugin(new Tinebase_WebDav_Auth(), null);
-        $server->addPlugin($authPlugin);
+        self::$_server->addPlugin($authPlugin);
         
         $aclPlugin = new Sabre_DAVACL_Plugin();
         $aclPlugin->defaultUsernamePath = 'principals/users';
         $aclPlugin->principalCollectionSet = array($aclPlugin->defaultUsernamePath/*, 'principals/groups'*/);
-        $server->addPlugin($aclPlugin);
+        self::$_server->addPlugin($aclPlugin);
         
-        $server->addPlugin(new Sabre_CardDAV_Plugin());
-        $server->addPlugin(new Sabre_CalDAV_Plugin());
-        $server->addPlugin(new Sabre_CalDAV_Schedule_Plugin());
-        $server->addPlugin(new Sabre_DAV_Browser_Plugin());
+        self::$_server->addPlugin(new Sabre_CardDAV_Plugin());
+        self::$_server->addPlugin(new Sabre_CalDAV_Plugin());
+        self::$_server->addPlugin(new Sabre_CalDAV_Schedule_Plugin());
+        self::$_server->addPlugin(new Sabre_DAV_Browser_Plugin());
         
-        $server->exec();
+        self::$_server->exec();
+    }
+    
+   /**
+    * helper to return request
+    *
+    * @return Sabre_HTTP_Request
+    */
+    public static function getRequest()
+    {
+        return self::$_server ? self::$_server->httpRequest : new Sabre_HTTP_Request();
     }
 }

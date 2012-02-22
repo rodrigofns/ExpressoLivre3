@@ -24,6 +24,7 @@ Ext.ns('Tine.Crm');
  * @constructor
  */
 Tine.Crm.AddressbookGridPanelHook = function(config) {
+    
     Tine.log.info('initialising crm addressbook hooks');
     Ext.apply(this, config);
     
@@ -54,7 +55,7 @@ Tine.Crm.AddressbookGridPanelHook = function(config) {
             scope: this,
             render: this.onRender
         }
-    });
+    });    
     
     // register in contextmenu
     Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu-New', this.newLeadAction, 80);
@@ -73,6 +74,7 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
     
     /**
      * @property newLeadAction
+<<<<<<< HEAD
      * @type Tine.widgets.ActionUpdater
      * @private
      */
@@ -83,6 +85,18 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
      * @type Tine.widgets.ActionUpdater
      * @private
      */
+=======
+     * @type Tine.widgets.ActionUpdater
+     * @private
+     */
+    newLeadAction: null,
+
+    /**
+     * @property addLeadAction
+     * @type Tine.widgets.ActionUpdater
+     * @private
+     */
+>>>>>>> master
     addLeadAction: null,    
     
     /**
@@ -125,6 +139,10 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
             record: new Tine.Crm.Model.Lead(leadData, 0)
         });
     },
+<<<<<<< HEAD
+=======
+    
+>>>>>>> master
     onAddLead: function(btn) {
         var contacts = this.getSelectionsAsArray();
         Tine.Crm.AddToLeadPanel.openWindow({attendee: contacts});

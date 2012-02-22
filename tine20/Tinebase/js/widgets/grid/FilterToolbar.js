@@ -207,7 +207,6 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
         if (! this.app && this.store) {
             this.app = Tine.Tinebase.appMgr.get(this.store.proxy.recordClass.getMeta('appName'));
         }
-        
         // automatically enable saving
         if (! this.neverAllowSaving && this.app && this.app.getMainScreen() && typeof this.app.getMainScreen().getWestPanel == 'function' && this.app.getMainScreen().getWestPanel().hasFavoritesPanel) {
             this.allowSaving = true;
@@ -341,7 +340,7 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
         
         if (! filterModel) {
             Tine.log.warn('Tine.widgets.grid.FilterToolbar::renderFilterRow no filterModel found');
-            Tine.log.warn(filter)
+            Tine.log.warn(filter);
             this.filterStore.remove(filter);
             return;
         }
@@ -363,7 +362,8 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
             valueField: 'field',
             value: filterModel.field,
             renderTo: fRow.child('td[class=tw-ftb-frow-field]'),
-            validator: this.validateFilter.createDelegate(this)
+            validator: this.validateFilter.createDelegate(this),
+            tpl: '<tpl for="."><div class="x-combo-list-item tw-ftb-field-{field}">{label}</div></tpl>'
         });
         filter.formFields.field.on('select', function(combo, newRecord, newKey) {
             if (combo.value != combo.filter.get('field')) {
@@ -628,7 +628,12 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
         // init filter selection
         this.fieldStore = new Ext.data.JsonStore({
             fields: ['field', 'label'],
-            data: filtersFields
+            data: filtersFields,
+            remoteSort: false,
+            sortInfo: {
+                field: 'label',
+                direction: 'ASC'
+            }
         });
     },
     
@@ -667,7 +672,7 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
      */
     getFilterModel: function(field) {
         var fieldName = Ext.isFunction(field.get) ? field.get('field') : field;
-        
+  
         if (! fieldName && field.data && field.data.condition) {
             return this.ownRecordFilterModel;
         }
@@ -767,40 +772,36 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
         var filters = [];
         
         this.filterStore.each(function(filter) {
-            try {
-                var filterModel = this.getFilterModel(filter),
-                    line = Ext.isFunction(filterModel.getFilterData) ? filterModel.getFilterData(filter) : this.getFilterData(filter);
+            var filterModel = this.getFilterModel(filter),
+                line = Ext.isFunction(filterModel.getFilterData) ? filterModel.getFilterData(filter) : this.getFilterData(filter);
+            
+            if (line.field && Ext.isString(line.field) &&  line.field.match(/:/)) {
+                var parts = line.field.split(':');
                 
-                if (line.field && Ext.isString(line.field) &&  line.field.match(/:/)) {
-                    var parts = line.field.split(':');
-                    
-                    // customfield handling
-                    if (parts[0] == 'customfield') {
-                        filters.push({field: 'customfield', operator: line.operator, value: {cfId: parts[1], value: line.value}});
-                    }
-                    
-                    else if (filterModel && filterModel.superFilter) {
-                        // if we are a childfilter of a recordclass of the subfilter, just place the subfilter
-                        if (this.parentSheet && this.parentSheet.recordClass == filterModel.superFilter.foreignRecordClass) {
-                            filters.push(line);
-                            return;
-                        }
-                        
-                        // check if filter of type superfilter is present
-                        if (this.filterStore.find('field', filterModel.superFilter.field) < 0) {
-                            
-                            // create one
-                            // @TODO HIDE? -> see ForeignRecordFilter line ~300
-                            var superFilter = this.addFilter(new this.record({field: filterModel.superFilter.field, operator: 'definedBy'}));
-                            line = this.getFilterData(superFilter);
-                            filters.push(line);
-                        }
-                    }
-                } else {
-                    filters.push(line);
+                // customfield handling
+                if (parts[0] == 'customfield') {
+                    filters.push({field: 'customfield', operator: line.operator, value: {cfId: parts[1], value: line.value}});
                 }
-            } catch (e) {
-                console.error(e.stack ? e.stack : e);
+                
+                else if (filterModel && filterModel.superFilter) {
+                    // if we are a childfilter of a recordclass of the subfilter, just place the subfilter
+                    if (this.parentSheet && this.parentSheet.recordClass == filterModel.superFilter.foreignRecordClass) {
+                        filters.push(line);
+                        return;
+                    }
+                    
+                    // check if filter of type superfilter is present
+                    if (this.filterStore.find('field', filterModel.superFilter.field) < 0) {
+                        
+                        // create one
+                        // @TODO HIDE? -> see ForeignRecordFilter line ~300
+                        var superFilter = this.addFilter(new this.record({field: filterModel.superFilter.field, operator: 'definedBy'}));
+                        line = this.getFilterData(superFilter);
+                        filters.push(line);
+                    }
+                }
+            } else {
+                filters.push(line);
             }
         }, this);
         
@@ -852,64 +853,58 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
         
         filter.endEdit();
         
-        return filter
+        return filter;
     },
     
     setValue: function(filters) {
-        try {
-            this.supressEvents = true;
-            
-            var oldFilters = [];
-            this.filterStore.each(function(filterRecord) {oldFilters.push(filterRecord)}, this);
-            
-            var filterModel, filterData, filterRecord;
-            
-            // custom fields handling
-            for (var i=0; i<filters.length; i++) {
-                filterData = filters[i];
-                if (filterData.value && filterData.value.cfId) {
-                    filters[i].field = filterData.field + ':' + filterData.value.cfId;
-                    filters[i].value = filterData.value.value;
-                }
+        this.supressEvents = true;
+        
+        var oldFilters = [];
+        this.filterStore.each(function(filterRecord) {oldFilters.push(filterRecord);}, this);
+        
+        var filterModel, filterData, filterRecord;
+        
+        // custom fields handling
+        for (var i=0; i<filters.length; i++) {
+            filterData = filters[i];
+            if (filterData.value && filterData.value.cfId) {
+                filters[i].field = filterData.field + ':' + filterData.value.cfId;
+                filters[i].value = filterData.value.value;
             }
-            
-            for (var i=0; i<filters.length; i++) {
-                filterRecord = null;
-                filterData = filters[i],
-//                filterData.filterValueWidth = this.filterValueWidth,
-                filterModel = filterData.condition ? this.ownRecordFilterModel : this.filterModelMap[filterData.field];
-                
-                if (filterModel) {
-                    if (filterData.id) {
-                        filterRecord = this.filterStore.getById(filterData.id);
-                    }
-                    
-                    // refresh existing filters
-                    if (filterRecord) {
-                        Ext.isFunction(filterModel.setFilterData) ? filterModel.setFilterData(filterRecord, filterData) : this.setFilterData(filterRecord, filterData);
-                        oldFilters.remove(filterRecord);
-                    } 
-                    
-                    // add non existing filters only if they where not created implicitly by server
-                    else if (! filterData.implicit) {
-                        filterRecord = new this.record(filterData, filterData.id);
-                        this.addFilter(filterRecord);
-                    }
-                }
-                
-            }
-            
-            // remove unused filters
-            Ext.each(oldFilters, function(filterRecord) {
-                this.deleteFilter(filterRecord);
-            }, this);
-            
-            this.supressEvents = false;
-            this.onFilterRowsChange();
-        } catch (e) {
-            console.error(e.stack ? e.stack : e);
         }
         
+        for (var i=0; i<filters.length; i++) {
+            filterRecord = null;
+            filterData = filters[i];
+            filterModel = filterData.condition ? this.ownRecordFilterModel : this.filterModelMap[filterData.field];
+            
+            if (filterModel) {
+                if (filterData.id) {
+                    filterRecord = this.filterStore.getById(filterData.id);
+                }
+                
+                // refresh existing filters
+                if (filterRecord) {
+                    Ext.isFunction(filterModel.setFilterData) ? filterModel.setFilterData(filterRecord, filterData) : this.setFilterData(filterRecord, filterData);
+                    oldFilters.remove(filterRecord);
+                } 
+                
+                // add non existing filters only if they where not created implicitly by server
+                else if (! filterData.implicit) {
+                    filterRecord = new this.record(filterData, filterData.id);
+                    this.addFilter(filterRecord);
+                }
+            }
+            
+        }
+        
+        // remove unused filters
+        Ext.each(oldFilters, function(filterRecord) {
+            this.deleteFilter(filterRecord);
+        }, this);
+        
+        this.supressEvents = false;
+        this.onFilterRowsChange();
     },
     
     /**
@@ -990,7 +985,7 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
                 sheet.breadCrumb.enable();
                 rootSheet.tbar.add(sheet.breadCrumb);
             }, this);
-            ftb.breadCrumb.disable()
+            ftb.breadCrumb.disable();
             rootSheet.tbar.add(ftb.breadCrumb, '->', ftb.action_loadFilter);
             rootSheet.tbar.show();
             rootSheet.tbar.doLayout();

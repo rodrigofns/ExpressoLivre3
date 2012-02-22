@@ -17,7 +17,7 @@
  */
 class Tinebase_Group_Sql extends Tinebase_Group_Abstract
 {
-	/**
+    /**
      * @var Zend_Db_Adapter_Abstract
      */
     protected $_db;
@@ -242,7 +242,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         }
         
         $event = new Tinebase_Group_Event_SetGroupMemberships(array(
-        	'user'               => $_userId,
+            'user'               => $_userId,
             'addedMemberships'   => $addGroupMemberships,
             'removedMemberships' => $removeGroupMemberships
         ));
@@ -428,9 +428,9 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $data = array(
             'name'          => $_group->name,
             'description'   => $_group->description,
-            'visibility'	=> $_group->visibility,
-            'email'			=> $_group->email,
-            'list_id'		=> $_group->list_id
+            'visibility'    => $_group->visibility,
+            'email'            => $_group->email,
+            'list_id'        => $_group->list_id
         );
         
         $where = $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $groupId);
@@ -565,7 +565,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $groupdId = Tinebase_Model_Group::convertGroupIdToInt($_groupId);     
         
         $select = $this->_getSelect();
-                
+        
         $select->where($this->_db->quoteIdentifier($this->_tableName . '.id') . ' = ?', $groupdId);
         
         $stmt = $this->_db->query($select);
@@ -575,7 +575,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         if (!$queryResult) {
             throw new Tinebase_Exception_Record_NotDefined('Group not found.');
         }
-
+        
         $result = new Tinebase_Model_Group($queryResult, TRUE);
         
         return $result;
@@ -589,19 +589,19 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      */
     public function getMultiple($_ids)
     {
-    	$result = new Tinebase_Record_RecordSet('Tinebase_Model_Group');
-    	
-    	if (! empty($_ids)) {
-	        $select = $this->groupsTable->select();
-	        $select->where($this->_db->quoteIdentifier('id') . ' IN (?)', array_unique((array) $_ids));
-	        
-	        $rows = $this->groupsTable->fetchAll($select);
-	        foreach ($rows as $row) {
-	        	$result->addRecord(new Tinebase_Model_Group($row->toArray(), TRUE));
-	        }
-    	}
-    	
-    	return $result;
+        $result = new Tinebase_Record_RecordSet('Tinebase_Model_Group');
+        
+        if (! empty($_ids)) {
+            $select = $this->groupsTable->select();
+            $select->where($this->_db->quoteIdentifier('id') . ' IN (?)', array_unique((array) $_ids));
+            
+            $rows = $this->groupsTable->fetchAll($select);
+            foreach ($rows as $row) {
+                $result->addRecord(new Tinebase_Model_Group($row->toArray(), TRUE));
+            }
+        }
+        
+        return $result;
     }
     
     /**

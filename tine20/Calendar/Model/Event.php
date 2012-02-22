@@ -5,7 +5,7 @@
  * @package     Calendar
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -74,9 +74,15 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         'seq'                  => array('allowEmpty' => true,  'Int'  ),
         // calendar only fields
         'dtend'                => array('allowEmpty' => true          ),
-        'transp'               => array('allowEmpty' => true,  'InArray' => array(self::TRANSP_TRANSP, self::TRANSP_OPAQUE)),
+        'transp'               => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::TRANSP_OPAQUE, self::TRANSP_TRANSP))
+        ),
         // ical common fields
-        'class'                => array('allowEmpty' => true,  'InArray' => array(self::CLASS_PUBLIC, self::CLASS_PRIVATE, /*self::CLASS_CONFIDENTIAL*/)),
+        'class'                => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::CLASS_PUBLIC, self::CLASS_PRIVATE, /*self::CLASS_CONFIDENTIAL*/))
+        ),
         'description'          => array('allowEmpty' => true          ),
         'geo'                  => array('allowEmpty' => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
         'location'             => array('allowEmpty' => true          ),
@@ -281,8 +287,14 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         $hasGrant = array_key_exists($_grant, $this->_properties) && (bool)$this->{$_grant};
         
         if ($this->class !== Calendar_Model_Event::CLASS_PUBLIC) {
-            // || i'm attendee
-            $hasGrant &= $this->{Tinebase_Model_Grants::GRANT_PRIVATE} || Calendar_Model_Attender::getOwnAttender($this->attendee);
+            $hasGrant &= (
+                // private grant
+                $this->{Tinebase_Model_Grants::GRANT_PRIVATE} ||
+                // I'm organizer
+                Tinebase_Core::getUser()->contact_id == ($this->organizer instanceof Addressbook_Model_Contact ? $this->organizer->getId() : $this->organizer) ||
+                // I'm attendee
+                Calendar_Model_Attender::getOwnAttender($this->attendee)
+            );
         }
         
         return $hasGrant;

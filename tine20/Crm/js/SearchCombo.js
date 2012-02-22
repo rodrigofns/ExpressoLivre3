@@ -86,3 +86,7 @@ Tine.Crm.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPickerComboBo
 });
 
 Ext.reg('crmleadpickercombobox', Tine.Crm.SearchCombo);
+<<<<<<< HEAD
+=======
+Tine.widgets.form.RecordPickerManager.register('Crm', 'Lead', 'crmleadpickercombobox');
+>>>>>>> master

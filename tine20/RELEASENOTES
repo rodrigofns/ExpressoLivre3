@@ -3,8 +3,8 @@
 
                     TINE 2.0 RELEASENOTES
                     
-Release:    Milan (2012/03)
-
+Release:     Milan (2012/03)
+Last change: 2012-02-08
 
 Contents
 --
@@ -16,6 +16,9 @@ Contents
 5. Projects application
 6. New Addressbook features
 7. ActiveSync improvements
+8. Add or reactivate admin user
+9. Calendar Frontend JSON API change
+10. Improved search / filtering options
 
 -----------------
 
@@ -60,3 +63,37 @@ Contents
 -----------------
  
 - The handling of the synckey has been improved. Resets of the sync data should happen at a much lower rate now.
+
+8. Add or reactivate admin user
+-----------------
+
+- You can now add or reactivate an admin user and set or reset the password via the setup CLI.
+ usage example:
+ 
+     $ php setup.php --create_admin
+    Please enter a username. If the user already exists, he is reactivated and you can reset the password.
+    
+    Username> existingAdmin
+    User existingAdmin already exists.
+    Activated admin user 'existingAdmin' (expires tomorrow).
+    
+    Do you want to reset the password (default: "no", "y" or "yes" for reset)?> y
+    
+    Admin user password> 
+    
+    Confirm password> 
+    User password has been reset.
+    
+9. Calendar Frontend JSON API change
+-----------------
+
+- A small API change took place in Calendar/Frontend/Json.php:
+ All occurrences of the function parameter "checkBusyConficts" have been replaced by the correct "checkBusyConflicts".
+ 
+ 10. Improved search / filtering options
+ -----------------
+ 
+ - The filtertoolbar has been extended to support OR filtering and it is now possible to filter in related records
+ and the relations themselves. For example you could search for contacts that are attender of events that are scheduled
+ this week and whose attender status is 'Tentative'.
+ 

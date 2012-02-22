@@ -217,12 +217,14 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
      * @return {Ext.Record} Ext.ux.file.Upload.file
      */
     upload: function() {
-                                   
         if ((
                 (! Ext.isGecko && window.XMLHttpRequest && window.File && window.FileList) || // safari, chrome, ...?
                 (Ext.isGecko && window.FileReader) // FF
         ) && this.file) {
      
+            // free browse plugin
+            this.getInput();
+            
             if (this.isHtml5ChunkedUpload()) {
 
 //                if(this.fileSize > this.maxAllowedFileSize) { // admin confgured max file size (nothing technically)
@@ -397,7 +399,9 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
             this.fileRecord.beginEdit();
             this.fileRecord.set('size', response.size);
             this.fileRecord.set('id', response.id);
-        	this.fileRecord.set('progress', 99);
+            this.fileRecord.set('progress', 99);
+            this.fileRecord.set('tempFile', '');
+            this.fileRecord.set('tempFile', response);
             this.fileRecord.commit(false);
             this.fireEvent('uploadcomplete', this, this.fileRecord);  
             this.fireEvent('update', 'uploadcomplete', this, this.fileRecord);
@@ -407,6 +411,8 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
             this.fileRecord.beginEdit();
             this.fileRecord.set('status', 'failure');
             this.fileRecord.set('progress', -1);
+            this.fileRecord.set('tempFile', '');
+            this.fileRecord.set('tempFile', response);
             this.fileRecord.commit(false);
             this.fireEvent('update', 'uploadfailure', this, this.fileRecord);
                        
@@ -524,11 +530,11 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
     html4upload: function() {
                 
         var form = this.createForm();
-        var input = this.getInput();       
+        var input = this.getInput();
         form.appendChild(input);
         
         this.fileRecord = new Ext.ux.file.Upload.file({
-            name: this.fileSelector.getFileName(),          
+            name: this.fileSelector.getFileName(),
             size: 0,
             type: this.fileSelector.getFileCls(),
             input: input,
@@ -578,8 +584,7 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
             status: status,
             progress: 0,
             input: this.file,
-            uploadKey: this.id,
-            type: 'file'
+            uploadKey: this.id
         });
         
         this.fireEvent('update', 'uploadprogress', this, this.fileRecord);
@@ -591,8 +596,8 @@ Ext.extend(Ext.ux.file.Upload, Ext.util.Observable, {
      * 
      * @param tempfile to add
      */
-    addTempfile: function(tempFile) {              
-        this.tempFiles.push(tempFile);               
+    addTempfile: function(tempFile) {
+        this.tempFiles.push(tempFile);
         return true;
     },
     
@@ -748,53 +753,20 @@ Ext.ux.file.Upload.file.getFileData = function(file) {
     return Ext.copyTo({}, file.data, ['tempFile', 'name', 'path', 'size', 'type']);
 };
 
+/**
+ * generic size renderer
+ */
 Ext.ux.file.Upload.fileSize = function (value, metadata, record) {
+    value = parseInt(value, 10);
     
-  if (!value || (record && record.get('type') == 'folder')) {
-      return '';
-  }
-  else if (value < 1) {
-      return '0 bytes';
-  }
-
-  var intValue= value/1;  
+    if (record && record.get('type') == 'folder') {
+        return '';
+    }
+    
+    var suffix = ['Bytes', 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    for (var i=0,j; i<suffix.length; i++) {
+        if (value < Math.pow(1024, i)) break;
+    }
   
-  if (intValue < 1024) {
-      return intValue + ' Bytes';     
-  }
-  else if(intValue < 1048576) {
-      
-      var stringValue = (intValue/1024).toString();
-      var separatorIndex = stringValue.indexOf('.');
-      var returnValue = stringValue;
-      if(separatorIndex > -1) {
-          returnValue = stringValue.substring(0, separatorIndex);
-      }
-      return returnValue + ' KB';
-      
-  }
-  else if(intValue < 1073741824) {
-      
-      var stringValue = (intValue/(1024*1024)).toString();
-      var separatorIndex = stringValue.indexOf('.');
-      
-      var returnValue = stringValue;
-      if(separatorIndex > -1 && separatorIndex <= stringValue.length - 3) {
-          returnValue = stringValue.substring(0, separatorIndex + 3);
-      }
-      
-      return returnValue + ' MB';
-  }
-  else {
-          
-      var stringValue = (intValue/(1024*1024*1024)).toString();
-      var separatorIndex = stringValue.indexOf('.');
-
-      var returnValue = stringValue;
-      if(separatorIndex > -1 && separatorIndex <= stringValue.length - 3)  {
-          returnValue = stringValue.substring(0, separatorIndex + 3);
-      }
-      return sreturnValue + ' GB';
-  }  
-    
+  return Ext.util.Format.round(value/(Math.pow(1024,Math.max(1, i-1))), 2) + ' ' + suffix[i];
 };

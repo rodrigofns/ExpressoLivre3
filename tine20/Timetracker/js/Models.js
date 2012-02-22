@@ -22,10 +22,10 @@ Tine.Timetracker.Model.TimesheetArray = Tine.Tinebase.Model.genericFields.concat
     { name: 'start_time', type: 'date', dateFormat: Date.patterns.ISO8601Time },
     { name: 'duration' },
     { name: 'description' },
-    { name: 'is_billable' },
-    { name: 'is_billable_combined' }, // ts & ta is_billable
-    { name: 'is_cleared' },
-    { name: 'is_cleared_combined' }, // ts is_cleared & ta status == 'billed'
+    { name: 'is_billable', type: 'bool' },
+    { name: 'is_billable_combined', type: 'bool' }, // ts & ta is_billable
+    { name: 'is_cleared', type: 'bool' },
+    { name: 'is_cleared_combined', type: 'bool' }, // ts is_cleared & ta status == 'billed'
     { name: 'billed_in' },
     // tine 2.0 notes + tags
     { name: 'notes'},
@@ -47,16 +47,22 @@ Tine.Timetracker.Model.Timesheet = Tine.Tinebase.data.Record.create(Tine.Timetra
     recordsName: 'Timesheets',
     containerProperty: 'timeaccount_id',
     // ngettext('timesheets list', 'timesheets lists', n);
-    containerName: 'timesheets list',
+    containerName: 'All Timesheets',
     containersName: 'timesheets lists',
     getTitle: function() {
-        var timeaccount = this.get('timeaccount_id');
+        var timeaccount = this.get('timeaccount_id'),
+            description = this.get('description'),
+            timeaccountTitle = '';
+        
         if (timeaccount) {
             if (typeof(timeaccount.get) !== 'function') {
                 timeaccount = new Tine.Timetracker.Model.Timeaccount(timeaccount);
             }
-            return timeaccount.getTitle();
+            timeaccountTitle = timeaccount.getTitle();
         }
+        
+        timeaccountTitle = timeaccountTitle ? '[' + timeaccountTitle + '] ' : '';
+        return timeaccountTitle + description;
     },
     copyOmitFields: ['billed_in', 'is_cleared']
 });
@@ -75,7 +81,7 @@ Tine.Timetracker.Model.Timesheet.getFilterModel = function() {
     var app = Tine.Tinebase.appMgr.get('Timetracker');
     
     return [
-        //{label: _('Quick search'),    field: 'query',    operators: ['contains']}, // query only searches description
+        {label: app.i18n._('Quick search'), field: 'query',    operators: ['contains']}, // query only searches description
         {label: app.i18n._('Account'),      field: 'account_id', valueType: 'user'},
         {label: app.i18n._('Date'),         field: 'start_date', valueType: 'date', pastOnly: true},
         {label: app.i18n._('Description'),  field: 'description', defaultOperator: 'contains'},
@@ -101,8 +107,8 @@ Tine.Timetracker.Model.TimeaccountArray = Tine.Tinebase.Model.genericFields.conc
     { name: 'budget_unit' },
     { name: 'price' },
     { name: 'price_unit' },
-    { name: 'is_open' },
-    { name: 'is_billable' },
+    { name: 'is_open', type: 'bool'},
+    { name: 'is_billable', type: 'bool' },
     { name: 'billed_in' },
     { name: 'status' },
     { name: 'deadline' },
@@ -127,10 +133,12 @@ Tine.Timetracker.Model.Timeaccount = Tine.Tinebase.data.Record.create(Tine.Timet
     recordsName: 'Time Accounts',
     containerProperty: 'container_id',
     // ngettext('timeaccount list', 'timeaccount lists', n);
-    containerName: 'timeaccount list',
+    containerName: 'All Timeaccounts',
     containersName: 'timeaccount lists',
     getTitle: function() {
-        return this.get('number') ? (this.get('number') + ' ' + this.get('title')) : false;
+        var closedText = this.get('is_open') ? '' : (' (' + Tine.Tinebase.appMgr.get('Timetracker').i18n._('closed') + ')');
+        
+        return this.get('number') ? (this.get('number') + ' - ' + this.get('title') + closedText) : '';
     }
 });
 
@@ -153,7 +161,7 @@ Tine.Timetracker.Model.Timeaccount.getFilterModel = function() {
         {label: app.i18n._('Booking deadline'), field: 'deadline'},
         {filtertype: 'tinebase.tag', app: app}
     ];
-}
+};
 
 /**
  * Model of a grant

@@ -6,7 +6,7 @@
  * @subpackage  Model
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
@@ -58,36 +58,38 @@ class Tinebase_Model_Tree_Node extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_validators = array (
-        // tine 2.0 generic fields
-    	'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
-    	'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+    // tine 2.0 generic fields
+        'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
+        'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'creation_time'         => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'last_modified_by'      => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'last_modified_time'    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'is_deleted'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'deleted_time'          => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'deleted_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-    
-        // model specific fields
+    // model specific fields
         'parent_id'      => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
-    	'object_id'      => array('presence' => 'required'),
-    	'name'           => array('presence' => 'required'),
-    	'islink'         => array(
+        'object_id'      => array('presence' => 'required'),
+        'name'           => array('presence' => 'required'),
+        'islink'         => array(
             Zend_Filter_Input::DEFAULT_VALUE => '0',
-            'InArray' => array(true, false)
+            array('InArray', array(true, false))
         ),
-        
-        // this is needed for ACL handling and should be sent by / delivered to client (not persistent in db atm)
-        'path'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'account_grants' => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        
-        // fields from filemanager_objects table (ro)
-        'type'           => array(Zend_Filter_Input::ALLOW_EMPTY => true, 'InArray' => array(self::TYPE_FILE, self::TYPE_FOLDER)),
+    // fields from filemanager_objects table (ro)
+        'type'           => array(
+            Zend_Filter_Input::ALLOW_EMPTY => true, 
+            array('InArray', array(self::TYPE_FILE, self::TYPE_FOLDER)),
+        ),
         'description'    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'contenttype'    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'revision'       => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'hash'			 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'size'			 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'hash'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'size'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+    // not persistent
+        'container_name' => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        // this is needed for ACL handling and should be sent by / delivered to client (not persistent in db atm)
+        'path'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'account_grants' => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     );
     
     /**
@@ -100,4 +102,18 @@ class Tinebase_Model_Tree_Node extends Tinebase_Record_Abstract
         'last_modified_time',
         'deleted_time'
     );
+    
+    /**
+    * overwrite constructor to add more filters
+    *
+    * @param mixed $_data
+    * @param bool $_bypassFilters
+    * @param mixed $_convertDates
+    * @return void
+    */
+    public function __construct($_data = NULL, $_bypassFilters = FALSE, $_convertDates = TRUE)
+    {
+        $this->_filters['size'] = new Zend_Filter_Empty(0);
+        return parent::__construct($_data, $_bypassFilters, $_convertDates);
+    }
 }

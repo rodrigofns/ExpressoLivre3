@@ -4,9 +4,12 @@
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+<<<<<<< HEAD
  * 
  * TODO         fix problems with onFilterTrigger (selected tag does not disappear, trigger click does not search again)
  * TODO         code cleanup
+=======
+>>>>>>> master
  */
 
 Ext.ns('Tine.widgets', 'Tine.widgets.tags');
@@ -32,6 +35,7 @@ Tine.widgets.tags.TagFilter = Ext.extend(Tine.widgets.grid.PickerFilter, {
         
         this.label = _('Tag');
     }
+<<<<<<< HEAD
     
     /**
      * get record picker
@@ -82,6 +86,8 @@ Tine.widgets.tags.TagFilter = Ext.extend(Tine.widgets.grid.PickerFilter, {
 //        
 //        return value;
 //    }
+=======
+>>>>>>> master
 });
 Tine.widgets.grid.FilterToolbar.FILTERS['tinebase.tag'] = Tine.widgets.tags.TagFilter;
 

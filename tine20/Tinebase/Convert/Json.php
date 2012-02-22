@@ -5,8 +5,8 @@
  * @package     Tinebase
  * @subpackage  Convert
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Philipp Schüle <p.schuele@metaways.de>
+ * @copyright   Copyright (c) 2011-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
@@ -44,19 +44,11 @@ class Tinebase_Convert_Json implements Tinebase_Convert_Interface
         $_record->setTimezone(Tinebase_Core::get(Tinebase_Core::USERTIMEZONE));
         $_record->bypassFilters = true;
         
-        $result = $_record->toArray();
+        Tinebase_Model_Container::resolveContainerOfRecord($_record);
         
-        if ($_record->has('container_id') && ! empty($_record->container_id)) {
-            $container = Tinebase_Container::getInstance()->getContainerById($_record->container_id);
-        
-            $result['container_id'] = $container->toArray();
-            $result['container_id']['account_grants'] = Tinebase_Container::getInstance()->getGrantsOfAccount(Tinebase_Core::getUser(), $_record->container_id)->toArray();
-            $result['container_id']['path'] = $container->getPath();
-        }
-        
-        return $result;
+        return $_record->toArray();
     }
-
+    
     /**
      * converts Tinebase_Record_RecordSet to external format
      * 
@@ -69,14 +61,14 @@ class Tinebase_Convert_Json implements Tinebase_Convert_Interface
         if (count($_records) == 0) {
             return array();
         }
-        
+
         Tinebase_Frontend_Json_Abstract::resolveContainerTagsUsers($_records, $_resolveUserFields);
-        
+
         $_records->setTimezone(Tinebase_Core::get(Tinebase_Core::USERTIMEZONE));
         $_records->convertDates = true;
-        
+
         $result = $_records->toArray();
-        
+
         return $result;
     }
 }

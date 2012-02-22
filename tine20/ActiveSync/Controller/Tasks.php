@@ -26,7 +26,7 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
      * @var array
      */
     protected $_filterArray = array(
-        ActiveSync_Command_Sync::FILTER_INCOMPLETE
+        Syncope_Command_Sync::FILTER_INCOMPLETE
     );
     
     protected $_mapping = array(
@@ -80,7 +80,7 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_defaultFolderType   = ActiveSync_Command_FolderSync::FOLDERTYPE_TASK;
+    protected $_defaultFolderType   = Syncope_Command_FolderSync::FOLDERTYPE_TASK;
     
     /**
      * default container for new entries
@@ -94,7 +94,7 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_folderType          = ActiveSync_Command_FolderSync::FOLDERTYPE_TASK_USER_CREATED;
+    protected $_folderType          = Syncope_Command_FolderSync::FOLDERTYPE_TASK_USER_CREATED;
     
     /**
      * name of property which defines the filterid for different content classes
@@ -106,17 +106,24 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
     /**
      * append task data to xml element
      *
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
      * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
+    public function appendXML(DOMElement $_domParrent, $_collectionData, $_serverId)
     {
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE))
+            Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " task data " . print_r($data->toArray(), true));
+        
+        $_domParrent->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Tasks', 'uri:Tasks');
+        
         foreach ($this->_mapping as $key => $value) {
-            if (!empty($data->$value)) {
+            if(!empty($data->$value) || $data->$value == '0') {
+                $nodeContent = null;
+                
                 switch($value) {
                     case 'completed':
                         continue 2;
@@ -124,32 +131,43 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
                         
                     case 'due':
                         if($data->$value instanceof DateTime) {
-                            $_xmlNode->appendChild(new DOMElement($key, $data->$value->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
+                            $_domParrent->appendChild(new DOMElement($key, $data->$value->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
                             $data->$value->setTimezone(Tinebase_Core::get('userTimeZone'));
-                            $_xmlNode->appendChild(new DOMElement('DueDate', $data->$value->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
+                            $_domParrent->appendChild(new DOMElement('DueDate', $data->$value->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
                         }
                         break;
                         
                     case 'priority':
-                        $priority = ($data->$value <= 2) ? $data->$value : 2;
-                        $_xmlNode->appendChild(new DOMElement($key, $priority, 'uri:Tasks'));
+                        $nodeContent = ($data->$value <= 2) ? $data->$value : 2;
                         break;
                         
                     default:
-                        $node = new DOMElement($key, null, 'uri:Tasks');
-                        
-                        $_xmlNode->appendChild($node);
-                        
-                        $node->appendChild(new DOMText($data->$value));
+                        $nodeContent = $data->$value;
                         
                         break;
                 }
+                
+                // skip empty elements
+                if($nodeContent === null || $nodeContent == '') {
+                    //Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " Value for $key is empty. Skip element.");
+                    continue;
+                }
+                
+                // strip off any non printable control characters
+                if (!ctype_print($nodeContent)) {
+                    $nodeContent = $this->removeControlChars($nodeContent);
+                }
+                
+                $node = $_domParrent->ownerDocument->createElementNS('uri:Tasks', $key);
+                $node->appendChild($_domParrent->ownerDocument->createTextNode($nodeContent));
+                
+                $_domParrent->appendChild($node);
             }
-        }   
+        }
 
         // body aka description
         if (!empty($data->description) && version_compare($this->_device->acsversion, '12.0', '>=')) {
-            $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+            $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
             
             $body->appendChild(new DOMElement('Type', 1, 'uri:AirSyncBase'));
             
@@ -159,14 +177,14 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
         
         // Completed is required
         if ($data->completed instanceof DateTime) {
-            $_xmlNode->appendChild(new DOMElement('Complete', 1, 'uri:Tasks'));
-            $_xmlNode->appendChild(new DOMElement('DateCompleted', $data->completed->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
+            $_domParrent->appendChild(new DOMElement('Complete', 1, 'uri:Tasks'));
+            $_domParrent->appendChild(new DOMElement('DateCompleted', $data->completed->toString('Y-m-d\TH:i:s') . '.000Z', 'uri:Tasks'));
         } else {
-            $_xmlNode->appendChild(new DOMElement('Complete', 0, 'uri:Tasks'));
+            $_domParrent->appendChild(new DOMElement('Complete', 0, 'uri:Tasks'));
         }
         
         if (isset($data->tags) && count($data->tags) > 0) {
-            $categories = $_xmlNode->appendChild(new DOMElement('Categories', null, 'uri:Tasks'));
+            $categories = $_domParrent->appendChild(new DOMElement('Categories', null, 'uri:Tasks'));
             foreach ($data->tags as $tag) {
                 $categories->appendChild(new DOMElement('Category', $tag, 'uri:Tasks'));
             }
@@ -273,15 +291,26 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
     /**
      * return contentfilter array
      * 
-     * @param $_filterType
+     * @param  int $_filterType
      * @return Tinebase_Model_Filter_FilterGroup
      */
-    protected function _getContentFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_filterType)
+    protected function _getContentFilter($_filterType)
     {
+        $filter = parent::_getContentFilter($_filterType);
+        
+        // no persistent filter set -> add default filter
+        if (! $filter ->getId()) {
+            $defaultFilter = $filter->createFilter('container_id', 'equals', array(
+                'path' => '/personal/' . Tinebase_Core::getUser()->getId()
+            ));
+            
+            $filter->addFilter($defaultFilter);
+        }
+        
         if(in_array($_filterType, $this->_filterArray)) {
             switch($_filterType) {
-                case ActiveSync_Command_Sync::FILTER_INCOMPLETE:
-                    $_filter->removeFilter('status_id');
+                case Syncope_Command_Sync::FILTER_INCOMPLETE:
+                    $filter->removeFilter('status_id');
                     
                     $status = Tasks_Config::getInstance()->get(Tasks_Config::TASK_STATUS)
                         ->records
@@ -289,7 +318,7 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
 
                     if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter by status ids " . print_r($status->getArrayOfIds(), true));
                     
-                    $_filter->addFilter(new Tinebase_Model_Filter_Int(
+                    $filter->addFilter(new Tinebase_Model_Filter_Int(
                         'status_id', 
                         'in', 
                         $status->getArrayOfIds()
@@ -298,5 +327,7 @@ class ActiveSync_Controller_Tasks extends ActiveSync_Controller_Abstract
                     break;
             }
         }
+        
+        return $filter;
     }
 }

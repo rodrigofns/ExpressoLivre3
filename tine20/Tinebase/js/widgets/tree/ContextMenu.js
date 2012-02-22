@@ -330,6 +330,9 @@ Tine.widgets.tree.ContextMenu = {
         if (this.scope.ctxNode) {
             var node = this.scope.ctxNode;
             
+            Tine.log.debug('Tine.widgets.tree.ContextMenu::deleteNode()');
+            Tine.log.debug(node);
+            
             Ext.MessageBox.confirm(_('Confirm'), String.format(_('Do you really want to delete the {0} "{1}"?'), this.nodeName, node.text), function(_btn){
                 if ( _btn == 'yes') {
                     
@@ -433,9 +436,8 @@ Tine.widgets.tree.ContextMenu = {
     managePermissions: function() {
 
         if (this.scope.ctxNode) {
-            var node = this.scope.ctxNode;
-                        
-            var grantsContainer;
+            var node = this.scope.ctxNode,
+                grantsContainer;
             if(node.attributes.container) {
                 grantsContainer = node.attributes.container;
             }
@@ -468,8 +470,6 @@ Tine.widgets.tree.ContextMenu = {
             else if(node.attributes.nodeRecord && node.attributes.nodeRecord.data.name) {
                 grantsContainer = node.attributes.nodeRecord.data.name;
             }
-            
-            console.log(grantsContainer);
             
             var window = Tine.widgets.container.PropertiesDialog.openWindow({
                 title: String.format(_('Properties for {0} "{1}"'), this.nodeName, Ext.util.Format.htmlEncode(grantsContainer.name)),

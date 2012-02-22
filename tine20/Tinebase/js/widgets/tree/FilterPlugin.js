@@ -95,12 +95,15 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
         sm.clearSelections(true);
         
         // use first OR panel in case of filterPanel
-        if (filters[0].condition == 'OR') {
-            filters = filters[0].filters[0].filters;
-        }
+        Ext.each(filters, function(filterData) {
+            if (filterData.condition && filterData.condition == 'OR') {
+                filters = filterData.filters[0].filters;
+                return false;
+            }
+        }, this);
         
         Ext.each(filters, function(filter) {
-            if (filter.field !== this.field) {
+            if (filter.field !== this.field || Ext.isEmpty(filter.value)) {
                 return;
             }
             
@@ -116,7 +119,11 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
      */
     selectValue: function(value) {
         var values = Ext.isArray(value) ? value : [value];
-        Ext.each(values, function(value) {
+        Ext.each(values, function(value, idx) {
+            if (Ext.isString(value) && ! value.path) {
+                value = values[idx] = {path: value};
+            }
+            
             var treePath = this.treePanel.getTreePath(value.path);
             this.selectPath.call(this.treePanel, treePath, null, function() {
                 // mark this expansion as done and check if all are done
@@ -129,7 +136,7 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
                 if (allValuesExpanded) {
                     this.treePanel.getSelectionModel().resumeEvents();
                 }
-            }.createDelegate(this), true)
+            }.createDelegate(this), true);
         }, this);
     },
     

@@ -4,7 +4,7 @@
  *
  * @package     Addressbook
  * @license     http://www.gnu.org/licenses/agpl.html
- * @copyright   Copyright (c) 2008-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2008-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  *
  * @todo        add testSetImage (NOTE: we can't test the upload yet, so we needd to simulate the upload)
@@ -68,9 +68,9 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-		$suite  = new PHPUnit_Framework_TestSuite('Tine 2.0 Addressbook Json Tests');
+        $suite  = new PHPUnit_Framework_TestSuite('Tine 2.0 Addressbook Json Tests');
         PHPUnit_TextUI_TestRunner::run($suite);
-	}
+    }
 
     /**
      * Sets up the fixture.
@@ -80,6 +80,9 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        // always resolve customfields
+        Addressbook_Controller_Contact::getInstance()->resolveCustomfields(TRUE);
+        
         $this->_instance = new Addressbook_Frontend_Json();
         
         $personalContainer = Tinebase_Container::getInstance()->getPersonalContainer(
@@ -112,17 +115,17 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-	    $this->_instance->deleteContacts($this->_contactIdsToDelete);
+        $this->_instance->deleteContacts($this->_contactIdsToDelete);
 
-	    foreach($this->_customfieldIdsToDelete as $cfd) {
+        foreach($this->_customfieldIdsToDelete as $cfd) {
             Tinebase_CustomField::getInstance()->deleteCustomField($cfd);
-	    }
-	    
-	    if ($this->_makeSCleverVisibleAgain) {
-    	    $sclever = Tinebase_User::getInstance()->getFullUserByLoginName('sclever');
-    	    $sclever->visibility = Tinebase_Model_User::VISIBILITY_DISPLAYED;
-    	    Tinebase_User::getInstance()->updateUser($sclever);
-	    }
+        }
+        
+        if ($this->_makeSCleverVisibleAgain) {
+            $sclever = Tinebase_User::getInstance()->getFullUserByLoginName('sclever');
+            $sclever->visibility = Tinebase_Model_User::VISIBILITY_DISPLAYED;
+            Tinebase_User::getInstance()->updateUser($sclever);
+        }
     }
 
     /**
@@ -219,11 +222,15 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
      *
      * @param string $_orgName
      * @param boolean $_forceCreation
+     * @param array $_tags
      * @return array contact data
      */
-    protected function _addContact($_orgName = NULL, $_forceCreation = FALSE)
+    protected function _addContact($_orgName = NULL, $_forceCreation = FALSE, $_tags = NULL)
     {
         $newContactData = $this->_getContactData($_orgName);
+        if ($_tags !== NULL) {
+            $newContactData['tags'] = $_tags;
+        }
         $newContact = $this->_instance->saveContact($newContactData, $_forceCreation);
         $this->assertEquals($newContactData['n_family'], $newContact['n_family'], 'Adding contact failed');
 
@@ -293,6 +300,7 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $record = array_pop($searchResult['results']);
 
         // check if customfieldvalue was updated properly
+        $this->assertTrue(isset($record['customfields']), 'No customfields in record');
         $this->assertEquals($record['customfields'][$createdCustomField->name],'PHPUNIT_multipleUpdate','Customfield was not updated as expected');
 
         // check if other default field value was updated properly
@@ -499,8 +507,8 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
 
         if (Tinebase_Config::getInstance()->getConfig(Tinebase_Config::MAPPANEL, NULL, TRUE)->value) {
             // check geo data
-            $this->assertEquals('9.99489818142748', $updatedContact['adr_one_lon'], 'wrong geodata (lon)');
-            $this->assertEquals('53.5444309689663', $updatedContact['adr_one_lat'], 'wrong geodata (lat)');
+            $this->assertEquals('9.99489300545466', $updatedContact['adr_one_lon'], 'wrong geodata (lon)');
+            $this->assertEquals('53.5444258235736', $updatedContact['adr_one_lat'], 'wrong geodata (lat)');
 
             // try another address
             $updatedContact['adr_one_locality']    = 'Wien';
@@ -633,7 +641,7 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $fritz = $result['results'][1];
 
         $clientRecords = array(array(
-        	'recordData'        => $fritz,
+            'recordData'        => $fritz,
             'resolveStrategy'   => 'discard',
             'index'             => 1,
         ));
@@ -651,7 +659,7 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $result = $this->_importHelper(array('dryrun' => 0));
         $fritz = $result['results'][1];
         $fritz['tags'][] = array(
-            'name'		=> 'new import tag'
+            'name'        => 'new import tag'
         );
 
         $clientRecords = array(array(
@@ -700,30 +708,30 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
     {
         $definition = Tinebase_ImportExportDefinition::getInstance()->getByName('adb_tine_import_csv');
         $definitionOptions = Tinebase_ImportExportDefinition::getOptionsAsZendConfigXml($definition);
-
+        
         $options = array(
-        	'dryrun'     => 0,
-        	'autotags'   => array(array(
-    	        'name'	        => 'Importliste (19.10.2011)',
-    	        'description'	=> 'Kontakte der Importliste vom 19.10.2011 um 20.00 Uhr. Bearbeiter: UNITTEST',
-    	        'contexts'		=> array('Addressbook' => ''),
-    	        'type'			=> Tinebase_Model_Tag::TYPE_SHARED,
-    	    )),
+            'dryrun'     => 0,
+            'autotags'   => array(array(
+                'name'            => 'Importliste (19.10.2011)',
+                'description'    => 'Kontakte der Importliste vom 19.10.2011 um 20.00 Uhr. Bearbeiter: UNITTEST',
+                'contexts'        => array('Addressbook' => ''),
+                'type'            => Tinebase_Model_Tag::TYPE_SHARED,
+            )),
         );
         $result = $this->_importHelper($options);
         $fritz = $result['results'][1];
-
+        
         $this->assertEquals(2, count($result['results']), 'should import 2');
         $this->assertEquals(1, count($result['results'][0]['tags']), 'no tag added');
         $this->assertEquals('Importliste (19.10.2011)', $result['results'][0]['tags'][0]['name']);
-
+        
         $fritz['tags'] = array(array(
-            'name'	=> 'supi',
-            'type'	=> Tinebase_Model_Tag::TYPE_PERSONAL,
+            'name'    => 'supi',
+            'type'    => Tinebase_Model_Tag::TYPE_PERSONAL,
         ));
         $fritz = $this->_instance->saveContact($fritz);
         //print_r($fritz);
-
+        
         // once again for duplicates (check if client record has tag)
         $result = $this->_importHelper($options);
         //print_r($result);
@@ -731,7 +739,7 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($result['exceptions'][0]['exception']['clientRecord']['tags']), 'no tag added');
         $this->assertEquals('Importliste (19.10.2011)', $result['exceptions'][0]['exception']['clientRecord']['tags'][0]['name']);
         $fritzClient = $result['exceptions'][1]['exception']['duplicates'][0];
-
+        
         // emulate client merge behaviour
         $fritzClient['tags'][] = $result['exceptions'][1]['exception']['clientRecord']['tags'][0];
         $fritzClient['adr_one_locality'] = '';
@@ -745,8 +753,6 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result['totalcount'], 'Should merge fritz: ' . print_r($result['exceptions'], TRUE));
         $this->assertEquals(2, count($result['results'][0]['tags']), 'Should merge tags');
         $this->assertEquals(NULL, $result['results'][0]['adr_one_locality'], 'Should remove locality');
-
-        //Tinebase_Tags::getInstance()->deleteTags(array($result['results'][0]['tags'][0]['id']));
     }
 
     /**
@@ -754,6 +760,10 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
      */
     public function testProjectRelationFilter()
     {
+        if (! Setup_Controller::getInstance()->isInstalled('Projects')) {
+            $this->markTestSkipped('Projects not installed.');
+        }
+        
         $contact = $this->_instance->saveContact($this->_getContactData());
         $project = $this->_getProjectData($contact);
 
@@ -1030,7 +1040,36 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($contact['org_name'], $exceptionData['duplicates'][0]['org_name']);
         }
     }
-
+    
+    /**
+    * testDuplicateCheckWithTag
+    */
+    public function testDuplicateCheckWithTag()
+    {
+        $tagName = Tinebase_Record_Abstract::generateUID();
+        $tag = array(
+            'type'          => Tinebase_Model_Tag::TYPE_PERSONAL,
+            'name'          => $tagName,
+            'description'    => 'testModlog',
+            'color'         => '#009B31',
+        );
+        $contact = $this->_addContact(NULL, FALSE, array($tag));
+        
+        unset($contact['id']);
+        // replace tag array with single tag id (like the client does)
+        $contact['tags'] = array($contact['tags'][0]['id']);
+        try {
+            $newContact = $this->_instance->saveContact($contact, TRUE);
+            $this->assertTrue(FALSE, 'duplicate detection failed');
+        } catch (Tinebase_Exception_Duplicate $ted) {
+            $exceptionData = $ted->toArray();
+            $this->assertEquals(1, count($exceptionData['clientRecord']['tags']), print_r($exceptionData['duplicates'], TRUE));
+            $this->assertTrue(is_array($exceptionData['clientRecord']['tags'][0]), 'array of tag data expected: ' . print_r($exceptionData['clientRecord']['tags'], TRUE));
+            $this->assertEquals(1, count($exceptionData['duplicates'][0]['tags']), print_r($exceptionData['duplicates'], TRUE));
+            $this->assertTrue(is_array($exceptionData['duplicates'][0]['tags'][0]));
+        }
+    }
+    
     /**
      * testDuplicateCheckWithEmail
      */
@@ -1129,6 +1168,7 @@ class Addressbook_JsonTest extends PHPUnit_Framework_TestCase
                     'description' => 'testImport',
                     'color' => '#009B31',
         ));
+        sleep(1);
         $tag = Tinebase_Tags::getInstance()->attachTagToMultipleRecords($filter, $tag);
         $filter = array(array(
             'field'    => 'tag',
@@ -1168,7 +1208,7 @@ Fax: +49 (0)40 343244-222";
         $this->assertTrue(is_array($result['contact']));
         $this->assertTrue(array_key_exists('unrecognizedTokens', $result));
         $this->assertTrue(count($result['unrecognizedTokens']) > 10 && count($result['unrecognizedTokens']) < 13,
-        	'unrecognizedTokens number mismatch: ' . count('unrecognizedTokens'));
+            'unrecognizedTokens number mismatch: ' . count('unrecognizedTokens'));
         $this->assertEquals('p.schuele@metaways.de', $result['contact']['email']);
         $this->assertEquals('Pickhuben 2', $result['contact']['adr_one_street']);
         $this->assertEquals('Hamburg', $result['contact']['adr_one_locality']);

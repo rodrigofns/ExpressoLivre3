@@ -19,12 +19,12 @@
  * @subpackage  Controller
  */
  
-abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_Interface
+abstract class ActiveSync_Controller_Abstract implements Syncope_Data_IData
 {
     /**
      * information about the current device
      *
-     * @var ActiveSync_Model_Device
+     * @var Syncope_Model_IDevice
      */
     protected $_device;
     
@@ -125,7 +125,7 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      *
      * @param Tinebase_DateTime $_syncTimeStamp
      */
-    public function __construct(ActiveSync_Model_Device $_device, DateTime $_syncTimeStamp)
+    public function __construct(Syncope_Model_IDevice $_device, DateTime $_syncTimeStamp)
     {
         if(empty($this->_applicationName)) {
             throw new Tinebase_Exception_UnexpectedValue('$this->_applicationName can not be empty');
@@ -162,7 +162,7 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      *
      * @return array
      */
-    public function getSupportedFolders()
+    public function getAllFolders()
     {
         // device supports multiple folders ?
         if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine', 'windowsphone'))) {
@@ -171,20 +171,15 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
             $allowedFolders = $this->_getSyncableFolders();
             
             $wantedFolders = null;
-            // maybe the user has defined a filter to limit the search results
-            try {
-                if(!empty($this->_device->contactsfilter_id)) {
-                    $persistentFilter = Tinebase_PersistentFilter::getFilterById($this->_device->contactsfilter_id);
-                    
-                    foreach($persistentFilter as $filter) {
-                        if($filter instanceof Tinebase_Model_Filter_Container) {
-                            $wantedFolders = array_flip($filter->getContainerIds());
-                        }
-                    }
-                }
-            } catch (Tinebase_Exception_NotFound $tenf) {
-               // filter got deleted already
+            
+            // check if contentfilter has a container limitation
+            // @TODO discuss if we query distinct containers of contentfilters?
+            $filter = $this->_getContentFilter(0);
+            $containerFilter = $filter->getFilter('container_id');
+            if ($containerFilter && $containerFilter instanceof Tinebase_Model_Filter_Container) {
+                $wantedFolders = array_flip($containerFilter->getContainerIds());
             }
+            
             $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
         } else {
             
@@ -224,15 +219,11 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
         return $records;
     }
     
-    /**
-     * (non-PHPdoc)
-     * @see ActiveSync/Controller/ActiveSync_Controller_Interface#moveItem()
-     */
-    public function moveItem($_srcFolder, $_srcItem, $_dstFolder)
+    public function moveItem($_srcFolderId, $_serverId, $_dstFolderId)
     {
-        $item = $this->_contentController->get($_srcItem);
+        $item = $this->_contentController->get($_serverId);
         
-        $item->container_id = $_dstFolder;
+        $item->container_id = $_dstFolderId;
         
         $item = $this->_contentController->update($item);
         
@@ -288,12 +279,13 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param SimpleXMLElement $_data
      * @return Tinebase_Record_Abstract
      */
-    public function add($_folderId, SimpleXMLElement $_data)
+    public function createEntry($_folderId, SimpleXMLElement $_entry)
     {
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " add entry");
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " create entry");
         
-        $entry = $this->toTineModel($_data);
-        $entry->creation_time = $this->_syncTimeStamp;
+        $entry = $this->toTineModel($_entry);
+        $entry->creation_time = new Tinebase_DateTime($this->_syncTimeStamp);
         $entry->created_by = Tinebase_Core::getUser()->getId();
         
         // container_id gets set to personal folder in application specific controller if missing
@@ -311,7 +303,7 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " added entry id " . $entry->getId());
 
-        return $entry;
+        return $entry->getId();
     }
         
     /**
@@ -322,20 +314,19 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param SimpleXMLElement $_data
      * @return Tinebase_Record_Abstract
      */
-    public function change($_folderId, $_id, SimpleXMLElement $_data)
+    public function updateEntry($_folderId, $_serverId, SimpleXMLElement $_entry)
     {
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId Id: $_id");
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " update CollectionId: $_folderId Id: $_serverId");
         
-        $oldEntry = $this->_contentController->get($_id); 
+        $oldEntry = $this->_contentController->get($_serverId); 
         
-        $entry = $this->toTineModel($_data, $oldEntry);
-        $entry->last_modified_time = $this->_syncTimeStamp;
+        $entry = $this->toTineModel($_entry, $oldEntry);
+        $entry->last_modified_time = new Tinebase_DateTime($this->_syncTimeStamp);
         
         $entry = $this->_contentController->update($entry);
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " updated entry id " . $entry->getId());
 
-        return $entry;
+        return $entry->getId();
     }
         
     /**
@@ -345,13 +336,12 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param  string  $_id
      * @param  array   $_options
      */
-    public function delete($_folderId, $_id, $_options)
+    public function deleteEntry($_folderId, $_serverId, $_collectionData)
     {
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " ColectionId: $_folderId Id: $_id");
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " delete ColectionId: $_folderId Id: $_serverId");
         
-        $this->_contentController->delete($_id);
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " deleted entry id " . $_id);
+        $this->_contentController->delete($_serverId);
     }
     
     /**
@@ -361,21 +351,21 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param SimpleXMLElement  $_data
      * @return Tinebase_Record_Abstract
      */
-    public function search($_folderId, SimpleXMLElement $_data)
-    {
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId");
-        
-        $filterArray  = $this->_toTineFilterArray($_data);
-        $filter       = new $this->_contentFilterClass($filterArray);
-        
-        $this->_getContainerFilter($filter, $_folderId);
-        
-        $foundEmtries = $this->_contentController->search($filter);
-
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " found " . count($foundEmtries));
-            
-        return $foundEmtries;
-    }
+    #public function search($_folderId, SimpleXMLElement $_data)
+    #{
+    #    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId");
+    #    
+    #    $filterArray  = $this->_toTineFilterArray($_data);
+    #    $filter       = new $this->_contentFilterClass($filterArray);
+    #    
+    #    $this->_addContainerFilter($filter, $_folderId);
+    #    
+    #    $foundEmtries = $this->_contentController->search($filter);
+    #
+    #    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " found " . count($foundEmtries));
+    #        
+    #    return $foundEmtries;
+    #}
     
     /**
      * used by the mail backend only. Used to update the folder cache
@@ -388,12 +378,12 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     }
     
     /**
-     * add container filter to filter group
+     * add container acl filter to filter group
      * 
      * @param Tinebase_Model_Filter_FilterGroup $_filter
-     * @param string $_containerId
+     * @param string                            $_containerId
      */
-    protected function _getContainerFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_containerId)
+    protected function _addContainerFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_containerId)
     {
         $syncableContainers = $this->_getSyncableFolders();
         
@@ -439,25 +429,13 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param unknown_type $_endTimeStamp
      * @return array
      */
-    public function getChanged($_folderId, $_startTimeStamp, $_endTimeStamp = NULL)
+    public function getChangedEntries($_folderId, DateTime $_startTimeStamp, DateTime $_endTimeStamp = NULL)
     {
-        $filter = new $this->_contentFilterClass();
-        
-        try {
-            $persistentFilterId = $this->_device->{$this->_filterProperty} ? 
-                $this->_device->{$this->_filterProperty} : 
-                Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter;
-                
-            $filter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
-        } catch (Tinebase_Exception_NotFound $tenf) {
-            // filter got deleted already
-        }
-        
-        $this->_getContentFilter($filter, 0);
-        $this->_getContainerFilter($filter, $_folderId);
+        $filter = $this->_getContentFilter(0);
+        $this->_addContainerFilter($filter, $_folderId);
 
-        $startTimeStamp = ($_startTimeStamp instanceof DateTime) ? $_startTimeStamp->get(Tinebase_Record_Abstract::ISO8601LONG) : $_startTimeStamp;
-        $endTimeStamp = ($_endTimeStamp instanceof DateTime) ? $_endTimeStamp->get(Tinebase_Record_Abstract::ISO8601LONG) : $_endTimeStamp;
+        $startTimeStamp = ($_startTimeStamp instanceof DateTime) ? $_startTimeStamp->format(Tinebase_Record_Abstract::ISO8601LONG) : $_startTimeStamp;
+        $endTimeStamp = ($_endTimeStamp instanceof DateTime) ? $_endTimeStamp->format(Tinebase_Record_Abstract::ISO8601LONG) : $_endTimeStamp;
         
         $filter->addFilter(new Tinebase_Model_Filter_DateTime(
             'last_modified_time',
@@ -487,42 +465,8 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      */
     public function getServerEntries($_folderId, $_filterType)
     {
-        $filter = new $this->_contentFilterClass();
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
-                
-        // apply the default search filter only to devices which do not support multiple folders
-        if($this->_specialFolderName == $_folderId) {
-            $persistentFilterId = $this->_device->{$this->_filterProperty} ?
-                $this->_device->{$this->_filterProperty} :
-                Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter;
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
-                    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " defaultpersistentfilter: " . Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter);
-        } else {
-            $persistentFilterId = $this->_device->{$this->_filterProperty} ?
-                $this->_device->{$this->_filterProperty} :
-                null;
-        }
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter id: " . $persistentFilterId);
-
-        if (!empty($persistentFilterId)) {
-            try {
-                $persistentFilter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
-                // @todo is this if statement really needed? either the filter got found or a Tinebase_Exception_NotFound got thrown
-                if ($persistentFilter) {
-                    $filter = $persistentFilter;
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter class: " . get_class($filter));
-                }
-            } catch (Tinebase_Exception_NotFound $tenf) {
-                // filter got deleted already
-            }
-        }
-        
-        $this->_getContentFilter($filter, $_filterType);
-        $this->_getContainerFilter($filter, $_folderId);
+        $filter = $this->_getContentFilter($_filterType);
+        $this->_addContainerFilter($filter, $_folderId);
         
         if(!empty($this->_sortField)) {
             $pagination = new Tinebase_Model_Pagination(array(
@@ -537,16 +481,44 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
         
         return $result;
     }
-
-    /**
-     * return contentfilter array
-     * 
-     * @param int $_filterType
-     * @return array
-     */
-    protected function _getContentFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_filterType)
+    
+    public function hasChanges(Syncope_Backend_IContent $contentBackend, Syncope_Model_IFolder $folder, Syncope_Model_ISyncState $syncState)
     {
-        return array();
+        $filterType = $folder->lastfiltertype;
+        
+        $this->updateCache($folder->folderid);
+        
+        $allClientEntries   = $contentBackend->getFolderState($this->_device, $folder);
+        $allServerEntries   = $this->getServerEntries($folder->folderid, $filterType);
+        
+        $addedEntries       = array_diff($allServerEntries, $allClientEntries);
+        $deletedEntries     = array_diff($allClientEntries, $allServerEntries);
+        $changedEntries     = $this->getChangedEntries($folder->folderid, $syncState->lastsync);
+
+        return !!(count($addedEntries) + count($deletedEntries) + count($changedEntries));
+    }
+    
+    
+    /**
+     * return (outer) contentfilter array
+     * 
+     * @param  int $_filterType
+     * @return Tinebase_Model_Filter_FilterGroup
+     */
+    protected function _getContentFilter($_filterType)
+    {
+        $filter = new $this->_contentFilterClass();
+        
+        try {
+            $persistentFilterId = $this->_device->{$this->_filterProperty};
+            if ($persistentFilterId) {
+                $filter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
+            }
+        } catch (Tinebase_Exception_NotFound $tenf) {
+            // filter got deleted already
+        }
+        
+        return $filter;
     }
     
     /**
@@ -573,7 +545,7 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
      * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    abstract public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false);
+    #abstract public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false);
     
     /**
      * removed control chars from string which are not allowd in ActiveSync

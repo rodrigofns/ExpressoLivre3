@@ -356,6 +356,16 @@ Ext.extend(Tine.widgets.container.TreePanel, Ext.tree.TreePanel, {
     afterRender: function() {
         Tine.widgets.container.TreePanel.superclass.afterRender.call(this);
         
+        var defaultContainerPath = this.getDefaultContainerPath();
+        
+        if (defaultContainerPath && defaultContainerPath != '/') {
+            var root = '/' + this.getRootNode().id;
+            
+            this.expand();
+            // @TODO use getTreePath() when filemanager is fixed
+            this.selectPath.defer(100, this, [root + defaultContainerPath]);
+        }
+        
         if (this.filterMode == 'filterToolbar' && this.filterPlugin) {
             this.filterPlugin.getGridPanel().filterToolbar.on('change', this.onFilterChange, this);
         }
@@ -413,6 +423,15 @@ Ext.extend(Tine.widgets.container.TreePanel, Ext.tree.TreePanel, {
      * @param {} e
      */
     onClick: function(node, e) {
+        var sm = this.getSelectionModel(),
+            selectedNode = sm.getSelectedNode();
+    
+        // NOTE: in single select mode, a node click on a selected node does not trigger 
+        //       a selection change. We need to do this by hand here
+        if (! this.allowMultiSelection && node == selectedNode) {
+            this.onSelectionChange(sm, node);
+        }
+        
         node.expand();
     },
     
@@ -562,11 +581,14 @@ Ext.extend(Tine.widgets.container.TreePanel, Ext.tree.TreePanel, {
      * clears selection silently
      */
     onFilterChange: function() {
+        /* 2012-01-30 cweiss: i have no idea what this was for.
+         * if its needed please document here!
         var sm = this.getSelectionModel();
         
         sm.suspendEvents();
         sm.clearSelections();
         sm.resumeEvents();
+        */
     },
     
     /**

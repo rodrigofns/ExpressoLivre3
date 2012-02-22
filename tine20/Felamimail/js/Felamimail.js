@@ -168,7 +168,8 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
                 }
             }
             
-            Tine.log.debug('updating message cache for folder "' + folder.get('localname') + '" with ' + executionTime + ' seconds max execution time');
+            Tine.log.debug('Updating message cache for folder "' + folder.get('localname') + '" of account ' + folder.get('account_id'));
+            Tine.log.debug('Max execution time: ' + executionTime + ' seconds');
             
             this.updateMessageCacheTransactionExpectedResponse = new Date().add(Date.SECOND, executionTime);
             folder.set('cache_status', 'pending');
@@ -378,9 +379,11 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
      */
     onGetFolderStatusSuccess: function(response) {
         this.getFolderStatusTransactionInProgress = false;
+        Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> Folder status update successful.');
+        Tine.log.debug(response);
         
         if (response && response.length > 0) {
-            Tine.log.debug('Got ' + response.length + ' folders that need an update.');
+            Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> Got ' + response.length + ' folders that need an update.');
             
             Ext.each(response, function(folder) {
                 var folderToUpdate = this.folderStore.getById(folder.id);
@@ -389,7 +392,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             
             this.checkMailsDelayedTask.delay(1000);
         } else {
-            Tine.log.debug('No folders for update found.');
+            Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> No folders for update found.');
         }
     },
     
@@ -551,7 +554,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.log.info('Folder "' + record.get('localname') + '" updated with quota values: ' 
                 + record.get('quota_usage') + ' / ' + record.get('quota_limit'));
 
-            this.getMainScreen().getCenterPanel().updateQuotaBar(null, record);
+            this.getMainScreen().getCenterPanel().updateQuotaBar(record);
         }
     },
     
@@ -729,7 +732,7 @@ Tine.Felamimail.getSignature = function(id) {
     var defaultAccount = app.getAccountStore().getById(id);
     var signature = (defaultAccount) ? defaultAccount.get('signature') : '';
     if (signature && signature != '') {
-        signature = Ext.util.Format.nl2br(signature);
+        // NOTE: signature is always in html, nl2br here would cause duplicate linebreaks!
         result = '<br><br><span id="felamimail-body-signature">--<br>' + signature + '</span>';
     }
     

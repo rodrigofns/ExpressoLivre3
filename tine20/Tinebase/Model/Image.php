@@ -48,7 +48,7 @@ class Tinebase_Model_Image extends Tinebase_Record_Abstract
         'height'      => array('allowEmpty' => true, 'Int' ),
         'bits'        => array('allowEmpty' => true, 'Int' ),
         'channels'    => array('allowEmpty' => true, 'Int' ),
-        'mime'        => array('allowEmpty' => true, 'InArray' => array('image/png', 'image/jpeg', 'image/gif')),
+        'mime'        => array('allowEmpty' => true, array('InArray', array('image/png', 'image/jpeg', 'image/gif'))),
     
         // binary data
         'blob'        => array('allowEmpty' => true)
@@ -110,6 +110,19 @@ class Tinebase_Model_Image extends Tinebase_Record_Abstract
         } else {
             throw new Tinebase_Exception_InvalidArgument("$_imageURL is not a valid imageURL");
         }
+    }
+    
+    /**
+     * returns an image url
+     * @param string     $appName    the name of the application
+     * @param string     $id         the identifier
+     * @param string     $location   location
+     * @param integer    $width      width
+     * @param integer    $height     height
+     * @param integer    $ratiomode  ratiomode
+     */
+    public static function getImageUrl($appName, $id, $location = '', $width = 90, $height = 90, $ratiomode = 0) {
+        return 'index.php?method=Tinebase.getImage&application=' . $appName . '&location=' . $location . '&id=' . $id . '&width=' . $width . '&height=' . $height . '&ratiomode='.$ratiomode;
     }
     
     /**

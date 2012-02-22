@@ -38,9 +38,9 @@ class Addressbook_Controller_Contact extends Tinebase_Controller_Record_Abstract
         $this->_purgeRecords = FALSE;
         $this->_resolveCustomFields = TRUE;
         $this->_duplicateCheckFields = Addressbook_Config::getInstance()->get(Addressbook_Config::CONTACT_DUP_FIELDS, array(
-                array('n_given', 'n_family', 'org_name'),
-                array('email'),
-            ));
+            array('n_given', 'n_family', 'org_name'),
+            array('email'),
+        ));
         
         // fields used for private and company address
         $this->_addressFields = array('locality', 'postalcode', 'street', 'countryname');
@@ -98,26 +98,10 @@ class Addressbook_Controller_Contact extends Tinebase_Controller_Record_Abstract
      * returns the default addressbook
      * 
      * @return Tinebase_Model_Container
-     * 
-     * @todo replace this with Tinebase_Container::getInstance()->getDefaultContainer
      */
     public function getDefaultAddressbook()
     {
-        $defaultAddressbookId = Tinebase_Core::getPreference($this->_applicationName)->getValue(Addressbook_Preference::DEFAULTADDRESSBOOK);
-        try {
-            $defaultAddressbook = Tinebase_Container::getInstance()->getContainerById($defaultAddressbookId);
-        } catch (Tinebase_Exception $te) {
-            Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Create new default addressbook. (' . $te->getMessage() . ')');
-            
-            // default may be gone -> remove default adb pref
-            Tinebase_Core::getPreference($this->_applicationName)->deleteUserPref(Addressbook_Preference::DEFAULTADDRESSBOOK);
-            
-            // generate a new one
-            $defaultAddressbookId = Tinebase_Core::getPreference($this->_applicationName)->getValue(Addressbook_Preference::DEFAULTADDRESSBOOK);
-            $defaultAddressbook = Tinebase_Container::getInstance()->getContainerById($defaultAddressbookId);
-        }
-        
-        return $defaultAddressbook;
+        return Tinebase_Container::getInstance()->getDefaultContainer($this->_applicationName, NULL, Addressbook_Preference::DEFAULTADDRESSBOOK);
     }
     
     /**
@@ -167,14 +151,15 @@ class Addressbook_Controller_Contact extends Tinebase_Controller_Record_Abstract
     }
 
     /**
-     * can be called to activate/deactivate if geodata should be set for contacts (ignoring the config setting)
-     * 
-     * @param boolean $_value
-     * @return void
-     */
-    public function setGeoDataForContacts($_value)
+    * can be called to activate/deactivate if geodata should be set for contacts (ignoring the config setting)
+    *
+    * @param  boolean optional
+    * @return boolean
+    */
+    public function setGeoDataForContacts()
     {
-        $this->_setGeoDataForContacts = (boolean) $_value;
+        $value = (func_num_args() === 1) ? (bool) func_get_arg(0) : NULL;
+        return $this->_setBooleanMemberVar('_setGeoDataForContacts', $value);
     }
     
     /**
@@ -191,6 +176,50 @@ class Addressbook_Controller_Contact extends Tinebase_Controller_Record_Abstract
         $userProfile = Tinebase_UserProfile::getInstance()->doProfileCleanup($contact);
         
         return $userProfile;
+    }
+
+
+    /**
+     * update multiple records in an iteration
+     * @see Tinebase_Record_Iterator / self::updateMultiple()
+     *
+     * @param Tinebase_Record_RecordSet $_records
+     * @param array $_data
+     *
+	 *	Overwrites Tinebase_Controller_Record_Abstract::processUpdateMultipleIteration: jpegphoto is set to null, so no deletion of photos on multipleUpdate happens
+	 *	@TODO: Can be removed when "0000284: modlog of contact images / move images to vfs" is resolved. 
+     * 
+     */
+    public function processUpdateMultipleIteration($_records, $_data)
+    {
+        if (count($_records) === 0) {
+            return;
+        }
+
+        foreach ($_records as $currentRecord) {
+            $oldRecordArray = $currentRecord->toArray();
+            $data = array_merge($oldRecordArray, $_data);
+
+            try {
+                $record = new $this->_modelName($data);
+                $record->__set('jpegphoto', NULL);
+                $updatedRecord = $this->update($record, FALSE);
+
+                $this->_updateMultipleResult['results']->addRecord($updatedRecord);
+                $this->_updateMultipleResult['totalcount'] ++;
+
+            } catch (Tinebase_Exception_Record_Validation $e) {
+
+                $this->_updateMultipleResult['exceptions']->addRecord(new Tinebase_Model_UpdateMultipleException(array(
+                    'id'         => $currentRecord->getId(),
+                    'exception'  => $e,
+                        'record'     => $currentRecord,
+                        'code'       => $e->getCode(),
+                        'message'    => $e->getMessage()
+                )));
+                $this->_updateMultipleResult['failcount'] ++;
+            }
+        }
     }
     
     /**

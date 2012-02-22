@@ -64,12 +64,25 @@ Tine.Addressbook.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPicke
     initComponent: function(){
         this.recordClass = Tine.Addressbook.Model.Contact;
         this.recordProxy = Tine.Addressbook.contactBackend;
-        
+
         this.initTemplate();
-        
         Tine.Addressbook.SearchCombo.superclass.initComponent.call(this);
     },
     
+    /**
+     * is called in accountMode to reset the value
+     * @param value
+     */
+    processValue: function(value) {
+        if (this.useAccountRecord) {
+            if(value == '') {
+                this.accountId = null;
+                this.selectedRecord = null;
+            }
+        }
+        return Tine.Addressbook.SearchCombo.superclass.processValue.call(this, value);        
+    },
+
     /**
      * use beforequery to set query filter
      * 
@@ -139,6 +152,7 @@ Tine.Addressbook.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPicke
     },
 
     setValue: function (value) {
+
         if (this.useAccountRecord) {
             if (value) {
                 if(value.accountId) {
@@ -152,10 +166,13 @@ Tine.Addressbook.SearchCombo = Ext.extend(Tine.Tinebase.widgets.form.RecordPicke
                 }
             } else {
                 this.accountId = null;
+                this.selectedRecord = null;
+                
             }
         }
-        
         return Tine.Addressbook.SearchCombo.superclass.setValue.call(this, value);
     }
 
 });
+
+Tine.widgets.form.RecordPickerManager.register('Addressbook', 'Contact', Tine.Addressbook.SearchCombo);

@@ -39,7 +39,10 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
-
+        
+        Syncope_Registry::setDatabase(Tinebase_Core::getDb());
+        Syncope_Registry::setTransactionManager(Tinebase_TransactionManager::getInstance());
+        
         $testDevice = ActiveSync_Backend_DeviceTests::getTestDevice();
         
         $this->objects['device'] = ActiveSync_Controller_Device::getInstance()->create($testDevice);
@@ -67,7 +70,7 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
             <Provision xmlns="uri:Provision"><Policies><Policy><PolicyType>MS-EAS-Provisioning-WBXML</PolicyType></Policy></Policies></Provision>'
         );
         
-        $provision = new ActiveSync_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
+        $provision = new Syncope_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
         
         $provision->handle();
         
@@ -79,11 +82,11 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Status');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Policies/Provision:Policy/Provision:PolicyType');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_Provision::POLICYTYPE_WBXML, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_Provision::POLICYTYPE_WBXML, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
 
         $nodes = $xpath->query('//Provision:Provision/Provision:Policies/Provision:Policy/Provision:Data/Provision:EASProvisionDoc/Provision:DevicePasswordEnabled');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
@@ -104,7 +107,7 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
             <Provision xmlns="uri:Provision"><Policies><Policy><PolicyType>MS-EAS-Provisioning-WBXML</PolicyType><PolicyKey>1307199584</PolicyKey><Status>1</Status></Policy></Policies></Provision>'
         );
         
-        $provision = new ActiveSync_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
+        $provision = new Syncope_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
         
         $provision->handle();
         
@@ -116,11 +119,11 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Status');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Policies/Provision:Policy/Provision:PolicyType');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_Provision::POLICYTYPE_WBXML, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_Provision::POLICYTYPE_WBXML, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
     }
     
     /**
@@ -134,10 +137,10 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
             <Provision xmlns="uri:Provision"></Provision>'
         );
         
-        $this->objects['device']->remotewipe = ActiveSync_Command_Provision::REMOTEWIPE_REQUESTED;
+        $this->objects['device']->remotewipe = Syncope_Command_Provision::REMOTEWIPE_REQUESTED;
         $this->objects['device'] = ActiveSync_Controller_Device::getInstance()->update($this->objects['device']);
         
-        $provision = new ActiveSync_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
+        $provision = new Syncope_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
         
         $provision->handle();
         
@@ -149,7 +152,7 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Status');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
         
         $nodes = $xpath->query('//Provision:Provision/Provision:RemoteWipe');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
@@ -168,7 +171,7 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
             <Provision xmlns="uri:Provision"><RemoteWipe><Status>1</Status></RemoteWipe></Provision>'
         );
         
-        $provision = new ActiveSync_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
+        $provision = new Syncope_Command_Provision($doc, $this->objects['device'], $this->objects['device']->policykey);
         
         $provision->handle();
         
@@ -176,14 +179,14 @@ class ActiveSync_Command_ProvisionTests extends PHPUnit_Framework_TestCase
         #$responseDoc->formatOutput = true; echo $responseDoc->saveXML();
         
         $this->objects['device'] = ActiveSync_Controller_Device::getInstance()->get($this->objects['device']);
-        $this->assertEquals(ActiveSync_Command_Provision::REMOTEWIPE_CONFIRMED, $this->objects['device']->remotewipe);
+        $this->assertEquals(Syncope_Command_Provision::REMOTEWIPE_CONFIRMED, $this->objects['device']->remotewipe);
         
         $xpath = new DomXPath($responseDoc);
         $xpath->registerNamespace('Provision', 'uri:Provision');
         
         $nodes = $xpath->query('//Provision:Provision/Provision:Status');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());
-        $this->assertEquals(ActiveSync_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
+        $this->assertEquals(Syncope_Command_FolderSync::STATUS_SUCCESS, $nodes->item(0)->nodeValue, $responseDoc->saveXML());
         
         $nodes = $xpath->query('//Provision:Provision/Provision:RemoteWipe');
         $this->assertEquals(1, $nodes->length, $responseDoc->saveXML());

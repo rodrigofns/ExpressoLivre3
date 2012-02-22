@@ -4,7 +4,7 @@
  * 
  * @package     Calendar
  * @license     http://www.gnu.org/licenses/agpl.html
- * @copyright   Copyright (c) 2011-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2011-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -12,10 +12,6 @@
  * Test helper
  */
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'TestHelper.php';
-
-if (!defined('PHPUnit_MAIN_METHOD')) {
-    define('PHPUnit_MAIN_METHOD', 'Calendar_Frontend_WebDAV_EventTest::main');
-}
 
 /**
  * Test class for Calendar_Frontend_WebDAV_Event
@@ -35,9 +31,9 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-		$suite  = new PHPUnit_Framework_TestSuite('Tine 2.0 Calendar WebDAV Event Tests');
+        $suite  = new PHPUnit_Framework_TestSuite('Tine 2.0 Calendar WebDAV Event Tests');
         PHPUnit_TextUI_TestRunner::run($suite);
-	}
+    }
 
     /**
      * Sets up the fixture.
@@ -47,16 +43,20 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
+        
         $this->objects['initialContainer'] = Tinebase_Container::getInstance()->addContainer(new Tinebase_Model_Container(array(
             'name'              => Tinebase_Record_Abstract::generateUID(),
             'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
             'backend'           => 'Sql',
             'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('Calendar')->getId(),
         )));
-        
-        $this->objects['containerToDelete'][] = $this->objects['initialContainer'];
-        
-        $this->objects['eventsToDelete'] = array();
+        $this->objects['sharedContainer'] = Tinebase_Container::getInstance()->addContainer(new Tinebase_Model_Container(array(
+            'name'              => Tinebase_Record_Abstract::generateUID(),
+            'type'              => Tinebase_Model_Container::TYPE_SHARED,
+            'backend'           => 'Sql',
+            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('Calendar')->getId(),
+        )));
         
         $_SERVER['REQUEST_URI'] = 'lars';
     }
@@ -69,19 +69,7 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        foreach ($this->objects['eventsToDelete'] as $event) {
-            $event->delete();
-        }
-        
-        foreach ($this->objects['containerToDelete'] as $containerId) {
-            $containerId = $containerId instanceof Tinebase_Model_Container ? $containerId->getId() : $containerId;
-            
-            try {
-                Tinebase_Container::getInstance()->deleteContainer($containerId);
-            } catch (Tinebase_Exception_NotFound $tenf) {
-                // do nothing
-            }
-        }
+        Tinebase_TransactionManager::getInstance()->rollBack();
     }
     
     /**
@@ -100,15 +88,43 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
         $id = Tinebase_Record_Abstract::generateUID();
         $event = Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], "$id.ics", $vcalendar);
         
-        $this->objects['eventsToDelete'][] = $event;
-        
         $record = $event->getRecord();
 
         $this->assertEquals('New Event', $record->summary);
         
         return $event;
     }
+    
+    /**
+     * create an event which already exists on the server
+     * - this happen when the client moves an event to another calendar -> see testMove*
+     * - or when an client processes an iMIP which is not already loaded by CalDAV
+     *
+     * @return Calendar_Frontend_WebDAV_Event
+     */
+    public function testCreateEventWhichExistsAlready()
+    {
+        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            $oldUserAgent = $_SERVER['HTTP_USER_AGENT'];
+        }
         
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $existingEvent = $this->testCreateEvent();
+        $existingRecord = $existingEvent->getRecord();
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], $existingEvent->getRecord()->uid . '.ics', $vcalendar);
+        
+        if (isset($oldUserAgent)) {
+            $_SERVER['HTTP_USER_AGENT'] = $oldUserAgent;
+        }
+        
+        $record = $event->getRecord();
+        
+        $this->assertEquals($existingRecord->getId(), $record->getId(), 'event got duplicated');
+    }
+    
     /**
      * test create repeating event
      *
@@ -124,8 +140,6 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
         
         $id = Tinebase_Record_Abstract::generateUID();
         $event = Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], "$id.ics", $vcalendarStream);
-    
-        $this->objects['eventsToDelete'][] = $event;
     
         $record = $event->getRecord();
         #var_dump($record->exdate->toArray());
@@ -165,6 +179,8 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
         $this->assertContains('SUMMARY:New Event', $vcalendar);
         $this->assertContains('EXDATE;VALUE=DATE-TIME:20111005T080000Z', $vcalendar);
         $this->assertContains('RECURRENCE-ID;VALUE=DATE-TIME;TZID=Europe/Berlin:20111008T100000', $vcalendar);
+        $this->assertContains('TRIGGER;VALUE=DURATION:-PT1H30M', $vcalendar); // base alarm
+        $this->assertContains('TRIGGER;VALUE=DURATION:-PT1H15M', $vcalendar); // exception alarm
     }
     
     /**
@@ -225,6 +241,24 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @see #5788: Silently discard alarms if more than 1 alarm is defined
+     */
+    public function testPutEventMultipleAlarms()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'CalendarStore/5.0 (1127); iCal/5.0 (1535); Mac OS X/10.7.1 (11B26)';
+        
+        $event = $this->testCreateEvent();
+        
+        $vcalendarStream = fopen(dirname(__FILE__) . '/../../Import/files/event_with_multiple_alarm.ics', 'r');
+        
+        $event->put($vcalendarStream);
+        
+        $record = $event->getRecord();
+        
+        $this->assertEquals('1', count($record->alarms));
+    }
+    
+    /**
      * test get name of vcard
      */
     public function testGetNameOfEvent()
@@ -234,6 +268,191 @@ class Calendar_Frontend_WebDAV_EventTest extends PHPUnit_Framework_TestCase
         $record = $event->getRecord();
         
         $this->assertEquals($event->getName(), $record->getId() . '.ics');
+    }
+    
+    /**
+     * move event orig container shared -> personal
+     */
+    public function testMoveOriginEvent()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", $vcalendar);
+        
+        // move event (origin container)
+        Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], "$id.ics", stream_get_contents($event->get()));
+        $oldEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        $oldEvent->delete();
+        
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['initialContainer'], "$id.ics");
+        $this->assertEquals($this->objects['initialContainer']->getId(), $loadedEvent->getRecord()->container_id, 'origin container not updated');
+        
+    }
+    
+    /**
+     * (organizer) move originpersonal -> originshared
+     * 
+     * NOTE: this is the hard case, as a attendee reference stays in personal which must not be deleted
+     * 
+     * solution: prohibit deleting from displaycal when origcal != displaycal
+     *  Exception: implicit decline if curruser owner of displaycal && ! organizer 
+     */
+    public function testMoveOriginPersonalToShared()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], "$id.ics", $vcalendar);
+        
+        // move event origin to shared (origin and display where the same)
+        Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", stream_get_contents($event->get()));
+        $oldEvent = new Calendar_Frontend_WebDAV_Event($this->objects['initialContainer'], "$id.ics");
+        $oldEvent->delete();
+        
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        $this->assertEquals($this->objects['sharedContainer']->getId(), $loadedEvent->getRecord()->container_id, 'origin container not updated');
+        
+        $ownAttendee = Calendar_Model_Attender::getOwnAttender($loadedEvent->getRecord()->attendee);
+        $this->assertEquals($this->objects['initialContainer']->getId(), $ownAttendee->displaycontainer_id, 'display container must not change');
+        $this->assertEquals(Calendar_Model_Attender::STATUS_ACCEPTED, $ownAttendee->status, 'event must not be declined');
+    }
+    
+    /**
+     * move event displaycal onedisplaycal -> otherdisplaycal
+     */
+    public function testMoveDisplayEvent()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", $vcalendar);
+        $ownAttendee = Calendar_Model_Attender::getOwnAttender($event->getRecord()->attendee);
+        $displayCalendar = Tinebase_Container::getInstance()->getContainerById($ownAttendee->displaycontainer_id);
+        
+        $personalCalendar = Tinebase_Container::getInstance()->addContainer(new Tinebase_Model_Container(array(
+            'name'              => Tinebase_Record_Abstract::generateUID(),
+            'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
+            'backend'           => 'Sql',
+            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('Calendar')->getId(),
+        )));
+        
+        // move event (displaycontainer)
+        $displayCalendarEvent = new Calendar_Frontend_WebDAV_Event($displayCalendar, "$id.ics");
+        Calendar_Frontend_WebDAV_Event::create($personalCalendar, "$id.ics", stream_get_contents($displayCalendarEvent->get()));
+        $oldEvent = new Calendar_Frontend_WebDAV_Event($displayCalendar, "$id.ics");
+        $oldEvent->delete();
+        
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($displayCalendar, "$id.ics");
+        $this->assertEquals($this->objects['sharedContainer']->getId(), $loadedEvent->getRecord()->container_id, 'origin container must not be updated');
+        
+        $ownAttendee = Calendar_Model_Attender::getOwnAttender($loadedEvent->getRecord()->attendee);
+        $this->assertEquals($personalCalendar->getId(), $ownAttendee->displaycontainer_id, 'display container not changed');
+        $this->assertEquals(Calendar_Model_Attender::STATUS_ACCEPTED, $ownAttendee->status, 'event must not be declined');
+    }
+    
+    public function testGetAlarm()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", $vcalendar);
+        
+        $personalEvent = new Calendar_Frontend_WebDAV_Event($this->objects['initialContainer'], "$id.ics");
+        $sharedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        
+        $personalVCalendar = stream_get_contents($personalEvent->get());
+        $sharedVCalendar = stream_get_contents($sharedEvent->get());
+        #var_dump($personalVCalendar);
+        #var_dump($sharedVCalendar);
+        $this->assertNotContains('X-MOZ-LASTACK;VALUE=DATE-TIME:21', $personalVCalendar, $personalVCalendar);
+        $this->assertContains('X-MOZ-LASTACK;VALUE=DATE-TIME:21', $sharedVCalendar, $sharedVCalendar);
+    }
+    
+    public function testDeleteOrignEvent()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/event_with_custom_alarm.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", $vcalendar);
+        
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        $loadedEvent->delete();
+        
+        $this->setExpectedException('Tinebase_Exception_NotFound');
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        $loadedEvent->getRecord();
+    }
+    
+    public function testDeleteImplicitDecline()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/event_with_custom_alarm.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", $vcalendar);
+        
+        $pwulf = new Calendar_Model_Attender(array(
+            'user_type'  => Calendar_Model_Attender::USERTYPE_USER,
+            'user_id'    => array_value('pwulf', Zend_Registry::get('personas'))->contact_id
+        ));
+        
+        $pwulfAttendee = Calendar_Model_Attender::getAttendee($event->getRecord()->attendee, $pwulf);
+        $pwulfPersonalCal = Tinebase_Container::getInstance()->getContainerById($pwulfAttendee->displaycontainer_id);
+        $pwulfPersonalEvent = new Calendar_Frontend_WebDAV_Event($pwulfPersonalCal, "$id.ics");
+        $pwulfPersonalEvent->delete();
+        
+        $pwulfPersonalEvent = new Calendar_Frontend_WebDAV_Event($pwulfPersonalCal, "$id.ics");
+        $pwulfAttendee = Calendar_Model_Attender::getAttendee($pwulfPersonalEvent->getRecord()->attendee, $pwulf);
+        $this->assertEquals(Calendar_Model_Attender::STATUS_DECLINED, $pwulfAttendee->status, 'event must be declined for pwulf');
+        $this->assertEquals(0, $pwulfPersonalEvent->getRecord()->is_deleted, 'event must not be deleted');
+    }
+    
+    /**
+     * NOTE: As noted in {@see testMoveOriginPersonalToShared} we can't delete/decline for organizer in his
+     *       personal cal because a move personal->shared would delete/decline the event.
+     *       
+     *       To support intensional delete/declines we allow the delte/decline only if ther is some
+     *       time between this and the last update
+     */
+    public function testDeleteImplicitDeclineOrganizer()
+    {
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.21) Gecko/20110831 Lightning/1.0b2 Thunderbird/3.1.13';
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../Import/files/lightning.ics');
+        
+        $id = Tinebase_Record_Abstract::generateUID();
+        $event = Calendar_Frontend_WebDAV_Event::create($this->objects['initialContainer'], "$id.ics", $vcalendar);
+        
+        // move event origin to shared (origin and display where the same)
+        Calendar_Frontend_WebDAV_Event::create($this->objects['sharedContainer'], "$id.ics", stream_get_contents($event->get()));
+//         $oldEvent = new Calendar_Frontend_WebDAV_Event($this->objects['initialContainer'], "$id.ics");
+//         $oldEvent->delete();
+        
+        // wait some time
+        $cbs = new Calendar_Backend_Sql();
+        $cbs->updateMultiple(array($id), array(
+            'creation_time'      => Tinebase_DateTime::now()->subMinute(5),
+            'last_modified_time' => Tinebase_DateTime::now()->subMinute(3),
+        ));
+        
+        $personalEvent = new Calendar_Frontend_WebDAV_Event($this->objects['initialContainer'], "$id.ics");
+        $personalEvent->delete();
+        
+        $loadedEvent = new Calendar_Frontend_WebDAV_Event($this->objects['sharedContainer'], "$id.ics");
+        $ownAttendee = Calendar_Model_Attender::getOwnAttender($loadedEvent->getRecord()->attendee);
+        $this->assertEquals(Calendar_Model_Attender::STATUS_DECLINED, $ownAttendee->status, 'event must be declined');
     }
     
     /**

@@ -35,7 +35,10 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
      *      (defaults to null -> root node)
      */
     filterMountId : null,
-
+    /**
+     * @cfg {String} contentType mainscreen.activeContentType  
+     */
+    contentType: null,
     /**
      * @private
      */
@@ -58,7 +61,7 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
      */
     initComponent : function() {
         
-        this.stateId = 'widgets-persistentfilter-pickerpanel_' + this.app.name;
+        this.stateId = 'widgets-persistentfilter-pickerpanel_' + this.app.name + '_' + this.contentType;
 
         this.store = this.store || Tine.widgets.persistentfilter.store.getPersistentFilterStore(this.stateId);
 
@@ -68,7 +71,8 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
 
         this.loader = new Tine.widgets.persistentfilter.PickerTreePanelLoader({
                     app : this.app,
-                    store : this.store
+                    store : this.store,
+                    contentType: this.contentType
                 });
 
         new Ext.tree.TreeSorter(this, {
@@ -282,16 +286,8 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
         }
 
         var record = this.store.getById(node.id);
-
-        var im = Tine.Tinebase.common.hasRight('manage_shared_favorites', this.app.name);
         var isHidden = record.isShipped();
-        var shareItemHidden = ((record.isShipped()) || (!im)) ? true : false;
-
-        if (record.isShared())
-            var shareItemText = _('Remove from shared favorites');
-        else
-            var shareItemText = _('Add to shared favorites');
-
+    
         var menu = new Ext.menu.Menu({
                     items : [{
                         text : _('Delete Favorite'),
@@ -308,11 +304,6 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
                         iconCls : 'action_saveFilter',
                         hidden : isHidden,
                         handler : this.onOverwritePersistentFilter.createDelegate(this, [node, e])
-                    }, {
-                        text : shareItemText,
-                        iconCls : 'action_toggleshared',
-                        hidden : shareItemHidden,
-                        handler : this.onToggleShared.createDelegate(this, [node, e])
                     }].concat(this.getAdditionalCtxItems(record))
                 });
 
@@ -383,45 +374,13 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
     },
 
     /**
-     * handler for toggling shared
-     * 
-     * @param {Ext.tree.TreeNode}
-     *            node
-     */
-    onToggleShared : function(node) {
-
-        var record = this.store.getById(node.id);
-        // Record was shared, now is not shared: setting owner = current user
-
-        if (record.data.account_id === null) {
-            record.data.account_id = Tine.Tinebase.registry.get('currentAccount').accountId;
-            var savingText = String.format(_('Setting favorite "{0}" not shared'), record.data.name);
-        } else {
-            var savingText = String.format(_('Setting favorite "{0}" shared'), record.data.name);
-            record.data.account_id = null;
-        }
-
-        Ext.MessageBox.wait(_('Please wait'), savingText);
-
-        Tine.widgets.persistentfilter.model.persistentFilterProxy.saveRecord(
-                record, {
-                    scope : this,
-                    success : function(savedRecord) {
-                        Ext.Msg.hide();
-                    }
-                });
-                
-        this.filterNode.reload();
-
-    },
-
-    /**
      * save persistent filter
      */
     saveFilter : function() {
         var ftb = this.getFilterToolbar();
         
         var record = this.getNewEmptyRecord();
+        
         record.set('filters', ftb.getAllFilterData());
         
         // recheck that current ftb is saveable
@@ -512,23 +471,24 @@ Tine.widgets.persistentfilter.PickerPanel = Ext.extend(Ext.tree.TreePanel, {
     
     
     getNewEmptyRecord: function() {
-                var model = this.filterModel;
-                if (!model) {
-                    var recordClass = this.recordClass || this.treePanel
-                        ? this.treePanel.recordClass
-                        : ftb.store.reader.recordType;
-                    model = recordClass.getMeta('appName') + '_Model_' + recordClass.getMeta('modelName') + 'Filter';
-                }
+        var model = this.filterModel;
+        if (!model) {
+            var recordClass = this.recordClass || this.treePanel
+                ? this.treePanel.recordClass
+                : ftb.store.reader.recordType;
+            model = recordClass.getMeta('appName') + '_Model_' + recordClass.getMeta('modelName') + 'Filter';
+        }
 
-                var record = new Tine.widgets.persistentfilter.model.PersistentFilter({
-                    application_id : this.app.id,
-                    account_id : Tine.Tinebase.registry.get('currentAccount').accountId,
-                    model : model,
-                    filters : null,
-                    name : null,
-                    description : null
-                });
-                return record;
+        var record = new Tine.widgets.persistentfilter.model.PersistentFilter({
+            application_id : this.app.id,
+            account_id : Tine.Tinebase.registry.get('currentAccount').accountId,
+            model : model,
+            filters : null,
+            name : null,
+            description : null
+        });
+        
+        return record;
     }
 
 });
@@ -685,7 +645,7 @@ Tine.widgets.persistentfilter.EditPersistentFilterPanel = Ext.extend(
                 this.inputCheck = new Ext.form.Checkbox({
                            checked: (this.window.record) ? this.window.record.isShared() : false,
                            hideLabel: true,
-                           boxLabel: _('Share this Favorite')
+                           boxLabel: _('Shared Favorite (visible by all users)')
                         });
 
                 var items = [{
@@ -754,9 +714,23 @@ Tine.widgets.persistentfilter.PickerTreePanelLoader = Ext.extend(
              */
             requestData : function(node, callback, scope) {
                 if (this.fireEvent("beforeload", this, node, callback) !== false) {
-                    var recordCollection = this.store.query('application_id',
-                            this.app.id);
 
+                    var recordCollection = this.store.queryBy(function(record, id) {
+                        if(record.get('application_id') == this.app.id) {
+                            if(this.contentType) {
+                                var modelName = this.app.appName + '_Model_' + this.contentType + 'Filter'; 
+                                if(record.get('model') == modelName) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }, this);
+                    
                     node.beginUpdate();
                     recordCollection.each(function(record) {
                                 var n = this.createNode(record.copy().data);

@@ -6,7 +6,7 @@
  * @subpackage  Frontend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  * @todo        try to split this into smaller parts (record proxy should support 'nested' json frontends first)
  * @todo        use functions from Tinebase_Frontend_Json_Abstract
@@ -196,8 +196,7 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     {
         if (!empty($id)) {
             $user = Admin_Controller_User::getInstance()->get($id);
-            $user->setTimezone(Tinebase_Core::get('userTimeZone'));
-            $userArray = $user->toArray();
+            $userArray = $this->_recordToJson($user);
             
             // don't send some infos to the client: unset email uid+gid
             if (array_key_exists('emailUser', $userArray)) {
@@ -241,21 +240,16 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         // encode the groups array
         $userArray['groups'] = array(
-			'results' 		=> $userGroups,
-			'totalcount' 	=> count($userGroups)
-		);
-		
-		// encode the roles array
-        $userArray['accountRoles'] = array(
-			'results' 		=> $userRoles,
-			'totalcount' 	=> count($userRoles)
-		);
+            'results'         => $userGroups,
+            'totalcount'     => count($userGroups)
+        );
         
-		// encode container id
-		if (!empty($user->container_id)) {
-            $userArray['container_id'] = Tinebase_Container::getInstance()->getContainerById($user->container_id)->toArray();
-        }
-
+        // encode the roles array
+        $userArray['accountRoles'] = array(
+            'results'         => $userRoles,
+            'totalcount'     => count($userRoles)
+        );
+        
         return $userArray;
     }
     
@@ -292,9 +286,9 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      */
     public function searchUsers($filter, $paging)
     {
-    	$sort = (isset($paging['sort']))    ? $paging['sort']   : 'accountDisplayName';
+        $sort = (isset($paging['sort']))    ? $paging['sort']   : 'accountDisplayName';
         $dir  = (isset($paging['dir']))     ? $paging['dir']    : 'ASC';
-    	
+        
         $result = $this->getUsers($filter[0]['value'], $sort, $dir, $paging['start'], $paging['limit']);
         $result['filter'] = $filter[0];
         
@@ -312,7 +306,7 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      */
     public function searchGroups($filter, $paging)
     {
-    	$result = array(
+        $result = array(
             'results'     => array(),
             'totalcount'  => 0
         );
@@ -340,6 +334,9 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         $password = (isset($recordData['accountPassword'])) ? $recordData['accountPassword'] : '';
         
         $account = new Tinebase_Model_FullUser();
+        
+        // always re-evaluate fullname
+        unset($recordData['accountFullName']);
         
         try {
             $account->setFromArray($recordData);
@@ -380,11 +377,10 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         // after user update or creation add user to selected roles
         if (isset($recordData['accountRoles']) && $recordData['accountRoles']) {
-			Tinebase_Acl_Roles::getInstance()->setRoleMemberships(array('id' => $account->accountId, 'type' => Tinebase_Acl_Rights::ACCOUNT_TYPE_USER), $recordData['accountRoles']);
+            Tinebase_Acl_Roles::getInstance()->setRoleMemberships(array('id' => $account->accountId, 'type' => Tinebase_Acl_Rights::ACCOUNT_TYPE_USER), $recordData['accountRoles']);
         }
         
-        $result = $account->toArray();
-        
+        $result = $this->_recordToJson($account);
         
         // add primary group to account for the group selection combo box
         $group = Tinebase_Group::getInstance()->getGroupById($account->accountPrimaryGroup);
@@ -394,27 +390,21 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         // add user roles
         $userRoles = Tinebase_Acl_Roles::getInstance()->getMultiple(Tinebase_Acl_Roles::getInstance()->getRoleMemberships($account->accountId))->toArray();
-            
         
         // encode the account array
         $result['accountPrimaryGroup'] = $group;
         
         // encode the groups array
         $result['groups'] = array(
-			'results' 		=> $userGroups,
-			'totalcount' 	=> count($userGroups)
-		);
-		
-		// encode the roles array
-        $result['accountRoles'] = array(
-			'results' 		=> $userRoles,
-			'totalcount' 	=> count($userRoles)
-		);
+            'results'         => $userGroups,
+            'totalcount'     => count($userGroups)
+        );
         
-		// encode container id
-		if (!empty($result['container_id'])) {
-            $result['container_id'] = Tinebase_Container::getInstance()->getContainerById($result['container_id'])->toArray();
-        }
+        // encode the roles array
+        $result['accountRoles'] = array(
+            'results'         => $userRoles,
+            'totalcount'     => count($userRoles)
+        );
         
         return $result;
     }
@@ -986,17 +976,19 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      *
      * @return array with all rights for applications
      * 
-     * @todo    get right description from Tinebase_Application/Acl_Rights
-     * @todo    get only active applications rights?
+     * @todo    get only rights of active applications?
      */
     public function getAllRoleRights()
     {
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Get all rights of all apps.');
+        
         $result = array();
         
-        // get all applications
         $applications = Admin_Controller_Application::getInstance()->search(NULL, 'name', 'ASC', NULL, NULL);
         
-        foreach ( $applications as $application ) {
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($applications->toArray(), TRUE));
+        
+        foreach ($applications as $application) {
             $appId = $application->getId();
             $rightsForApplication = array(
                 "application_id"    => $appId,
@@ -1004,10 +996,11 @@ class Admin_Frontend_Json extends Tinebase_Frontend_Json_Abstract
                 "children"          => array()
             );
             
-            $allAplicationRights = Tinebase_Application::getInstance()->getAllRights($appId);
+            $allAplicationRights = Tinebase_Application::getInstance()->getAllRightDescriptions($appId);
             
-            foreach ( $allAplicationRights as $right ) {
-                $description = Tinebase_Application::getInstance()->getRightDescription($appId, $right);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($allAplicationRights, TRUE));
+            
+            foreach ($allAplicationRights as $right => $description) {
                 $rightsForApplication["children"][] = array(
                     "text"      => $description['text'],
                     "qtip"      => $description['description'],

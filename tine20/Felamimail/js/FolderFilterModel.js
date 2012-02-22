@@ -2,7 +2,11 @@
  * Tine 2.0
  * 
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+<<<<<<< HEAD
  * @author      Philipp Sch¸le <p.schuele@metaways.de>
+=======
+ * @author      Philipp Sch√ºle <p.schuele@metaways.de>
+>>>>>>> master
  * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  */

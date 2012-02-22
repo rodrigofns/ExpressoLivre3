@@ -92,25 +92,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             ]
         });
     },
-    
-    /**
-     * Set default time for date time field
-     * 
-     * @param {Ext.ux.form.DateTimeField} field
-     * @param {Date} newValue
-     * @param {Date} oldValue
-     */
-    setDueDateDefaultTime: function (field, newValue, oldValue) {
-    	if (newValue.getHours() === 0 && newValue.getMinutes() === 0) {
-			var newDate = newValue.clone(),
-				now     = new Date();
-			
-			newDate.setHours(now.getHours());
-			newDate.setMinutes(now.getMinutes());
-				
-			field.setValue(newDate);
-		}
-    },
+
     
     /**
      * returns cm
@@ -141,16 +123,12 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             dataIndex: 'due',
             renderer: Tine.Tinebase.common.dateTimeRenderer,
             editor: new Ext.ux.form.DateTimeField({
-            	allowBlank: true,
-            	listeners: {
-            		'change': this.setDueDateDefaultTime
-            	}
+                defaultTime: '12:00',
+            	allowBlank: true
             }),
             quickaddField: new Ext.ux.form.DateTimeField({
-            	allowBlank: true,
-            	listeners: {
-            		'change': this.setDueDateDefaultTime
-            	}
+                defaultTime: '12:00',
+            	allowBlank: true
             })
         }, {
             id: 'priority',
@@ -217,19 +195,13 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             width: 200,
             dataIndex: 'organizer',
             renderer: Tine.Tinebase.common.accountRenderer,
-            quickaddField: new Tine.Addressbook.SearchCombo({
-                // at the moment we support accounts only
+            quickaddField: Tine.widgets.form.RecordPickerManager.get('Addressbook', 'Contact', {
                 userOnly: true,
-                nameField: 'n_fileas',
+                useAccountRecord: true,
                 blurOnSelect: true,
                 selectOnFocus: true,
-                value: Tine.Tinebase.registry.get('currentAccount').accountDisplayName,
-                selectedRecord: new Tine.Addressbook.Model.Contact(Tine.Tinebase.registry.get('userContact')),
-                getValue: function() {
-                    if (this.selectedRecord) {
-                        return this.selectedRecord.get('account_id');
-                    }
-                }
+                allowEmpty: true,
+                value: Tine.Tinebase.registry.get('currentAccount').accountDisplayName
             })
         }]
         });
@@ -282,9 +254,12 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      */
     getViewRowClass: function(record, index) {
         var due = record.get('due');
-        
+         
         var className = '';
-        if (due) {
+        
+        if(record.get('status') == 'COMPLETED') {
+            className += 'tasks-grid-completed';
+        } else  if (due) {
             var dueDay = due.format('Y-m-d');
             var today = new Date().format('Y-m-d');
 

@@ -36,11 +36,11 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
      * @var array
      */
     protected $_filterArray = array(
-        ActiveSync_Command_Sync::FILTER_1_DAY_BACK,
-        ActiveSync_Command_Sync::FILTER_3_DAYS_BACK,
-        ActiveSync_Command_Sync::FILTER_1_WEEK_BACK,
-        ActiveSync_Command_Sync::FILTER_2_WEEKS_BACK,
-        ActiveSync_Command_Sync::FILTER_1_MONTH_BACK,
+        Syncope_Command_Sync::FILTER_1_DAY_BACK,
+        Syncope_Command_Sync::FILTER_3_DAYS_BACK,
+        Syncope_Command_Sync::FILTER_1_WEEK_BACK,
+        Syncope_Command_Sync::FILTER_2_WEEKS_BACK,
+        Syncope_Command_Sync::FILTER_1_MONTH_BACK,
     );
     
     /**
@@ -66,14 +66,14 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_defaultFolderType   = ActiveSync_Command_FolderSync::FOLDERTYPE_INBOX;
+    protected $_defaultFolderType   = Syncope_Command_FolderSync::FOLDERTYPE_INBOX;
     
     /**
      * type of user created folders
      *
      * @var int
      */
-    protected $_folderType          = ActiveSync_Command_FolderSync::FOLDERTYPE_MAIL_USER_CREATED;
+    protected $_folderType          = Syncope_Command_FolderSync::FOLDERTYPE_MAIL_USER_CREATED;
     
     /**
      * name of property which defines the filterid for different content classes
@@ -102,15 +102,13 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
      * @param unknown_type $_endTimeStamp
      * @return array
      */
-    public function getChanged($_folderId, $_startTimeStamp, $_endTimeStamp = NULL)
+    public function getChangedEntries($_folderId, DateTime $_startTimeStamp, DateTime $_endTimeStamp = NULL)
     {
-        $filter = new $this->_contentFilterClass();
-        
-        $this->_getContentFilter($filter, 0);
-        $this->_getContainerFilter($filter, $_folderId);
+        $filter = $this->_getContentFilter(0);
+        $this->_addContainerFilter($filter, $_folderId);
 
-        $startTimeStamp = ($_startTimeStamp instanceof DateTime) ? $_startTimeStamp->get(Tinebase_Record_Abstract::ISO8601LONG) : $_startTimeStamp;
-        $endTimeStamp = ($_endTimeStamp instanceof DateTime) ? $_endTimeStamp->get(Tinebase_Record_Abstract::ISO8601LONG) : $_endTimeStamp;
+        $startTimeStamp = ($_startTimeStamp instanceof DateTime) ? $_startTimeStamp->format(Tinebase_Record_Abstract::ISO8601LONG) : $_startTimeStamp;
+        $endTimeStamp = ($_endTimeStamp instanceof DateTime) ? $_endTimeStamp->format(Tinebase_Record_Abstract::ISO8601LONG) : $_endTimeStamp;
         
         $filter->addFilter(new Tinebase_Model_Filter_DateTime(
             'timestamp',
@@ -136,42 +134,46 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     /**
      * append email data to xml element
      *
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
      */
-    public function appendFileReference(DOMElement $_xmlNode, $_fileReference)
+    public function appendFileReference(DOMElement $_domParrent, $_fileReference)
     {
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " append fileReference " . $_fileReference/* . ' options ' . print_r($_options, true)*/);
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " append fileReference " . $_fileReference/* . ' options ' . print_r($_collectionData, true)*/);
         
         list($messageId, $partId) = explode('-', $_fileReference, 2);
         
         $file = $this->_contentController->getMessagePart($messageId, $partId);
         
-        $_xmlNode->appendChild(new DOMElement('ContentType', $file->type, 'uri:AirSyncBase'));
-        $_xmlNode->appendChild(new DOMElement('Data', base64_encode($file->getDecodedContent()), 'uri:ItemOperations'));  
+        $_domParrent->appendChild(new DOMElement('ContentType', $file->type, 'uri:AirSyncBase'));
+        $_domParrent->appendChild(new DOMElement('Data', base64_encode($file->getDecodedContent()), 'uri:ItemOperations'));  
     }
     
     /**
      * append email data to xml element
      *
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
      * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
+    public function appendXML(DOMElement $_domParrent, $_collectionData, $_serverId)
     {
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " append email " . $_serverId/* . ' options ' . print_r($_options, true)*/);
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " append email " . $_serverId/* . ' options ' . print_r($_collectionData, true)*/);
         
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
-        foreach($this->_mapping as $key => $value) {
-            if(!empty($data->$value) || $data->$value == 0) {
+        $_domParrent->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Email'       , 'uri:Email');
+        
+        foreach ($this->_mapping as $key => $value) {
+            if(!empty($data->$value) || $data->$value == '0') {
                 $nodeContent = null;
                 
                 switch($value) {
                     case 'received':
-                        $nodeContent = $data->$value->toString('Y-m-d\TH:i:s') . '.000Z';
+                        if($data->$value instanceof DateTime) {
+                            $nodeContent = $data->$value->toString('Y-m-d\TH:i:s') . '.000Z';
+                        }
                         break;
                         
                     case 'from_email':
@@ -194,25 +196,23 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
                     continue;
                 }
                 
-                // ... append it to parent node aka append it to the document ...
-                $node = $_xmlNode->appendChild(new DOMElement($key, null, 'uri:Email'));
-                
                 // strip off any non printable control characters
                 if (!ctype_print($nodeContent)) {
-                    # another way to remove non printing characters
                     $nodeContent = $this->removeControlChars($nodeContent);
                 }
                 
-                // ... and now add the content (DomText takes care of special chars)
-                $node->appendChild(new DOMText($nodeContent));
+                $node = $_domParrent->ownerDocument->createElementNS('uri:Email', $key);
+                $node->appendChild($_domParrent->ownerDocument->createTextNode($nodeContent));
+                
+                $_domParrent->appendChild($node);
             }
         }
         
         // read flag
         if (in_array('\Seen', $data->flags)) {
-            $_xmlNode->appendChild(new DOMElement('Read', 1, 'uri:Email'));                 
+            $_domParrent->appendChild(new DOMElement('Read', 1, 'uri:Email'));                 
         } else {
-            $_xmlNode->appendChild(new DOMElement('Read', 0, 'uri:Email'));
+            $_domParrent->appendChild(new DOMElement('Read', 0, 'uri:Email'));
         }
         
         // attachments?
@@ -220,7 +220,7 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
             $attachments = $this->_contentController->getAttachments($data);
             
             if (count($attachments) > 0) {
-                $tagAttachments = $_xmlNode->appendChild(new DOMElement('Attachments', null, 'uri:AirSyncBase'));
+                $tagAttachments = $_domParrent->appendChild(new DOMElement('Attachments', null, 'uri:AirSyncBase'));
                 
                 foreach ($attachments as $attachment) {
                     $tagAttachment = $tagAttachments->appendChild(new DOMElement('Attachment', null, 'uri:AirSyncBase'));
@@ -237,51 +237,49 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
         // get truncation
         $truncateAt = null;
         
-        if (isset($_options['mimeSupport']) && $_options['mimeSupport'] == 2 && (version_compare($this->_device->acsversion, '12.0', '<=') || isset($_options['bodyPreferences'][4]))) {
-            if ($_neverTruncate === false && isset($_options['bodyPreferences'][4]) && isset($_options['bodyPreferences'][4]['truncationSize'])) {
-                $truncateAt = $_options['bodyPreferences'][4]['truncationSize'];
+        if (isset($_collectionData['mimeSupport']) && $_collectionData['mimeSupport'] == 2 && (version_compare($this->_device->acsversion, '12.0', '<=') || isset($_collectionData['bodyPreferences'][4]))) {
+            if (isset($_collectionData['bodyPreferences'][4]) && isset($_collectionData['bodyPreferences'][4]['truncationSize'])) {
+                $truncateAt = $_collectionData['bodyPreferences'][4]['truncationSize'];
             }
             $airSyncBaseType = 4;
-        } elseif (isset($_options['bodyPreferences'][2])) {
-            if ($_neverTruncate === false && isset($_options['bodyPreferences'][2]['truncationSize'])) {
-                $truncateAt = $_options['bodyPreferences'][2]['truncationSize'];
+        } elseif (isset($_collectionData['bodyPreferences'][2])) {
+            if (isset($_collectionData['bodyPreferences'][2]['truncationSize'])) {
+                $truncateAt = $_collectionData['bodyPreferences'][2]['truncationSize'];
             }
             $airSyncBaseType = 2;
         } else {
-            if ($_neverTruncate === false && isset($_options['bodyPreferences'][1]) && isset($_options['bodyPreferences'][1]['truncationSize'])) {
-                $truncateAt = $_options['bodyPreferences'][1]['truncationSize'];
+            if (isset($_collectionData['bodyPreferences'][1]) && isset($_collectionData['bodyPreferences'][1]['truncationSize'])) {
+                $truncateAt = $_collectionData['bodyPreferences'][1]['truncationSize'];
             }
             $airSyncBaseType = 1;
         }
         
-        if ($_neverTruncate === false) {
-            if (isset($_options['mimeTruncation']) && $_options['mimeTruncation'] < 8) {
-                switch($_options['mimeTruncation']) {
-                    case ActiveSync_Command_Sync::TRUNCATE_ALL:
-                        $truncateAt = 0;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_4096:
-                        $truncateAt = 4096;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_5120:
-                        $truncateAt = 5120;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_7168:
-                        $truncateAt = 7168;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_10240:
-                        $truncateAt = 10240;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_20480:
-                        $truncateAt = 20480;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_51200:
-                        $truncateAt = 51200;
-                        break;
-                    case ActiveSync_Command_Sync::TRUNCATE_102400:
-                        $truncateAt = 102400;
-                        break;
-                }
+        if (isset($_collectionData['mimeTruncation']) && $_collectionData['mimeTruncation'] < 8) {
+            switch($_collectionData['mimeTruncation']) {
+                case Syncope_Command_Sync::TRUNCATE_ALL:
+                    $truncateAt = 0;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_4096:
+                    $truncateAt = 4096;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_5120:
+                    $truncateAt = 5120;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_7168:
+                    $truncateAt = 7168;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_10240:
+                    $truncateAt = 10240;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_20480:
+                    $truncateAt = 20480;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_51200:
+                    $truncateAt = 51200;
+                    break;
+                case Syncope_Command_Sync::TRUNCATE_102400:
+                    $truncateAt = 102400;
+                    break;
             }
         }
         
@@ -317,7 +315,7 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
             $messageBody  = @iconv('utf-8', 'utf-8//IGNORE', $messageBody);
             
             if (version_compare($this->_device->acsversion, '12.0', '>=')) {
-                $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+                $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
                 $body->appendChild(new DOMElement('Type', $airSyncBaseType, 'uri:AirSyncBase'));
                 $body->appendChild(new DOMElement('Truncated', $isTruncacted, 'uri:AirSyncBase'));
                 $body->appendChild(new DOMElement('EstimatedDataSize', $data->size, 'uri:AirSyncBase'));
@@ -325,29 +323,29 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
                 $dataTag = $body->appendChild(new DOMElement('Data', null, 'uri:AirSyncBase'));
                 $dataTag->appendChild(new DOMText($messageBody));
                 
-                $_xmlNode->appendChild(new DOMElement('NativeBodyType', $airSyncBaseType, 'uri:AirSyncBase'));
+                $_domParrent->appendChild(new DOMElement('NativeBodyType', $airSyncBaseType, 'uri:AirSyncBase'));
             } else {
                 if ($airSyncBaseType == 4) {
-                    $_xmlNode->appendChild(new DOMElement('MIMETruncated', $isTruncacted, 'uri:Email'));
+                    $_domParrent->appendChild(new DOMElement('MIMETruncated', $isTruncacted, 'uri:Email'));
                     
-                    $body = $_xmlNode->appendChild(new DOMElement('MIMEData', null, 'uri:Email'));
+                    $body = $_domParrent->appendChild(new DOMElement('MIMEData', null, 'uri:Email'));
                     $body->appendChild(new DOMText($messageBody));
                     
                 } else {
-                    $_xmlNode->appendChild(new DOMElement('BodyTruncated', $isTruncacted, 'uri:Email'));
+                    $_domParrent->appendChild(new DOMElement('BodyTruncated', $isTruncacted, 'uri:Email'));
                     
-                    $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:Email'));
+                    $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:Email'));
                     $body->appendChild(new DOMText($messageBody));
                 }
             }
         }
         
         if ($airSyncBaseType == 4) {
-            $_xmlNode->appendChild(new DOMElement('MessageClass', 'IPM.Note.SMIME', 'uri:Email'));
+            $_domParrent->appendChild(new DOMElement('MessageClass', 'IPM.Note.SMIME', 'uri:Email'));
         } else {
-            $_xmlNode->appendChild(new DOMElement('MessageClass', 'IPM.Note', 'uri:Email'));
+            $_domParrent->appendChild(new DOMElement('MessageClass', 'IPM.Note', 'uri:Email'));
         }
-        $_xmlNode->appendChild(new DOMElement('ContentClass', 'urn:content-classes:message', 'uri:Email'));
+        $_domParrent->appendChild(new DOMElement('ContentClass', 'urn:content-classes:message', 'uri:Email'));
         
         return;
         /*
@@ -356,11 +354,11 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
                 case 'importance':
                     switch (strtolower($headerValue)) {
                         case 'low':
-                            $_xmlNode->appendChild($_xmlDocument->createElementNS('uri:Email', 'Importance', 0));
+                            $_domParrent->appendChild($_xmlDocument->createElementNS('uri:Email', 'Importance', 0));
                             break;
                     	
                         case 'high':
-                            $_xmlNode->appendChild($_xmlDocument->createElementNS('uri:Email', 'Importance', 2));
+                            $_domParrent->appendChild($_xmlDocument->createElementNS('uri:Email', 'Importance', 2));
                             break;
                             
                     }
@@ -374,73 +372,53 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     /**
      * delete entry
      *
-     * @param  string  $_collectionId
-     * @param  string  $_id
-     * @param  array   $_options
+     * @param  string  $_folderId
+     * @param  string  $_serverId
+     * @param  array   $_collectionData
      */
-    public function delete($_collectionId, $_id, $_options)
+    public function deleteEntry($_folderId, $_serverId, $_collectionData)
     {
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " delete ColectionId: $_collectionId Id: $_id");
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " delete ColectionId: $_folderId Id: $_serverId");
         
-        $folder  = Felamimail_Controller_Folder::getInstance()->get($_collectionId);
+        $folder  = Felamimail_Controller_Folder::getInstance()->get($_folderId);
         $account = Felamimail_Controller_Account::getInstance()->get($folder->account_id);
         
-        if ($_options['deletesAsMoves'] === true && !empty($account->trash_folder)) {
+        if ($_collectionData['deletesAsMoves'] === true && !empty($account->trash_folder)) {
             // move message to trash folder
             $trashFolder = Felamimail_Controller_Folder::getInstance()->getByBackendAndGlobalName($account, $account->trash_folder);
-            Felamimail_Controller_Message_Move::getInstance()->moveMessages($_id, $trashFolder);
-            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " moved entry $_id to trash folder");
+            Felamimail_Controller_Message_Move::getInstance()->moveMessages($_serverId, $trashFolder);
+            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " moved entry $_serverId to trash folder");
         } else {
             // set delete flag
-            Felamimail_Controller_Message_Flags::getInstance()->addFlags($_id, Zend_Mail_Storage::FLAG_DELETED);
-            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " deleted entry " . $_id);
+            Felamimail_Controller_Message_Flags::getInstance()->addFlags($_serverId, Zend_Mail_Storage::FLAG_DELETED);
+            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " deleted entry " . $_serverId);
         }
     }
-    
-    #/**
-    # * get id's of all contacts available on the server
-    # *
-    # * @return array
-    # */
-    #protected function _getServerEntries($_folderId, $_filterType)
-    #{
-    #    Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " get server entries for folder " . $_folderId);
-    #    
-    #    $filter = new $this->_contentFilterClass();
-    #    
-    #    $this->_getContentFilter($filter, $_filterType);
-    #    $this->_getContainerFilter($filter, $_folderId);
-    #    
-    #    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " filter " . print_r($filter->toArray(), true));
-    #    
-    #    $messages = $this->_contentController->search($filter, null, false, true);
-    #    
-    #	return $messages;    	
-    #}
     
     /**
      * update existing entry
      *
-     * @param  string  $_collectionId
-     * @param  string  $_id
+     * @param  string  $_folderId
+     * @param  string  $_serverId
      * @param SimpleXMLElement $_data
      * @return Tinebase_Record_Abstract
      */
-    public function change($_collectionId, $_id, SimpleXMLElement $_data)
+    public function updateEntry($_folderId, $_serverId, SimpleXMLElement $_entry)
     {
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " CollectionId: $_collectionId Id: $_id");
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId Id: $_serverId");
         
-        $xmlData = $_data->children('uri:Email');
+        $xmlData = $_entry->children('uri:Email');
         
         if(isset($xmlData->Read)) {
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_collectionId Id: $_id set read flag: $xmlData->Read");
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+                Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId Id: $_serverId set read flag: $xmlData->Read");
             if((int)$xmlData->Read === 1) {
-                Felamimail_Controller_Message_Flags::getInstance()->addFlags($_id, Zend_Mail_Storage::FLAG_SEEN);
+                Felamimail_Controller_Message_Flags::getInstance()->addFlags($_serverId, Zend_Mail_Storage::FLAG_SEEN);
             } else {
-                Felamimail_Controller_Message_Flags::getInstance()->clearFlags($_id, Zend_Mail_Storage::FLAG_SEEN);
+                Felamimail_Controller_Message_Flags::getInstance()->clearFlags($_serverId, Zend_Mail_Storage::FLAG_SEEN);
             }
             
-            $message = $this->_contentController->get($_id);
+            $message = $this->_contentController->get($_serverId);
             $message->timestamp = $this->_syncTimeStamp;
             $this->_contentController->update($message);
         }
@@ -503,7 +481,7 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
      *
      * @return array
      */
-    public function getSupportedFolders()
+    public function getAllFolders()
     {
         if (!Tinebase_Core::getUser()->hasRight('Felamimail', Tinebase_Acl_Rights::RUN)) {
             // no folders
@@ -561,23 +539,19 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
         return $result;
     }
     
-    /**
-     * (non-PHPdoc)
-     * @see ActiveSync/Controller/ActiveSync_Controller_Interface#moveItem()
-     */
-    public function moveItem($_srcFolder, $_srcItem, $_dstFolder)
+    public function moveItem($_srcFolderId, $_serverId, $_dstFolderId)
     {
         $filter = new Felamimail_Model_MessageFilter(array(
             array(
                 'field'     => 'id',
                 'operator'  => 'equals',
-                'value'     => $_srcItem
+                'value'     => $_serverId
             )
         ));
         
-        Felamimail_Controller_Message_Move::getInstance()->moveMessages($filter, $_dstFolder);
+        Felamimail_Controller_Message_Move::getInstance()->moveMessages($filter, $_dstFolderId);
         
-        return $_srcItem;
+        return $_serverId;
     }
     
     /**
@@ -598,13 +572,13 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     protected function _getFolderType($_folderName)
     {
         if(strtoupper($_folderName) == 'INBOX') {
-            return ActiveSync_Command_FolderSync::FOLDERTYPE_INBOX;
+            return Syncope_Command_FolderSync::FOLDERTYPE_INBOX;
         } elseif (strtoupper($_folderName) == 'TRASH') {
-            return ActiveSync_Command_FolderSync::FOLDERTYPE_DELETEDITEMS;
+            return Syncope_Command_FolderSync::FOLDERTYPE_DELETEDITEMS;
         } elseif (strtoupper($_folderName) == 'SENT') {
-            return ActiveSync_Command_FolderSync::FOLDERTYPE_SENTMAIL;
+            return Syncope_Command_FolderSync::FOLDERTYPE_SENTMAIL;
         } else {
-            return ActiveSync_Command_FolderSync::FOLDERTYPE_MAIL_USER_CREATED;
+            return Syncope_Command_FolderSync::FOLDERTYPE_MAIL_USER_CREATED;
         }
     }
     
@@ -626,42 +600,44 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     }
     
     /**
-     * return contentfilter object
+     * return contentfilter array
      * 
-     * @param $_filterType
+     * @param  int $_filterType
      * @return Tinebase_Model_Filter_FilterGroup
      */
-    protected function _getContentFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_filterType)
+    protected function _getContentFilter($_filterType)
     {
-        #$_filter->addFilter(new Tinebase_Model_Filter_Text('recurid', 'isnull', null));
+        $filter = parent::_getContentFilter($_filterType);
         
         if(in_array($_filterType, $this->_filterArray)) {
             $today = Tinebase_DateTime::now()->setTime(0,0,0);
                 
             switch($_filterType) {
-                case ActiveSync_Command_Sync::FILTER_1_DAY_BACK:
+                case Syncope_Command_Sync::FILTER_1_DAY_BACK:
                     $received = $today->subDay(1);
                     break;
-                case ActiveSync_Command_Sync::FILTER_3_DAYS_BACK:
+                case Syncope_Command_Sync::FILTER_3_DAYS_BACK:
                     $received = $today->subDay(3);
                     break;
-                case ActiveSync_Command_Sync::FILTER_1_WEEK_BACK:
+                case Syncope_Command_Sync::FILTER_1_WEEK_BACK:
                     $received = $today->subWeek(1);
                     break;
-                case ActiveSync_Command_Sync::FILTER_2_WEEKS_BACK:
+                case Syncope_Command_Sync::FILTER_2_WEEKS_BACK:
                     $received = $today->subWeek(2);
                     break;
-                case ActiveSync_Command_Sync::FILTER_1_MONTH_BACK:
+                case Syncope_Command_Sync::FILTER_1_MONTH_BACK:
                     $received = $today->subMonth(2);
                     break;
             }
             
             // add period filter
-            $_filter->addFilter(new Tinebase_Model_Filter_DateTime('received', 'after', $received->get(Tinebase_Record_Abstract::ISO8601LONG)));
+            $filter->addFilter(new Tinebase_Model_Filter_DateTime('received', 'after', $received->get(Tinebase_Record_Abstract::ISO8601LONG)));
         }
+        
+        return $filter;
     }
     
-    protected function _getContainerFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_containerId)
+    protected function _addContainerFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_containerId)
     {
         // custom filter gets added when created
         $_filter->createFilter(

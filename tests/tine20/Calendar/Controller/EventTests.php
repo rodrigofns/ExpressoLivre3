@@ -935,6 +935,9 @@ class Calendar_Controller_EventTests extends Calendar_TestCase
     public function testSetAlarmOfRecurSeries()
     {
         $event = $this->_getEvent();
+        $event->dtstart = Tinebase_DateTime::now()->addHour(1);
+        $event->dtend = Tinebase_DateTime::now()->addHour(2);
+        
         $event->rrule = 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1';
         $event->alarms = new Tinebase_Record_RecordSet('Tinebase_Model_Alarm', array(
             new Tinebase_Model_Alarm(array(
@@ -942,28 +945,18 @@ class Calendar_Controller_EventTests extends Calendar_TestCase
             ), TRUE)
         ));
         $persistentEvent = $this->_controller->create($event);
-
-        // assert alarm time is just before next occurence
-        $exceptions = new Tinebase_Record_RecordSet('Calendar_Model_Event');
-        $nextOccurance = Calendar_Model_Rrule::computeNextOccurrence($persistentEvent, $exceptions, new Tinebase_DateTime());
-        
-        $nextAlarmEventStart = new Tinebase_DateTime(substr($persistentEvent->alarms->getFirstRecord()->getOption('recurid'), -19));
-        
-        $this->assertTrue($nextOccurance->dtstart->equals($nextAlarmEventStart), 'initial alarm is not at expected time');
+        $this->assertEquals($event->dtstart->subMinute(30)->toString(), $persistentEvent->alarms->getFirstRecord()->alarm_time->toString(), 'inital alarm fails');
         
         // move whole series
         $persistentEvent->dtstart->addHour(5);
         $persistentEvent->dtend->addHour(5);
         $updatedEvent = $this->_controller->update($persistentEvent);
-
-        $exceptions = new Tinebase_Record_RecordSet('Calendar_Model_Event');
-        $nextOccurance = Calendar_Model_Rrule::computeNextOccurrence($updatedEvent, $exceptions, new Tinebase_DateTime());
-        
-        $nextAlarmEventStart = new Tinebase_DateTime(substr($updatedEvent->alarms->getFirstRecord()->getOption('recurid'), -19));
-        
-        $this->assertTrue($nextOccurance->dtstart->equals($nextAlarmEventStart), 'updated alarm is not at expected time');
+        $this->assertEquals($persistentEvent->dtstart->subMinute(30)->toString(), $updatedEvent->alarms->getFirstRecord()->alarm_time->toString(), 'update alarm fails');
     }
     
+    /**
+     * testSetAlarmOfRecurSeriesException
+     */
     public function testSetAlarmOfRecurSeriesException()
     {
         $event = $this->_getEvent();

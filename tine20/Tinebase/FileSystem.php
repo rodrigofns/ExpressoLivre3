@@ -6,7 +6,7 @@
  * @subpackage  FileSystem
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  */
 
@@ -16,7 +16,7 @@
  * @package     Tinebase
  * @subpackage  FileSystem
  */
-class Tinebase_FileSystem
+class Tinebase_FileSystem implements Tinebase_Controller_Interface
 {
     /**
      * @var Tinebase_Tree_FileObject
@@ -244,17 +244,25 @@ class Tinebase_FileSystem
         $updatedFileObject = clone($currentFileObject);
         $updatedFileObject->hash = $_hash;
         $updatedFileObject->size = filesize($_hashFile);
-        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+        if (version_compare(PHP_VERSION, '5.3.0', '>=') && function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $_hashFile);
             if ($mimeType !== false) {
                 $updatedFileObject->contenttype = $mimeType;
             }
             finfo_close($finfo);
+        } else {
+            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                . ' finfo_open() is not available: Could not get file information.');
         }
         
         $modLog = Tinebase_Timemachine_ModificationLog::getInstance();
         $modLog->setRecordMetaData($updatedFileObject, 'update', $currentFileObject);
+        
+        // sanitize file size, somehow filesize() seems to return empty strings on some systems
+        if (empty($updatedFileObject->size)) {
+            $updatedFileObject->size = 0;
+        }
         
         return $this->_fileObjectBackend->update($updatedFileObject);
     }
@@ -452,8 +460,7 @@ class Tinebase_FileSystem
      */
     public function mkdir($_path)
     {
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Creating directory ' . $_path);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Creating directory ' . $_path);
         
         $path = '/';
         $parentNode = null;

@@ -6,7 +6,7 @@
  * @subpackage  Frontend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
@@ -34,7 +34,20 @@ class Addressbook_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     protected $_resolveUserFields = array(
         'Addressbook_Model_Contact' => array('created_by', 'last_modified_by')
     );
-    
+
+    /**
+     * resolve images
+     * @param Tinebase_Record_RecordSet $_records
+     */
+    public static function resolveImages(Tinebase_Record_RecordSet $_records)
+    {
+        foreach($_records as &$record) {
+            if($record['jpegphoto'] == '1') {
+                $record['jpegphoto'] = Tinebase_Model_Image::getImageUrl('Addressbook', $record->__get('id'), '');
+            }
+        }
+    }
+
     /**
      * get one contact identified by $id
      *
@@ -157,7 +170,7 @@ class Addressbook_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         $result = Addressbook_Controller_Contact::getInstance()->parseAddressData($address);
         
         return array(
-        	'contact'             => $this->_recordToJson($result['contact']),
+            'contact'             => $this->_recordToJson($result['contact']),
             'unrecognizedTokens'  => $result['unrecognizedTokens'],
         );
     }
@@ -218,12 +231,12 @@ class Addressbook_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     {
         $link = 'images/empty_photo_blank.png';
         if (! empty($contactArray['jpegphoto'])) {
-            $link = 'index.php?method=Tinebase.getImage&application=Addressbook&location=&id=' . $contactArray['id'] . '&width=90&height=90&ratiomode=0';
+            $link = Tinebase_Model_Image::getImageUrl('Addressbook', $contactArray['id'], '');
         } else if (isset($contactArray['salutation']) && ! empty($contactArray['salutation'])) {
-    	    $salutationRecord = Addressbook_Config::getInstance()->contactSalutation->records->getById($contactArray['salutation']);
-    	    if ($salutationRecord->image) {
-			    $link = $salutationRecord->image;
-    	    }	
+            $salutationRecord = Addressbook_Config::getInstance()->get(Addressbook_Config::CONTACT_SALUTATION)->records->getById($contactArray['salutation']);
+            if ($salutationRecord && $salutationRecord->image) {
+                $link = $salutationRecord->image;
+            }
         }
         
         return $link;
