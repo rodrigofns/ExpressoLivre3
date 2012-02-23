@@ -21,11 +21,5 @@ Tine.Messenger.ChatHandler = {
     
     onOutgoMessage: function (message) {
         return true;
-    },
-    
-    onAll: function () {
-        alert('Catch someting!!');
-        
-        return true;
     }
 }

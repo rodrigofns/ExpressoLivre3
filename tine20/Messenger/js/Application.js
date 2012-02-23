@@ -7,6 +7,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     
     startMessengerDelayedTask: null,
     
+    startMessengerHandlersDelayedTask: null,
+    
     // The XMPP Connection to the BOSH server
     connection: null,
     
@@ -34,27 +36,21 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         });
     },
     
-    startMessengerHandlers: function () {
-        // handle the incoming messages
-        console.log("STARTING HANDLERS...");
-        console.log(Tine.Messenger.Application.connection);
-        Tine.Messenger.Application.connection.addHandler(Tine.Messenger.ChatHandler.onAll);//, null, "message", "chat");
-        console.log("HANDLERS STARTED!");
-    },
-    
     startMessenger: function () {
         console.log("START MESSENGER");
         var con = new Strophe.Connection("/http-bind");
-        con.connect('marcio@simdev.sdr.serpro', '12345', function (status) {
+        con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
             $('#ext-gen52').html('(offline)');
             if (status === Strophe.Status.CONNECTED) {
                 $('#ext-gen52').html('(online)');
+                // Send user presence
                 con.send($pres());
+                // Setting the connection property
                 Tine.Messenger.Application.connection = con;
-                console.log(Tine.Messenger.Application.connection);
-                console.log(Tine.Messenger.Application.startMessengerHandlers);
-                Tine.Messenger.Application.startMessengerHandlers();
-                console.log('Pass through startHandlers()');
+                // Start the handlers
+                Tine.Messenger.Application.connection.addHandler(
+                    Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
+                );
             } else if (status === Strophe.Status.DISCONNECTED) {
                 Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
             } else if (status === Strophe.Status.AUTHFAIL) {
