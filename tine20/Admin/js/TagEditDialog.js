@@ -27,10 +27,7 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
     windowNamePrefix: 'AdminTagEditDialog_',
     id: 'tagDialog',
     layout: 'fit',
-<<<<<<< HEAD
-=======
     border: false,
->>>>>>> master
     labelWidth: 120,
     labelAlign: 'top',
     

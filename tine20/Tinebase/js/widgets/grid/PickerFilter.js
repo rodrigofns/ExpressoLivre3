@@ -5,11 +5,7 @@
  * @author      Philipp Schüle <p.schuele@metaways.de>
  * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
-<<<<<<< HEAD
- * TODO         container tag filter should extend this
-=======
  * TODO         container filter should extend this
->>>>>>> master
  */
 Ext.ns('Tine.widgets.grid');
 
@@ -104,14 +100,6 @@ Tine.widgets.grid.PickerFilter = Ext.extend(Tine.widgets.grid.FilterModel, {
      * TODO keep value widget if old operator / new operator use the same widget?
      */
     onOperatorChange: function(filter, newOperator, keepValue) {
-<<<<<<< HEAD
-
-        Tine.widgets.grid.PickerFilter.superclass.onOperatorChange.apply(this, arguments);
-        
-        var el = Ext.select('tr[id=' + this.ftb.frowIdPrefix + filter.id + '] td[class^=tw-ftb-frow-value]', this.ftb.el).first();
-        
-        // NOTE: removeMode got introduced on ext3.1 but is not docuemented
-=======
         var oldOperator = filter.formFields.operator.getValue(),
             oldValues = [].concat(filter.formFields.value.getValue()),
             oldValuesStore = filter.formFields.value.store,
@@ -131,7 +119,6 @@ Tine.widgets.grid.PickerFilter = Ext.extend(Tine.widgets.grid.FilterModel, {
         Tine.widgets.grid.PickerFilter.superclass.onOperatorChange.apply(this, arguments);
         
         // NOTE: removeMode got introduced on ext3.1 but is not documented
->>>>>>> master
         //       'childonly' is no ext mode, we just need something other than 'container'
         if (filter.formFields.value && Ext.isFunction(filter.formFields.value.destroy)) {
             filter.formFields.value.removeMode = 'childsonly';
@@ -140,14 +127,11 @@ Tine.widgets.grid.PickerFilter = Ext.extend(Tine.widgets.grid.FilterModel, {
         }
         
         filter.formFields.value = this.valueRenderer(filter, el);
-<<<<<<< HEAD
-=======
         
         // retain value(s) on operator change (single -> multi, multi -> multi)
         if (['in', 'notin'].indexOf(newOperator) > -1) {
             filter.formFields.value.setValue(oldValues);
         }
->>>>>>> master
     },
     
     /**
@@ -176,11 +160,7 @@ Tine.widgets.grid.PickerFilter = Ext.extend(Tine.widgets.grid.FilterModel, {
         }
 
         value.on('specialkey', function(field, e){
-<<<<<<< HEAD
-             if(e.getKey() == e.ENTER){
-=======
              if (e.getKey() == e.ENTER){
->>>>>>> master
                  this.onFiltertrigger();
              }
         }, this);
@@ -211,11 +191,6 @@ Tine.widgets.grid.PickerFilter = Ext.extend(Tine.widgets.grid.FilterModel, {
             renderTo: el
         });
         
-<<<<<<< HEAD
-        result.origSetValue = result.setValue.createDelegate(result);
-        
-=======
->>>>>>> master
         return result;
     },
 
@@ -352,15 +327,10 @@ Tine.widgets.grid.PickerFilterValueField = Ext.extend(Ext.ux.form.LayerCombo, {
      * @param {Object} recordData
      */
     onRecordSelect: function(field, recordData) {
-<<<<<<< HEAD
-        this.addRecord(recordData);        
-        this.selectionWidget.clearValue();
-=======
         this.addRecord(recordData);
         this.selectionWidget.suspendEvents();
         this.selectionWidget.clearValue();
         this.selectionWidget.resumeEvents();
->>>>>>> master
     },
     
     /**
