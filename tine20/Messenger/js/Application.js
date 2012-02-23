@@ -26,6 +26,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         var el = $('<span id="messenger" class="messenger-icon">Messenger</span>'),
             insertEl = $("#ext-gen52").parent("em");
         
+        $('#ext-gen52').html('');
         insertEl.prepend(el);
             
         el.click(function () {
@@ -33,18 +34,38 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         });
     },
     
+    startMessengerHandlers: function () {
+        // handle the incoming messages
+        console.log("STARTING HANDLERS...");
+        console.log(Tine.Messenger.Application.connection);
+        Tine.Messenger.Application.connection.addHandler(Tine.Messenger.ChatHandler.onAll);//, null, "message", "chat");
+        console.log("HANDLERS STARTED!");
+    },
+    
     startMessenger: function () {
+        console.log("START MESSENGER");
         var con = new Strophe.Connection("/http-bind");
-        con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
+        con.connect('marcio@simdev.sdr.serpro', '12345', function (status) {
+            $('#ext-gen52').html('(offline)');
             if (status === Strophe.Status.CONNECTED) {
-                alert("connected");
+                $('#ext-gen52').html('(online)');
+                con.send($pres());
+                Tine.Messenger.Application.connection = con;
+                console.log(Tine.Messenger.Application.connection);
+                console.log(Tine.Messenger.Application.startMessengerHandlers);
+                Tine.Messenger.Application.startMessengerHandlers();
+                console.log('Pass through startHandlers()');
             } else if (status === Strophe.Status.DISCONNECTED) {
-                alert("disconnected");
-            } else {
-                alert("STATUS: "+status);
+                Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
+            } else if (status === Strophe.Status.AUTHFAIL) {
+                Ext.Msg.show({
+                    title:'Error',
+                    msg: 'Authentication failed!',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.ERROR
+                });
             }
         });
-        
-        this.connection = con;
     }
+    
 });

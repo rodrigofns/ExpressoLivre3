@@ -1,3 +1,5 @@
+Ext.ns('Tine.Messenger');
+
 Tine.Messenger.Window = new Ext.Window({
     title: 'Expresso Messenger',
     iconCls: 'messenger-icon',

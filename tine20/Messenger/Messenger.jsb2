@@ -20,7 +20,11 @@
           "path": "js/"
         },
         {
-          "text": "Messenger.js",
+          "text": "Window.js",
+          "path": "js/"
+        },
+        {
+          "text": "ChatHandler.js",
           "path": "js/"
         },
         {
