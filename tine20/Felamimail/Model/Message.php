@@ -155,6 +155,31 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     {
         return (is_array($this->flags) && in_array(Zend_Mail_Storage::FLAG_SEEN, $this->flags));
     }    
+
+    /**
+     * Send the reading confirmation in a message who has the correct header and is not seen yet
+     *
+     * @return void
+     */
+    public function sendReadingConfirmation()
+    {
+        if (($this->headers['disposition-notification-to']) && (!$this->hasSeenFlag()))
+        {
+            $translate = Tinebase_Translation::getTranslation($this->_application);
+            $from = Felamimail_Controller_Account::getInstance()->get($this->account_id);
+
+            $message = new Felamimail_Model_Message();
+            $message->account_id = $this->account_id;
+
+            $message->to         = $this->headers['disposition-notification-to'];
+            $message->subject    = $translate->_('Reading Confirmation:') . ' '. $this->subject;
+            $message->body       = $translate->_('Your message:'). ' ' . $this->subject . "\n" .
+                                   $translate->_('Received in')  . ' ' . $this->received . "\n" .
+                                   $translate->_('Was readed by:') . ' ' . $from->from .  ' <' . $from->email .'> ' .
+                                   'em' . ' ' . (date('Y-m-d H:i:s'));
+            Felamimail_Controller_Message_Send::getInstance()->sendMessage($message);
+        }
+    }
     
     /**
      * parse headers and set 'date', 'from', 'to', 'cc', 'bcc', 'subject', 'sender' fields
