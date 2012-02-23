@@ -430,7 +430,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             $event = $this->get($_record->getId());
             if ($this->_doContainerACLChecks === FALSE || $event->hasGrant(Tinebase_Model_Grants::GRANT_EDIT)) {
                 Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " updating event: {$_record->id} ");
-    	        
+                
                 // we need to resolve groupmembers before free/busy checking
                 Calendar_Model_Attender::resolveGroupMembers($_record->attendee);
                         
@@ -691,8 +691,25 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             
             // update baseEvent
             $rrule = Calendar_Model_Rrule::getRruleFromString($baseEvent->rrule);
-            $rrule->until = $_event->getOriginalDtStart();
-            $rrule->until->subHour(1);
+            if (isset($rrule->count)) {
+                // get all occurences and find the split
+                
+                $exdate = $baseEvent->exdate;
+                $baseEvent->exdate = NULL;
+                    //$baseCountOccurrence = Calendar_Model_Rrule::computeNextOccurrence($baseEvent, new Tinebase_Record_RecordSet('Calendar_Model_Event'), $baseEvent->rrule_until, $baseCount);
+                $recurSet = Calendar_Model_Rrule::computeRecurrenceSet($baseEvent, new Tinebase_Record_RecordSet('Calendar_Model_Event'), $baseEvent->dtstart, $baseEvent->rrule_until);
+                $baseEvent->exdate = $exdate;
+                
+                $originalDtstart = $_event->getOriginalDtStart();
+                foreach($recurSet as $idx => $rInstance) {
+                    if ($rInstance->dtstart >= $originalDtstart) break;
+                }
+                
+                $rrule->count = $idx+1;
+            } else {
+                $rrule->until = $_event->getOriginalDtStart();
+                $rrule->until->subHour(1);
+            }
             $baseEvent->rrule = (string) $rrule;
             $baseEvent->exdate = $pastExdates;
             
@@ -714,6 +731,14 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
                 $_event->dtstart = clone $originalDtstart;
                 $_event->dtend = clone $originalDtstart;
                 $_event->dtend->add($eventLength);
+                
+                // adopt count
+                if (isset($rrule->count)) {
+                    $baseCount = $rrule->count;
+                    $rrule = Calendar_Model_Rrule::getRruleFromString($_event->rrule);
+                    $rrule->count = $rrule->count - $baseCount;
+                    $_event->rrule = (string) $rrule;
+                }
                 
                 $_event->setId(NULL);
                 $_event->uid = $futurePersistentExceptionEvents->uid = Tinebase_Record_Abstract::generateUID();
