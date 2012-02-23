@@ -1,6 +1,12 @@
 #messenger {
-    color: blue;
+    color: #000000;
     cursor: pointer;
     font-weight: bold;
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+.messenger-icon {
+    background-image: url(/images/talk-balloons.png);
+    background-repeat: no-repeat;
+    padding-left: 20px;
 }

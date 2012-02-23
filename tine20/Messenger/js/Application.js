@@ -1,25 +1,29 @@
 Ext.ns('Tine.Messenger');
 
-console.log("=========");
-console.log(Tine.Tinebase.MainMenu);
-console.log("=========");
-
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     hasMainScreen: false,
     
-    showAlertDelayedTask: null,
+    showMessengerDelayedTask: null,
+    
+    startMessengerDelayedTask: null,
+    
+    // The XMPP Connection to the BOSH server
+    connection: null,
     
     getTitle: function () {
         return "Expresso Messenger";
     },
     
     init: function () {
-        this.showAlertDelayedTask = new Ext.util.DelayedTask(this.showAlert, this);
-        this.showAlertDelayedTask.delay(500);
+        this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
+        this.showMessengerDelayedTask.delay(500);
+        
+        this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
+        this.startMessengerDelayedTask.delay(500);
     },
     
-    showAlert: function () {
-        var el = $('<span id="messenger">MESSENGER</span>'),
+    showMessenger: function () {
+        var el = $('<span id="messenger" class="messenger-icon">Messenger</span>'),
             insertEl = $("#ext-gen52").parent("em");
         
         insertEl.prepend(el);
@@ -27,5 +31,20 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         el.click(function () {
             Tine.Messenger.Window.show();
         });
+    },
+    
+    startMessenger: function () {
+        var con = new Strophe.Connection("/http-bind");
+        con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
+            if (status === Strophe.Status.CONNECTED) {
+                alert("connected");
+            } else if (status === Strophe.Status.DISCONNECTED) {
+                alert("disconnected");
+            } else {
+                alert("STATUS: "+status);
+            }
+        });
+        
+        this.connection = con;
     }
 });
