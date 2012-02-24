@@ -15,8 +15,18 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
                     style: 'width: 100%;'
                 },
                 {
-                    xtype: 'textfield',
-                    style: 'width: 100%;'
+                    xtype:             'textfield',
+                    style:             'width: 100%;',
+                    cls:               'text-sender',
+                    handleMouseEvents: true,
+                    listeners: {
+                        scope: this,
+                        specialkey: function (field, ev) {
+                             if (ev.getKey() == ev.ENTER){
+                                 field.setValue("");
+                             }  
+                        }
+                    }
                 }
             ]
         });

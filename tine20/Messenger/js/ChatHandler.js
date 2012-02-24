@@ -30,13 +30,14 @@ Tine.Messenger.ChatHandler = {
         var name = $(message).attr("name") || raw_jid;
         var chat_id = "#messenger-chat-"+id;
         var chat_area = chat_id+" .chat";
-        var chat_sender = chat_id+" .sender";
+        var chat_sender = chat_id+" .text-sender";
         
         // Shows the chat specifc chat window
-        Tine.Messenger.ChatHandler.showChatWindow(id, name);
+        Tine.Messenger.ChatHandler.showChatWindow(chat_id, name);
         
         // Puts focus on chat's input text (sender box)
-        //$(chat_sender).focus();
+        // TODO: NOT WORKING! Focus the textfield!
+        $(chat_sender).focus();
         
         // Capture the message body element, 
         // extract text and append to chat area
@@ -47,7 +48,7 @@ Tine.Messenger.ChatHandler = {
         var msg = body.text(),
             txt = "<span class=\"recv\">&lt;"+name+"&gt;"+msg+"</span><br/>";
         //$(chat_area).append(txt);
-        console.log(txt);
+        Tine.Messenger.Log.debug(txt);
 
         return true;
     },
