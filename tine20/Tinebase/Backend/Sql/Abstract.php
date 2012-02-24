@@ -1325,4 +1325,61 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     	return $primaryKey;
     }
     
+    protected function _enableDbProfiler()
+    {
+    	$this->_db->getProfiler()->setEnabled(true);
+    }
+    
+    protected function _getLastProfile()
+    {
+    	return $this->_db->getProfiler()->getLastQueryProfile();
+    }
+    
+    protected function _disableDbProfiler()
+    {
+    	$profile = $this->_db->getProfiler()->getLastQueryProfile();
+    	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' profile query: ' . $profile->getQuery() . ' profile params: ' . print_r($profile->getQueryParams(),true));
+    	$this->_db->getProfiler()->setEnabled(false);
+    }
+    
+    /**
+     *
+     * @param string $table
+     * @param array $bind
+     * @todo improve when PHP traits are available
+     */
+    protected function _insertWithProfile($table, array $bind)
+    {
+    	$this->_enableDbProfiler();
+    	$this->_db->insert($table, $bind);
+    	$this->_disableDbProfiler();
+    }
+    
+    /**
+     *
+     * @param string $table
+     * @param array $bind
+     * @param string $where
+     * @todo improve when PHP traits are available
+     */
+    protected function _updateWithProfile($table, array $bind, $where)
+    {
+    	$this->_enableDbProfiler();
+    	$this->_db->update($table, $bind,$where);
+    	$this->_disableDbProfiler();
+    }
+    
+    /**
+     *
+     * @param string $table
+     * @param string $where
+     * $todo improve when PHP traits are available
+     */
+    protected function _deleteWithProfile($table, $where)
+    {
+    	$this->_enableDbProfiler();
+    	$this->_db->delete($table, $where);
+    	$this->_disableDbProfiler();
+    }    
+    
 }
