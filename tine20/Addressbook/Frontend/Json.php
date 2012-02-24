@@ -42,6 +42,7 @@ class Addressbook_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     public static function resolveImages(Tinebase_Record_RecordSet $_records)
     {
         foreach($_records as &$record) {
+        	if (!isset($record['jpegphoto'])) continue; 
             if($record['jpegphoto'] == '1') {
                 $record['jpegphoto'] = Tinebase_Model_Image::getImageUrl('Addressbook', $record->__get('id'), '');
             }
