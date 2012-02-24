@@ -9,10 +9,11 @@ Tine.Messenger.ChatHandler = {
         return id.replace(/_/g, "@").replace(/\-/g, ".");
     },
     
-    createWindowChat: function (id, name) {
-        console.log("Creating Chat Window");
+    showChatWindow: function (id, name) {
+        // Shows the chat window OR
         if (Ext.getCmp(id)) {
             Ext.getCmp(id).show();
+        // Creates it if doesn't exist and show
         } else {
             var chat = new Tine.Messenger.Chat({
                 title: name,
@@ -31,10 +32,9 @@ Tine.Messenger.ChatHandler = {
         var chat_area = chat_id+" .chat";
         var chat_sender = chat_id+" .sender";
         
-        // Creates chat if doesn't exist
-        //if ($(chat_id).length === 0) {
-            Tine.Messenger.ChatHandler.createWindowChat(id, name);
-        //}
+        // Shows the chat specifc chat window
+        Tine.Messenger.ChatHandler.showChatWindow(id, name);
+        
         // Puts focus on chat's input text (sender box)
         //$(chat_sender).focus();
         
