@@ -24,6 +24,10 @@
           "path": "js/"
         },
         {
+          "text": "Chat.js",
+          "path": "js/"
+        },
+        {
           "text": "ChatHandler.js",
           "path": "js/"
         },
