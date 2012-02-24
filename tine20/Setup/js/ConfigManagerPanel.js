@@ -144,14 +144,10 @@ Tine.Setup.ConfigManagerPanel = Ext.extend(Tine.Tinebase.widgets.form.ConfigPane
         	name: 'database_adapter',
             fieldLabel: this.app.i18n._('Adapter'),
             value: 'pdo_mysql',
-<<<<<<< HEAD
-            store: [ ['pdo_mysql', 'MySQL'], ['oracle', 'Oracle'], ['pdo_pgsql', 'PostgreSQL'] ],
-=======
             store: [
                 ['pdo_mysql', 'MySQL']
                 //['pdo_pgsql', 'PostgreSQL']
             ],
->>>>>>> master
             listeners: {
                 scope: this,
                 change: this.onChangeSqlBackend,

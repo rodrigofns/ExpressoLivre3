@@ -53,11 +53,7 @@ Tine.Crm.AddToLeadPanel = Ext.extend(Ext.FormPanel, {
     
     initActions: function() {
         this.action_cancel = new Ext.Action({
-<<<<<<< HEAD
-            text : this.app.i18n._('Cancel'),
-=======
             text : _('Cancel'),
->>>>>>> master
             minWidth : 70,
             scope : this,
             handler : this.onCancel,
@@ -65,11 +61,7 @@ Tine.Crm.AddToLeadPanel = Ext.extend(Ext.FormPanel, {
         });
         
         this.action_update = new Ext.Action({
-<<<<<<< HEAD
-            text : this.app.i18n._('OK'),
-=======
             text : _('Ok'),
->>>>>>> master
             minWidth : 70,
             scope : this,
             handler : this.onUpdate,

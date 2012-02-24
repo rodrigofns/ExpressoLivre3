@@ -66,40 +66,6 @@ Tine.Calendar.RrulePanel = Ext.extend(Ext.Panel, {
         
         this.tbar = [{
             id: this.idPrefix + 'tglbtn' + 'NONE',
-<<<<<<< HEAD
-                xtype: 'tbbtnlockedtoggle',
-                enableToggle: true,
-                //pressed: true,
-                text: this.app.i18n._('None'),
-                handler: this.onFreqChange.createDelegate(this, ['NONE']),
-                toggleGroup: this.idPrefix + 'freqtglgroup'
-            }, {
-                id: this.idPrefix + 'tglbtn' + 'DAILY',
-                xtype: 'tbbtnlockedtoggle',
-                enableToggle: true,
-                text: this.app.i18n._('Daily'),
-                handler: this.onFreqChange.createDelegate(this, ['DAILY']),
-                toggleGroup: this.idPrefix + 'freqtglgroup'
-            }, {
-                id: this.idPrefix + 'tglbtn' + 'WEEKLY',
-                xtype: 'tbbtnlockedtoggle',
-                enableToggle: true,
-                text: this.app.i18n._('Weekly'),
-                handler: this.onFreqChange.createDelegate(this, ['WEEKLY']),
-                toggleGroup: this.idPrefix + 'freqtglgroup'
-            }, {
-                id: this.idPrefix + 'tglbtn' + 'MONTHLY',
-                xtype: 'tbbtnlockedtoggle',
-                enableToggle: true,
-                text: this.app.i18n._('Monthly'),
-                handler: this.onFreqChange.createDelegate(this, ['MONTHLY']),
-                toggleGroup: this.idPrefix + 'freqtglgroup'
-            }, {
-                id: this.idPrefix + 'tglbtn' + 'YEARLY',
-                xtype: 'tbbtnlockedtoggle',
-                enableToggle: true,
-                text: this.app.i18n._('Yearly'),
-=======
             xtype: 'tbbtnlockedtoggle',
             enableToggle: true,
             //pressed: true,
@@ -132,7 +98,6 @@ Tine.Calendar.RrulePanel = Ext.extend(Ext.Panel, {
             xtype: 'tbbtnlockedtoggle',
             enableToggle: true,
             text: this.app.i18n._('Yearly'),
->>>>>>> master
             handler: this.onFreqChange.createDelegate(this, ['YEARLY']),
             toggleGroup: this.idPrefix + 'freqtglgroup'
         }];
@@ -370,7 +335,6 @@ Tine.Calendar.RrulePanel.AbstractCard = Ext.extend(Ext.Panel, {
     },
     
     onLimitRender: function() {
-        try {
         var untilradioel = Ext.get(this.limitId + 'untilRadio');
         var untilel = Ext.get(this.limitId + 'until');
         
@@ -382,24 +346,11 @@ Tine.Calendar.RrulePanel.AbstractCard = Ext.extend(Ext.Panel, {
         }
         
         this.untilRadio.render(untilradioel);
-<<<<<<< HEAD
-            this.until.render(untilel);
-            this.until.wrap.setWidth(80);
-            
-            this.countRadio.render(countradioel);
-            this.count.render(countel);
-             
-        } catch (e) {
-            Tine.log.error('Tine.Calendar.RrulePanel::onLimitRender');
-            Tine.log.error(e);
-        }
-=======
         this.until.render(untilel);
         this.until.wrap.setWidth(80);
         
         this.countRadio.render(countradioel);
         this.count.render(countel);
->>>>>>> master
     },
     
     onLimitRadioCheck: function(radio, checked) {

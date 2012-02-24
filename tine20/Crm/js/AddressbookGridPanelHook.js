@@ -74,7 +74,6 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
     
     /**
      * @property newLeadAction
-<<<<<<< HEAD
      * @type Tine.widgets.ActionUpdater
      * @private
      */
@@ -85,18 +84,6 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
      * @type Tine.widgets.ActionUpdater
      * @private
      */
-=======
-     * @type Tine.widgets.ActionUpdater
-     * @private
-     */
-    newLeadAction: null,
-
-    /**
-     * @property addLeadAction
-     * @type Tine.widgets.ActionUpdater
-     * @private
-     */
->>>>>>> master
     addLeadAction: null,    
     
     /**
@@ -139,10 +126,7 @@ Ext.apply(Tine.Crm.AddressbookGridPanelHook.prototype, {
             record: new Tine.Crm.Model.Lead(leadData, 0)
         });
     },
-<<<<<<< HEAD
-=======
     
->>>>>>> master
     onAddLead: function(btn) {
         var contacts = this.getSelectionsAsArray();
         Tine.Crm.AddToLeadPanel.openWindow({attendee: contacts});

@@ -662,7 +662,6 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
     },
     
     onUpdateEventAction: function(event) {
-        try {
         var panel = this.getCalendarPanel(this.activeView),
             store = panel.getStore(),
             view = panel.getView();
@@ -673,36 +672,6 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
                 if (updatedEvent.isRecurBase()) {
                     store.load({refresh: true});
                 } else {
-<<<<<<< HEAD
-                        
-                        // no sm when called from another app
-                        if (view && view.calPanel && view.rendered) {
-                            
-                            // find out if filter still matches for this record
-                            var filterData = this.getAllFilterData();
-                            filterData[0].filters[0].filters.push({field: 'id', operator: 'in', value: [ event.get('id') ]});
-                            
-                            Tine.Calendar.searchEvents(filterData, {}, function(r) {
-                                if(event) store.replaceRecord(event, updatedEvent);
-                                else store.add(updatedEvent);
-                                
-                                view.getSelectionModel().select(updatedEvent);
-                                var selection = view.getSelectionModel().getSelected();
-                                
-                                if(r.totalcount == 0) {   
-                                    selection.ui.markOutOfFilter();
-                                } 
-    
-                                this.setLoading(false);                            
-                            }, this);
-                        } else {
-                            if(event) store.replaceRecord(event, updatedEvent);
-                            else store.add(updatedEvent);
-                            this.setLoading(false);
-                        }
-                   }
-                },
-=======
                     // no sm when called from another app
                     if (view && view.calPanel && view.rendered) {
                         this.congruenceFilterCheck(event, updatedEvent);
@@ -713,19 +682,11 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
                     }
                }
             },
->>>>>>> master
             failure: this.onProxyFail.createDelegate(this, [event], true)
         }, {
-                checkBusyConflicts: 1
-            });
-        } catch(e) {
-            Tine.log.error('Tine.Calendar.MainScreenCenterPanel::onUpdateEventAction');
-            Tine.log.error(e.stack ? e.stack : e);
-        } 
+            checkBusyConflicts: 1
+        });
     },
-<<<<<<< HEAD
-       
-=======
 
     /**
      * checks, if the last filter still matches after update 
@@ -758,7 +719,6 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
         }, this);
     },
     
->>>>>>> master
     onDeleteRecords: function () {
         var panel = this.getCalendarPanel(this.activeView);
         var selection = panel.getSelectionModel().getSelectedEvents();
