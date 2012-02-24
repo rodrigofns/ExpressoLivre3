@@ -47,7 +47,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 con.send($pres());
                 // Setting the connection property
                 Tine.Messenger.Application.connection = con;
-                // Start the handlers
+                
+                // START THE HANDLERS
+                // Chat Messaging handler
                 Tine.Messenger.Application.connection.addHandler(
                     Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
                 );
