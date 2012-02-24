@@ -10,15 +10,16 @@ Tine.Messenger.ChatHandler = {
     },
     
     createWindowChat: function (id, name) {
-        console.log("CREATING WINDOW!!!");
-        console.log(Tine.Messenger.Chat);
-        var chat = new Tine.Messenger.Chat({
-            title: name,
-            id: id
-        });
-        
-        chat.show();
-        console.log(chat);
+        console.log("Creating Chat Window");
+        if (Ext.getCmp(id)) {
+            Ext.getCmp(id).show();
+        } else {
+            var chat = new Tine.Messenger.Chat({
+                title: name,
+                id: id
+            });
+            chat.show();
+        }
     },
     
     onIncomingMessage: function (message) {
@@ -29,7 +30,6 @@ Tine.Messenger.ChatHandler = {
         var chat_id = "#messenger-chat-"+id;
         var chat_area = chat_id+" .chat";
         var chat_sender = chat_id+" .sender";
-        
         
         // Creates chat if doesn't exist
         //if ($(chat_id).length === 0) {

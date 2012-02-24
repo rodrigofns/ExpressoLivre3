@@ -1,5 +1,28 @@
 Ext.ns('Tine.Messenger');
 
+// Show Messenger's messages (info, errors, etc)
+// in the browsers debugging console
+// ex.: Chrome's Developer Tools, Firebug, etc
+Tine.Messenger.Log = {
+    prefix: 'EXPRESSO MESSENGER: ',
+    
+    info: function (txt) {
+        Tine.log.info(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    error: function (txt) {
+        Tine.log.error(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    debug: function (txt) {
+        Tine.log.debug(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    warn: function (txt) {
+        Tine.log.warn(Tine.Messenger.Log.prefix + txt);
+    }
+};
+
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     hasMainScreen: false,
     
@@ -37,11 +60,24 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     startMessenger: function () {
-        console.log("START MESSENGER");
+        Tine.Messenger.Log.debug("Starting Messenger...");
         var con = new Strophe.Connection("/http-bind");
         con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
             $('#ext-gen52').html('(offline)');
-            if (status === Strophe.Status.CONNECTED) {
+            if (status === Strophe.Status.CONNECTING) {
+                Tine.Messenger.Log.debug("Connecting...");
+            } else if (status === Strophe.Status.CONNFAIL) {
+                Tine.Messenger.Log.error("Connection failed!");
+                Ext.Msg.show({
+                    title:'Error',
+                    msg: 'Authentication failed!',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.ERROR
+                });
+            } else if (status === Strophe.Status.AUTHENTICATING) {
+                Tine.Messenger.Log.debug("Authenticating...");
+            } else if (status === Strophe.Status.CONNECTED) {
+                Tine.Messenger.Log.debug("Connected!");
                 $('#ext-gen52').html('(online)');
                 // Send user presence
                 con.send($pres());
