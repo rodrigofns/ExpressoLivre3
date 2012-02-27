@@ -54,7 +54,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     showMessenger: function () {
-        Tine.Tinebase.MainScreen.getMainMenu().add({
+        Tine.Tinebase.MainScreen.getMainMenu().insert(3, {
             xtype: 'button',
             html: '<span id="messenger">Messenger</span>',
             cls: 'messenger-icon',
