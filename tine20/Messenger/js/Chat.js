@@ -9,15 +9,19 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
             height:      300,
             closeAction: 'hide', //'close' - destroy the component
             plain:       true,
+            layout: 'border',
             items: [
                 {
-                    xtype: 'textarea',
-                    style: 'width: 100%;'
+                    region: 'center',
+                    xtype: 'panel',
+                    style: 'width: 100%;',
+                    autoScroll: true
                 },
                 {
-                    xtype:             'textfield',
-                    style:             'width: 100%;',
-                    cls:               'text-sender',
+                    region: 'south',
+                    xtype: 'textfield',
+                    style: 'width: 100%;',
+                    cls:   'text-sender',
                     handleMouseEvents: true,
                     listeners: {
                         scope: this,

@@ -48,22 +48,22 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     showMessenger: function () {
-        var el = $('<span id="messenger" class="messenger-icon">Messenger</span>'),
-            insertEl = $("#ext-gen52").parent("em");
-        
-        $('#ext-gen52').html('');
-        insertEl.prepend(el);
-            
-        el.click(function () {
-            Tine.Messenger.Window.show();
+        Tine.Tinebase.MainScreen.getMainMenu().add({
+            xtype: 'button',
+            html: '<span id="messenger">Messenger</span>',
+            cls: 'messenger-icon',
+            handler: function (bt, ev) {
+                Tine.Messenger.Window.show();
+            }
         });
+        Tine.Tinebase.MainScreen.getMainMenu().doLayout();
     },
     
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
         var con = new Strophe.Connection("/http-bind");
         con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
-            $('#ext-gen52').html('(offline)');
+            Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
             if (status === Strophe.Status.CONNECTING) {
                 Tine.Messenger.Log.debug("Connecting...");
             } else if (status === Strophe.Status.CONNFAIL) {
@@ -78,7 +78,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Log.debug("Authenticating...");
             } else if (status === Strophe.Status.CONNECTED) {
                 Tine.Messenger.Log.debug("Connected!");
-                $('#ext-gen52').html('(online)');
+                Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
                 // Send user presence
                 con.send($pres());
                 // Setting the connection property
@@ -100,6 +100,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 });
             }
         });
+    },
+    
+    // Private Methods
+    _setStatus: function (status) {
+        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus(status);
     }
     
 });

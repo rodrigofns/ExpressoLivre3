@@ -5,8 +5,20 @@
     margin-left: 5px;
 }
 
+#messenger:hover {
+    text-decoration: underline;
+}
+
 .messenger-icon {
     background-image: url(/images/talk-balloons.png);
     background-repeat: no-repeat;
-    padding-left: 20px;
+    padding-left: 12px;
+}
+
+.recv {
+    color: blue;
+}
+
+.send {
+    color: red;
 }
