@@ -15,10 +15,41 @@
     padding-left: 12px;
 }
 
-.recv {
+.chat-message {
+    font-size: 1.2em;
+    padding: 4px;
+    border-bottom: 1px solid #bebebe;
+}
+
+.chat-message .x-panel-body {
+    border: 0;
+}
+
+.text-sender {
+    font-size: 1.2em;
+    font-weight: bold;
+    width: 100%;
+}
+
+.messenger-receive {
     color: blue;
 }
 
-.send {
+.messenger-receive strong {
+    color: #0000a8;
+    font-weight: bold;
+}
+
+.messenger-send {
     color: red;
+}
+
+.messenger-send strong {
+    color: #a80000;
+    font-weight: bold;
+}
+
+.messenger-notify {
+    color: green;
+    font-weight: bold;
 }

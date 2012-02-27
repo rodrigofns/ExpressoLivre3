@@ -1,5 +1,9 @@
 Ext.ns('Tine.Messenger');
 
+// Messenger Application constants
+var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
+    
+
 // Show Messenger's messages (info, errors, etc)
 // in the browsers debugging console
 // ex.: Chrome's Developer Tools, Firebug, etc
@@ -24,8 +28,10 @@ Tine.Messenger.Log = {
 };
 
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
+    // Tinebase.Application configs
     hasMainScreen: false,
     
+    // Delayed Tasks
     showMessengerDelayedTask: null,
     
     startMessengerDelayedTask: null,

@@ -6,7 +6,10 @@ Tine.Messenger.ChatHandler = {
     },
     
     idToJid: function (id) {
-        return id.replace(/_/g, "@").replace(/\-/g, ".");
+        var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
+            id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
+            id;
+        return clean.replace(/_/g, "@").replace(/\-/g, ".");
     },
     
     showChatWindow: function (id, name) {
@@ -23,17 +26,48 @@ Tine.Messenger.ChatHandler = {
         }
     },
     
+    formatMessage: function (message, name, flow) {
+        var space = '&nbsp;&nbsp;';
+        flow = flow || 'messenger-send';
+        name = (name) ? "<strong>&lt;" + name + "&gt;</strong>" + space : '';
+        var txt = "<span class=\"" + flow + "\">" + 
+                     name + message.replace(/\n/g, '<br/>') + 
+                  "</span><br/>";
+              
+        return txt;
+    },
+    
+    /** flow parameter:
+     *      'messenger-send' => message that user send
+     *      'messenger-receive' => message that user received
+     *      'messenger-notify' => notification that user received
+     */
+    setChatMessage: function (chat_id, msg, name, flow) {
+        var chat_area = Ext.getCmp(chat_id).items.items[0],
+            panel_id = '#'+chat_area.getId()+' .x-panel-body';
+
+        chat_area.add({
+            xtype: 'panel',
+            html: Tine.Messenger.ChatHandler.formatMessage(msg, name, flow),
+            cls: 'chat-message'
+        });
+        chat_area.doLayout();
+
+        $(panel_id).scrollTop($(panel_id).get(0).scrollHeight);
+
+        Tine.Messenger.Log.debug('Incoming: '+msg);
+    },
+    
     onIncomingMessage: function (message) {
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
         var id = Tine.Messenger.ChatHandler.jidToId(jid);
         var name = $(message).attr("name") || raw_jid;
-        var chat_id = "#messenger-chat-"+id;
-        var chat_sender = chat_id+" .text-sender";
+        var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
+        var chat_sender = chat_id + " .text-sender";
         
         // Shows the chat specifc chat window
         Tine.Messenger.ChatHandler.showChatWindow(chat_id, name);
-        var chat_area = Ext.getCmp(chat_id).items.items[0];
         
         // Capture the message body element, 
         // extract text and append to chat area
@@ -41,23 +75,19 @@ Tine.Messenger.ChatHandler = {
         if (body.length === 0) {
             body = $(message).find("body");
         }
-        var space = '&nbsp;&nbsp;&nbsp;&nbsp;',
-            msg = body.text(),
-            txt = "<span class=\"recv\">&lt;"+name+"&gt;"+space+msg+"</span><br/>";
-        chat_area.add({
-            xtype: 'panel',
-            html: txt
-        });
-        chat_area.doLayout();
-        var panel_id = '#'+chat_area.getId()+' .x-panel-body';
-        $(panel_id).scrollTop($(panel_id).get(0).scrollHeight);
+        Tine.Messenger.ChatHandler.setChatMessage(chat_id, body.text(), name, 'messenger-receive');
         
-        Tine.Messenger.Log.debug(txt);
-
         return true;
     },
     
-    onOutgoingMessage: function (message) {
+    sendMessage: function (msg, id) {
+        Tine.Messenger.Application.connection.send($msg({
+            "to": Tine.Messenger.ChatHandler.idToJid(id),
+            "type": "chat"
+        }).c("body").t(msg));
+        
+        Tine.Messenger.ChatHandler.setChatMessage(id, msg, _('ME'));
+        
         return true;
     }
 }
