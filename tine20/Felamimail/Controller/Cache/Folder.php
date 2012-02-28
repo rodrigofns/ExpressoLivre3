@@ -258,7 +258,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
             
         // check validity
         $folder->cache_uidvalidity = $folder->imap_uidvalidity;
-        $folder->imap_uidvalidity  = $counter['uidvalidity'];
+        $folder->imap_uidvalidity  = $counter['uidvalidity']; 
+        $folder->cache_uidvalidity = empty($folder->cache_uidvalidity) ? $folder->imap_uidvalidity : $folder->cache_uidvalidity;  
         $folder->imap_totalcount   = $counter['exists'];
         $folder->imap_status       = Felamimail_Model_Folder::IMAP_STATUS_OK;
         $folder->imap_timestamp    = Tinebase_DateTime::now();
