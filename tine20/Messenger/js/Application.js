@@ -111,11 +111,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 });
             }
         });
-    },
-    
-    // Private Methods
-    _setStatus: function (status) {
-        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus(status);
     }
     
 });

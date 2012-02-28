@@ -12,7 +12,6 @@ Tine.Messenger.RosterHandler = {
                                                                                     cls:'messenger-contact',
                                                                                     icon: 'images/icon-presence.gif'
                                                                                     } ))
-            console.log(Ext.getCmp('roster'));
             //var contact = "<span id=\""+jid+"\" class=\"roster-contact offline\">"+name+"</span>";
         });
         
