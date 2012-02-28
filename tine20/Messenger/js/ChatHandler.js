@@ -64,7 +64,6 @@ Tine.Messenger.ChatHandler = {
         var id = Tine.Messenger.ChatHandler.jidToId(jid);
         var name = $(message).attr("name") || raw_jid;
         var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
-        var chat_sender = chat_id + " .text-sender";
         
         // Shows the chat specifc chat window
         Tine.Messenger.ChatHandler.showChatWindow(chat_id, name);
