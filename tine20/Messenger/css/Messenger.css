@@ -53,3 +53,26 @@
     color: green;
     font-weight: bold;
 }
+
+.messenger-treeview .x-panel-body {
+    width: 100%;
+    height: 100%;
+}
+
+.messenger-contact {
+    font-size: 12px;
+}
+
+.x-tree-lines .x-tree-elbow {
+    background-image: none !important;
+    width: 0 !important;
+}
+
+.x-tree-lines .x-tree-elbow-end {
+    background-image: none !important;
+    width: 0 !important;
+}
+
+.x-tree-node-leaf .x-tree-node-icon {
+    background-image: none !important;
+}

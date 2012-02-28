@@ -32,6 +32,10 @@
           "path": "js/"
         },
         {
+          "text": "RosterHandler.js",
+          "path": "js/"
+        },
+        {
           "text": "strophe.min.js",
           "path": "js/"
         }

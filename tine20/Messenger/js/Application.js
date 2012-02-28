@@ -95,6 +95,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Application.connection.addHandler(
                     Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
                 );
+                var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
+                con.sendIQ(roster, Tine.Messenger.RosterHandler.onStartRoster);
+                Tine.Messenger.Application.connection.addHandler(
+                    Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
+                );
             } else if (status === Strophe.Status.DISCONNECTED) {
                 Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
             } else if (status === Strophe.Status.AUTHFAIL) {
