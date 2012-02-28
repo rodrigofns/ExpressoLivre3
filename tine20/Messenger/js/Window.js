@@ -3,6 +3,7 @@ Ext.ns('Tine.Messenger');
 var tree = new Ext.tree.TreePanel({
      id: 'roster',
      loader:new Ext.tree.TreeLoader(),
+     border: false,
      cls: 'messenger-treeview',
      rootVisible: false,
      renderTo:Ext.getBody(),
@@ -21,6 +22,7 @@ Tine.Messenger.Window = new Ext.Window({
     height:      450,
     closeAction: 'hide', //'close' - destroy the component
     plain:       true,
+    layout: 'fit',
     items: tree,
     buttons: [{
         text: 'Close',
