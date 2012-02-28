@@ -64,18 +64,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
     },
-    
-    jidToId: function (jid) {
-        return jid.replace(/@/g, "_").replace(/\./g, "-");
-    },
-    
-    idToJid: function (id) {
-        var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
-            id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
-            id;
-        return clean.replace(/_/g, "@").replace(/\-/g, ".");
-    },
-    
+
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
         var con = new Strophe.Connection("/http-bind");
@@ -130,3 +119,16 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     }
     
 });
+
+Tine.Messenger.Util = {
+    jidToId: function (jid) {
+        return jid.replace(/@/g, "_").replace(/\./g, "-");
+    },
+    
+    idToJid: function (id) {
+        var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
+            id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
+            id;
+        return clean.replace(/_/g, "@").replace(/\-/g, ".");
+    }
+}

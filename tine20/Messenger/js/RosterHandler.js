@@ -7,7 +7,7 @@ Tine.Messenger.RosterHandler = {
             var jid = $(this).attr("jid"),
                 name = $(this).attr("name") || jid;
 
-            jid = Tine.Messenger.Application.jidToId(Strophe.getBareJidFromJid(jid));
+            jid = Tine.Messenger.Util.jidToId(Strophe.getBareJidFromJid(jid));
             Ext.getCmp('roster').getRootNode().appendChild(new Ext.tree.TreeNode( {text:name, 
                                                                                     cls:'messenger-contact',
                                                                                     icon: 'images/icon-presence.gif'
