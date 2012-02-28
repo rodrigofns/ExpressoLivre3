@@ -1,6 +1,7 @@
 Ext.ns('Tine.Messenger');
 
 Tine.Messenger.ChatHandler = {
+    // TODO-EXP: Put jidToId and idToJid in Application
     jidToId: function (jid) {
         return jid.replace(/@/g, "_").replace(/\./g, "-");
     },
@@ -11,7 +12,12 @@ Tine.Messenger.ChatHandler = {
             id;
         return clean.replace(/_/g, "@").replace(/\-/g, ".");
     },
-    
+    // TODO-EXP: transform jid at arrival not outside
+    // showChatWindow: function (jid, name) {
+    //     ...
+    //     var id = MESSENGER_CHAT_ID_PREFIX + Tine.Messenger.ChatHandler.jidToId(jid);
+    //     ...
+    // }
     showChatWindow: function (id, name) {
         // Shows the chat window OR
         if (Ext.getCmp(id)) {
