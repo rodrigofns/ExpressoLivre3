@@ -112,7 +112,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
             );
-
+            // Logs handler
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.LogHandler.getPresence, null, 'presence'
+            );
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.LogHandler.onErrorMessage, null, 'message','error'
+            );
             // Start unload events
             window.onbeforeunload = function () {
                 return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
