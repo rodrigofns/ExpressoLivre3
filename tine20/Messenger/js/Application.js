@@ -87,7 +87,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // START THE HANDLERS
             // Chat Messaging handler
             Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
+//                Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
+                Tine.Messenger.LogHandler.onIncoming, null, 'message', 'chat'
             );
             
             // Getting Roster

@@ -65,8 +65,7 @@ Tine.Messenger.LogHandler = {
     onErrorMessage: function(message){
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var id = Tine.Messenger.Util.jidToId(jid);
-        var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
         var body = $(message).children("body");
         
         Tine.Messenger.ChatHandler.setChatMessage(chat_id, "erro ao enviar: "+body.text(), _('Erro'), 'messenger-notify');
@@ -76,11 +75,31 @@ Tine.Messenger.LogHandler = {
     },
     onChatStatusChange: function(raw_jid, status){
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var id = Tine.Messenger.Util.jidToId(jid);
-        var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
         
         if(Ext.getCmp(chat_id)){
             Tine.Messenger.ChatHandler.setChatMessage(chat_id, status, _('Info'), 'messenger-notify');
+        }
+        
+        return true;
+    },
+    onIncoming: function(message){
+        var raw_jid = $(message).attr("from");
+        var jid = Strophe.getBareJidFromJid(raw_jid);
+        
+        var composing = $(message).children("composing");
+        var msg = $(message).children("body");
+        var paused = $(message).children("paused");
+
+        Tine.Messenger.Log.debug("Msg:"+msg.length+"   Paused: "+paused.length+"  Composing: "+composing.length);
+        
+        if(msg.length > 0){
+            Tine.Messenger.Log.debug("Menssagem enviada");
+            Tine.Messenger.ChatHandler.onIncomingMessage(message);
+        }else if(paused.length > 0){
+            Tine.Messenger.Log.debug("Parou de digitar");
+        }else if(composing.length > 0){
+            Tine.Messenger.Log.debug(jid+" está digitando...");
         }
         
         return true;
