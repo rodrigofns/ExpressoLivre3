@@ -15,7 +15,7 @@ Tine.Messenger.RosterHandler = {
                                             id: jid
                                           } );
             node.on('dblclick', Tine.Messenger.RosterHandler.abreChat);
-            Ext.getCmp('roster').getRootNode().appendChild(node);
+            Ext.getCmp('messenger-roster').getRootNode().appendChild(node);
         });
         
         return true;
