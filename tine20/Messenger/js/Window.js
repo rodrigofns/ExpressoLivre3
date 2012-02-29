@@ -61,8 +61,16 @@ Tine.Messenger.Window = new Ext.Window({
                                 text: 'GO',
                                 listeners: {
                                     click: function () {
+                                        var user = Ext.getCmp('messenger-connect-login').getValue();
+                                        
+                                        if (user.indexOf('@') < 0) {
+                                            user += '@simdev.sdr.serpro/expresso-3.0';
+                                        }                                        
+                                        if (user.indexOf('expresso-3.0') < 0) {
+                                            user += '/expresso-3.0';
+                                        }
                                         Tine.Tinebase.registry.add('messengerAccount', {
-                                            login: Ext.getCmp('messenger-connect-login').getValue(),
+                                            login: user,
                                             password: Ext.getCmp('messenger-connect-pwd').getValue()
                                         });
                                         Ext.getCmp('messenger-connect-window').close();
