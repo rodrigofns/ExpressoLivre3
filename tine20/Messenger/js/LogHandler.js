@@ -1,5 +1,28 @@
 Ext.ns('Tine.Messenger');
 
+// Show Messenger's messages (info, errors, etc)
+// in the browsers debugging console
+// ex.: Chrome's Developer Tools, Firebug, etc
+Tine.Messenger.Log = {
+    prefix: 'EXPRESSO MESSENGER: ',
+    
+    info: function (txt) {
+        Tine.log.info(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    error: function (txt) {
+        Tine.log.error(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    debug: function (txt) {
+        Tine.log.debug(Tine.Messenger.Log.prefix + txt);
+    },
+    
+    warn: function (txt) {
+        Tine.log.warn(Tine.Messenger.Log.prefix + txt);
+    }
+};
+
 Tine.Messenger.LogHandler = {
     
     log: function (msg) {
@@ -50,13 +73,10 @@ Tine.Messenger.LogHandler = {
         var jid = Strophe.getBareJidFromJid(raw_jid);
         var id = Tine.Messenger.Util.jidToId(jid);
         var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
+        var body = $(message).children("body");
         
-        var body = $(message).find("html > body");
-        if (body.length === 0) {
-            body = $(message).find("body");
-        }
-        
-        Tine.Messenger.ChatHandler.setChatMessage(chat_id, "Não foi possível enviar: "+body.text(), _('Erro'), 'messenger-notify');
+        Tine.Messenger.ChatHandler.setChatMessage(chat_id, "erro ao enviar: "+body.text(), _('Erro'), 'messenger-notify');
+        Tine.Messenger.Log.error("Erro número "+$(message).children("error").attr("code"));
         
         return true;
     },
