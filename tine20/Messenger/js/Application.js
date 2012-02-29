@@ -33,24 +33,27 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     
     // Delayed Tasks
     showMessengerDelayedTask: null,
-    
     startMessengerDelayedTask: null,
-    
-    startMessengerHandlersDelayedTask: null,
+    constructWindowDelayedTask: null,
     
     // The XMPP Connection to the BOSH server
     connection: null,
+    
+    // Messenger's Main Window
+    MessengerWindow: null,
     
     getTitle: function () {
         return "Expresso Messenger";
     },
     
     init: function () {
+        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
+        
         this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
         this.showMessengerDelayedTask.delay(500);
         
-        this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
-        this.startMessengerDelayedTask.delay(500);
+        //this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
+        //this.startMessengerDelayedTask.delay(500);
     },
     
     showMessenger: function () {
@@ -58,27 +61,35 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             xtype: 'button',
             html: '<span id="messenger">Messenger</span>',
             cls: 'messenger-icon',
-            handler: function (bt, ev) {
-                Tine.Messenger.Window.show();
+            listeners: {
+                click: function () {
+                    Tine.Messenger.Window.show();
+                }
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
         $("body").append('<div id="loghandler"></div>');
     },
+    
+    stopMessenger: function () {
+        Tine.Messenger.Log.debug("Stopping Messenger...");
+        Tine.Messenger.Application.connection.disconnect();
+        Tine.Messenger.Log.debug("Messenger Stopped!");
+    },
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-        Tine.Messenger.Application.connection.connect('marcio@simdev.sdr.serpro/expresso-3.0',
-                                                      '12345',
+        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').login,
+                                                      Tine.Tinebase.registry.get('messengerAccount').password,
                                                       this.connectionHandler);
     },
     
     connectionHandler: function (status) {
-        Tine.Messenger.Log.debug(status);
         Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
+            Ext.getCmp('messenger-connect-button').disable().setText('Connecting...');
         } else if (status === Strophe.Status.CONNFAIL) {
             Tine.Messenger.Log.error("Connection failed!");
             Ext.Msg.show({
@@ -89,8 +100,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             });
         } else if (status === Strophe.Status.AUTHENTICATING) {
             Tine.Messenger.Log.debug("Authenticating...");
+            Ext.getCmp('messenger-connect-button').setText('Authenticating...');
         } else if (status === Strophe.Status.CONNECTED) {
             Tine.Messenger.Log.debug("Connected!");
+            Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             // Send user presence
             Tine.Messenger.Application.connection.send($pres());
@@ -130,7 +143,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
-            Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
+            Ext.Msg.alert('Expresso Messenger', 'Messenger has been disconnected!');
             window.onbeforeunload = null;
             window.onunload = null;
         } else if (status === Strophe.Status.AUTHFAIL) {

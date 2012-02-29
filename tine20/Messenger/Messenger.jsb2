@@ -12,15 +12,15 @@
       "isDebug": true,
       "fileIncludes": [
         {
+          "text": "Window.js",
+          "path": "js/"
+        },
+        {
           "text": "Application.js",
           "path": "js/"
         },
         {
           "text": "jquery-1.7.1.min.js",
-          "path": "js/"
-        },
-        {
-          "text": "Window.js",
           "path": "js/"
         },
         {
