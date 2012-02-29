@@ -63,6 +63,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
+        $("body").append('<div id="loghandler"></div>');
     },
     
     startMessenger: function () {
@@ -95,6 +96,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Application.connection.addHandler(
                     Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
                 );
+                Tine.Messenger.Application.connection.addHandler(
+                    Tine.Messenger.LogHandler.getPresence, null, 'presence'
+                );
+                Tine.Messenger.Application.connection.addHandler(
+                    Tine.Messenger.LogHandler.onErrorMessage, null, 'message','error'
+                );
+                
                 var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
                 con.sendIQ(roster, Tine.Messenger.RosterHandler.onStartRoster);
                 Tine.Messenger.Application.connection.addHandler(
