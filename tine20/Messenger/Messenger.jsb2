@@ -32,6 +32,10 @@
           "path": "js/"
         },
         {
+          "text": "LogHandler.js",
+          "path": "js/"
+        },
+        {
           "text": "RosterHandler.js",
           "path": "js/"
         },

@@ -63,6 +63,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
+        $("body").append('<div id="loghandler"></div>');
     },
 
     startMessenger: function () {

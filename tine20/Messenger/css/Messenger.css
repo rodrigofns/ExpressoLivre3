@@ -76,3 +76,38 @@
 .x-tree-node-leaf .x-tree-node-icon {
     background-image: none !important;
 }
+
+#loghandler .msg {
+    width: 95%;
+    min-height: 25px;
+    background-color: #555;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    opacity: 0.85;
+    float: left;
+    font: 1.2em;
+    color: #fff;
+    margin-top: 5px;
+    padding: 6px 10px;
+    overflow: hidden;
+    white-space: pre-line;
+}
+#loghandler .msg .title {
+    font-size: 120%;
+    font-weight: bold;
+    display: block;
+}
+#loghandler .msg .body {
+    display: block;
+}
+#loghandler {
+    width: 250px;
+    min-height: 10px;
+    position: fixed;
+    right: 20px;
+    bottom: auto;
+    top: 30px;
+    z-index: 9999;
+/*    display: none;*/
+/*    border:solid red 1px;*/
+}
