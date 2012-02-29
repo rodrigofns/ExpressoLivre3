@@ -67,50 +67,88 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
-        var con = new Strophe.Connection("/http-bind");
-        con.connect('marcio@simdev.sdr.serpro/expresso-3.0', '12345', function (status) {
-            Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
-            if (status === Strophe.Status.CONNECTING) {
-                Tine.Messenger.Log.debug("Connecting...");
-            } else if (status === Strophe.Status.CONNFAIL) {
-                Tine.Messenger.Log.error("Connection failed!");
-                Ext.Msg.show({
-                    title:'Error',
-                    msg: 'Authentication failed!',
-                    buttons: Ext.Msg.OK,
-                    icon: Ext.MessageBox.ERROR
-                });
-            } else if (status === Strophe.Status.AUTHENTICATING) {
-                Tine.Messenger.Log.debug("Authenticating...");
-            } else if (status === Strophe.Status.CONNECTED) {
-                Tine.Messenger.Log.debug("Connected!");
-                Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
-                // Send user presence
-                con.send($pres());
-                // Setting the connection property
-                Tine.Messenger.Application.connection = con;
-                
-                // START THE HANDLERS
-                // Chat Messaging handler
-                Tine.Messenger.Application.connection.addHandler(
-                    Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
-                );
-                var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
-                con.sendIQ(roster, Tine.Messenger.RosterHandler.onStartRoster);
-                Tine.Messenger.Application.connection.addHandler(
-                    Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
-                );
-            } else if (status === Strophe.Status.DISCONNECTED) {
-                Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
-            } else if (status === Strophe.Status.AUTHFAIL) {
-                Ext.Msg.show({
-                    title:'Error',
-                    msg: 'Authentication failed!',
-                    buttons: Ext.Msg.OK,
-                    icon: Ext.MessageBox.ERROR
-                });
+        //var con = new Strophe.Connection("/http-bind");
+        Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
+        Tine.Messenger.Application.connection.connect('marcio@simdev.sdr.serpro/expresso-3.0',
+                                                      '12345',
+                                                      this.connectionHandler);
+    },
+    
+    connectionHandler: function (status) {
+        Tine.Messenger.Log.debug(status);
+        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
+        if (status === Strophe.Status.CONNECTING) {
+            Tine.Messenger.Log.debug("Connecting...");
+        } else if (status === Strophe.Status.CONNFAIL) {
+            Tine.Messenger.Log.error("Connection failed!");
+            Ext.Msg.show({
+                title:'Error',
+                msg: 'Authentication failed!',
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.ERROR
+            });
+        } else if (status === Strophe.Status.AUTHENTICATING) {
+            Tine.Messenger.Log.debug("Authenticating...");
+        } else if (status === Strophe.Status.CONNECTED) {
+            Tine.Messenger.Log.debug("Connected!");
+            Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
+            // Send user presence
+            Tine.Messenger.Application.connection.send($pres());
+            
+            // START THE HANDLERS
+            // Chat Messaging handler
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
+            );
+            
+            // Getting Roster
+            var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
+            Tine.Messenger.Application.connection.sendIQ(
+                roster, Tine.Messenger.RosterHandler.onStartRoster
+            );
+            
+            // Roster handler
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
+            );
+
+            // Start unload events
+            window.onbeforeunload = function () {
+                return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
             }
-        });
+
+            // Leaving the page cause disconnection
+            window.onunload = function () {
+                Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
+            }
+        } else if (status === Strophe.Status.DISCONNECTED) {
+            Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
+        } else if (status === Strophe.Status.AUTHFAIL) {
+            Ext.Msg.show({
+                title:'Error',
+                msg: 'Authentication failed!',
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.ERROR
+            });
+        }
+    },
+    
+    bindUnloadEvents: function () {
+        // Disconnection warning on leaving the page
+        window.onbeforeunload = function () {
+            alert('SAINDO...');
+            return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
+        }
+
+        // Leaving the page cause disconnection
+        window.onunload = function () {
+            Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
+        }
+    },
+    
+    unbindUnloadEvents: function () {
+        window.onbeforeunload = null;
+        window.onunload = null;
     }
     
 });
