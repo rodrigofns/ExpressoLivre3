@@ -3,30 +3,6 @@ Ext.ns('Tine.Messenger');
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
     
-
-// Show Messenger's messages (info, errors, etc)
-// in the browsers debugging console
-// ex.: Chrome's Developer Tools, Firebug, etc
-Tine.Messenger.Log = {
-    prefix: 'EXPRESSO MESSENGER: ',
-    
-    info: function (txt) {
-        Tine.log.info(Tine.Messenger.Log.prefix + txt);
-    },
-    
-    error: function (txt) {
-        Tine.log.error(Tine.Messenger.Log.prefix + txt);
-    },
-    
-    debug: function (txt) {
-        Tine.log.debug(Tine.Messenger.Log.prefix + txt);
-    },
-    
-    warn: function (txt) {
-        Tine.log.warn(Tine.Messenger.Log.prefix + txt);
-    }
-};
-
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
     hasMainScreen: false,
