@@ -123,6 +123,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Ext.Msg.alert('Expresso Messenger', 'Disconnected!');
+            window.onbeforeunload = null;
+            window.onunload = null;
         } else if (status === Strophe.Status.AUTHFAIL) {
             Ext.Msg.show({
                 title:'Error',
@@ -131,24 +133,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 icon: Ext.MessageBox.ERROR
             });
         }
-    },
-    
-    bindUnloadEvents: function () {
-        // Disconnection warning on leaving the page
-        window.onbeforeunload = function () {
-            alert('SAINDO...');
-            return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
-        }
-
-        // Leaving the page cause disconnection
-        window.onunload = function () {
-            Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
-        }
-    },
-    
-    unbindUnloadEvents: function () {
-        window.onbeforeunload = null;
-        window.onunload = null;
     }
     
 });
