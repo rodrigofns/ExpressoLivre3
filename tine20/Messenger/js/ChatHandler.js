@@ -1,32 +1,25 @@
 Ext.ns('Tine.Messenger');
 
 Tine.Messenger.ChatHandler = {
-    // TODO-EXP: Put jidToId and idToJid in Application
-    jidToId: function (jid) {
-        return jid.replace(/@/g, "_").replace(/\./g, "-");
+    
+    formatChatId: function (jid) {
+        return (jid.indexOf('@') >= 0) ? 
+            MESSENGER_CHAT_ID_PREFIX + Tine.Messenger.Util.jidToId(jid) :
+            jid;
     },
     
-    idToJid: function (id) {
-        var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
-            id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
-            id;
-        return clean.replace(/_/g, "@").replace(/\-/g, ".");
-    },
-    // TODO-EXP: transform jid at arrival not outside
-    // showChatWindow: function (jid, name) {
-    //     ...
-    //     var id = MESSENGER_CHAT_ID_PREFIX + Tine.Messenger.ChatHandler.jidToId(jid);
-    //     ...
-    // }
-    showChatWindow: function (id, name) {
+    showChatWindow: function (jid, name) {
+        // Transform jid to chat id
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
+        
         // Shows the chat window OR
-        if (Ext.getCmp(id)) {
-            Ext.getCmp(id).show();
+        if (Ext.getCmp(chat_id)) {
+            Ext.getCmp(chat_id).show();
         // Creates it if doesn't exist and show
         } else {
             var chat = new Tine.Messenger.Chat({
                 title: _('Chat with ')+name,
-                id: id
+                id: chat_id
             });
             chat.show();
         }
@@ -48,10 +41,11 @@ Tine.Messenger.ChatHandler = {
      *      'messenger-receive' => message that user received
      *      'messenger-notify' => notification that user received
      */
-    setChatMessage: function (chat_id, msg, name, flow) {
-        var chat_area = Ext.getCmp(chat_id).items.items[0],
+    setChatMessage: function (id, msg, name, flow) {
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(id),
+            chat_area = Ext.getCmp(chat_id).items.items[0],
             panel_id = '#'+chat_area.getId()+' .x-panel-body';
-
+        
         chat_area.add({
             xtype: 'panel',
             html: Tine.Messenger.ChatHandler.formatMessage(msg, name, flow),
@@ -61,18 +55,16 @@ Tine.Messenger.ChatHandler = {
 
         $(panel_id).scrollTop($(panel_id).get(0).scrollHeight);
 
-        Tine.Messenger.Log.debug('Incoming: '+msg);
+        Tine.Messenger.Log.debug(((flow) ? 'Incoming: ' : 'Outgo: ') + msg);
     },
     
     onIncomingMessage: function (message) {
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var id = Tine.Messenger.ChatHandler.jidToId(jid);
         var name = $(message).attr("name") || raw_jid;
-        var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
         
         // Shows the chat specifc chat window
-        Tine.Messenger.ChatHandler.showChatWindow(chat_id, name);
+        Tine.Messenger.ChatHandler.showChatWindow(jid, name);
         
         // Capture the message body element, 
         // extract text and append to chat area
@@ -80,19 +72,19 @@ Tine.Messenger.ChatHandler = {
         if (body.length === 0) {
             body = $(message).find("body");
         }
-        Tine.Messenger.ChatHandler.setChatMessage(chat_id, body.text(), name, 'messenger-receive');
+        Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         
         return true;
     },
     
     sendMessage: function (msg, id) {
         Tine.Messenger.Application.connection.send($msg({
-            "to": Tine.Messenger.ChatHandler.idToJid(id),
+            "to": Tine.Messenger.Util.idToJid(id),
             "type": "chat"
         }).c("body").t(msg));
-        
         Tine.Messenger.ChatHandler.setChatMessage(id, msg, _('ME'));
         
         return true;
     }
+    
 }
