@@ -35,12 +35,6 @@ Tine.Messenger.LogHandler = {
         $("#loghandler").append(handler);
         handler.delay(8000).fadeOut("slow");
     },
-    rawInputLog: function(data) {
-        alert("Input: "+data);
-    },
-    rawOutputLog: function(data) {
-        atert("Output: "+data);
-    },
     getPresence: function(presence) {
         var type = $(presence).attr("type");
         var from = $(presence).attr("from");
