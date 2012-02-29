@@ -16,7 +16,6 @@ Tine.Messenger.RosterHandler = {
                                           } );
             node.on('dblclick', Tine.Messenger.RosterHandler.abreChat);
             Ext.getCmp('roster').getRootNode().appendChild(node);
-            console.log(Ext.getCmp('roster'));
         });
         
         return true;
