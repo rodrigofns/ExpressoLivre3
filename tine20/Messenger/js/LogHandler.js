@@ -24,7 +24,7 @@ Tine.Messenger.Log = {
 };
 
 Tine.Messenger.LogHandler = {
-    
+
     log: function (msg) {
         var handler = $("<div class='msg'>"+msg+"</div>");
         $("#loghandler").append(handler);
@@ -104,4 +104,5 @@ Tine.Messenger.LogHandler = {
         
         return true;
     }
+
 };

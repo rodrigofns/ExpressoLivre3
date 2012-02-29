@@ -109,6 +109,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.Util.handle_pong, null, "iq", null, "ping1"
+            );
                 
             // Start unload events
             window.onbeforeunload = function () {
@@ -136,6 +139,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 });
 
 Tine.Messenger.Util = {
+    start_time: null,
+    
     jidToId: function (jid) {
         return jid.replace(/@/g, "_").replace(/\./g, "-");
     },
@@ -145,5 +150,21 @@ Tine.Messenger.Util = {
             id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
             id;
         return clean.replace(/_/g, "@").replace(/\-/g, ".");
+    },
+    send_ping: function (to) {
+        var ping = $iq({
+            to: to,
+            type: "get",
+            id: "ping1"}).c("ping", {xmlns: "urn:xmpp:ping"});
+        Tine.Messenger.Log.info("Sending ping to "+to+".");
+        
+        this.start_time = (new Date()).getTime();
+        Tine.Messenger.Application.connection.send(ping);
+    },
+    handle_pong: function (iq) {
+        var elapsed = (new Date()).getTime() - this.start_time;
+        Tine.Messenger.Log.debug("Received pong from server in " + elapsed + "ms");
+        
+        return true;
     }
 }
