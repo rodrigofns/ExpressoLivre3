@@ -56,7 +56,7 @@ Tine.Messenger.LogHandler = {
             body = $(message).find("body");
         }
         
-        Tine.Messenger.ChatHandler.setChatMessage(chat_id, "Não foi possível enviar: "+body.text(), _('Erro: '));
+        Tine.Messenger.ChatHandler.setChatMessage(chat_id, "Não foi possível enviar: "+body.text(), _('Erro'), 'messenger-notify');
         
         return true;
     },
@@ -66,7 +66,7 @@ Tine.Messenger.LogHandler = {
         var chat_id = MESSENGER_CHAT_ID_PREFIX + id;
         
         if(Ext.getCmp(chat_id)){
-            Tine.Messenger.ChatHandler.setChatMessage(chat_id, status, _('Info: '));
+            Tine.Messenger.ChatHandler.setChatMessage(chat_id, status, _('Info'), 'messenger-notify');
         }
         
         return true;
