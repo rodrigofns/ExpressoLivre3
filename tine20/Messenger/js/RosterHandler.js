@@ -3,6 +3,7 @@ Ext.ns('Tine.Messenger');
 Tine.Messenger.RosterHandler = {
     onStartRoster: function(iq) {
         Tine.Messenger.Log.info("Getting roster...");
+        var node = null;
         $(iq).find("item").each(function () {
             var jid = $(this).attr("jid"),
                 name = $(this).attr("name") || jid;
@@ -17,13 +18,13 @@ Tine.Messenger.RosterHandler = {
             Ext.getCmp('roster').getRootNode().appendChild(node);
             console.log(Ext.getCmp('roster'));
         });
-        
+
         //Tine.Messenger.Application.connection.addHandler(Tine.Messenger.NotificationHandler.onPresence, null, "presence");
         
         return true;
     },
     
     abreChat: function(e, t) {
-        alert(e.id);
+        Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text);
     }
 }
