@@ -47,13 +47,13 @@ Tine.Messenger.LogHandler = {
                 var title = $(presence).attr("name") ||contact;
                 var message = "";
                 if(type === 'unavailable'){
-                    message = "está desconectado";
+                    message = _('unavailable');
                 } else {
                     var show = $(presence).find("show").text();
                     if(show === "" || show === "chat"){
-                        message = "está online";
+                        message = _('on-line');
                     } else {
-                        message = "está ausente";
+                        message = _('away');
                     }
                 }
                 Tine.Messenger.LogHandler.status(title, message);
@@ -65,10 +65,10 @@ Tine.Messenger.LogHandler = {
     onErrorMessage: function(message){
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
+//        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
         var body = $(message).children("body");
-        
-        Tine.Messenger.ChatHandler.setChatMessage(chat_id, "erro ao enviar: "+body.text(), _('Erro'), 'messenger-notify');
+
+        Tine.Messenger.ChatHandler.setChatMessage(jid, "erro ao enviar: "+body.text(), _('Error'), 'messenger-notify');
         Tine.Messenger.Log.error("Erro número "+$(message).children("error").attr("code"));
         
         return true;
@@ -78,7 +78,7 @@ Tine.Messenger.LogHandler = {
         var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
         
         if(Ext.getCmp(chat_id)){
-            Tine.Messenger.ChatHandler.setChatMessage(chat_id, status, _('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, status, _('Info'), 'messenger-notify');
         }
         
         return true;
@@ -91,15 +91,15 @@ Tine.Messenger.LogHandler = {
         var msg = $(message).children("body");
         var paused = $(message).children("paused");
 
-        Tine.Messenger.Log.debug("Msg:"+msg.length+"   Paused: "+paused.length+"  Composing: "+composing.length);
+//        Tine.Messenger.Log.debug("Msg:"+msg.length+"   Paused: "+paused.length+"  Composing: "+composing.length);
         
         if(msg.length > 0){
-            Tine.Messenger.Log.debug("Menssagem enviada");
+            Tine.Messenger.Log.debug(_("Message sent"));
             Tine.Messenger.ChatHandler.onIncomingMessage(message);
         }else if(paused.length > 0){
-            Tine.Messenger.Log.debug("Parou de digitar");
+            Tine.Messenger.Log.debug(_("Stopped typing"));
         }else if(composing.length > 0){
-            Tine.Messenger.Log.debug(jid+" está digitando...");
+            Tine.Messenger.Log.debug(jid + _(" is typing..."));
         }
         
         return true;
