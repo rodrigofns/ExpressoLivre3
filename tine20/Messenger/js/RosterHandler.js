@@ -25,8 +25,8 @@ Tine.Messenger.RosterHandler = {
         Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text);
     },
     
-    clear: function () {
-        Tine.Messenger.RosterHandler.getRootNode().removeAll();
+    clearRoster: function () {
+        Ext.getCmp('messenger-roster').getRootNode().removeAll();
         Tine.Messenger.Window.toggleConnectionButton();
     }
 }

@@ -87,7 +87,7 @@ Tine.Messenger.Window = new Ext.Window({
                 // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
             } else if (this.getText() == 'Disconnect') {
                 Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
-                Tine.Messenger.RosterHandler.clear();
+                Tine.Messenger.RosterHandler.clearRoster();
                 this.setText('Connect');
             }
         }
