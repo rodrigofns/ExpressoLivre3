@@ -87,11 +87,20 @@ Tine.Messenger.Window = new Ext.Window({
                 // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
             } else if (this.getText() == 'Disconnect') {
                 Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
-                Ext.getCmp('messenger-roster').getRootNode().removeAll();
+                Tine.Messenger.RosterHandler.clear();
                 this.setText('Connect');
             }
         }
-    }]
+    }],
+
+    toggleConnectionButton: function () {
+        var button = Ext.getCmp('messenger-connect-button');
+        if (button.getText() == 'Connect') {
+            button.setText('Disconnect');
+        } else {
+            button.setText('Connect');
+        }
+    }
 });
 
 

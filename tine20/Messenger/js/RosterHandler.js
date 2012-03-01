@@ -8,20 +8,25 @@ Tine.Messenger.RosterHandler = {
             var jid = $(this).attr("jid"),
                 name = $(this).attr("name") || jid;
 
-            jid = Tine.Messenger.Util.jidToId(Strophe.getBareJidFromJid(jid));
+            jid = Strophe.getBareJidFromJid(jid);
             node = new Ext.tree.TreeNode( {text:name, 
                                             cls:'messenger-contact',
                                             icon: 'images/icon-offline.gif',
                                             id: jid
                                           } );
-            node.on('dblclick', Tine.Messenger.RosterHandler.abreChat);
+            node.on('dblclick', Tine.Messenger.RosterHandler.openChat);
             Ext.getCmp('messenger-roster').getRootNode().appendChild(node);
         });
         
         return true;
     },
     
-    abreChat: function(e, t) {
+    openChat: function(e, t) {
         Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text);
+    },
+    
+    clear: function () {
+        Tine.Messenger.RosterHandler.getRootNode().removeAll();
+        Tine.Messenger.Window.toggleConnectionButton();
     }
 }

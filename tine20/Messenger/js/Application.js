@@ -65,6 +65,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
+            // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').disable().setText('Connecting...');
         } else if (status === Strophe.Status.CONNFAIL) {
             Tine.Messenger.Log.error("Connection failed!");
@@ -76,9 +77,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             });
         } else if (status === Strophe.Status.AUTHENTICATING) {
             Tine.Messenger.Log.debug("Authenticating...");
+            // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').setText('Authenticating...');
         } else if (status === Strophe.Status.CONNECTED) {
             Tine.Messenger.Log.debug("Connected!");
+            // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             // Send user presence
@@ -124,6 +127,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Ext.Msg.alert('Expresso Messenger', 'Messenger has been disconnected!');
+            Tine.Messenger.RosterHandler.clear();
             window.onbeforeunload = null;
             window.onunload = null;
         } else if (status === Strophe.Status.AUTHFAIL) {
