@@ -36,7 +36,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Tinebase.MainScreen.getMainMenu().insert(3, {
             xtype: 'button',
             html: '<span id="messenger">Messenger</span>',
-            cls: 'messenger-icon',
+            cls: 'messenger-icon-off',
             listeners: {
                 click: function () {
                     Tine.Messenger.Window.show();
@@ -80,6 +80,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').setText('Authenticating...');
         } else if (status === Strophe.Status.CONNECTED) {
+            $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
             Tine.Messenger.Log.debug("Connected!");
             // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
@@ -105,7 +106,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
             );
 
-            // Logs handler
+            // Log handlers
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.getPresence, null, 'presence'
             );
@@ -154,21 +155,5 @@ Tine.Messenger.Util = {
             id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
             id;
         return clean.replace(/_/g, "@").replace(/\-/g, ".");
-    },
-    send_ping: function (to) {
-        var ping = $iq({
-            to: to,
-            type: "get",
-            id: "ping1"}).c("ping", {xmlns: "urn:xmpp:ping"});
-        Tine.Messenger.Log.info("Sending ping to "+to+".");
-        
-        this.start_time = (new Date()).getTime();
-        Tine.Messenger.Application.connection.send(ping);
-    },
-    handle_pong: function (iq) {
-        var elapsed = (new Date()).getTime() - this.start_time;
-        Tine.Messenger.Log.debug("Received pong from server in " + elapsed + "ms");
-        
-        return true;
     }
 }

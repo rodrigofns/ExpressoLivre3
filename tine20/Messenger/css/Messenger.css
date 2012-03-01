@@ -10,7 +10,12 @@
 }
 
 .messenger-icon {
-    background-image: url(/images/talk-balloons.png);
+    background-image: url(/images/messenger/talk-balloons.png);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+.messenger-icon-off {
+    background-image: url(/images/messenger/talk-balloons-off.png);
     background-repeat: no-repeat;
     padding-left: 12px;
 }
