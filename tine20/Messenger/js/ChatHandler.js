@@ -18,7 +18,7 @@ Tine.Messenger.ChatHandler = {
         // Creates it if doesn't exist and show
         } else {
             var chat = new Tine.Messenger.Chat({
-                title: _('Chat with ')+name,
+                title: _('Chat with ') + name + ' (' + jid + ')',
                 id: chat_id
             });
             chat.show();
@@ -61,7 +61,8 @@ Tine.Messenger.ChatHandler = {
     onIncomingMessage: function (message) {
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var name = $(message).attr("name") || raw_jid;
+        var name = $(message).attr("name") ||
+                   Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid).text;
         
         // Shows the chat specifc chat window
         Tine.Messenger.ChatHandler.showChatWindow(jid, name);
