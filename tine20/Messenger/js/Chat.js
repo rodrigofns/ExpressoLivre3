@@ -1,5 +1,7 @@
 Ext.ns('Tine.Messenger');
 
+var timeout = null;
+
 Tine.Messenger.Chat = Ext.extend(Ext.Window, {
     
     constructor: function () {
@@ -22,13 +24,27 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
                     xtype: 'textfield',
                     cls:   'text-sender',
                     handleMouseEvents: true,
+                    enableKeyEvents: true,
                     listeners: {
                         scope: this,
                         specialkey: function (field, ev) {
-                             if (ev.getKey() == ev.ENTER){
+                             if (ev.getKey() == ev.ENTER) {
                                  Tine.Messenger.ChatHandler.sendMessage(field.getValue(), this.id);
                                  field.setValue("");
-                             }  
+                             }
+                        },
+                        keypress: function (field, ev) {
+                            Tine.Messenger.ChatHandler.sendState(this.id, 'composing');
+                            if (ev.getKey() == ev.ENTER) {
+                                Tine.Messenger.ChatHandler.sendState(this.id, 'paused');
+                            }
+                            var chat_id = this.id;
+                            timeout = setTimeout(
+                                function () {
+                                    Tine.Messenger.ChatHandler.sendState(chat_id, 'paused');
+                                },
+                                3000
+                            );
                         }
                     }
                 }

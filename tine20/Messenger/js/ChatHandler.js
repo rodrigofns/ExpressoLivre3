@@ -1,6 +1,9 @@
 Ext.ns('Tine.Messenger');
 
 Tine.Messenger.ChatHandler = {
+    // Chat State Messages
+    COMPOSING_STATE: " is typing...",
+    PAUSED_STATE: " stopped typing!",
     
     formatChatId: function (jid) {
         return (jid.indexOf('@') >= 0) ? 
@@ -10,19 +13,21 @@ Tine.Messenger.ChatHandler = {
     
     showChatWindow: function (jid, name) {
         // Transform jid to chat id
-        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid),
+            chat = null;
         
         // Shows the chat window OR
         if (Ext.getCmp(chat_id)) {
-            Ext.getCmp(chat_id).show();
+            chat = Ext.getCmp(chat_id);
         // Creates it if doesn't exist and show
         } else {
-            var chat = new Tine.Messenger.Chat({
+            chat = new Tine.Messenger.Chat({
                 title: _('Chat with ') + name + ' (' + jid + ')',
                 id: chat_id
             });
-            chat.show();
         }
+        
+        chat.show();
     },
     
     formatMessage: function (message, name, flow) {
@@ -59,10 +64,12 @@ Tine.Messenger.ChatHandler = {
     },
     
     onIncomingMessage: function (message) {
-        var raw_jid = $(message).attr("from");
-        var jid = Strophe.getBareJidFromJid(raw_jid);
-        var name = $(message).attr("name") ||
-                   Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid).text;
+        var raw_jid = $(message).attr("from"),
+            jid = Strophe.getBareJidFromJid(raw_jid),
+            name = $(message).attr("name") ||
+                   Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid).text,
+            composing = $(message).find("composing"),
+            paused = $(message).find("paused");
         
         // Shows the chat specifc chat window
         Tine.Messenger.ChatHandler.showChatWindow(jid, name);
@@ -73,37 +80,65 @@ Tine.Messenger.ChatHandler = {
         if (body.length === 0) {
             body = $(message).find("body");
         }
-        Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         
-        return true;
-    },
-    onIncoming: function(message){
-        var raw_jid = $(message).attr("from");
-        var jid = Strophe.getBareJidFromJid(raw_jid);
-        
-        var composing = $(message).children("composing");
-        var msg = $(message).children("body");
-        var paused = $(message).children("paused");
-
-        if(msg.length > 0){
-            Tine.Messenger.Log.debug(_("Message received!"));
-            Tine.Messenger.ChatHandler.onIncomingMessage(message);
-        }else if(paused.length > 0){
-            Tine.Messenger.Log.debug(_("Stopped typing!"));
-        }else if(composing.length > 0){
-            Tine.Messenger.Log.debug(jid + _(" is typing..."));
+        // Typing events
+        if (paused.length > 0) {
+            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.PAUSED_STATE));
+        } else if (composing.length > 0) {
+            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+        } else {
+            Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         }
         
         return true;
     },
     
+    setChatState: function (id, state) {
+        var chat_id = Tine.Messenger.ChatHandler.formatChatId(id);
+        Tine.Messenger.ChatHandler.resetState(chat_id);
+        Ext.getCmp(chat_id).setTitle(Ext.getCmp(chat_id).title + state);
+        setTimeout(
+            function () {
+                Tine.Messenger.ChatHandler.resetState(chat_id);
+            },
+            3000
+        );
+    },
+    
+    resetState: function (chat_id) {
+        var title = Ext.getCmp(chat_id).title,
+            new_title = title;
+        
+        if (title.indexOf(Tine.Messenger.ChatHandler.COMPOSING_STATE) >= 0) {
+            new_title = title.substring(0, title.indexOf(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+        }
+        
+        if (title.indexOf(Tine.Messenger.ChatHandler.PAUSED_STATE) >= 0) {
+            new_title = title.substring(0, title.indexOf(Tine.Messenger.ChatHandler.PAUSED_STATE));
+        }
+        
+        Ext.getCmp(chat_id).setTitle(new_title);
+    },
+    
     sendMessage: function (msg, id) {
         Tine.Messenger.Application.connection.send($msg({
             "to": Tine.Messenger.Util.idToJid(id),
-            "type": "chat"
-        }).c("body").t(msg));
+            "type": "chat"})
+          .c("body").t(msg).up()
+          .c("active", {xmlns: "http://jabber.org/protocol/chatstates"}));
         Tine.Messenger.ChatHandler.setChatMessage(id, msg, _('ME'));
         
+        return true;
+    },
+    
+    sendState: function (id, state) {
+        var notify = $msg({to: Tine.Messenger.Util.idToJid(id), "type": "chat"})
+                     .c(state, {xmlns: "http://jabber.org/protocol/chatstates"});
+        
+        Tine.Messenger.Application.connection.send(notify);
+          
         return true;
     }
     
