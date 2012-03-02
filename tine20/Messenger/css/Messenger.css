@@ -74,19 +74,35 @@
     background-repeat: no-repeat;
 }
 
+.messenger-contact-unavailable span[unselectable] {
+    color: #B3B3B3;
+}
+
 .messenger-contact-available {
     background-image: url(/images/messenger/icon_available.png);
     background-repeat: no-repeat;
+    font-weight: bold;
 }
 
 .messenger-contact-away {
     background-image: url(/images/messenger/icon_away.png);
     background-repeat: no-repeat;
+    font-weight: bold;
+}
+
+.messenger-contact-available span[unselectable],
+.messenger-contact-away span[unselectable] {
+    color: black;
 }
 
 .messenger-contact-donotdisturb {
     background-image: url(/images/messenger/icon_dnd.png);
     background-repeat: no-repeat;
+    font-weight: bold;
+}
+
+.messenger-contact-donotdisturb span[unselectable] {
+    color: red;
 }
 
 .x-tree-lines .x-tree-elbow {
