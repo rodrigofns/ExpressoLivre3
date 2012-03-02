@@ -68,11 +68,10 @@ Tine.Messenger.LogHandler = {
     onErrorMessage: function(message){
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-//        var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
         var body = $(message).children("body");
 
-        Tine.Messenger.ChatHandler.setChatMessage(jid, "erro ao enviar: "+body.text(), _('Error'), 'messenger-notify');
-        Tine.Messenger.Log.error("Erro número "+$(message).children("error").attr("code"));
+        Tine.Messenger.ChatHandler.setChatMessage(jid, _('Error sending: ') + body.text(), _('Error'), 'messenger-notify');
+        Tine.Messenger.Log.error(_('Error number ') + $(message).children("error").attr("code"));
         
         return true;
     },
@@ -82,27 +81,6 @@ Tine.Messenger.LogHandler = {
         
         if(Ext.getCmp(chat_id)){
             Tine.Messenger.ChatHandler.setChatMessage(jid, status, _('Info'), 'messenger-notify');
-        }
-        
-        return true;
-    },
-    onIncoming: function(message){
-        var raw_jid = $(message).attr("from");
-        var jid = Strophe.getBareJidFromJid(raw_jid);
-        
-        var composing = $(message).children("composing");
-        var msg = $(message).children("body");
-        var paused = $(message).children("paused");
-
-//        Tine.Messenger.Log.debug("Msg:"+msg.length+"   Paused: "+paused.length+"  Composing: "+composing.length);
-        
-        if(msg.length > 0){
-            Tine.Messenger.Log.debug(_("Message sent"));
-            Tine.Messenger.ChatHandler.onIncomingMessage(message);
-        }else if(paused.length > 0){
-            Tine.Messenger.Log.debug(_("Stopped typing"));
-        }else if(composing.length > 0){
-            Tine.Messenger.Log.debug(jid + _(" is typing..."));
         }
         
         return true;

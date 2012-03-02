@@ -77,6 +77,25 @@ Tine.Messenger.ChatHandler = {
         
         return true;
     },
+    onIncoming: function(message){
+        var raw_jid = $(message).attr("from");
+        var jid = Strophe.getBareJidFromJid(raw_jid);
+        
+        var composing = $(message).children("composing");
+        var msg = $(message).children("body");
+        var paused = $(message).children("paused");
+
+        if(msg.length > 0){
+            Tine.Messenger.Log.debug(_("Message received!"));
+            Tine.Messenger.ChatHandler.onIncomingMessage(message);
+        }else if(paused.length > 0){
+            Tine.Messenger.Log.debug(_("Stopped typing!"));
+        }else if(composing.length > 0){
+            Tine.Messenger.Log.debug(jid + _(" is typing..."));
+        }
+        
+        return true;
+    },
     
     sendMessage: function (msg, id) {
         Tine.Messenger.Application.connection.send($msg({
