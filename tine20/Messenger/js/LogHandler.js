@@ -50,10 +50,13 @@ Tine.Messenger.LogHandler = {
                     message = _('unavailable');
                     Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
                 } else {
-                    var show = $(presence).find("show").text();
-                    if(show === "" || show === "chat"){
+                    var show = $(presence).find('show').text();
+                    if(show === '' || show === 'chat'){
                         message = _('online');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
+                    } else if(show === 'dnd'){
+                        message = _('dnd');
+                        Tine.Messenger.RosterHandler.changeStatus(contact, 'donotdisturb');
                     } else {
                         message = _('away');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
