@@ -28,7 +28,7 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
                     listeners: {
                         scope: this,
                         specialkey: function (field, ev) {
-                             if (ev.getKey() == ev.ENTER && ev.getKey().trim() != "") {
+                             if (ev.getKey() == ev.ENTER && field.getValue().trim() != '') {
                                  Tine.Messenger.ChatHandler.sendMessage(field.getValue(), this.id);
                                  field.setValue("");
                              }
