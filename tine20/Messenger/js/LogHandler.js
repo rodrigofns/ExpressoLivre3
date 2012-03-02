@@ -42,18 +42,21 @@ Tine.Messenger.LogHandler = {
         
         if (type !== 'error'){
             if(to !== from){
-                var contact = Tine.Messenger.Util.jidToId(from);
-                contact = Strophe.getBareJidFromJid(from);
-                var title = $(presence).attr("name") ||contact;
+                //var contact = Tine.Messenger.Util.jidToId(from);
+                var contact = Strophe.getBareJidFromJid(from);
+                var title = $(presence).attr("name") || contact;
                 var message = "";
                 if(type === 'unavailable'){
                     message = _('unavailable');
+                    Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
                 } else {
                     var show = $(presence).find("show").text();
                     if(show === "" || show === "chat"){
-                        message = _('on-line');
+                        message = _('online');
+                        Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
                     } else {
                         message = _('away');
+                        Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
                     }
                 }
                 Tine.Messenger.LogHandler.status(title, message);

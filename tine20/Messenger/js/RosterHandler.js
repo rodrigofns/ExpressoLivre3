@@ -11,12 +11,24 @@ Tine.Messenger.RosterHandler = {
             jid = Strophe.getBareJidFromJid(jid);
             node = new Ext.tree.TreeNode( {text:name, 
                                             cls:'messenger-contact',
-                                            icon: 'images/icon-offline.gif',
-                                            id: jid
+                                            id: jid,
+                                            leaf: true
                                           } );
             node.on('dblclick', Tine.Messenger.RosterHandler.openChat);
             Ext.getCmp('messenger-roster').getRootNode().appendChild(node);
+            Ext.getCmp('messenger-roster')
+               .getRootNode()
+               .findChild('id', jid)
+               .ui.addClass('messenger-contact-unavailable');
         });
+        // Send user presence
+        Tine.Messenger.Application.connection.send($pres());
+        // Modify Main Menu status
+        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
+        // Adding handler for roster presence
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+            Tine.Messenger.LogHandler.getPresence, null, 'presence'
+        );
         
         return true;
     },
@@ -28,5 +40,19 @@ Tine.Messenger.RosterHandler = {
     clearRoster: function () {
         Ext.getCmp('messenger-roster').getRootNode().removeAll();
         Tine.Messenger.Window.toggleConnectionButton();
+    },
+    
+    changeStatus: function (jid, status) {
+        var contact = Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+        
+        Tine.Messenger.RosterHandler.resetStatus(contact.ui);
+        contact.ui.addClass('messenger-contact-' + status);
+    },
+    
+    resetStatus: function (contact) {
+        contact.removeClass('messenger-contact-available');
+        contact.removeClass('messenger-contact-unavailable');
+        contact.removeClass('messenger-contact-away');
+        contact.removeClass('messenger-contact-donotdisturb');
     }
 }

@@ -12,12 +12,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     startMessengerDelayedTask: null,
     constructWindowDelayedTask: null,
     
-    // The XMPP Connection to the BOSH server
-    connection: null,
-    
-    // Messenger's Main Window
-    MessengerWindow: null,
-    
     getTitle: function () {
         return "Expresso Messenger";
     },
@@ -61,6 +55,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                                                       this.connectionHandler);
     },
     
+    getConnection: function () {
+        return Tine.Messenger.Application.connection;
+    },
+    
     connectionHandler: function (status) {
         Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
         if (status === Strophe.Status.CONNECTING) {
@@ -84,9 +82,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Log.debug("Connected!");
             // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
-            Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
-            // Send user presence
-            Tine.Messenger.Application.connection.send($pres());
             
             // START THE HANDLERS
             // Chat Messaging handler
@@ -107,9 +102,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             );
 
             // Log handlers
-            Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.LogHandler.getPresence, null, 'presence'
-            );
+//            Tine.Messenger.Application.connection.addHandler(
+//                Tine.Messenger.LogHandler.getPresence, null, 'presence'
+//            );
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );
@@ -138,6 +133,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.ERROR
             });
+            Ext.getCmp('messenger-connect-button').enable().setText('Connect');
         }
     }
     

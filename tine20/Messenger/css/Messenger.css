@@ -66,6 +66,27 @@
 
 .messenger-contact {
     font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.messenger-contact-unavailable {
+    background-image: url(/images/messenger/icon_unavailable.png);
+    background-repeat: no-repeat;
+}
+
+.messenger-contact-available {
+    background-image: url(/images/messenger/icon_available.png);
+    background-repeat: no-repeat;
+}
+
+.messenger-contact-away {
+    background-image: url(/images/messenger/icon_away.png);
+    background-repeat: no-repeat;
+}
+
+.messenger-contact-donotdisturb {
+    background-image: url(/images/messenger/icon_dnd.png);
+    background-repeat: no-repeat;
 }
 
 .x-tree-lines .x-tree-elbow {
@@ -115,4 +136,23 @@
     z-index: 9999;
 /*    display: none;*/
 /*    border:solid red 1px;*/
+}
+
+/* PRESENCE */
+.messenger-presence-offline {
+    background-image: url(/images/icon-offline.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+.messenger-presence-away {
+    background-image: url(/images/icon-offline.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+.messenger-presence-online {
+    background-image: url(/images/icon-presence.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
 }
