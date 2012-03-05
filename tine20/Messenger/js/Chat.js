@@ -36,15 +36,16 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
                         keypress: function (field, ev) {
                             Tine.Messenger.ChatHandler.sendState(this.id, 'composing');
                             if (ev.getKey() == ev.ENTER) {
-                                Tine.Messenger.ChatHandler.sendState(this.id, 'paused');
+                                Tine.Messenger.ChatHandler.sendState(this.id, 'active');
+                            }else{
+                                var chat_id = this.id;
+                                timeout = setTimeout(
+                                    function () {
+                                        Tine.Messenger.ChatHandler.sendState(chat_id, 'paused');
+                                    },
+                                    3000
+                                );
                             }
-                            var chat_id = this.id;
-                            timeout = setTimeout(
-                                function () {
-                                    Tine.Messenger.ChatHandler.sendState(chat_id, 'paused');
-                                },
-                                3000
-                            );
                         }
                     }
                 }

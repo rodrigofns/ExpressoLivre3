@@ -88,7 +88,7 @@ Tine.Messenger.ChatHandler = {
         } else if (composing.length > 0) {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
             Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-        } else {
+        } else if (body.length > 0){
             Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         }
         

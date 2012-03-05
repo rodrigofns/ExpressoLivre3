@@ -71,9 +71,14 @@ Tine.Messenger.LogHandler = {
     onErrorMessage: function(message){
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
-        var body = $(message).children("body");
-
-        Tine.Messenger.ChatHandler.setChatMessage(jid, _('Error sending: ') + body.text(), _('Error'), 'messenger-notify');
+        
+        var body = $(message).find("html > body");
+        if (body.length === 0) {
+            body = $(message).find("body");
+        }
+        if(body.length > 0){
+            Tine.Messenger.ChatHandler.setChatMessage(jid, _('Error sending: ') + body.text(), _('Error'), 'messenger-notify');
+        }
         Tine.Messenger.Log.error(_('Error number ') + $(message).children("error").attr("code"));
         
         return true;
