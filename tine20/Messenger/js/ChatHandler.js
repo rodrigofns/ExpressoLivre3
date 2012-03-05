@@ -50,10 +50,10 @@ Tine.Messenger.ChatHandler = {
         var chat_id = Tine.Messenger.ChatHandler.formatChatId(id),
             chat_area = Ext.getCmp(chat_id).items.items[0],
             panel_id = '#'+chat_area.getId()+' .x-panel-body';
-        
+        var msg_with_emotions = Tine.Messenger.ChatHandler.replaceEmotions(msg);
         chat_area.add({
             xtype: 'panel',
-            html: Tine.Messenger.ChatHandler.formatMessage(msg, name, flow),
+            html: Tine.Messenger.ChatHandler.formatMessage(msg_with_emotions, name, flow),
             cls: 'chat-message'
         });
         chat_area.doLayout();
@@ -140,6 +140,12 @@ Tine.Messenger.ChatHandler = {
         Tine.Messenger.Application.connection.send(notify);
           
         return true;
+    },
+    replaceEmotions: function(message){
+        var key = /:D/g;
+        var img = 'teeth';
+        message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' />");
+        return message;
     }
     
 }
