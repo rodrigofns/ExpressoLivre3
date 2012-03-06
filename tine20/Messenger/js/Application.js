@@ -12,6 +12,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     startMessengerDelayedTask: null,
     constructWindowDelayedTask: null,
     
+    // Upload XML emoticons information
+    xml_raw: null,
+    
     getTitle: function () {
         return "Expresso Messenger";
     },
@@ -107,9 +110,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );
-            Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.Util.handle_pong, null, "iq", null, "ping1"
-            );
+            
+            Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
                 
             // Start unload events
             window.onbeforeunload = function () {

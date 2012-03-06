@@ -142,9 +142,18 @@ Tine.Messenger.ChatHandler = {
         return true;
     },
     replaceEmotions: function(message){
-        var key = /:D/g;
-        var img = 'teeth';
-        message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' />");
+        var key = '';
+        var img = '';
+        var $xml = $(Tine.Messenger.Application.xml_raw.responseText);
+        var $emoticons = $xml.find("emoticon");
+        
+        $emoticons.each(function(){ 
+            $(this).find("string").each(function(){
+                key = $(this).text().trim();
+                img = $(this).parent().attr("file").trim();
+                message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' alt='"+key+"' />");
+                });
+            });
         return message;
     }
     
