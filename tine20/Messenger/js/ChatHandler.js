@@ -31,6 +31,7 @@ Tine.Messenger.ChatHandler = {
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid)) {
             Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' is unavailable', _("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, 'Your messages will be sent offline', 'messenger-notify');
         }
     },
     
