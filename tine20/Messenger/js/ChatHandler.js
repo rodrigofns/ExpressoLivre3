@@ -71,9 +71,6 @@ Tine.Messenger.ChatHandler = {
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
         
-        // Shows the chat specifc chat window
-        Tine.Messenger.ChatHandler.showChatWindow(jid, name);
-        
         // Capture the message body element, 
         // extract text and append to chat area
         var body = $(message).find("html > body");
@@ -89,6 +86,9 @@ Tine.Messenger.ChatHandler = {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
             Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
+            // Shows the chat specifc chat window
+            Tine.Messenger.ChatHandler.showChatWindow(jid, name);
+            
             Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         }
         
@@ -97,14 +97,16 @@ Tine.Messenger.ChatHandler = {
     
     setChatState: function (id, state) {
         var chat_id = Tine.Messenger.ChatHandler.formatChatId(id);
-        Tine.Messenger.ChatHandler.resetState(chat_id);
-        Ext.getCmp(chat_id).setTitle(Ext.getCmp(chat_id).title + state);
-        setTimeout(
-            function () {
-                Tine.Messenger.ChatHandler.resetState(chat_id);
-            },
-            3000
-        );
+        if(Ext.getCmp(chat_id)){
+            Tine.Messenger.ChatHandler.resetState(chat_id);
+            Ext.getCmp(chat_id).setTitle(Ext.getCmp(chat_id).title + state);
+            setTimeout(
+                function () {
+                    Tine.Messenger.ChatHandler.resetState(chat_id);
+                },
+                3000
+            );
+        }
     },
     
     resetState: function (chat_id) {
