@@ -54,5 +54,33 @@ Tine.Messenger.RosterHandler = {
         contact.removeClass('messenger-contact-unavailable');
         contact.removeClass('messenger-contact-away');
         contact.removeClass('messenger-contact-donotdisturb');
+    },
+    
+    getContactElement: function (jid) {
+        return Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+    },
+    
+    isContactAvailable: function (jid) {
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        
+        return Ext.fly(contact.ui.elNode).hasClass(AVAILABLE_CLASS);
+    },
+    
+    isContactUnavailable: function (jid) {
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        
+        return Ext.fly(contact.ui.elNode).hasClass(UNAVAILABLE_CLASS);
+    },
+    
+    isContactAway: function (jid) {
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        
+        return Ext.fly(contact.ui.elNode).hasClass(AWAY_CLASS);
+    },
+    
+    isContactDoNotDisturb: function (jid) {
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        
+        return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
     }
 }

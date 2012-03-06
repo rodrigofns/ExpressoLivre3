@@ -1,7 +1,11 @@
 Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
-var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
+var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
+    AVAILABLE_CLASS = 'messenger-contact-available',
+    UNAVAILABLE_CLASS = 'messenger-contact-unavailable',
+    AWAY_CLASS = 'messenger-contact-away',
+    DONOTDISTURB_CLASS = 'messenger-contact-donotdisturb';
     
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs

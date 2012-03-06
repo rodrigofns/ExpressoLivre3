@@ -28,6 +28,10 @@ Tine.Messenger.ChatHandler = {
         }
         
         chat.show();
+        
+        if (Tine.Messenger.RosterHandler.isContactUnavailable(jid)) {
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' is unavailable', _("Info"), 'messenger-notify');
+        }
     },
     
     formatMessage: function (message, name, flow) {
@@ -136,10 +140,13 @@ Tine.Messenger.ChatHandler = {
     },
     
     sendState: function (id, state) {
-        var notify = $msg({to: Tine.Messenger.Util.idToJid(id), "type": "chat"})
+        var jid = Tine.Messenger.Util.idToJid(id),
+            notify = $msg({to: jid, "type": "chat"})
                      .c(state, {xmlns: "http://jabber.org/protocol/chatstates"});
         
-        Tine.Messenger.Application.connection.send(notify);
+        if (Tine.Messenger.RosterHandler.isContactAvailable(jid)) {
+            Tine.Messenger.Application.connection.send(notify);
+        }
           
         return true;
     },
