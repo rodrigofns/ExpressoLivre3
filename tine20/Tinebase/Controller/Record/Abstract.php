@@ -209,7 +209,7 @@ abstract class Tinebase_Controller_Record_Abstract
     {
         $currValue = $this->{$name};
         if ($value !== NULL) {
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Resetting ' . $name . ' to ' . (int) $value);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Resetting ' . $name . ' to ' . (int) $value);
             $this->{$name} = $value;
         }
         
@@ -426,18 +426,35 @@ abstract class Tinebase_Controller_Record_Abstract
                 $this->doSendNotifications($createdRecord, $this->_currentAccount, 'created');
             }
             
-            $this->_increaseContainerContentSequence($createdRecord);
+            $this->_increaseContainerContentSequence($createdRecord, Tinebase_Model_ContainerContent::ACTION_CREATE);
 
             Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
 
         } catch (Exception $e) {
-            Tinebase_TransactionManager::getInstance()->rollBack();
-            Tinebase_Core::getLogger()->err(__METHOD__ . '::' . __LINE__ . ' ' . $e->getMessage());
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
-            throw $e;
+            $this->_handleRecordCreateOrUpdateException($e);
         }
 
         return $this->get($createdRecord);
+    }
+    
+    /**
+     * handle record exception
+     * 
+     * @param Exception $e
+     * @throws Exception
+     * 
+     * @todo invent hooking mechanism for database/backend independant exception handling (like lock timeouts)
+     */
+    protected function _handleRecordCreateOrUpdateException(Exception $e)
+    {
+        Tinebase_TransactionManager::getInstance()->rollBack();
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e);
+        
+        if ($e instanceof Zend_Db_Statement_Exception && preg_match('/Lock wait timeout exceeded/', $e->getMessage())) {
+            throw new Tinebase_Exception_Backend_Database_LockTimeout($e->getMessage());
+        }
+        
+        throw $e;
     }
     
     /**
@@ -547,11 +564,12 @@ abstract class Tinebase_Controller_Record_Abstract
      * increase container content sequence
      * 
      * @param Tinebase_Record_Interface $_record
+     * @param string $action
      */
-    protected function _increaseContainerContentSequence(Tinebase_Record_Interface $_record)
+    protected function _increaseContainerContentSequence(Tinebase_Record_Interface $record, $action = NULL)
     {
-        if ($_record->has('container_id')) {
-            Tinebase_Container::getInstance()->increaseContentSequence($_record->container_id);
+        if ($record->has('container_id')) {
+            Tinebase_Container::getInstance()->increaseContentSequence($record->container_id, $action, $record->getId());
         }
     }
     
@@ -609,13 +627,17 @@ abstract class Tinebase_Controller_Record_Abstract
                 $this->doSendNotifications($updatedRecordWithRelatedData, $this->_currentAccount, 'changed', $currentRecord);
             }
             
-            $this->_increaseContainerContentSequence($updatedRecord);
+            if ($_record->has('container_id') && $currentRecord->container_id !== $updatedRecord->container_id) {
+                $this->_increaseContainerContentSequence($currentRecord, Tinebase_Model_ContainerContent::ACTION_DELETE);
+                $this->_increaseContainerContentSequence($updatedRecord, Tinebase_Model_ContainerContent::ACTION_CREATE);
+            } else {
+                $this->_increaseContainerContentSequence($updatedRecord, Tinebase_Model_ContainerContent::ACTION_UPDATE);
+            }
 
             Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
 
         } catch (Exception $e) {
-            Tinebase_TransactionManager::getInstance()->rollBack();
-            throw $e;
+            $this->_handleRecordCreateOrUpdateException($e);
         }
         return $this->get($updatedRecord->getId());
     }
@@ -735,7 +757,6 @@ abstract class Tinebase_Controller_Record_Abstract
      */
     protected function _inspectBeforeUpdate($_record, $_oldRecord)
     {
-
     }
 
     /**
@@ -747,7 +768,6 @@ abstract class Tinebase_Controller_Record_Abstract
      */
     protected function _inspectAfterUpdate($_updatedRecord, $_record)
     {
-
     }
 
     /**
@@ -812,7 +832,7 @@ abstract class Tinebase_Controller_Record_Abstract
             'iteratable' => $this,
             'controller' => $this,
             'filter'     => $_filter,
-            'function'     => 'processUpdateMultipleIteration',
+            'function'   => 'processUpdateMultipleIteration',
         ));
         $result = $iterator->iterate($_data);
     
@@ -878,7 +898,6 @@ abstract class Tinebase_Controller_Record_Abstract
 
         $records = $this->_backend->getMultiple((array)$ids);
         if (count((array)$ids) != count($records)) {
-            //throw new Tinebase_Exception_NotFound('Error, only ' . count($records) . ' of ' . count((array)$ids) . ' records exist');
             Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Only ' . count($records) . ' of ' . count((array)$ids) . ' records exist.');
         }
 
@@ -992,11 +1011,6 @@ abstract class Tinebase_Controller_Record_Abstract
             $_containerProperty => $targetContainerId
         ));
         
-        foreach ($updateResult['results'] as $record) {
-            // only increase original container content seq of successfully updated records
-            $this->_increaseContainerContentSequence($records->getById($record->getId()));
-        }
-        
         return $idsToMove;
     }
 
@@ -1021,7 +1035,7 @@ abstract class Tinebase_Controller_Record_Abstract
             $this->_backend->delete($_record);
         }
         
-        $this->_increaseContainerContentSequence($_record);
+        $this->_increaseContainerContentSequence($_record, Tinebase_Model_ContainerContent::ACTION_DELETE);
     }
 
     /**
@@ -1128,7 +1142,8 @@ abstract class Tinebase_Controller_Record_Abstract
     public function checkFilterACL(Tinebase_Model_Filter_FilterGroup $_filter, $_action = 'get')
     {
         if (! $this->_doContainerACLChecks) {
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Container ACL disabled for ' . $_filter->getModelName() . '.');
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ 
+                . ' Container ACL disabled for ' . $_filter->getModelName() . '.');
             return TRUE;
         }
 
@@ -1140,8 +1155,8 @@ abstract class Tinebase_Controller_Record_Abstract
             $_filter->addFilter($containerFilter);
         }
 
-        // set grants according to action
-        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Setting filter grants for action ' . $_action);
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__
+            . ' Setting filter grants for action ' . $_action);
         switch ($_action) {
             case 'get':
                 $_filter->setRequiredGrants(array(

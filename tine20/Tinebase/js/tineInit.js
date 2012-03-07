@@ -313,8 +313,8 @@ Tine.Tinebase.tineInit = {
          *        Empty resonses (Ext.Decode can't deal with them) are maped to 540
          *        Memory exhausted to 550
          */
-        Ext.Ajax.on('requestcomplete', function (connection, response, options) {        	
-          
+        Ext.Ajax.on('requestcomplete', function (connection, response, options) {
+            
             // detect resoponse errors (e.g. html from xdebug) and convert into error response
             if (! options.isUpload && ! response.responseText.match(/^([{\[])|(<\?xml)+/)) {
                 var exception = {
@@ -447,6 +447,7 @@ Tine.Tinebase.tineInit = {
         Ext.namespace('Tine.Tinebase.registry');
         if (window.isMainWindow) {
             Ext.Ajax.request({
+                timeout: 120000, // 2 minutes
                 params: {
                     method: Tine.Tinebase.tineInit.getAllRegistryDataMethod
                 },

@@ -112,7 +112,7 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
      */
     protected $_datetimeFields = array(
         'alarm_ack_time',
-        'alarm_snoze_time'
+        'alarm_snooze_time'
     );
     
     /**
@@ -310,16 +310,43 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
         $attendeesToAdd    = array_diff_key($emailsOfNewAttendees,     $emailsOfCurrentAttendees);
         if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " attendees to add " . print_r(array_keys($attendeesToAdd), true));
         
+        $smtpConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::SMTP, 'Tinebase');
+        
         // add attendee identified by their emailAdress
         foreach ($attendeesToAdd as $newAttendee) {
             $attendeeId = NULL;
             
             if ($newAttendee['userType'] == Calendar_Model_Attender::USERTYPE_USER) {
-                $contact = self::resolveEmailToContact($newAttendee, $_implicitAddMissingContacts);
-                if ($contact) {
+                // does the email address exist?
+                if ($contact = self::resolveEmailToContact($newAttendee, false)) {
                     $attendeeId = $contact->getId();
+                    
+                // does a list with this name exist?
+                } else if (
+                    isset($smtpConfig['primarydomain']) && 
+                    preg_match('/(?P<localName>.*)@' . preg_quote($smtpConfig['primarydomain']) . '$/', $newAttendee['email'], $matches)
+                ) {
+                    $lists = Addressbook_Controller_List::getInstance()->search(new Addressbook_Model_ListFilter(array(
+                        array('field' => 'containerType', 'operator' => 'equals', 'value' => 'all'),
+                        array('field' => 'name', 'operator' => 'equals', 'value' => $matches['localName']),
+                        array('field' => 'type', 'operator' => 'equals', 'value' => Addressbook_Model_List::LISTTYPE_GROUP)
+                    )));
+                    
+                    if(count($lists) > 0) {
+                        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+                            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " found # of lists " . count($lists));
+                    
+                        $newAttendee['userType'] = Calendar_Model_Attender::USERTYPE_GROUP;
+                        $attendeeId = $lists->getFirstRecord()->group_id;
+                    }
+                    
+                // autocreate a contact if allowed
+                } else {
+                    $contact = self::resolveEmailToContact($newAttendee, $_implicitAddMissingContacts);
+                    if ($contact) {
+                        $attendeeId = $contact->getId();
+                    }
                 }
-                
             } else if($newAttendee['userType'] == Calendar_Model_Attender::USERTYPE_GROUP) {
                 $lists = Addressbook_Controller_List::getInstance()->search(new Addressbook_Model_ListFilter(array(
                     array('field' => 'containerType', 'operator' => 'equals', 'value' => 'all'),
@@ -453,11 +480,16 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
         
             if ($groupAttender->user_id instanceof Addressbook_Model_List) {
                 $listId = $groupAttender->user_id->getId();
-            } else {
+            } else if ($groupAttender->user_id !== NULL) {
                 $group = Tinebase_Group::getInstance()->getGroupById($groupAttender->user_id);
                 if (!empty($group->list_id)) {
                     $listId = $group->list_id;
                 }
+            } else {
+                if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ 
+                    . ' Group attender ID missing');
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+                    . ' ' . print_r($groupAttender->toArray(), TRUE));
             }
             
             if ($listId !== null) {
@@ -542,12 +574,16 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
     
     /**
      * resolves given attendee for json representation
-     *
+     * 
+     * @TODO move status_authkey cleanup elsewhere
+     * 
      * @param Tinebase_Record_RecordSet|array   $_eventAttendee 
      * @param bool                              $_resolveDisplayContainers
+     * @param Calendar_Model_Event|array        $_events
      */
-    public static function resolveAttendee($_eventAttendee, $_resolveDisplayContainers = TRUE) {
+    public static function resolveAttendee($_eventAttendee, $_resolveDisplayContainers = TRUE, $_events = NULL) {
         $eventAttendee = $_eventAttendee instanceof Tinebase_Record_RecordSet ? array($_eventAttendee) : $_eventAttendee;
+        $events = $_events instanceof Tinebase_Record_Abstract ? array($_events) : $_events;
         
         // set containing all attendee
         $allAttendee = new Tinebase_Record_RecordSet('Calendar_Model_Attender');
@@ -643,15 +679,21 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
         }
         
         
-        foreach ($eventAttendee as $attendee) {
+        foreach ($eventAttendee as $idx => $attendee) {
+            $event = is_array($events) && array_key_exists($idx, $events) ? $events[$idx] : NULL;
+            
             foreach ($attendee as $attender) {
                 // keep authkey if user has editGrant to displaycontainer
                 if (isset($attender['displaycontainer_id']) && !is_scalar($attender['displaycontainer_id']) && array_key_exists(Tinebase_Model_Grants::GRANT_EDIT, $attender['displaycontainer_id']['account_grants']) &&  $attender['displaycontainer_id']['account_grants'][Tinebase_Model_Grants::GRANT_EDIT]) {
                     continue;
                 }
                 
-                // keep authkey if attender is not an account and user has editGrant for event
-                if ($attender->user_id instanceof Tinebase_Record_Abstract && (!$attender->user_id->has('account_id') || !$attender->user_id->account_id)) {
+                // keep authkey if attender resource OR contact (no account) and user has editGrant for event
+                if (in_array($attender->user_type, array(self::USERTYPE_USER, self::USERTYPE_RESOURCE))
+                    && $attender->user_id instanceof Tinebase_Record_Abstract
+                    && (!$attender->user_id->has('account_id') || !$attender->user_id->account_id)
+                    && (!$event || $event->{Tinebase_Model_Grants::GRANT_EDIT})
+                ) {
                     continue;
                 }
                 

@@ -54,6 +54,9 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
         
         if (! $this->_event instanceof Calendar_Model_Event) {
             $this->_event = ($pos = strpos($this->_event, '.')) === false ? $this->_event : substr($this->_event, 0, $pos);
+        } else {
+            // resolve alarms
+            Calendar_Controller_MSEventFacade::getInstance()->getAlarms($this->_event);
         }
         
         list($backend, $version) = Calendar_Convert_Event_VCalendar_Factory::parseUserAgent($_SERVER['HTTP_USER_AGENT']);
@@ -132,10 +135,6 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
         $existingEvent = Calendar_Controller_MSEventFacade::getInstance()->search($filter, null, false, false, 'sync')->getFirstRecord();
         
         if ($existingEvent === null) {
-            if ($event->organizer != Tinebase_Core::getUser()->contact_id) {
-                throw new Sabre_DAV_Exception_PreconditionFailed('invalid organizer provided: ' . $event->organizer .' => '. Tinebase_Core::getUser()->contact_id);
-            }
-            
             $event = Calendar_Controller_MSEventFacade::getInstance()->create($event);
             
             $vevent = new self($container, $event);
@@ -184,6 +183,18 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
                     $exdate->container_id = $_event->container_id;
                     $exdate->organizer    = $_event->organizer;
                     self::enforceEventParameters($exdate);
+                }
+                
+                if (! $exdate->getId()) {
+                    // new exdates must authenticate for status updates
+                    foreach($_event->attendee as $attendee) {
+                        if ($attendee->status_authkey) {
+                            $exdateAttedee = Calendar_Model_Attender::getAttendee($exdate->attendee, $attendee);
+                            if ($exdateAttedee) {
+                                $exdateAttedee->status_authkey = $attendee->status_authkey;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -324,11 +335,32 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
     /**
      * Returns an ETag for this object
      *
+     * How to calculate the etag?
+     * The etag consists of 2 parts. The part, which is equal for all users (subject, dtstart, dtend, ...) and
+     * the part which is different for all users(X-MOZ-LASTACK for example).
+     * Because of the this we have to generate the etag as the hash of the record id, the lastmodified time stamp and the
+     * hash of the json encoded attendee object.
+     * This way the etag changes when the general properties or the user specific properties change.
+     * 
      * @return string
      */
     public function getETag() 
     {
-        return '"' . md5($this->getRecord()->getId() . $this->getLastModified()) . '"'; 
+        $attendeeHash = null;
+        
+        if ( ($ownAttendee = Calendar_Model_Attender::getOwnAttender($this->getRecord()->attendee)) instanceof Calendar_Model_Attender) {
+            $attendeeHash = sha1(Zend_Json::encode($ownAttendee->toArray()));
+        }
+        
+        if ($this->getRecord()->exdate instanceof Tinebase_Record_RecordSet) {
+            foreach ($this->getRecord()->exdate as $exdate) {
+                if ( ($ownAttendee = Calendar_Model_Attender::getOwnAttender($exdate->attendee)) instanceof Calendar_Model_Attender) {
+                    $attendeeHash = sha1($attendeeHash . Zend_Json::encode($ownAttendee->toArray()));
+                }
+            }
+        }
+        
+        return '"' . sha1($this->getRecord()->getId() . $this->getLastModified()) . $attendeeHash . '"'; 
     }
     
     /**
@@ -381,15 +413,15 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
             }
         }
         
-        // iCal does sends back an old value, because it does refetch the vcalendar after update
-        // therefor we have to keep the current value and must apply it after the convert
-        $currentLastModifiedTime = $this->getRecord()->last_modified_time;
+        // keep old record for reference
+        $recordBeforeUpdate = clone $this->getRecord();
         
         $event = $this->_converter->toTine20Model($vobject, $this->getRecord());
         
-        $event->last_modified_time = $currentLastModifiedTime;
+        // iCal does sends back an old value, because it does not refresh the vcalendar after 
+        // update. Therefor we must reapply the value of last_modified_time after the convert
+        $event->last_modified_time = $recordBeforeUpdate->last_modified_time;
         
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " " . print_r($event->toArray(), true));
         $currentContainer = Tinebase_Container::getInstance()->getContainerById($this->getRecord()->container_id);
         $ownAttendee = Calendar_Model_Attender::getOwnAttender($this->getRecord()->attendee);
         
@@ -425,6 +457,19 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
         
         self::enforceEventParameters($event);
         
+        // don't allow update of alarms for non organizer if oganizer is Tine 2.0 user
+        if ($event->organizer !== Tinebase_Core::getUser()->contact_id) {
+            $organizerContact = Addressbook_Controller_Contact::getInstance()->get($event->organizer);
+            
+            // reset alarms if organizer is Tine 2.0 user
+            if (!empty($organizerContact->account_id)) {
+                $this->_resetAlarms($event, $recordBeforeUpdate);
+            }
+        }
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG))
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " " . print_r($event->toArray(), true));
+        
         try {
             $this->_event = Calendar_Controller_MSEventFacade::getInstance()->update($event);
         } catch (Tinebase_Timemachine_Exception_ConcurrencyConflict $ttecc) {
@@ -435,6 +480,32 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
         if (php_sapi_name() != 'cli') {
             // @todo this belong to DAV_Server, but it currently not supported
             header('ETag: ' . $this->getETag());
+        }
+    }
+    
+    /**
+     * reset alarms to previous values
+     * 
+     * we don't reset the alarms in the vcalendar parser already, because this it is a limitation
+     * of our current calendar implementation to not allow user specific alarms
+     * 
+     * @param Calendar_Model_Event $event
+     * @param Calendar_Model_Event $recordBeforeUpdate
+     */
+    protected function _resetAlarms(Calendar_Model_Event $event, Calendar_Model_Event $recordBeforeUpdate)
+    {
+        $event->alarms = $recordBeforeUpdate->alarms;
+    
+        if ($event->exdate instanceof Tinebase_Record_RecordSet) {
+            foreach ($event->exdate as $exdate) {
+                $recurId = $event->id . '-' . (string) $exdate->recurid;
+                
+                if ($recordBeforeUpdate->exdate instanceof Tinebase_Record_RecordSet && ($matchingRecord = $recordBeforeUpdate->exdate->find('recurid', $recurId)) !== null) {
+                    $exdate->alarms = $matchingRecord->alarms;
+                } else {
+                    $exdate->alarms = new Tinebase_Record_RecordSet('Tinebase_Model_Alarm');
+                }
+            }
         }
     }
     
@@ -460,12 +531,13 @@ class Calendar_Frontend_WebDAV_Event extends Sabre_DAV_File implements Sabre_Cal
     {
         if (! $this->_event instanceof Calendar_Model_Event) {
             $this->_event = Calendar_Controller_MSEventFacade::getInstance()->get($this->_event);
+            
+            // resolve alarms
+            Calendar_Controller_MSEventFacade::getInstance()->getAlarms($this->_event);
+            
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " " . print_r($this->_event->toArray(), true));
         }
 
-        // resolve alarms
-        Calendar_Controller_MSEventFacade::getInstance()->getAlarms($this->_event);
-        
-        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " " . print_r($this->_event->toArray(), true));
         return $this->_event;
     }
     

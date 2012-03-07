@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-02-20 12:03+0000\n"
+"PO-Revision-Date: 2012-02-28 18:56+0000\n"
 "Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -11,8 +11,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-02-22 06:53+0000\n"
-"X-Generator: Launchpad (build 14838)\n"
+"X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
+"X-Generator: Launchpad (build 14886)\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -180,6 +180,10 @@ msgstr ""
 
 #: Import/definitions/adb_mac_import_csv.xml:16
 msgid "Contact CSV import from mac address book"
+msgstr ""
+
+#: Import/definitions/adb_outlook2007_de_import_csv.xml:14
+msgid "CSV Outlook 2007 German"
 msgstr ""
 
 #: Import/definitions/adb_outlook_import_csv.xml:13
@@ -461,31 +465,38 @@ msgstr "GPS souřadnice"
 msgid "Export Contact"
 msgstr "Exportovat kontakt"
 
-#: js/ContactGrid.js:160
+#: js/ContactGrid.js:153 js/ContactGrid.js:154
+msgid "Export {0}"
+msgid_plural "Export {0}"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: js/ContactGrid.js:163
 msgid "Export as PDF"
 msgstr "Exportovat do PDF"
 
-#: js/ContactGrid.js:167
+#: js/ContactGrid.js:170
 msgid "Export as CSV"
 msgstr "Exportovat do CSV"
 
-#: js/ContactGrid.js:174
+#: js/ContactGrid.js:177
 msgid "Export as ODS"
 msgstr "Exportovat do ODS"
 
-#: js/ContactGrid.js:181
+#: js/ContactGrid.js:184
 msgid "Export as XLS"
 msgstr "Exportovat do XLS"
 
-#: js/ContactGrid.js:188
+#: js/ContactGrid.js:191
 msgid "Export as ..."
 msgstr ""
 
-#: js/ContactGrid.js:200
+#: js/ContactGrid.js:203
 msgid "Import contacts"
 msgstr "Importovat kontakty"
 
-#: js/ContactGrid.js:289
+#: js/ContactGrid.js:292
 msgid "Internal Contact"
 msgstr "Interní kontakt"
 

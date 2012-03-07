@@ -3,16 +3,16 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-02-20 11:53+0000\n"
-"Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
+"PO-Revision-Date: 2012-02-29 13:13+0000\n"
+"Last-Translator: Etienne Quesselaire <Unknown>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-02-22 06:54+0000\n"
-"X-Generator: Launchpad (build 14838)\n"
+"X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
+"X-Generator: Launchpad (build 14886)\n"
 "X-Poedit-Country: NOT SPECIFIED / ANY\n"
 "X-Poedit-Language: French\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -179,6 +179,10 @@ msgstr ""
 msgid "Contact CSV import from mac address book"
 msgstr ""
 
+#: Import/definitions/adb_outlook2007_de_import_csv.xml:14
+msgid "CSV Outlook 2007 German"
+msgstr ""
+
 #: Import/definitions/adb_outlook_import_csv.xml:13
 msgid "Contact CSV import from Outlook address book"
 msgstr ""
@@ -199,7 +203,7 @@ msgstr ""
 
 #: js/Addressbook.js:22
 msgid "New Contact"
-msgstr ""
+msgstr "Nouveau contact"
 
 #: js/Addressbook.js:32 js/Model.js:98 js/Model.js:205
 msgid "Addressbook"
@@ -456,31 +460,37 @@ msgstr "Localisation géographique"
 msgid "Export Contact"
 msgstr "Exporter ce contact"
 
-#: js/ContactGrid.js:160
+#: js/ContactGrid.js:153 js/ContactGrid.js:154
+msgid "Export {0}"
+msgid_plural "Export {0}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ContactGrid.js:163
 msgid "Export as PDF"
 msgstr "Exporter au format PDF"
 
-#: js/ContactGrid.js:167
+#: js/ContactGrid.js:170
 msgid "Export as CSV"
 msgstr "Exporter au format CSV"
 
-#: js/ContactGrid.js:174
+#: js/ContactGrid.js:177
 msgid "Export as ODS"
 msgstr "Exporter au format ODS"
 
-#: js/ContactGrid.js:181
+#: js/ContactGrid.js:184
 msgid "Export as XLS"
 msgstr "Exporter au format XLS"
 
-#: js/ContactGrid.js:188
+#: js/ContactGrid.js:191
 msgid "Export as ..."
 msgstr "Exporter..."
 
-#: js/ContactGrid.js:200
+#: js/ContactGrid.js:203
 msgid "Import contacts"
 msgstr "Importer des contacts"
 
-#: js/ContactGrid.js:289
+#: js/ContactGrid.js:292
 msgid "Internal Contact"
 msgstr "Contact internet"
 

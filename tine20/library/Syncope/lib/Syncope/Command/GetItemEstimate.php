@@ -45,7 +45,6 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
             
             $collectionData = array(
                 'syncKey'       => (int)$airSyncValues->SyncKey,
-                'syncKeyValid'  => true,
                 'class'         => (string) $xmlCollection->Class,
                 'collectionId'  => (string) $xmlCollection->CollectionId,
                 'filterType'    => isset($airSyncValues->FilterType) ? (int)$airSyncValues->FilterType : 0
@@ -57,6 +56,7 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
             try {
                 // does the folder exist?
                 $collectionData['folder'] = $this->_folderBackend->getFolder($this->_device, $collectionData['collectionId']);
+                $collectionData['folder']->lastfiltertype = $collectionData['filterType'];
                 
                 if($collectionData['syncKey'] === 0) {
                     $collectionData['syncState'] = new Syncope_Model_SyncState(array(
@@ -70,24 +70,13 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
                     $this->_syncStateBackend->resetState($this->_device, $collectionData['folder']);
                     $this->_contentStateBackend->resetState($this->_device, $collectionData['folder']);
                     
-                } else if(($collectionData['syncState'] = $this->_syncStateBackend->validate($this->_device, $collectionData['folder'], $collectionData['syncKey'])) === false) {
-                    if ($this->_logger instanceof Zend_Log) 
-                        $this->_logger->warn(__METHOD__ . '::' . __LINE__ . " invalid synckey {$collectionData['syncKey']} provided");
-                    
-                    // reset sync state for this folder
-                    $this->_syncStateBackend->resetState($this->_device, $collectionData['folder']);
-                    $this->_contentStateBackend->resetState($this->_device, $collectionData['folder']);
-                    
+                } else {
+                    $collectionData['syncState'] = $this->_syncStateBackend->validate($this->_device, $collectionData['folder'], $collectionData['syncKey']);
                 }
-                
-                $collectionData['folder']->lastfiltertype = $collectionData['filterType'];
-                
             } catch (Syncope_Exception_NotFound $senf) {
                 if ($this->_logger instanceof Zend_Log)
                     $this->_logger->debug(__METHOD__ . '::' . __LINE__ . " " . $senf->getMessage());
             }
-            
-            
             
             $this->_collections[$collectionData['collectionId']] = $collectionData;
         }
@@ -115,7 +104,7 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
                 $collection->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'CollectionId', $collectionData['collectionId']));
                 $collection->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'Estimate', 0));
                 
-            } elseif ($collectionData['syncKeyValid'] !== true) {
+            } elseif (! ($collectionData['syncState'] instanceof Syncope_Model_ISyncState)) {
                 if ($this->_logger instanceof Zend_Log)
                     $this->_logger->warn(__METHOD__ . '::' . __LINE__ . " invalid synckey ${collectionData['syncKey']} provided");
                 /*
@@ -142,11 +131,11 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
                 $collection = $response->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'Collection'));
                 $collection->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'Class', $collectionData['class']));
                 $collection->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'CollectionId', $collectionData['collectionId']));
-                if($collectionData['syncKey'] <= 1) {
+                if($collectionData['syncState']->counter === 0) {
                     // this is the first sync. in most cases there are data on the server.
                     $count = count($dataController->getServerEntries($collectionData['collectionId'], $collectionData['filterType']));
                 } else {
-                    $count = $this->_getItemEstimate($dataController, $collectionData);
+                    $count = $dataController->getCountOfChanges($this->_contentStateBackend, $collectionData['folder'], $collectionData['syncState']);
                 }
                 $collection->appendChild($this->_outputDom->createElementNS('uri:ItemEstimate', 'Estimate', $count));
             }
@@ -158,29 +147,5 @@ class Syncope_Command_GetItemEstimate extends Syncope_Command_Wbxml
         }
                 
         return $this->_outputDom;
-    }
-
-    /**
-     * return number of chnaged entries
-     * 
-     * @param $_dataController
-     * @param array $_collectionData
-     * @param $_lastSyncTimeStamp
-     * @return int number of changed entries
-     */
-    protected function _getItemEstimate($_dataController, $_collectionData)
-    {
-        $contentStateBackend  = new Syncope_Backend_ContentState();
-        
-        $allClientEntries   = $contentStateBackend->getClientState($this->_device, $_collectionData['class'], $_collectionData['collectionId']);
-        
-        $_dataController->updateCache($_collectionData['collectionId']);
-        $allServerEntries   = $_dataController->getServerEntries($_collectionData['collectionId'], $_collectionData['filterType']);    
-        
-        $addedEntries       = array_diff($allServerEntries, $allClientEntries);
-        $deletedEntries     = array_diff($allClientEntries, $allServerEntries);
-        $changedEntries     = $_dataController->getChanged($_collectionData['collectionId'], $_collectionData['syncState']->lastsync, $this->_syncTimeStamp);
-        
-        return count($addedEntries) + count($deletedEntries) + count($changedEntries);
     }
 }

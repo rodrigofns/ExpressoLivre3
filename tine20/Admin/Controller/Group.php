@@ -103,7 +103,7 @@ class Admin_Controller_Group extends Tinebase_Controller_Abstract
     /**
      * set all groups an user is member of
      *
-     * @param  mixed  $_usertId   the account as integer or Tinebase_Model_User
+     * @param  mixed  $_userId   the account as integer or Tinebase_Model_User
      * @param  mixed  $_groupIds
      * @return array
      */
@@ -119,7 +119,7 @@ class Admin_Controller_Group extends Tinebase_Controller_Abstract
             throw new Tinebase_Exception_InvalidArgument('user must belong to at least one group');
         }
         
-        $userId = Tinebase_Model_user::convertUserIdToInt($_userId);
+        $userId = Tinebase_Model_User::convertUserIdToInt($_userId);
         
         $groupMemberships = Tinebase_Group::getInstance()->getGroupMemberships($userId);
         
@@ -289,7 +289,16 @@ class Admin_Controller_Group extends Tinebase_Controller_Abstract
             $user  = Tinebase_User::getInstance()->getUserById($_userId);
             
             if (!empty($user->contact_id) && !empty($group->list_id)) {
-                Addressbook_Controller_List::getInstance()->removeListMember($group->list_id, $user->contact_id);
+                try {
+                    Addressbook_Controller_List::getInstance()->removeListMember($group->list_id, $user->contact_id);
+                } catch (Tinebase_Exception_NotFound $tenf) {
+                    if (Tinebase_Core::isLogLevel(Zend_Log::WARN)) 
+                        Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' catched exception: ' . get_class($tenf));
+                    if (Tinebase_Core::isLogLevel(Zend_Log::WARN)) 
+                        Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' ' . $tenf->getMessage());
+                    if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) 
+                        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' ' . $tenf->getTraceAsString());
+                }
             }
         }
         

@@ -76,6 +76,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
      */
     onRecordLoad : function() {
 
+        if(!this.editDialog.rendered) {
+            this.onRecordLoad.defer(100, this);
+            return;
+        }
+        
         Ext.each(this.handleFields, function(field) {
             var refData = false; 
             
@@ -102,10 +107,11 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
             }, this);
         }, this);
 
+        this.interRecord.set('container_id', {account_grants: {editGrant: true}});
         this.interRecord.dirty = false;
         this.interRecord.modified = {};
         
-        this.editDialog.window.setTitle(String.format(_('Edit {0} {1}'), this.editDialog.selectedRecords.length, this.editDialog.i18nRecordsName));
+        this.editDialog.window.setTitle(String.format(_('Edit {0} {1}'), this.editDialog.totalRecordCount, this.editDialog.i18nRecordsName));
 
         Tine.log.debug('loading of the following intermediate record completed:');
         Tine.log.debug(this.interRecord);
@@ -157,10 +163,9 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
             
             this.handleFields.push(field);
 
-            if (ff.isXType('textfield')) {
-                ff.isClearable = true;
                 ff.on('focus', function() {
-                  if (!(ff.isXType('extuxclearabledatefield', true)) && (ff.isClearable !== false)) {
+
+                    if (! ff.isXType('extuxclearabledatefield', true)) {
                     var subLeft = 0;
                     if (ff.isXType('trigger')) subLeft += 17;
 
@@ -175,38 +180,38 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                     }
 
                     // create Button
-                    var button = new Ext.Element(document.createElement('img'));
-                    button.set({
+                    this.multiButton = new Ext.Element(document.createElement('img'));
+                    this.multiButton.set({
                         'src': Ext.BLANK_IMAGE_URL,
-                        'title': _('Delete value from all selected records'),
+                        'ext:qtip': _('Delete value from all selected records'),
                         'class': 'tinebase-editmultipledialog-clearer',
                         'style': 'left:' + left
                         });
                     
-                    button.addClassOnOver('over');
-                    button.addClassOnClick('click');
+                    this.multiButton.addClassOnOver('over');
+                    this.multiButton.addClassOnClick('click');
 
-                    button.on('click', function() {
-                        if(button.hasClass('undo')) {
+                    this.multiButton.on('click', function() {
+                        if(this.multiButton.hasClass('undo')) {
                             this.setValue(this.originalValue);
-                            button.set({title: _('Delete value from all selected records')});
                             if (this.multi) this.cleared = false;
                         } else {
-                            if (this.multi) this.cleared = true;
                             this.setValue('');
-                            button.set({title: _('Undo delete value from all selected records')});
+                            if (this.multi) this.cleared = true;
                         }
-                        this.fireEvent('blur',this);
+
+                        this.fireEvent('blur', this);
+
                     }, this);
                     
-                    this.el.insertSibling(button);
+                    this.el.insertSibling(this.multiButton);
                   }
-                    this.on('blur', function() {
-                        var el = this.el.parent().select('.tinebase-editmultipledialog-clearer');
-                        var ar = this.el.parent().select('.tinebase-editmultipledialog-dirty');
-                        if ((this.originalValue != this.getValue()) || this.cleared) {
-                            this.removeClass('tinebase-editmultipledialog-noneedit');
+                    this.on('blur', function(action) {
 
+                        var ar = this.el.parent().select('.tinebase-editmultipledialog-dirty');
+
+                        if ((this.originalValue != this.getValue()) || this.cleared) {  // if edited or cleared
+                            // Create or set arrow
                             if(ar.elements.length > 0) {
                                 ar.setStyle('display','block');
                             } else {
@@ -219,28 +224,38 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
                                 });
                                 this.el.insertSibling(arrow);
                             }
-                            
+                            // Set field
                             this.edited = true;
-                            el.addClass('undo');
-                            el.removeClass('hidden');
-                        } else {
-                            this.edited = false;
                             
+                            this.removeClass('tinebase-editmultipledialog-noneedit');
+                            
+                            // Set button
+                            this.multiButton.addClass('undo');
+                            this.multiButton.removeClass('hidden');
+                            this.multiButton.set({'ext:qtip': _('Undo change for all selected records')});
+                            
+                        } else {    // If set back
+                            // Set arrow
                             if(ar.elements.length > 0) {
                                 ar.setStyle('display','none');
                             }
-                            
+                            // Set field
+                            this.edited = false;
                             if (this.multi) {
                                 this.setReadOnly(true);
                                 this.addClass('tinebase-editmultipledialog-noneedit');
                             }
-                            el.removeClass('undo');
-                            el.addClass('hidden');
+                            
+                            // Set button
+                            this.multiButton.removeClass('undo');
+                            this.multiButton.addClass('hidden');
+                            this.multiButton.set({'ext:qtip': _('Delete value from all selected records')});
+                            
                         }
                     });
                     this.un('focus');
                 });
-            } 
+
         }, this);
         
         this.onRecordLoad();
@@ -274,9 +289,12 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
             });
             
             if (ff.isXType('checkbox')) {
-                ff.getEl().wrap({tag: 'span', 'class': 'tinebase-editmultipledialog-dirtycheck'});
-                ff.originalValue = null;
-                ff.setValue(false);
+                ff.on('afterrender', function() {
+                    this.getEl().wrap({tag: 'span', 'class': 'tinebase-editmultipledialog-dirtycheck'});
+                    this.originalValue = null;
+                    this.setValue(false);
+                });
+                
             } else {
                 ff.on('focus', function() {
                     if (this.readOnly) this.originalValue = this.getValue();
@@ -352,14 +370,14 @@ Tine.widgets.dialog.MultipleEditDialogPlugin.prototype = {
             
             Ext.MessageBox.confirm(
                 _('Confirm'),
-                String.format(_('Do you really want to change these {0} records?') + this.changedHuman, this.editDialog.selectedRecords.length),
+                String.format(_('Do you really want to change these {0} records?') + this.changedHuman, this.editDialog.totalRecordCount),
                 
                 function(_btn) {
                 if (_btn == 'yes') {
                     Ext.MessageBox.wait(_('Please wait'),_('Applying changes'));
                     Ext.Ajax.request({
                         url: 'index.php',
-                        timeout: 120000,
+                        timeout: 3600000, // 1 hour
                         params: {
                             method: 'Tinebase.updateMultipleRecords',
                             appName: this.editDialog.recordClass.getMeta('appName'),

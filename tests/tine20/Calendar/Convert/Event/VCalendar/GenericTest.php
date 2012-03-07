@@ -62,9 +62,9 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
      */
     public function testConvertToTine20Model()
     {
-        $vcalendarStream = $this->_getVCalendar(dirname(__FILE__) . '/../../../Import/files/lightning.ics', 'r');
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../../Import/files/lightning.ics');
         $converter = Calendar_Convert_Event_VCalendar_Factory::factory(Calendar_Convert_Event_VCalendar_Factory::CLIENT_GENERIC);
-        $event = $converter->toTine20Model($vcalendarStream);
+        $event = $converter->toTine20Model($vcalendar);
         
         //var_dump($event->toArray());
         
@@ -92,6 +92,34 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $event = $converter->toTine20Model($vcalendarStream);
         
         $this->assertEquals('Europe/Berlin', $event->originator_tz);
+    }
+    
+    /**
+     * test converting vcard from lighting to Calendar_Model_Event
+     *
+     * @return Calendar_Model_Event
+     */
+    public function testConvertToTine20ModelWithGroupInvitation()
+    {
+        $smtpConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::SMTP, 'Tinebase');
+        
+        if (!isset($smtpConfig['primarydomain'])) {
+            $this->markTestSkipped('no primary smtp domain configured');
+        }
+        
+        $vcalendar = $this->_getVCalendar(dirname(__FILE__) . '/../../../Import/files/lightning.ics');
+    
+        $vcalendar = preg_replace('/lars@kneschke.de/', 'users@' . $smtpConfig['primarydomain'], $vcalendar);
+    
+        $converter = Calendar_Convert_Event_VCalendar_Factory::factory(Calendar_Convert_Event_VCalendar_Factory::CLIENT_GENERIC);
+        $event = $converter->toTine20Model($vcalendar);
+    
+        #var_dump($event->attendee->toArray());
+    
+        $this->assertEquals(2, count($event->attendee));
+        $this->assertContains('group', $event->attendee->user_type);
+    
+        return $event;
     }
     
     /**
@@ -215,7 +243,7 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $this->assertContains('PRODID:-//tine20.org//Tine 2.0 Calendar V',      $vevent, $vevent);
         $this->assertContains('CREATED;VALUE=DATE-TIME:20111111T111100Z',       $vevent, $vevent);
         $this->assertContains('LAST-MODIFIED;VALUE=DATE-TIME:20111111T121200Z', $vevent, $vevent);
-        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:20111111T121200Z',       $vevent, $vevent);
+        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:',                       $vevent, $vevent);
         $this->assertContains('RRULE:FREQ=DAILY;UNTIL=20111112;INTERVAL=1',     $vevent, $vevent);
         $this->assertContains('EXDATE;VALUE=DATE:20111111',                     $vevent, $vevent);
         $this->assertContains('ORGANIZER;CN="' . Tinebase_Core::getUser()->accountDisplayName . '":mailto:' . Tinebase_Core::getUser()->accountEmailAddress, $vevent, $vevent);
@@ -294,7 +322,7 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $this->assertContains('PRODID:-//tine20.org//Tine 2.0 Calendar V',      $vevent, $vevent);
         $this->assertContains('CREATED;VALUE=DATE-TIME:20111111T111100Z',       $vevent, $vevent);
         $this->assertContains('LAST-MODIFIED;VALUE=DATE-TIME:20111111T121200Z', $vevent, $vevent);
-        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:20111111T121200Z',       $vevent, $vevent);
+        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:',                       $vevent, $vevent);
         $this->assertContains('TZID:Europe/Berlin',               $vevent, $vevent);
         $this->assertContains('UID:' . $event->uid,               $vevent, $vevent);
         $this->assertContains('LOCATION:' . $event->location,     $vevent, $vevent);
@@ -333,7 +361,7 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $this->assertContains('PRODID:-//tine20.org//Tine 2.0 Calendar V',      $vevent, $vevent);
         $this->assertContains('CREATED;VALUE=DATE-TIME:20111111T111100Z',       $vevent, $vevent);
         $this->assertContains('LAST-MODIFIED;VALUE=DATE-TIME:20111111T121200Z', $vevent, $vevent);
-        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:20111111T121200Z',       $vevent, $vevent);
+        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:',         $vevent, $vevent);
         $this->assertContains('TZID:Europe/Berlin',               $vevent, $vevent);
         $this->assertContains('UID:' . $event->uid,               $vevent, $vevent);
         $this->assertContains('LOCATION:' . $event->location,     $vevent, $vevent);
@@ -373,7 +401,7 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $this->assertContains('PRODID:-//tine20.org//Tine 2.0 Calendar V',      $vevent, $vevent);
         $this->assertContains('CREATED;VALUE=DATE-TIME:20111111T111100Z',       $vevent, $vevent);
         $this->assertContains('LAST-MODIFIED;VALUE=DATE-TIME:20111111T121200Z', $vevent, $vevent);
-        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:20111111T121200Z',       $vevent, $vevent);
+        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:',         $vevent, $vevent);
         $this->assertContains('DTSTART;VALUE=DATE:20111019',      $vevent, $vevent);
         $this->assertContains('DTEND;VALUE=DATE:20111020',        $vevent, $vevent);
         $this->assertContains('TZID:Europe/Berlin',               $vevent, $vevent);
@@ -409,7 +437,7 @@ class Calendar_Convert_Event_VCalendar_GenericTest extends PHPUnit_Framework_Tes
         $this->assertContains('PRODID:-//tine20.org//Tine 2.0 Calendar V',      $vevent, $vevent);
         $this->assertContains('CREATED;VALUE=DATE-TIME:20111111T111100Z',       $vevent, $vevent);
         $this->assertContains('LAST-MODIFIED;VALUE=DATE-TIME:20111111T121200Z', $vevent, $vevent);
-        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:20111111T121200Z',       $vevent, $vevent);
+        $this->assertContains('DTSTAMP;VALUE=DATE-TIME:',                       $vevent, $vevent);
         $this->assertContains('RRULE:FREQ=DAILY;UNTIL=20111030T060000Z',        $vevent, $vevent);
         $this->assertContains('EXDATE;VALUE=DATE-TIME:20111005T080000Z',        $vevent, $vevent);
         $this->assertContains('EXDATE;VALUE=DATE-TIME:20111006T080000Z',        $vevent, $vevent);

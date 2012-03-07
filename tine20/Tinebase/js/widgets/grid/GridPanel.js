@@ -264,10 +264,10 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
      */
     initComponent: function(){
         // init some translations
-        this.i18nRecordName = this.app.i18n.n_hidden(this.recordClass.getMeta('recordName'), this.recordClass.getMeta('recordsName'), 1);
-        this.i18nRecordsName = this.app.i18n._hidden(this.recordClass.getMeta('recordsName'));
-        this.i18nContainerName = this.app.i18n.n_hidden(this.recordClass.getMeta('containerName'), this.recordClass.getMeta('containersName'), 1);
-        this.i18nContainersName = this.app.i18n._hidden(this.recordClass.getMeta('containersName'));
+        this.i18nRecordName = this.recordClass.getRecordName();
+        this.i18nRecordsName = this.recordClass.getRecordsName();
+        this.i18nContainerName = this.recordClass.getContainerName();
+        this.i18nContainersName = this.recordClass.getContainersName();
         this.i18nEmptyText = this.i18nEmptyText || String.format(Tine.Tinebase.translation._("No {0} where found. Please try to change your filter-criteria, view-options or the {1} you search in."), this.i18nRecordsName, this.i18nContainersName);
 
         this.i18nEditActionText = this.i18nEditActionText ? this.i18nEditActionText : [String.format(Tine.Tinebase.translation.ngettext('Edit {0}', 'Edit {0}', 1), this.i18nRecordName), String.format(Tine.Tinebase.translation.ngettext('Edit {0}', 'Edit {0}', 2), this.i18nRecordsName)];
@@ -369,7 +369,8 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
 
         this.action_editInNewWindow = new Ext.Action({
             requiredGrant: 'readGrant',
-            requiredMultipleGrant: this.multipleEditRequiredRight,
+            requiredMultipleGrant: 'editGrant',
+            requiredMultipleRight: this.multipleEditRequiredRight,
             text: this.i18nEditActionText ? this.i18nEditActionText[0] : String.format(_('Edit {0}'), this.i18nRecordName),
             singularText: this.i18nEditActionText ? this.i18nEditActionText[0] : String.format(_('Edit {0}'), this.i18nRecordName),
             pluralText:  this.i18nEditActionText ? this.i18nEditActionText[1] : String.format(Tine.Tinebase.translation.ngettext('Edit {0}', 'Edit {0}', 1), this.i18nRecordsName),
@@ -379,7 +380,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             handler: this.onEditInNewWindow,
             iconCls: 'action_edit',
             scope: this,
-            allowMultiple: true
+            allowMultiple: this.multipleEdit
         });
 
         this.action_editCopyInNewWindow = new Ext.Action({
@@ -1051,7 +1052,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             });
 
             this.newRecordAction = new Ext.Action({
-                text: this.app.i18n._('New...'),
+                text: _('New...'),
                 hidden: ! this.newRecordMenu.items.length,
                 iconCls: this.app.getIconCls(),
                 scope: this,
@@ -1070,7 +1071,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             });
 
             this.addToRecordAction = new Ext.Action({
-                text: this.app.i18n._('Add to...'),
+                text: _('Add to...'),
                 hidden: ! this.addToRecordMenu.items.length,
                 iconCls: this.app.getIconCls(),
                 scope: this,
@@ -1322,7 +1323,8 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             record = new this.recordClass(this.recordClass.getDefaultData(), 0);
         }
 
-        var useMultiple = ((this.selectionModel.getCount() > 1) && (this.multipleEdit) && (button.actionType == 'edit')),
+        var totalcount = this.selectionModel.getCount(),
+            useMultiple = ((totalcount > 1) && (this.multipleEdit) && (button.actionType == 'edit')),
             selectedRecords = [];
 
         if (useMultiple) {
@@ -1340,6 +1342,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
                 selectedRecords: Ext.encode(selectedRecords),
                 selectionFilter: Ext.encode(this.selectionModel.getSelectionFilter()),
                 isFilterSelect: this.selectionModel.isFilterSelect,
+                totalRecordCount: totalcount,
                 /* end multi edit stuff */
                 record: editDialogClass.prototype.mode == 'local' ? Ext.encode(record.data) : record,
                 copyRecord: (button.actionType == 'copy'),
@@ -1347,7 +1350,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
                     scope: this,
                     'update': ((this.selectionModel.getCount() > 1) && (this.multipleEdit)) ? this.onUpdateMultipleRecords : this.onUpdateRecord
                 }
-            }, 'useMultiple,selectedRecords,selectionFilter,isFilterSelect,record,listeners,copyRecord')
+            }, 'useMultiple,selectedRecords,selectionFilter,isFilterSelect,totalRecordCount,record,listeners,copyRecord')
         );
     },
 

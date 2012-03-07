@@ -216,7 +216,7 @@ class Calendar_Convert_Event_VCalendar_Abstract implements Tinebase_Convert_Inte
         $vevent->add($lastModified);
         
         $dtstamp = new Sabre_VObject_Element_DateTime('DTSTAMP');
-        $dtstamp->setDateTime($lastModifiedDatTime, Sabre_VObject_Element_DateTime::UTC);
+        $dtstamp->setDateTime(Tinebase_DateTime::now(), Sabre_VObject_Element_DateTime::UTC);
         $vevent->add($dtstamp);
         
         $vevent->add(new Sabre_VObject_Property('UID', $event->uid));
@@ -328,13 +328,13 @@ class Calendar_Convert_Event_VCalendar_Abstract implements Tinebase_Convert_Inte
             
             if ($ownAttendee && $ownAttendee->alarm_ack_time instanceof Tinebase_DateTime) {
                 $xMozLastAck = new Sabre_VObject_Element_DateTime('X-MOZ-LASTACK');
-                $xMozLastAck->setDateTime(Tinebase_DateTime::now(), Sabre_VObject_Element_DateTime::UTC);
+                $xMozLastAck->setDateTime($ownAttendee->alarm_ack_time, Sabre_VObject_Element_DateTime::UTC);
                 $vevent->add($xMozLastAck);
             }
             
             if ($ownAttendee && $ownAttendee->alarm_snooze_time instanceof Tinebase_DateTime) {
                 $xMozSnoozeTime = new Sabre_VObject_Element_DateTime('X-MOZ-SNOOZE-TIME');
-                $xMozSnoozeTime->setDateTime(Tinebase_DateTime::now(), Sabre_VObject_Element_DateTime::UTC);
+                $xMozSnoozeTime->setDateTime($ownAttendee->alarm_snooze_time, Sabre_VObject_Element_DateTime::UTC);
                 $vevent->add($xMozSnoozeTime);
             }
             
@@ -377,23 +377,22 @@ class Calendar_Convert_Event_VCalendar_Abstract implements Tinebase_Convert_Inte
     
     protected function _addEventAttendee(Sabre_VObject_Component $_vevent, Calendar_Model_Event $_event)
     {
-        Calendar_Model_Attender::resolveAttendee($_event->attendee, FALSE);
+        Calendar_Model_Attender::resolveAttendee($_event->attendee, FALSE, $_event);
         
         foreach($_event->attendee as $eventAttendee) {
             $attendeeEmail = $eventAttendee->getEmail();
-            if ($attendeeEmail) {
-                $attendee = new Sabre_VObject_Property('ATTENDEE', (strpos($attendeeEmail, '@') !== false ? 'mailto:' : 'urn:uuid:') . $attendeeEmail);
-                $attendee->add('CN',       $eventAttendee->getName());
-                $attendee->add('CUTYPE',   Calendar_Convert_Event_VCalendar_Abstract::$cutypeMap[$eventAttendee->user_type]);
-                $attendee->add('PARTSTAT', $eventAttendee->status);
-                $attendee->add('ROLE',     "{$eventAttendee->role}-PARTICIPANT");
-                $attendee->add('RSVP',     'FALSE');
-                if (strpos($attendeeEmail, '@') !== false) {
-                    $attendee->add('EMAIL',    $attendeeEmail);
-                }
-
-                $_vevent->add($attendee);
+            
+            $attendee = new Sabre_VObject_Property('ATTENDEE', (strpos($attendeeEmail, '@') !== false ? 'mailto:' : 'urn:uuid:') . $attendeeEmail);
+            $attendee->add('CN',       $eventAttendee->getName());
+            $attendee->add('CUTYPE',   Calendar_Convert_Event_VCalendar_Abstract::$cutypeMap[$eventAttendee->user_type]);
+            $attendee->add('PARTSTAT', $eventAttendee->status);
+            $attendee->add('ROLE',     "{$eventAttendee->role}-PARTICIPANT");
+            $attendee->add('RSVP',     'FALSE');
+            if (strpos($attendeeEmail, '@') !== false) {
+                $attendee->add('EMAIL',    $attendeeEmail);
             }
+
+            $_vevent->add($attendee);
         }
     }
     
@@ -593,10 +592,14 @@ class Calendar_Convert_Event_VCalendar_Abstract implements Tinebase_Convert_Inte
             $status = Calendar_Model_Attender::STATUS_NEEDSACTION;
         }
         
-        if (!preg_match('/(?P<protocol>mailto:|urn:uuid:)(?P<email>.*)/', $_attendee->value, $matches)) {
-            throw new Tinebase_Exception_UnexpectedValue('invalid attendee provided: ' . $_attendee->value);
+        if (isset($_attendee['EMAIL']) && !empty($_attendee['EMAIL']->value)) {
+            $email = $_attendee['EMAIL']->value;
+        } else {
+            if (!preg_match('/(?P<protocol>mailto:|urn:uuid:)(?P<email>.*)/', $_attendee->value, $matches)) {
+                throw new Tinebase_Exception_UnexpectedValue('invalid attendee provided: ' . $_attendee->value);
+            }
+            $email = $matches['email'];
         }
-        $email = $matches['email'];
         
         $fullName = isset($_attendee['CN']) ? $_attendee['CN']->value : $email;
         
@@ -711,14 +714,14 @@ class Calendar_Convert_Event_VCalendar_Abstract implements Tinebase_Convert_Inte
                     
                 case 'ORGANIZER':
                     if (preg_match('/mailto:(?P<email>.*)/i', $property->value, $matches)) {
-                        $name = isset($property['CN']) ? $property['CN']->value : $matches['email'];
-                        $contact = Calendar_Model_Attender::resolveEmailToContact(array(
-                            'email'     => $matches['email'],
-                            'lastName'    => $name,
-                        ));
-                        
                         // it's not possible to change the organizer by spec
                         if (empty($event->organizer)) {
+                            $name = isset($property['CN']) ? $property['CN']->value : $matches['email'];
+                            $contact = Calendar_Model_Attender::resolveEmailToContact(array(
+                                'email'     => $matches['email'],
+                                'lastName'  => $name,
+                            ));
+                        
                             $event->organizer = $contact->getId();
                         }
                         

@@ -403,7 +403,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      */
     public function updateGroup(Tinebase_Model_Group $_group)
     {
-        if($this instanceof Tinebase_Group_Interface_SyncAble) {
+        if ($this instanceof Tinebase_Group_Interface_SyncAble) {
             $this->updateGroupInSyncBackend($_group);
         }
         
@@ -412,6 +412,8 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     
     /**
      * create a new group in sync backend
+     * 
+     * NOTE: sets visibility to HIDDEN if list_id is empty
      *
      * @param  Tinebase_Model_Group  $_group
      * @return Tinebase_Model_Group
@@ -421,7 +423,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $groupId = Tinebase_Model_Group::convertGroupIdToInt($_group);
         
         if (empty($_group->list_id)) {
-            $_group->visibility = 'hidden';
+            $_group->visibility = Tinebase_Model_Group::VISIBILITY_HIDDEN;
             $_group->list_id    = null;
         }
         
@@ -429,8 +431,8 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             'name'          => $_group->name,
             'description'   => $_group->description,
             'visibility'    => $_group->visibility,
-            'email'            => $_group->email,
-            'list_id'        => $_group->list_id
+            'email'         => $_group->email,
+            'list_id'       => $_group->list_id
         );
         
         $where = $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $groupId);
@@ -586,6 +588,8 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      *
      * @param string|array $_ids Ids
      * @return Tinebase_Record_RecordSet
+     * 
+     * @todo this should return the container_id, too
      */
     public function getMultiple($_ids)
     {
@@ -606,14 +610,15 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     
     /**
      * get the basic select object to fetch records from the database
+     * 
+     * NOTE: container_id is joined from addressbook lists table
      *  
      * @param array|string|Zend_Db_Expr $_cols columns to get, * per default
      * @param boolean $_getDeleted get deleted records (if modlog is active)
      * @return Zend_Db_Select
-     * 
      */
     protected function _getSelect($_cols = '*', $_getDeleted = FALSE)
-    {        
+    {
         $select = $this->_db->select();
 
         $select->from(array($this->_tableName => SQL_TABLE_PREFIX . $this->_tableName), $_cols);
@@ -625,7 +630,6 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
                 array('container_id')
             );
         }
-        
         
         return $select;
     }

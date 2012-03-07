@@ -204,12 +204,7 @@ class Setup_Update_Abstract
      * drop table
      *
      * @param string $_tableName
-<<<<<<< HEAD
-     * 
-     * @todo this should remove table from application tables, too
-=======
      * @param string $_application
->>>>>>> master
      */  
     public function dropTable($_tableName, $_application = 'Tinebase')
     {

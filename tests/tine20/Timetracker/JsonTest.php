@@ -699,4 +699,35 @@ class Timetracker_JsonTest extends Timetracker_AbstractTest
         Timetracker_ControllerTest::removeManageAllRight();
         $this->testSearchTimesheetsWithOrFilter();
     }
+    
+    /**
+     * testUpdateMultipleTimesheets
+     * @see http://forge.tine20.org/mantisbt/view.php?id=5878
+     */
+    public function testUpdateMultipleTimesheets()
+    {
+        // create 100+ timesheets
+        $first = $this->_getTimesheet(array(), TRUE);
+        for ($i = 0; $i < 122; $i++) {
+            $this->_getTimesheet(array(
+                'timeaccount_id' => $first->timeaccount_id
+            ), TRUE);
+        }
+        
+        // update multi with filter
+        $filterArray = $this->_getTimesheetDateFilter();
+        $filterArray[] = array(
+            'field'     => 'is_cleared_combined',
+            'operator'  => 'equals',
+            'value'     => 0
+        );
+        $tinebaseJson = new Tinebase_Frontend_Json();
+        $result = $tinebaseJson->updateMultipleRecords('Timetracker', 'Timesheet', array(array('name' => 'is_cleared', 'value' => 1)), $filterArray);
+        
+        // check if all got updated
+        $this->assertEquals($result['totalcount'], 123);
+        $this->assertEquals($result['failcount'], 0);
+        $this->assertEquals(1, $result['results'][0]['is_cleared'], print_r($result['results'][0], TRUE));
+        $this->assertEquals(1, $result['results'][122]['is_cleared'], print_r($result['results'][122], TRUE));
+    }
 }

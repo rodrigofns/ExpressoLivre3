@@ -303,6 +303,8 @@ class Calendar_Controller_EventTests extends Calendar_TestCase
     
     public function testCreateEventWithConfict()
     {
+        $this->_testNeedsTransaction();
+        
         $event = $this->_getEvent();
         $event->attendee = new Tinebase_Record_RecordSet('Calendar_Model_Attender', array(
             array('user_type' => Calendar_Model_Attender::USERTYPE_USER, 'user_id' => $this->_personasContacts['sclever']->getId()),
@@ -805,7 +807,7 @@ class Calendar_Controller_EventTests extends Calendar_TestCase
         $this->_controller->delete($persistentEvent->getId());
         
         $contentSeq = Tinebase_Container::getInstance()->getContentSequence($this->_testCalendar);
-        $this->assertEquals(2, $contentSeq[$this->_testCalendar->getId()], 'container content seq should be increased 2 times!');
+        $this->assertEquals(2, $contentSeq, 'container content seq should be increased 2 times!');
         
         $this->setExpectedException('Tinebase_Exception_NotFound');
         $this->_controller->get($persistentEvent->getId());

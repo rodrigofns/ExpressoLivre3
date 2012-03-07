@@ -7,7 +7,7 @@
  * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
- 
+
 Ext.namespace('Tine.Tasks');
 
 /**
@@ -43,7 +43,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     gridConfig: {
         clicksToEdit: 'auto',
         quickaddMandatory: 'summary',
-        resetAllOnNew: true,
+        resetAllOnNew: false,
         autoExpandColumn: 'summary',
         // drag n drop
         enableDragDrop: true,
@@ -82,6 +82,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     initFilterToolbar: function() {
         this.filterToolbar = new Tine.widgets.grid.FilterPanel({
             recordClass: this.recordClass,
+            app: this.app,
             filterModels: Tine.Tasks.Task.getFilterModel(),
             defaultFilter: 'query',
             filters: [
@@ -201,7 +202,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 blurOnSelect: true,
                 selectOnFocus: true,
                 allowEmpty: true,
-                value: Tine.Tinebase.registry.get('currentAccount').accountDisplayName
+                value: Tine.Tinebase.registry.get('currentAccount')
             })
         }]
         });

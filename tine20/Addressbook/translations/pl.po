@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-02-20 11:44+0000\n"
+"PO-Revision-Date: 2012-02-28 18:37+0000\n"
 "Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -12,8 +12,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-02-22 06:54+0000\n"
-"X-Generator: Launchpad (build 14838)\n"
+"X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
+"X-Generator: Launchpad (build 14886)\n"
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-Language: Polish\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -190,6 +190,10 @@ msgstr "Import kontaktów z VCARD"
 #: Import/definitions/adb_mac_import_csv.xml:16
 msgid "Contact CSV import from mac address book"
 msgstr "Import kontaktów z CSV książki adresowej Mac"
+
+#: Import/definitions/adb_outlook2007_de_import_csv.xml:14
+msgid "CSV Outlook 2007 German"
+msgstr ""
 
 #: Import/definitions/adb_outlook_import_csv.xml:13
 msgid "Contact CSV import from Outlook address book"
@@ -474,35 +478,42 @@ msgstr "Położenie geograficzne"
 msgid "Export Contact"
 msgstr "Eksportuj kontakt"
 
+#: js/ContactGrid.js:153 js/ContactGrid.js:154
+msgid "Export {0}"
+msgid_plural "Export {0}"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 # I think, we don't need to translate 1:1 in this case Instead of that, we should use the imperative form "Eksportuj". Moreover we cannot use the letter 'x'. It couldn't be correct in Polish.
 # Ich denke, in diesem Fall brauchen wir keine 1:1 Uebersetzung. Anstatt dessen sollen wir eine Imperativform "Eksportuj" verwenden. Darueber hinaus sollen wir den Buchstaben 'x' nicht verwenden. Dies waere nicht richtig im Polnischen.
-#: js/ContactGrid.js:160
+#: js/ContactGrid.js:163
 msgid "Export as PDF"
 msgstr "Eksportuj jako PDF"
 
 # I think, we don't need to translate 1:1 in this case Instead of that, we should use the imperative form "Eksportuj". Moreover we cannot use the letter 'x'. It couldn't be correct in Polish.
 # Ich denke, in diesem Fall brauchen wir keine 1:1 Uebersetzung. Anstatt dessen sollen wir eine Imperativform "Eksportuj" verwenden. Darueber hinaus sollen wir den Buchstaben 'x' nicht benutzen. Dies waere nicht richtig im Polnischen.
-#: js/ContactGrid.js:167
+#: js/ContactGrid.js:170
 msgid "Export as CSV"
 msgstr "Eksportuj jako CSV"
 
-#: js/ContactGrid.js:174
+#: js/ContactGrid.js:177
 msgid "Export as ODS"
 msgstr "Eksportuj jako ODS"
 
-#: js/ContactGrid.js:181
+#: js/ContactGrid.js:184
 msgid "Export as XLS"
 msgstr "Eksportuj jako XLS"
 
-#: js/ContactGrid.js:188
+#: js/ContactGrid.js:191
 msgid "Export as ..."
 msgstr "Eksportuj jako ..."
 
-#: js/ContactGrid.js:200
+#: js/ContactGrid.js:203
 msgid "Import contacts"
 msgstr "Importuj kontakty"
 
-#: js/ContactGrid.js:289
+#: js/ContactGrid.js:292
 msgid "Internal Contact"
 msgstr "Kontakty wewnętrzne"
 
