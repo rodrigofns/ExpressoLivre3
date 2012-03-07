@@ -4,9 +4,11 @@ Tine.Messenger.RosterHandler = {
     onStartRoster: function(iq) {
         Tine.Messenger.Log.info("Getting roster...");
         var node = null;
+        Tine.Messenger.RosterHandler.getGroupsFromResponse(iq);
         $(iq).find("item").each(function () {
             var jid = $(this).attr("jid"),
-                name = $(this).attr("name") || jid;
+                name = $(this).attr("name") || jid,
+                subscription = $(this).attr("subscription");
 
             jid = Strophe.getBareJidFromJid(jid);
             node = new Ext.tree.TreeNode( {text:name, 
@@ -15,11 +17,25 @@ Tine.Messenger.RosterHandler = {
                                             leaf: true
                                           } );
             node.on('dblclick', Tine.Messenger.RosterHandler.openChat);
-            Ext.getCmp('messenger-roster').getRootNode().appendChild(node);
-            Ext.getCmp('messenger-roster')
-               .getRootNode()
-               .findChild('id', jid)
-               .ui.addClass('messenger-contact-unavailable');
+            
+            var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+            var i=0;
+            if($(this).children("group").length > 0){
+                $(this).children("group").each(function(){
+                    for(i=0; i < rootNode.childNodes.length; i++){
+                        if(rootNode.childNodes[i].text == $(this).text()){
+                            rootNode.childNodes[i].appendChild(node).ui.addClass('messenger-contact-unavailable');
+                        }
+                    }
+                });
+            } else {
+                rootNode.appendChild(node).ui.addClass('messenger-contact-unavailable');
+            }
+//            Ext.getCmp('messenger-roster').getRootNode().appendChild(node).ui.addClass('messenger-contact-unavailable');
+//            Ext.getCmp('messenger-roster')
+//               .getRootNode()
+//               .findChild('id', jid)
+//               .ui.addClass('messenger-contact-unavailable');
         });
         // Send user presence
         Tine.Messenger.Application.connection.send($pres());
@@ -29,7 +45,7 @@ Tine.Messenger.RosterHandler = {
         Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
             Tine.Messenger.LogHandler.getPresence, null, 'presence'
         );
-        
+            
         return true;
     },
     
@@ -86,5 +102,27 @@ Tine.Messenger.RosterHandler = {
     setStatus: function(status, text) {
         var presence = $pres().c('show').t(status).up().c('status').t(text);
         Tine.Messenger.Application.connection.send(presence);
+    },
+    getGroupsFromResponse : function(el){
+        var group_tree = null;
+        var arr_groups = [];
+        var group_name = '';
+        $(el).find("group").each(function(){
+            group_name = $(this).text()
+            if($.inArray(group_name, arr_groups) === -1){
+                arr_groups.push(group_name);
+                
+                group_tree = new Ext.tree.TreeNode({ //group adden
+                                text:group_name,
+                                iconCls:"display:none;",
+                                expanded:true,
+                                expandable:true,
+                                allowDrag:false,
+                                "gname":group_name
+                });
+                Ext.getCmp('messenger-roster').getRootNode().appendChild(group_tree);
+            }
+        });
+        return true;
     }
 }
