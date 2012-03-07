@@ -165,6 +165,63 @@ Tine.Messenger.ChatHandler = {
                 });
             });
         return message;
+    },
+    diconnect: function() {
+        Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
+        Tine.Messenger.RosterHandler.clearRoster();
+        Ext.getCmp('messenger-connect-button').setText('Connect');
+    },
+    connect: function() {
+        // TODO-EXP: TEMPORARY - Place your jabber login and password
+        var login = new Ext.Window({
+            id: 'messenger-connect-window',
+            layout: 'anchor',
+            closeAction: 'close',
+            plain: true,
+            width: 300,
+            height: 100,
+            title: 'Jabber Login',
+            items: {
+                xtype: 'form',
+                border: false,
+                items: [
+                    {
+                        xtype: 'textfield',
+                        id: 'messenger-connect-login',
+                        fieldLabel: 'Login'
+                    },
+                    {
+                        xtype: 'textfield',
+                        inputType: 'password',
+                        id: 'messenger-connect-pwd',
+                        fieldLabel: 'Password'
+                    },
+                    {
+                        xtype: 'button',
+                        text: 'GO',
+                        listeners: {
+                            click: function () {
+                                var user = Ext.getCmp('messenger-connect-login').getValue();
+
+                                if (user.indexOf('@') < 0) {
+                                    user += '@simdev.sdr.serpro/expresso-3.0';
+                                }                                        
+                                if (user.indexOf('expresso-3.0') < 0) {
+                                    user += '/expresso-3.0';
+                                }
+                                Tine.Tinebase.registry.add('messengerAccount', {
+                                    login: user,
+                                    password: Ext.getCmp('messenger-connect-pwd').getValue()
+                                });
+                                Ext.getCmp('messenger-connect-window').close();
+                                Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+                            }
+                        }
+                    }
+                ]
+            }
+        });
+        login.show();
     }
     
 }

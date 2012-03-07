@@ -82,5 +82,9 @@ Tine.Messenger.RosterHandler = {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
         
         return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
+    },
+    setStatus: function(status, text) {
+        var presence = $pres().c('show').t(status).up().c('status').t(text);
+        Tine.Messenger.Application.connection.send(presence);
     }
 }
