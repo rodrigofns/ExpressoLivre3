@@ -99,60 +99,6 @@ Tine.Messenger.RosterHandler = {
         
         return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
     },
-    getUserFromResponse : function(el){
-            if(el.getElementsByTagName("methodResponse")[0]){
-                    var response = el.getElementsByTagName("methodResponse")[0];
-                    var me = response.getElementsByTagName("you")[0];
-                    if(me){
-                            ExtJame.myJid = me.getElementsByTagName("name")[0].firstChild.nodeValue;
-                            return true;
-                    }
-            }else{
-                    return false;
-            }
-    },
-    getBuddyFromResponse : function(el){
-        Tine.Messenger.Log.debug("Chamou o buddy com el=");
-            var buddy = el;
-            var buddy_attrs = new Object();
-            buddy_attrs["jid"] = buddy.attr("jid");
-            for(var x=0; x<buddy.childNodes.length; x++){
-                    if(buddy.childNodes[x].nodeType == 1){
-                            switch(buddy.childNodes[x].nodeName){
-                                    case "name" :{
-                                            buddy_attrs["name"] = buddy.childNodes[x].firstChild ? buddy.childNodes[x].firstChild.nodeValue : "";
-                                            break;
-                                    }
-                                    case "status":{
-                                            buddy_attrs["status"] = buddy.childNodes[x].getAttribute("type")? buddy.childNodes[x].getAttribute("type") : "";
-                                            buddy_attrs["subscription"] = buddy.childNodes[x].getAttribute("subscription")? buddy.childNodes[x].getAttribute("subscription") : "";
-                                            buddy_attrs["status_text"] =  buddy.childNodes[x].firstChild ?  buddy.childNodes[x].firstChild.nodeValue : "";
-                                            break;
-                                    }
-                                    case "group":{
-                                            buddy_attrs["group"] = buddy.childNodes[x].firstChild ? buddy.childNodes[x].firstChild.nodeValue : "";
-                                            break;
-                                    }
-                                    default:break;
-                            }
-                    }
-            }
-            return buddy_attrs;
-    },
-    getBuddysFromResponse : function(el){
-            var buddys = el.getElementsByTagName("buddys")[0].childNodes;
-            var ret = Array();
-            if(buddys.length > 0){ //buddys matching to group adden
-                    for(var b=0;b<buddys.length;b++){
-                            if(buddys[b].nodeName == "buddy"){
-                                    var temp = Tine.Messenger.RosterHandler.getBuddyFromResponse(buddys[b]);
-                                    ret.push(temp);
-                                    Tine.Messenger.Log.debug("Buddy: "+temp);
-                            }
-                    }
-            }
-            return ret;
-    },
     getGroupsFromResponse : function(el){
         var group_tree = null;
         var arr_groups = [];
@@ -173,7 +119,6 @@ Tine.Messenger.RosterHandler = {
                 Ext.getCmp('messenger-roster').getRootNode().appendChild(group_tree);
             }
         });
-        Tine.Messenger.Log.debug("Acabou de fazer os grupos!!");
         return true;
     }
 }
