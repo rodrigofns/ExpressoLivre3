@@ -29,7 +29,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     changeStatus: function (jid, status) {
-        var contact = Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
         
         Tine.Messenger.RosterHandler.resetStatus(contact.ui);
         contact.ui.addClass('messenger-contact-' + status);
