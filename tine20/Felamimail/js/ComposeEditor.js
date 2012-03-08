@@ -70,7 +70,7 @@ Tine.Felamimail.ComposeEditor = Ext.extend(Ext.form.HtmlEditor, {
             new Ext.ux.form.HtmlEditor.IndentOutdent(),  
             new Ext.ux.form.HtmlEditor.RemoveFormat(),
             new Ext.ux.form.HtmlEditor.EndBlockquote(),
-						new Ext.ux.form.HtmlEditor.SpellChecker(),
+			new Ext.ux.form.HtmlEditor.SpellChecker(),
             new Ext.ux.form.HtmlEditor.SpecialKeys()
         ];
         
