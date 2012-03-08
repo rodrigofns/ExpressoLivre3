@@ -11,7 +11,7 @@ var contextMenu = new Ext.menu.Menu({
 
                 choice.parentMenu.hide();
                 
-                var contactMngtWindow = new Ext.Window({
+                var renameContactWindow = new Ext.Window({
                     closeAction: 'close',
                     layout: 'fit',
                     plain: true,
@@ -35,7 +35,7 @@ var contextMenu = new Ext.menu.Menu({
                                         click: function () {
                                             var name = Ext.getCmp('messenger-contact-mngt-name').getValue();
                                             Tine.Messenger.RosterHandler.renameContact(jid, name);
-                                            contactMngtWindow.close();
+                                            renameContactWindow.close();
                                         }
                                     }
                                 }
@@ -43,18 +43,29 @@ var contextMenu = new Ext.menu.Menu({
                         }
                     ]
                 });
-                contactMngtWindow.show();
+                renameContactWindow.show();
             }
         },
         {
             text: 'Delete',
             icon: '/images/messenger/user_delete.png',
             handler: function (choice, ev) {
-                var jid = choice.parentMenu.contactId;
-                
-                alert('DELETING ' + jid + '!!');
+                var jid = choice.parentMenu.contactId,
+                    name = Tine.Messenger.RosterHandler.getContactElement(jid).text;
                 
                 choice.parentMenu.hide();
+                
+                Ext.Msg.buttonText.yes = _('Yes');
+                Ext.Msg.buttonText.no = _('No');
+                Ext.Msg.minWidth = 300;
+                Ext.Msg.confirm(_('Delete Contact') + ' - ' + jid,
+                                    _('Are you sure to delete ' + name + '?'),
+                                    function (id) {
+                                        if (id == 'yes') {
+                                            Tine.Messenger.RosterHandler.deleteContact(jid);
+                                        }
+                                    }
+                );
             }
         }
     ]
@@ -140,6 +151,10 @@ Tine.Messenger.RosterHandler = {
         return Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
     },
     
+    removeContactElement: function (jid) {
+        Tine.Messenger.RosterHandler.getContactElement(jid).remove(true);
+    },
+    
     isContactAvailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
         
@@ -210,6 +225,15 @@ Tine.Messenger.RosterHandler = {
     },
     
     deleteContact: function (jid) {
+        var iq = $iq({type: "set"})
+                    .c("query", {"xmlns": "jabber:iq:roster"})
+                    .c("item", {
+                        jid: jid,
+                        subscription: 'remove'
+                    });
+                    
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
         
+        Tine.Messenger.RosterHandler.removeContactElement(jid);
     }
 }
