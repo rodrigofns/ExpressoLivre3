@@ -74,10 +74,9 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param array $file
      * @return array
      */
-    public function importMessageEml($accountId,$folderId, $file)
+    public function importMessage($accountId,$folderId, $file)
     {
-        $msg = file_get_contents($file);
-        $result = Felamimail_Controller_Message::getInstance()->appendMessage($folderId, $msg);
+        $result = Felamimail_Controller_Message::getInstance()->importMessagefromfile($accountId,$folderId, $file);
         return array(
             'status'    =>  'success' );
     }

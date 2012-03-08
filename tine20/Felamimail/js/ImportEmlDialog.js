@@ -179,7 +179,7 @@ Ext.namespace('Tine.Felamimail');
         uploader.on('uploadcomplete',function(x,fileRecord){
             Ext.Ajax.request({
             params: {
-                method: 'Felamimail.importMessageEml',
+                method: 'Felamimail.importMessage',
                 accountId:this.account,
                 folderId: this.folderId,
                 file: fileRecord.get('path')

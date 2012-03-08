@@ -149,6 +149,45 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         $imapBackend->appendMessage($message, $folder->globalname, $flags);
     }
     
+     /**
+     * import messages to folder from file(eml), or/and from a zip file.
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @param array $file
+     * @return array
+     */
+    public function importMessagefromfile($accountId,$folderId, $file)
+    {
+        $zip = zip_open($file);
+        if(gettype($zip) === 'resource')
+            {
+                // is a zip file ...
+                while ($zip_entry = zip_read($zip))
+                    {
+                        $filename = zip_entry_name($zip_entry);
+                        if (substr($filename, strlen($filename) - 4) == '.eml')
+                        {
+                            if (zip_entry_open($zip, $zip_entry, "r"))
+                            {
+                                $email = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+                                $result = Felamimail_Controller_Message::getInstance()->appendMessage($folderId, $email);
+                                zip_entry_close($zip_entry);
+                            }
+                        }
+                    }
+                zip_close($zip); 
+            }
+        else
+            {
+                // Error!!! Not zip file. But may be a eml file. Then try ...
+                $msg = file_get_contents($file);
+                $result = Felamimail_Controller_Message::getInstance()->appendMessage($folderId, $msg);
+            }
+        return array(
+            'status'    =>  'success' );
+    }
+    
     /**
      * get complete message by id
      *
