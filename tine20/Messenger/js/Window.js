@@ -28,67 +28,89 @@ Tine.Messenger.Window = new Ext.Window({
     items:       roster,
     
     buttons: [{
-        id: 'messenger-connect-button',
-        text: 'Connect',
+        id: 'messenger-change-status-button',
+        text: 'Change Status',
         handler: function(){
-            if (this.getText() == 'Connect') {
-                // TODO-EXP: TEMPORARY - Place your jabber login and password
-                var login = new Ext.Window({
-                    id: 'messenger-connect-window',
-                    layout: 'anchor',
+                var statusWindow = new Ext.Window({
+                    id: 'messenger-change-status-window',
                     closeAction: 'close',
                     plain: true,
-                    width: 300,
-                    height: 100,
-                    title: 'Jabber Login',
+                    layout:      'fit',
+                    width: 350,
+                    height: 150,
+                    title: 'Change Status',
                     items: {
                         xtype: 'form',
                         border: false,
                         items: [
                             {
-                                xtype: 'textfield',
-                                id: 'messenger-connect-login',
-                                fieldLabel: 'Login'
+                                xtype: 'combo',
+                                id: 'messenger-change-status',
+                                fieldLabel: 'Status',
+                                store: new Ext.data.SimpleStore({
+                                                data: [
+                                                        [1, 'Online'],
+                                                        [2, 'Offline'],
+                                                        [3, 'Away'],
+                                                        [4, 'Do not disturb'],
+                                                ],
+                                                id: 0,
+                                                fields: ['value', 'text']
+                                        }),
+                                emptyText:'Select a status...',
+                                valueField: 'value',
+                                displayField: 'text',
+                                triggerAction: 'all',
+                                editable: false,
+                                mode : 'local'
                             },
                             {
-                                xtype: 'textfield',
-                                inputType: 'password',
-                                id: 'messenger-connect-pwd',
-                                fieldLabel: 'Password'
+                                xtype: 'textarea',
+                                id: 'messenger-change-status-message',
+                                fieldLabel: 'Message',
+                                width: 200,
+                                height: 100
                             },
                             {
                                 xtype: 'button',
                                 text: 'GO',
                                 listeners: {
                                     click: function () {
-                                        var user = Ext.getCmp('messenger-connect-login').getValue();
-                                        
-                                        if (user.indexOf('@') < 0) {
-                                            user += '@simdev.sdr.serpro/expresso-3.0';
-                                        }                                        
-                                        if (user.indexOf('expresso-3.0') < 0) {
-                                            user += '/expresso-3.0';
+                                        var status = Ext.getCmp('messenger-change-status').getValue();
+                                        var message = Ext.getCmp('messenger-change-status-message').getValue();
+                                        if (status == 1) {
+                                            if (!Tine.Tinebase.appMgr.get('Messenger').getConnection().connected)
+                                                Tine.Messenger.ChatHandler.connect();
+                                            else
+                                                Tine.Messenger.Application.connection.send($pres());
+                                        } else if (status == 2) {
+                                            Tine.Messenger.ChatHandler.diconnect();
+                                        } else if (status == 3) {
+                                            Tine.Messenger.RosterHandler.setStatus('away', message);
+                                        } else if (status == 4) {
+                                            Tine.Messenger.RosterHandler.setStatus('dnd', message);
                                         }
-                                        Tine.Tinebase.registry.add('messengerAccount', {
-                                            login: user,
-                                            password: Ext.getCmp('messenger-connect-pwd').getValue()
-                                        });
-                                        Ext.getCmp('messenger-connect-window').close();
-                                        Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+                                        Ext.getCmp('messenger-change-status-window').close();
                                     }
                                 }
                             }
                         ]
                     }
                 });
-                login.show();
+                statusWindow.show();
+            }
+        },
+        {
+        id: 'messenger-connect-button',
+        text: 'Connect',
+        handler: function(){
+            if (this.getText() == 'Connect') {
+                Tine.Messenger.ChatHandler.connect();
                 // Commenting up, uncomment down!!
                 // Start your engines!
                 // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
             } else if (this.getText() == 'Disconnect') {
-                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
-                Tine.Messenger.RosterHandler.clearRoster();
-                this.setText('Connect');
+                Tine.Messenger.ChatHandler.diconnect();
             }
         }
     }],
@@ -102,5 +124,3 @@ Tine.Messenger.Window = new Ext.Window({
         }
     }
 });
-
-
