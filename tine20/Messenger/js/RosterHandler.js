@@ -1,5 +1,25 @@
 Ext.ns('Tine.Messenger');
 
+var contextMenu = new Ext.menu.Menu({
+    floating: true,
+    items: [
+        {
+            text: 'Rename',
+            handler: function (choice, ev) {
+                alert(choice.parentMenu.contactId);
+                choice.parentMenu.hide();
+            }
+        },
+        {
+            text: 'Delete',
+            handler: function (choice, ev) {
+                alert(choice.parentMenu.contactId);
+                choice.parentMenu.hide();
+            }
+        }
+    ]
+});
+
 Tine.Messenger.RosterHandler = {
     onStartRoster: function(iq) {
         Tine.Messenger.Log.info("Getting roster...");
@@ -15,6 +35,10 @@ Tine.Messenger.RosterHandler = {
                                             leaf: true
                                           } );
             node.on('dblclick', Tine.Messenger.RosterHandler.openChat);
+            node.on('contextmenu', function (el) {
+                contextMenu.contactId = el.id;
+                contextMenu.show(el.ui.getEl());
+            });
             Ext.getCmp('messenger-roster').getRootNode().appendChild(node);
             Ext.getCmp('messenger-roster')
                .getRootNode()
