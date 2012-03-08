@@ -43,7 +43,13 @@ Tine.Messenger.RosterHandler = {
     },
     
     getContactElement: function (jid) {
-        return Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+        var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+        for(i=0; i < rootNode.childNodes.length ; i++){
+            var buddy = rootNode.childNodes[i].findChild('id', jid);
+            if(buddy != null)
+                return buddy;
+        }
+        return null;
     },
     
     removeContactElement: function (jid) {

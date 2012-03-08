@@ -47,18 +47,18 @@ Tine.Messenger.LogHandler = {
                 var title = $(presence).attr("name") || contact;
                 var message = "";
                 if(type === 'unavailable'){
-                    message = _('unavailable');
+                    message = _('Unavailable');
                     Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
                 } else {
                     var show = $(presence).find('show').text();
                     if(show === '' || show === 'chat'){
-                        message = _('online');
+                        message = _('Online');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
                     } else if(show === 'dnd'){
-                        message = _('dnd');
+                        message = _('Do not disturb');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'donotdisturb');
                     } else {
-                        message = _('away');
+                        message = _('Away');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
                     }
                 }
