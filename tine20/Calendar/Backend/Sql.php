@@ -88,10 +88,10 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
     public function create(Tinebase_Record_Interface $_record) 
     {
         
-        $this->_setRruleUntil($_record);
         if ($_record->rrule) {
             $_record->rrule = (string) $_record->rrule;
         }
+        $_record->rrule   = !empty($_record->rrule)   ? $_record->rrule   : NULL;
         $_record->recurid = !empty($_record->recurid) ? $_record->recurid : NULL;
         
         $event = parent::create($_record);
@@ -159,7 +159,7 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $subselect->joinLeft(
             /* table  */ array('exdate' => $this->_tablePrefix . 'cal_exdate'),
             /* on     */ $this->_db->quoteIdentifier('exdate.cal_event_id') . ' = ' . $this->_db->quoteIdentifier($this->_tableName . '.id'),
-            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));
+            /* select */ array('exdate' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('exdate.exdate'))));
         
         // this attendee join has nothing to do with grants but is here for attendee/status/... filters
         $subselect->joinLeft(
@@ -197,6 +197,7 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
 
         $select = $this->_getSelectSimple('*', $_getDeleted);
         $select->where($this->_db->quoteInto("{$this->_db->quoteIdentifier('cal_events.id')} IN (?)", !empty($ids) ? $ids : ' ' ));
+        $_pagination->appendPaginationSql($select);
         
         // append grants filters : only take limited set of attendee into account for grants computation
         $attenderFilter = $_filter->getFilter('attender');
@@ -218,15 +219,17 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             $grantsFilter->appendFilterSql($select, $this);
         }
         $select->group($this->_tableName . '.' . 'id');
-        
+        $this->_traitGroup($select);
+	
         $stmt = null; // solve PHP bug @see {http://bugs.php.net/bug.php?id=35793}
         $stmt = $this->_db->query($select);
         $rows = (array)$stmt->fetchAll(Zend_Db::FETCH_ASSOC);
         
         if ($_onlyIds) {
+            $identifier = is_bool($_onlyIds) ? $this->_getRecordIdentifier() : $_onlyIds;
             $result = array();
             foreach ($rows as $row) {
-                $result[] = $row[$this->_getRecordIdentifier()];
+                $result[] = $row[$identifier];
             }
         } else {
             foreach ($rows as &$row) {
@@ -285,10 +288,10 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
      */
     public function update(Tinebase_Record_Interface $_record) 
     {
-        $this->_setRruleUntil($_record);
         if ($_record->rrule) {
             $_record->rrule = (string) $_record->rrule;
         }
+        $_record->rrule   = !empty($_record->rrule)   ? $_record->rrule   : NULL;
         $_record->recurid = !empty($_record->recurid) ? $_record->recurid : NULL;
         
         $event = parent::update($_record);
@@ -314,10 +317,11 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $select->joinLeft(
             /* table  */ array('exdate' => $this->_tablePrefix . 'cal_exdate'), 
             /* on     */ $this->_db->quoteIdentifier('exdate.cal_event_id') . ' = ' . $this->_db->quoteIdentifier($this->_tableName . '.id'),
-            /* select */ array('exdate' => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('exdate.exdate') . ')'));
+            /* select */ array('exdate' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('exdate.exdate'))));
         
         $select->group($this->_tableName . '.' . 'id');
-        
+        $this->_traitGroup($select);
+	
         return $select;
     }
     
@@ -385,15 +389,15 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         
         foreach ($allGrants as $grant) {
             if (in_array($grant, $this->_recordBasedGrants)) {
-                $_select->columns(array($grant => "\n MAX( \n" .
+                $_select->columns(array($grant => "\n MAX( case when ( \n" .
                     '  /* physgrant */' . $this->_getContainGrantCondition('physgrants', 'groupmemberships', $grant) . " OR \n" . 
                     '  /* implicit  */' . $this->_getImplicitGrantCondition($grant) . " OR \n" .
                     '  /* inherited */' . $this->_getInheritedGrantCondition($grant) . " \n" .
-                 ")"));
+                 ")then 1 else 0 end ) "));
             } else {
-                $_select->columns(array($grant => "\n MAX( \n" .
+                $_select->columns(array($grant => "\n MAX( case when ( \n" .
                     '  /* physgrant */' . $this->_getContainGrantCondition('physgrants', 'groupmemberships', $grant) . "\n" .
-                ")"));
+                ")then 1 else 0 end ) "));
             }
         }
     }
@@ -576,27 +580,6 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
     }
     */
     
-    /**
-     * sets rrule until field in event model
-     *
-     * @param  Calendar_Model_Event $_event
-     * @return void
-     */
-    protected function _setRruleUntil(Calendar_Model_Event $_event)
-    {
-        if (empty($_event->rrule)) {
-            $_event->rrule_until = NULL;
-        } else {
-            $rrule = $_event->rrule;
-            if (! $_event->rrule instanceof Calendar_Model_Rrule) {
-                $rrule = new Calendar_Model_Rrule(array());
-                $rrule->setFromString($_event->rrule);
-            }
-            
-            $_event->rrule_until = $rrule->until;
-        }
-    }
-    
     /****************************** attendee functions ************************/
     
     /**
@@ -620,6 +603,16 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
      */
     public function createAttendee(Calendar_Model_Attender $_attendee)
     {
+        if ($_attendee->user_id instanceof Addressbook_Model_Contact) {
+            $_attendee->user_id = $_attendee->user_id->getId();
+        } else if ($_attendee->user_id instanceof Addressbook_Model_List) {
+            $_attendee->user_id = $_attendee->user_id->group_id;
+        }
+        
+        if ($_attendee->displaycontainer_id instanceof Tinebase_Model_Container) {
+            $_attendee->displaycontainer_id = $_attendee->displaycontainer_id->getId();
+        }
+        
         return $this->_attendeeBackend->create($_attendee);
     }
     
@@ -631,6 +624,16 @@ class Calendar_Backend_Sql extends Tinebase_Backend_Sql_Abstract
      */
     public function updateAttendee(Calendar_Model_Attender $_attendee)
     {
+        if ($_attendee->user_id instanceof Addressbook_Model_Contact) {
+            $_attendee->user_id = $_attendee->user_id->getId();
+        } else if ($_attendee->user_id instanceof Addressbook_Model_List) {
+            $_attendee->user_id = $_attendee->user_id->group_id;
+        }
+        
+        if ($_attendee->displaycontainer_id instanceof Tinebase_Model_Container) {
+            $_attendee->displaycontainer_id = $_attendee->displaycontainer_id->getId();
+        }
+        
         return $this->_attendeeBackend->update($_attendee);
     }
     

@@ -188,7 +188,7 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                     // ignore
             }
         }
-        
+
         if ($tokens[0] != 'OK') {
             return false;
         }

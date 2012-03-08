@@ -5,8 +5,8 @@
  * @package     Tinebase
  * @subpackage  EmailUser
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
- * @author      Philipp Schuele <p.schuele@metaways.de>
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Philipp Schüle <p.schuele@metaways.de>
  * 
  */
 
@@ -15,6 +15,8 @@
  * 
  * @package    Tinebase
  * @subpackage EmailUser
+ * 
+ * @todo generalize some logic and move it to abstract parent class
  */
 class Tinebase_EmailUser_Imap_Dbmail extends Tinebase_User_Plugin_Abstract
 {
@@ -97,7 +99,7 @@ class Tinebase_EmailUser_Imap_Dbmail extends Tinebase_User_Plugin_Abstract
      */
     public function __construct(array $_options = array())
     {
-        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::IMAP);
+        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::IMAP);
         
         // merge _config and dbmail imap
         $this->_config = array_merge($imapConfig['dbmail'], $this->_config);
@@ -127,22 +129,20 @@ class Tinebase_EmailUser_Imap_Dbmail extends Tinebase_User_Plugin_Abstract
     /**
      * delete user by id
      *
-     * @param  string  $_userId
+     * @param  Tinebase_Model_FullUser  $_user
      */
-    public function inspectDeleteUser($_userId)
+    public function inspectDeleteUser(Tinebase_Model_FullUser $_user)
     {
-        $userId = $_userId instanceof Tinebase_Model_User ? $_userId->getId() : $_userId;
-        
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Dbmail settings for user ' . $userId);
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Dbmail settings for user ' . $_user->accountLoginName);
 
         if($this->_hasTine20Userid === true) {
             $where = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $userId),
+                $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $_user->getId()),
                 $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailGID'])    . ' = ?', $this->_config['emailGID'])
             );
         } else {
             $where = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $this->_convertToInt($userId)),
+                $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $this->_convertToInt($_user->getId())),
                 $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailGID'])    . ' = ?', $this->_convertToInt($this->_config['emailGID']))
             );
         }
@@ -238,9 +238,16 @@ class Tinebase_EmailUser_Imap_Dbmail extends Tinebase_User_Plugin_Abstract
      */
     protected function _addUser(Tinebase_Model_FullUser $_addedUser, Tinebase_Model_FullUser $_newUserProperties)
 	{
+	    if (! $_addedUser->accountEmailAddress) {
+	        if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ 
+	            . ' User ' . $_addedUser->accountDisplayName . ' has no email address defined. Skipping dbmail user creation.');
+	        return;
+	    }
+	    
         $imapSettings = $this->_recordToRawData($_addedUser, $_newUserProperties);
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Adding Dbmail user ' . $imapSettings[$this->_propertyMapping['emailUsername']]);
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+            . ' Adding Dbmail user ' . $imapSettings[$this->_propertyMapping['emailUsername']]);
         
         // generate random password if not set
         if (empty($imapSettings[$this->_propertyMapping['emailPassword']])) {
@@ -250,10 +257,34 @@ class Tinebase_EmailUser_Imap_Dbmail extends Tinebase_User_Plugin_Abstract
         unset($imapSettings[$this->_propertyMapping['emailMailSize']]);
         unset($imapSettings[$this->_propertyMapping['emailSieveSize']]);
         unset($imapSettings[$this->_propertyMapping['emailLastLogin']]);
-                    
+        
+        $this->_checkOldUserRecord($imapSettings);
         $this->_db->insert($this->_userTable, $imapSettings);
         
         $this->inspectGetUserByProperty($_addedUser);
+	}
+	
+	/**
+	 * check if old entry exists and delete it
+	 * 
+	 * @param array $_userData
+	 */
+	protected function _checkOldUserRecord($_userData)
+	{
+	    $userIdProperty = $this->_propertyMapping['emailUsername'];
+	    $where = $this->_db->quoteInto($this->_db->quoteIdentifier($userIdProperty) . ' = ?', $_userData[$userIdProperty]);
+	    $select = $this->_db->select();
+	    $select->from(array($this->_userTable => $this->_userTable), array($userIdProperty))
+	        ->where($where)
+	        ->limit(1);
+	    
+	    $stmt = $this->_db->query($select);
+	    $queryResult = $stmt->fetch();
+	    if ($queryResult) {
+	        if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ 
+	            . " Delete existing userid {$_userData[$userIdProperty]} from {$this->_userTable}");
+            $this->_db->delete($this->_userTable, $where);
+	    }
 	}
 	
     /**

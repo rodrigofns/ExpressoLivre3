@@ -5,7 +5,7 @@
  * @package     Felamimail
  * @subpackage  Setup
  * @license     http://www.gnu.org/licenses/agpl.html AGPL3
- * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Philipp Schüle <p.schuele@metaways.de>
  */
 
@@ -304,24 +304,20 @@ class Felamimail_Setup_Update_Release4 extends Setup_Update_Abstract
         $this->_backend->createTable($tableDefinition, 'Felamimail', 'felamimail_sieve_vacation');
         $this->setApplicationVersion('Felamimail', '4.7');
     }
-
+    
+    /**
+     * update to 5.0
+     */
     public function update_7()
     {
-        if ($this->getTableVersion('felamimail_cache_message') < 8) {
-            $declaration = new Setup_Backend_Schema_Field_Xml(
-                '<field>
-                    <name>smime</name>
-                    <type>integer</type>
-                    <default>0</default>
-                    <notnull>true</notnull>
-                </field>'
-            );
-
-            $this->_backend->addCol('felamimail_cache_message', $declaration);
-
-            $this->setTableVersion('felamimail_folder', '8');
-            $this->setApplicationVersion('Felamimail', '4.8');
-        }
+        $this->setApplicationVersion('Felamimail', '5.0');
     }
     
+    /**
+     * update to 5.0
+     */
+    public function update_8()
+    {
+        $this->setApplicationVersion('Felamimail', '5.0');
+    }
 }

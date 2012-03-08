@@ -78,15 +78,23 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      */
     public function connectAndLogin($_params)
     {
+        $timeStartConnect = microtime(true);
         try {
             $this->_protocol->connect($_params->host, $_params->port, $_params->ssl);
         } catch (Exception $e) {
             throw new Felamimail_Exception_IMAPServiceUnavailable($e->getMessage());
         }
+        $timeEndConnect = microtime(true);
+        $connectTime = $timeEndConnect - $timeStartConnect;
         
         if (! $this->_protocol->login($_params->user, $_params->password)) {
             throw new Felamimail_Exception_IMAPInvalidCredentials('Cannot login, user or password wrong.');
-        }        
+        }
+        $timeEndLogin = microtime(true);
+        $loginTime = $timeEndLogin - $timeEndConnect;
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' CONNECT TIME: ' . $connectTime . ' seconds');
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' LOGIN TIME: ' . $loginTime . ' seconds');
     }    
     
     /**
@@ -155,29 +163,6 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
         $result = $this->_protocol->getFolderStatus($this->_currentFolder);        
         return $result;
     }
-    
-     /**
-     * get folder Acls
-     * 
-     * @param  Zend_Mail_Storage_Folder|string $globalName global name of folder or instance for subfolder
-     * @return array with folder values
-     */
-    public function getFolderAcls($globalName)
-    {
-        $this->_currentFolder = $globalName;
-        $result = $this->_protocol->getFolderAcls($this->_currentFolder);        
-        return $result;
-    }
-    
-    
-    public function setFolderAcls($globalName,$acls)
-    {
-        $this->_currentFolder = $globalName;
-        $result = $this->_protocol->setFolderAcls($this->_currentFolder,$acls);        
-        return $result;
-    }
-    
-    
     
     /**
      * create a new folder

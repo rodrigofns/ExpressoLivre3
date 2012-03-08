@@ -18,6 +18,7 @@ Ext.ns('Tine.widgets.dialog');
  * @constructor
  * @param {Object} config The configuration options.
  */
+
 Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     /**
      * @cfg {Tine.Tinebase.Application} app
@@ -63,6 +64,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * record in edit process.
      */
     record: null,
+
     /**
      * @cfg {String} saveAndCloseButtonText
      * text of save and close button
@@ -81,11 +83,33 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     copyRecord: false,
     
     /**
+     * @cfg {Boolean} doDuplicateCheck
+     * do duplicate check when saveing record (mode remote only)
+     */
+    doDuplicateCheck: true,
+    
+    /**
      * required grant for apply/save
      * @type String
      */
     editGrant: 'editGrant',
 
+    /**
+     * Shall the MultipleEditDialogPlugin be aplied?
+     * @type Boolean
+     */
+    useMultiple: false,
+    
+    /**
+     * holds items to disable on multiple edit
+     * @type Array
+     */
+    disableOnEditMultiple: null,
+    
+    selectedRecords: null,
+    selectionFilter: null,
+        
+    
     /**
      * @property window {Ext.Window|Ext.ux.PopupWindow|Ext.Air.Window}
      */
@@ -108,7 +132,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     bufferResize: 500,
     
     //private
-    initComponent: function(){
+    initComponent: function() {
         this.addEvents(
             /**
              * @event cancel
@@ -124,6 +148,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
              * @event update
              * @desc  Fired when the record got updated
              * @param {Json String} data data of the entry
+             * @pram  {String} this.mode
              */
             'update',
             /**
@@ -156,6 +181,9 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
         Tine.log.debug('initComponent: modelName: ', this.modelName);
         Tine.log.debug('initComponent: app: ', this.app);
         
+        this.selectedRecords = Ext.decode(this.selectedRecords);
+        this.selectionFilter = Ext.decode(this.selectionFilter);
+        
         // init some translations
         if (this.app.i18n && this.recordClass !== null) {
             this.i18nRecordName = this.app.i18n.n_hidden(this.recordClass.getMeta('recordName'), this.recordClass.getMeta('recordsName'), 1);
@@ -167,6 +195,17 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             this.recordProxy = new Tine.Tinebase.data.RecordProxy({
                 recordClass: this.recordClass
             });
+        }
+        
+        // init plugins
+        this.plugins = this.plugins ? this.plugins : [];
+        this.plugins.push(new Tine.widgets.customfields.EditDialogPlugin({}));
+        this.plugins.push(this.tokenModePlugin = new Tine.widgets.dialog.TokenModeEditDialogPlugin({}));
+        
+        if(this.useMultiple) {
+            this.mode = 'local';
+            this.record = new this.recordClass({});
+            this.plugins.push(new Tine.widgets.dialog.MultipleEditDialogPlugin({}));
         }
         
         // init actions
@@ -191,8 +230,9 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             requiredGrant: this.editGrant,
             text: (this.saveAndCloseButtonText != '') ? this.app.i18n._(this.saveAndCloseButtonText) : _('Ok'),
             minWidth: 70,
+            ref: '../btnSaveAndClose',
             scope: this,
-            handler: this.onSaveAndClose,
+            handler: function() { this.onSaveAndClose.defer(500, this) },
             iconCls: 'action_saveAndClose'
         });
     
@@ -279,6 +319,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * init record to edit
      */
     initRecord: function() {
+        
         Tine.log.debug('init record with mode: ' + this.mode);
         if (! this.record) {
             Tine.log.debug('creating new default data record');
@@ -382,8 +423,14 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             {
                 key: [10,13], // ctrl + return
                 ctrl: true,
-                fn: this.onSaveAndClose,
-                scope: this
+                scope: this,
+                fn: function() {
+                    // focus ok btn
+                    if (this.action_saveAndClose.items) {
+                        this.action_saveAndClose.items[0].focus();
+                    }
+                    this.onSaveAndClose.defer(10, this);
+                }
             }
         ]);
 
@@ -421,6 +468,11 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
         return this.getTopToolbar();
     },
     
+    /**
+     * is form valid?
+     * 
+     * @return {Boolean}
+     */
     isValid: function() {
         return this.getForm().isValid();
     },
@@ -468,7 +520,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
                             //       closing of native windows
                             this.onRecordLoad();
                         }
-                        this.fireEvent('update', Ext.util.JSON.encode(this.record.data));
+                        this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
                         
                         // free 0 namespace if record got created
                         this.window.rename(this.windowNamePrefix + this.record.id);
@@ -480,10 +532,12 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
                     },
                     failure: this.onRequestFailed,
                     timeout: 300000 // 5 minutes
+                }, {
+                    duplicateCheck: this.doDuplicateCheck
                 });
             } else {
                 this.onRecordLoad();
-                this.fireEvent('update', Ext.util.JSON.encode(this.record.data));
+                this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
                 
                 // free 0 namespace if record got created
                 this.window.rename(this.windowNamePrefix + this.record.id);
@@ -532,11 +586,94 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     },
     
     /**
+     * doublicate(s) found exception handler
+     * 
+     * @param {Object} exception
+     */
+    onDuplicateException: function(exception) {
+        var resolveGridPanel = new Tine.widgets.dialog.DuplicateResolveGridPanel({
+            app: this.app,
+            store: new Tine.widgets.dialog.DuplicateResolveStore({
+                app: this.app,
+                recordClass: this.recordClass,
+                recordProxy: this.recordProxy,
+                data: {
+                    clientRecord: exception.clientRecord,
+                    duplicates: exception.duplicates
+                }
+            }),
+            fbar: [
+                '->',
+                this.action_cancel,
+                this.action_saveAndClose
+            ]
+        });
+        
+        // intercept save handler
+        resolveGridPanel.btnSaveAndClose.setHandler(function(btn, e) {
+            var resolveStrategy = resolveGridPanel.store.resolveStrategy;
+            
+            // action discard -> close window
+            if (resolveStrategy == 'discard') {
+                return this.onCancel();
+            }
+            
+            this.record = resolveGridPanel.store.getResolvedRecord();
+            this.onRecordLoad();
+            
+            mainCardPanel.layout.setActiveItem(this.id);
+            resolveGridPanel.doLayout();
+            
+            this.doDuplicateCheck = false;
+            this.onSaveAndClose(btn, e);
+        }, this);
+        
+        // place in viewport
+        this.window.setTitle(String.format(_('Resolve Duplicate {0} Suspicion'), this.i18nRecordName));
+        var mainCardPanel = this.findParentBy(function(p) {return p.isWindowMainCardPanel });
+        mainCardPanel.add(resolveGridPanel);
+        mainCardPanel.layout.setActiveItem(resolveGridPanel.id);
+        resolveGridPanel.doLayout();
+    },
+    
+    /**
      * generic request exception handler
      * 
      * @param {Object} exception
      */
     onRequestFailed: function(exception) {
-        Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+        if (exception.code == 629) {
+            this.onDuplicateException.apply(this, arguments);
+        } else {
+            Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+        }
+        this.loadMask.hide();
+    },
+    
+    /**
+     * add given item disable registry for multiple edit
+     * 
+     * NOTE: this function can be called from any child's scope also
+     * 
+     * @param {Ext.Component} item
+     */
+    addToDisableOnEditMultiple: function(item) {
+        
+        var mgrCmpTest = function(p) {return Ext.isFunction(p.addToDisableOnEditMultiple);},
+            me = mgrCmpTest(this) ? this : this.findParentBy(mgrCmpTest);
+            
+        if (me) {
+            me.disableOnEditMultiple = me.disableOnEditMultiple || [];
+            if (me.disableOnEditMultiple.indexOf(item) < 0) {
+                Tine.log.debug('Tine.widgets.dialog.EditDialog::addToDisableOnEditMultiple ' + item.id);
+                me.disableOnEditMultiple.push(item);
+            }
+        }
+    },
+    
+    getDisableOnEditMultiple: function() {
+        if(!this.disableOnEditMultiple) this.disableOnEditMultiple = new Array();
+        return this.disableOnEditMultiple;
+       
     }
 });

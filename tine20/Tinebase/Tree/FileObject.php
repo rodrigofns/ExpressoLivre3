@@ -3,15 +3,17 @@
  * Tine 2.0
  *
  * @package     Tinebase
+ * @subpackage  Backend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2010-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
  * sql backend class for tree file(and directory) objects
  *
  * @package     Tinebase
+ * @subpackage  Backend
  */
 class Tinebase_Tree_FileObject extends Tinebase_Backend_Sql_Abstract
 {
@@ -21,6 +23,13 @@ class Tinebase_Tree_FileObject extends Tinebase_Backend_Sql_Abstract
      * @var string
      */
     protected $_tableName = 'tree_fileobjects';
+    
+    /**
+     * Table name without prefix (file revisions)
+     *
+     * @var string
+     */
+    protected $_revisionsTableName = 'tree_filerevisions';
     
     /**
      * Model name
@@ -34,7 +43,14 @@ class Tinebase_Tree_FileObject extends Tinebase_Backend_Sql_Abstract
      *
      * @var boolean
      */
-    protected $_modlogActive = false;
+    protected $_modlogActive = FALSE;
+    
+    /**
+     * keep old revisions in tree_filerevisions table
+     * 
+     * @var boolean
+     */
+    protected $_keepOldRevisions = FALSE;
     
     /**
      * get the basic select object to fetch records from the database
@@ -47,12 +63,12 @@ class Tinebase_Tree_FileObject extends Tinebase_Backend_Sql_Abstract
     {
         $select = parent::_getSelect($_cols, $_getDeleted);
         
-        $select
-            ->joinLeft(
-                /* table  */ array('tree_filerevisions' => $this->_tablePrefix . 'tree_filerevisions'), 
-                /* on     */ $this->_db->quoteIdentifier($this->_tableName . '.id') . ' = ' . $this->_db->quoteIdentifier('tree_filerevisions.id') . ' AND ' . $this->_db->quoteIdentifier($this->_tableName . '.revision') . ' = ' . $this->_db->quoteIdentifier('tree_filerevisions.revision'),
-                /* select */ array('revision', 'hash', 'size')
-            );
+        $select->joinLeft(
+            /* table  */ array($this->_revisionsTableName => $this->_tablePrefix . $this->_revisionsTableName), 
+            /* on     */ $this->_db->quoteIdentifier($this->_tableName . '.id') . ' = ' . $this->_db->quoteIdentifier($this->_revisionsTableName . '.id') . ' AND ' 
+                . $this->_db->quoteIdentifier($this->_tableName . '.revision') . ' = ' . $this->_db->quoteIdentifier($this->_revisionsTableName . '.revision'),
+            /* select */ array('revision', 'hash', 'size')
+        );
             
         return $select;
     }        
@@ -120,34 +136,61 @@ class Tinebase_Tree_FileObject extends Tinebase_Backend_Sql_Abstract
         if ($_record->type != Tinebase_Model_Tree_FileObject::TYPE_FILE || empty($_record->hash)) {
             return;
         }
-        $data = null;
+        $createRevision = $this->_keepOldRevisions || $_mode === 'create';
+        $updateRevision = FALSE;
         
-        if ($_mode == 'create') {
-            $data = array(
-                'id'            => $_record->getId(),
-                'revision'      => $this->_getNextRevision($_record),
-                'creation_time' => Tinebase_DateTime::now()->toString(Tinebase_Record_Abstract::ISO8601LONG),
-            	'created_by'    => Tinebase_Core::getUser()->getId(),
-                'hash'          => $_record->hash,
-                'size'          => $_record->size
-            );
-        } else {
+        if ($_mode !== 'create') {
             // select latest hash of id and compare with new hash
             $currentRecord = $this->get($_record);
-            if ($currentRecord->hash !== $_record->hash) {
-                $data = array(
-                    'id'            => $_record->getId(),
-                    'revision'      => $this->_getNextRevision($_record),
-                    'creation_time' => Tinebase_DateTime::now()->toString(Tinebase_Record_Abstract::ISO8601LONG),
-                	'created_by'    => Tinebase_Core::getUser()->getId(),
-                    'hash'          => $_record->hash,
-                    'size'          => $_record->size
-                );
+            if ($currentRecord->hash !== NULL) {
+                $updateRevision = ($currentRecord->hash !== $_record->hash);
+            } else {
+                $createRevision = TRUE;
             }
         }
         
-        if ($data !== null) {
-            $this->_db->insert($this->_tablePrefix . 'tree_filerevisions', $data);
+        if (! $createRevision && ! $updateRevision) {
+            return;
         }
-    }    
+
+        $data = array(
+            'creation_time' => Tinebase_DateTime::now()->toString(Tinebase_Record_Abstract::ISO8601LONG),
+            'created_by'    => Tinebase_Core::getUser()->getId(),
+            'hash'          => $_record->hash,
+            'size'          => $_record->size,
+            'revision'      => $this->_getNextRevision($_record),
+        );
+            
+        if ($createRevision) {
+            $data['id'] = $_record->getId();
+            $this->_db->insert($this->_tablePrefix . 'tree_filerevisions', $data);
+        } else if ($updateRevision) {
+            $where = array(
+                $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $_record->getId()),
+            );
+            $this->_db->update($this->_tablePrefix . 'tree_filerevisions', $data, $where);
+        }
+    }
+
+    /**
+     * returns all hashes of revisions that still exists in the db
+     * 
+     * @param array $_hashes
+     * @return array
+     */
+    public function checkRevisions($_hashes)
+    {
+        if (empty($_hashes)) {
+            return array();
+        }
+        
+        $select = $this->_db->select();
+        $select->from(array($this->_revisionsTableName => $this->_tablePrefix . $this->_revisionsTableName), array('hash'));
+        $select->where($this->_db->quoteInto($this->_db->quoteIdentifier($this->_revisionsTableName . '.hash') . ' IN (?)', (array) $_hashes));
+        
+        $stmt = $this->_db->query($select);
+        $queryResult = $stmt->fetchAll(Zend_Db::FETCH_COLUMN);
+        
+        return $queryResult;
+    }
 }

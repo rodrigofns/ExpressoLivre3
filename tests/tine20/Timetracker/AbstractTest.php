@@ -1,11 +1,11 @@
 <?php
 /**
  * Tine 2.0 - http://www.tine20.org
- * 
+ *
  * @package     Timetracker
  * @license     http://www.gnu.org/licenses/agpl.html
- * @copyright   Copyright (c) 2010 Metaways Infosystems GmbH (http://www.metaways.de)
- * @author      Philipp Schuele <p.schuele@metaways.de>
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Philipp Schüle <p.schuele@metaways.de>
  */
 
 /**
@@ -17,16 +17,13 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
      * @var Timetracker_Frontend_Json
      */
     protected $_json = array();
-    
+
     /**
-     * timesheet/timeaccounts to delete
-     * @var array
+     * last record created by _getTime(account|sheet) or _getCustomField
+     * @var Tinebase_Record_Abstract
      */
-    protected $_toDeleteIds = array(
-        'ta'    => array(),
-        'cf'    => array(),
-    );
-    
+    protected $_lastCreatedRecord = null;
+
     /**
      * Runs the test methods of this class.
      *
@@ -47,7 +44,8 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_json = new Timetracker_Frontend_Json();        
+        Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
+        $this->_json = new Timetracker_Frontend_Json();
     }
 
     /**
@@ -55,32 +53,40 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
      * This method is called after a test is executed.
      *
      * @access protected
-     * 
-     * @todo use this for all ts/ta that are created in the tests
      */
     protected function tearDown()
     {
-        $this->_json->deleteTimeaccounts($this->_toDeleteIds['ta']);
-        foreach ($this->_toDeleteIds['cf'] as $cf) {
-            Tinebase_CustomField::getInstance()->deleteCustomField($cf);
-        }
+        Tinebase_TransactionManager::getInstance()->rollBack();
     }
-    
+
     /************ protected helper funcs *************/
-    
+
     /**
      * get Timesheet
      *
+     * @param array $_data
+     * @param boolean $_forceCreation
      * @return Timetracker_Model_Timeaccount
      */
-    protected function _getTimeaccount()
+    protected function _getTimeaccount($_data = array(), $_forceCreation = false)
     {
-        return new Timetracker_Model_Timeaccount(array(
+        $defaultData = array(
             'title'         => Tinebase_Record_Abstract::generateUID(),
             'description'   => 'blabla',
-        ), TRUE);
+        );
+
+        $data = array_replace($defaultData, $_data);
+
+        $ta = new Timetracker_Model_Timeaccount($data, true);
+
+        if($_forceCreation) {
+            $taRec = $this->_json->saveTimeaccount($ta->toArray(), $_forceCreation);
+            $this->_lastCreatedRecord = $taRec;
+        }
+
+        return $ta;
     }
-    
+
     /**
      * get grants
      *
@@ -99,34 +105,44 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
                 Tinebase_Model_Grants::GRANT_EXPORT                     => TRUE,
                 Tinebase_Model_Grants::GRANT_ADMIN                      => TRUE,
             )
-        );        
+        );
     }
-    
+
     /**
      * get Timesheet (create timeaccount as well)
      *
-     * @param string $_taId
-     * @param Tinebase_DateTime $_startDate
+     * @param array fields data
+     * @param boolean force creation of the record
      * @return Timetracker_Model_Timesheet
      */
-    protected function _getTimesheet($_taId = NULL, $_startDate = NULL)
+    protected function _getTimesheet($_data = array(), $_forceCreation = false)
     {
-        if ($_taId === NULL) {
+        $defaultData = array('account_id'        => Tinebase_Core::getUser()->getId(),
+             'description'       => 'blabla',
+             'duration'          => 30,
+             'timeaccount_id'    => NULL,
+             'start_date'        => NULL
+        );
+
+        $data = array_replace($defaultData, $_data);
+
+        if ($data['timeaccount_id'] === NULL) {
             $timeaccount = Timetracker_Controller_Timeaccount::getInstance()->create($this->_getTimeaccount());
-            $taId = $timeaccount->getId();
-        } else {
-            $taId = $_taId;
+            $data['timeaccount_id'] = $timeaccount->getId();
         }
-        
-        $startDate = ($_startDate !== NULL) ? $_startDate : Tinebase_DateTime::now()->toString('Y-m-d');
-        
-        return new Timetracker_Model_Timesheet(array(
-            'account_id'        => Tinebase_Core::getUser()->getId(),
-            'timeaccount_id'    => $taId,
-            'description'       => 'blabla',
-            'start_date'        => $startDate,
-            'duration'          => 30,
-        ), TRUE);
+
+        if($data['start_date'] === NULL) {
+            $data['start_date'] = Tinebase_DateTime::now()->toString('Y-m-d');
+        }
+
+        $ts = new Timetracker_Model_Timesheet($data, TRUE);
+
+        if ($_forceCreation) {
+            $tsRec = $this->_json->saveTimesheet($ts->toArray(), $_forceCreation);
+            $this->_lastCreatedRecord = $tsRec;
+        }
+
+        return $ts;
     }
 
     /**
@@ -141,7 +157,7 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
             'model'             => 'Timetracker_Model_Timesheet',
             'name'              => Tinebase_Record_Abstract::generateUID(),
             'definition'        => array(
-                'label' => Tinebase_Record_Abstract::generateUID(),        
+                'label' => Tinebase_Record_Abstract::generateUID(),
                 'type'  => 'string',
                 'uiconfig' => array(
                     'xtype'  => Tinebase_Record_Abstract::generateUID(),
@@ -149,16 +165,16 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
                     'group'  => 'unittest',
                     'order'  => 100,
                 )
-            )      
+            )
         ));
-        
+
         $result = Tinebase_CustomField::getInstance()->addCustomField($record);
-        
-        $this->_toDeleteIds['cf'][] = $result->getId();
-        
+
+        $this->_lastCreatedRecord = $result;
+
         return $result;
     }
-    
+
     /**
      * get paging
      *
@@ -185,28 +201,28 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         $result = array(
             array(
-                'field' => 'description', 
-                'operator' => 'contains', 
+                'field' => 'description',
+                'operator' => 'contains',
                 'value' => 'blabla'
-            ),     
+            ),
             array(
-                'field' => 'containerType', 
-                'operator' => 'equals', 
+                'field' => 'containerType',
+                'operator' => 'equals',
                 'value' => Tinebase_Model_Container::TYPE_SHARED
             ),
         );
-        
+
         if ($_showClosed) {
             $result[] = array(
-                'field' => 'showClosed', 
-                'operator' => 'equals', 
+                'field' => 'showClosed',
+                'operator' => 'equals',
                 'value' => TRUE
             );
         }
 
         return $result;
     }
-    
+
     /**
      * get Timesheet filter
      *
@@ -217,16 +233,16 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         $result = array(
             array(
-                'field' => 'query', 
-                'operator' => 'contains', 
+                'field' => 'query',
+                'operator' => 'contains',
                 'value' => 'blabla'
             ),
         );
-        
+
         if ($_cfFilter !== NULL) {
             $result[] = $_cfFilter;
         }
-        
+
         return $result;
     }
 
@@ -240,18 +256,18 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'field' => 'customfield_id', 
-                'operator' => 'equals', 
+                'field' => 'customfield_id',
+                'operator' => 'equals',
                 'value' => $_cfid
             ),
             array(
-                'field' => 'value', 
-                'operator' => 'group', 
+                'field' => 'value',
+                'operator' => 'group',
                 'value' => ''
             ),
-        );        
+        );
     }
-    
+
     /**
      * get Timesheet filter with custom field
      *
@@ -261,18 +277,18 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'field' => 'query', 
-                'operator' => 'contains', 
+                'field' => 'query',
+                'operator' => 'contains',
                 'value' => 'blabla'
             ),
             array(
-                'field' => 'customfield', 
-                'operator' => 'equals', 
+                'field' => 'customfield',
+                'operator' => 'equals',
                 'value' => array('cfId' => $_cfId, 'value' => $_value)
             ),
-        );        
+        );
     }
-    
+
     /**
      * get persistent filter filter
      *
@@ -283,13 +299,13 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'field'     => 'name', 
-                'operator'  => 'equals', 
+                'field'     => 'name',
+                'operator'  => 'equals',
                 'value'     => $_name
             ),
-        );        
+        );
     }
-    
+
     /**
      * get Timesheet filter with date
      *
@@ -300,39 +316,39 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         $result = array(
             array(
-                'field' => 'query', 
-                'operator' => 'contains', 
+                'field' => 'query',
+                'operator' => 'contains',
                 'value' => 'blabla'
             ),
             array(
-                'field' => 'start_date', 
-                'operator' => 'after', 
+                'field' => 'start_date',
+                'operator' => 'after',
                 'value' => '2008-12-12'
             ),
         );
-        
+
         if ($_type == 'inweek') {
             $date = Tinebase_DateTime::now();
             $weekNumber = $date->get('W');
             $result[] = array(
-                'field' => 'start_date', 
-                'operator' => 'inweek', 
+                'field' => 'start_date',
+                'operator' => 'inweek',
                 'value' => $weekNumber
             );
         } else {
             $result[] = array(
-                'field' => 'start_date', 
-                'operator' => 'within', 
+                'field' => 'start_date',
+                'operator' => 'within',
                 'value' => $_type
             );
         }
-        
+
         return $result;
     }
-    
+
     /**
      * add timesheet with customfield
-     * 
+     *
      * @param Tinebase_Model_CustomField_Config $_customField1
      * @param string $_cf1Value
      */
@@ -340,24 +356,21 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
     {
         // create custom fields
         $customField2 = $this->_getCustomField();
-        
+
         // create timesheet and add custom fields
         $timesheetArray = $this->_getTimesheet()->toArray();
         $timesheetArray[$_customField1->name] = $_cf1Value;
         $timesheetArray[$customField2->name] = Tinebase_Record_Abstract::generateUID();
-        
+
         $timesheetData = $this->_json->saveTimesheet($timesheetArray);
-        
-        // tearDown settings
-        $this->_toDeleteIds['ta'][] = $timesheetData['timeaccount_id']['id'];
-        
+
         // checks
         $this->assertTrue(array_key_exists($_customField1->name, $timesheetData['customfields']), 'cf 1 not found');
         $this->assertTrue(array_key_exists($customField2->name, $timesheetData['customfields']), 'cf 2 not found');
         $this->assertGreaterThan(0, count($timesheetData['customfields']));
         $this->assertEquals($timesheetArray[$_customField1->name], $timesheetData['customfields'][$_customField1->name]);
         $this->assertEquals($timesheetArray[$customField2->name], $timesheetData['customfields'][$customField2->name]);
-        
+
         // check if custom fields are returned with search
         $searchResult = $this->_json->searchTimesheets($this->_getTimesheetFilter(), $this->_getPaging());
         $this->assertGreaterThan(0, count($searchResult['results'][0]['customfields']));
@@ -371,12 +384,19 @@ abstract class Timetracker_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(array_key_exists($customField2->name, $ts['customfields']));
         $this->assertEquals($timesheetArray[$_customField1->name], $ts['customfields'][$_customField1->name]);
         $this->assertEquals($timesheetArray[$customField2->name], $ts['customfields'][$customField2->name]);
-        
+
         // test search with custom field filter
         $searchResult = $this->_json->searchTimesheets(
-            $this->_getTimesheetFilterWithCustomField($_customField1->getId(), $_cf1Value), 
+            $this->_getTimesheetFilterWithCustomField($_customField1->getId(), $_cf1Value),
             $this->_getPaging()
         );
         $this->assertGreaterThan(0, $searchResult['totalcount'], 'cf filter not working');
+    }
+
+    /**
+     * get last created record
+     */
+    protected function _getLastCreatedRecord() {
+        return $this->_lastCreatedRecord;
     }
 }

@@ -251,7 +251,7 @@ class Tinebase_EmailUser_Imap_Dovecot extends Tinebase_User_Plugin_Abstract
     public function __construct(array $_options = array())
     {
         // get dovecot imap config options (host, dbname, username, password, port)
-        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::IMAP);
+        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::IMAP);
         
         // merge _config and dovecot imap
         $this->_config = array_merge($imapConfig['dovecot'], $this->_config);
@@ -296,16 +296,14 @@ class Tinebase_EmailUser_Imap_Dovecot extends Tinebase_User_Plugin_Abstract
     /**
      * delete user by id
      *
-     * @param  string  $_userId
+     * @param  Tinebase_Model_FullUser  $_user
      */
-    public function inspectDeleteUser($_userId)
+    public function inspectDeleteUser(Tinebase_Model_FullUser $_user)
     {
-        $userId = $_userId instanceof Tinebase_Model_User ? $_userId->getId() : $_userId;
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Dovecot settings for user ' . $userId);
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Dovecot settings for user ' . $_user->accountLoginName);
 
         $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $userId)
+            $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $_user->getId())
         );
         // append domain if set or domain IS NULL
         if (array_key_exists('domain', $this->_config) && ! empty($this->_config['domain'])) {
@@ -441,6 +439,12 @@ class Tinebase_EmailUser_Imap_Dovecot extends Tinebase_User_Plugin_Abstract
      */
     protected function _addUser(Tinebase_Model_FullUser $_addedUser, Tinebase_Model_FullUser $_newUserProperties)
     {
+        if (! $_addedUser->accountEmailAddress) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__
+            . ' User ' . $_addedUser->accountDisplayName . ' has no email address defined. Skipping dovecot user creation.');
+            return;
+        }
+         
         $imapSettings = $this->_recordToRawData($_addedUser, $_newUserProperties);
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Adding new dovecot user ' . $imapSettings[$this->_propertyMapping['emailUsername']]);

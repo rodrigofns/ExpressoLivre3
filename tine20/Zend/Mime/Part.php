@@ -223,7 +223,8 @@ class Zend_Mime_Part {
     /**
      * Get the Content of the current Mime Part in the given encoding.
      *
-     * @return String
+     * @param string $EOL
+     * @return string
      */
     public function getContent($EOL = Zend_Mime::LINEEND)
     {

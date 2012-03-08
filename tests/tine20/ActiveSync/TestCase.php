@@ -39,6 +39,11 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     protected $_controller;
     
+    /**
+     * @var ActiveSync_Model_Device
+     */
+    protected $_device;
+    
     protected $_specialFolderName;
     
     /**
@@ -74,7 +79,9 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      * @see PHPUnit_Framework_TestCase::setUp()
      */
     protected function setUp()
-    {   	
+    {       
+        Tinebase_TransactionManager::getInstance()->startTransaction(Tinebase_Core::getDb());
+        
         $this->_testUser          = Tinebase_Core::getUser();        
         $this->_specialFolderName = strtolower($this->_applicationName) . '-root';
         
@@ -91,21 +98,7 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        foreach($this->objects['container'] as $container) {
-            Tinebase_Container::getInstance()->deleteContainer($container, TRUE);
-        }
-        
-        foreach($this->objects['devices'] as $device) {
-            ActiveSync_Controller_Device::getInstance()->delete($device);
-        }
-        
-        foreach($this->objects['events'] as $event) {
-            Calendar_Controller_Event::getInstance()->delete(array($event->getId()));
-        }
-        
-        foreach($this->objects['tasks'] as $task) {
-            Tasks_Controller_Task::getInstance()->delete(array($task->getId()));
-        }
+        Tinebase_TransactionManager::getInstance()->rollBack();
     }
     
     
@@ -114,11 +107,11 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     public function testGetFoldersPalm()
     {
-    	$controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));
         
-    	$folders = $controller->getSupportedFolders();
-    	
-    	$this->assertArrayHasKey($this->_specialFolderName, $folders, "key {$this->_specialFolderName} not found in " . print_r($folders, true));
+        $folders = $controller->getAllFolders();
+        
+        $this->assertArrayHasKey($this->_specialFolderName, $folders, "key {$this->_specialFolderName} not found in " . print_r($folders, true));
     }
     
     /**
@@ -129,7 +122,7 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
         // create at least one folder with sync grants
         $syncAbleFolder    = $this->_getContainerWithSyncGrant();
         
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_IPHONE));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_IPHONE));
         
         $folder = $controller->getFolder($syncAbleFolder);
         
@@ -143,7 +136,7 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     public function testGetSpecialFolder()
     {
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_IPHONE));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_IPHONE));
         
         $folder = $controller->getFolder($this->_specialFolderName);
         
@@ -160,12 +153,12 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
         // create at least one folder with sync grants
         $syncAbleFolder    = $this->_getContainerWithSyncGrant();
         
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_IPHONE));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_IPHONE));
         
-        $folders = $controller->getSupportedFolders();
+        $folders = $controller->getAllFolders();
         
         foreach($folders as $folder) {
-        	$this->assertTrue($this->_testUser->hasGrant($folder['folderId'], Tinebase_Model_Grants::GRANT_SYNC));
+            $this->assertTrue($this->_testUser->hasGrant($folder['folderId'], Tinebase_Model_Grants::GRANT_SYNC));
         }
         
         $this->assertArrayNotHasKey($this->_specialFolderName, $folders, "key {$this->_specialFolderName} found in " . print_r($folders, true));
@@ -188,32 +181,30 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     public function testAddEntryToBackend()
     {
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));
         
         $xml = simplexml_import_dom($this->_getInputDOMDocument());
-        $record = $controller->add($this->_getContainerWithSyncGrant()->getId(), $xml->Collections->Collection->Commands->Change[0]->ApplicationData);
+        $recordId = $controller->createEntry($this->_getContainerWithSyncGrant()->getId(), $xml->Collections->Collection->Commands->Change[0]->ApplicationData);
 
-        $this->_validateAddEntryToBackend($record);
+        $this->assertTrue(!empty($recordId));
         
-        return $record;
+        return $recordId;
     }
-    
-    abstract protected function _validateAddEntryToBackend(Tinebase_Record_Abstract $_record);
     
     /**
      * test get list all record ids
      */
     public function testGetServerEntries()
     {
-        $controller = $this->_getController($this->_getDevice(ActiveSync_Backend_Device::TYPE_PALM));
+        $controller = $this->_getController($this->_getDevice(Syncope_Model_Device::TYPE_WEBOS));
         
         $xml = simplexml_import_dom($this->_getInputDOMDocument());
-        $record = $controller->add($this->_getContainerWithSyncGrant()->getId(), $xml->Collections->Collection->Commands->Change[0]->ApplicationData);
+        $record = $controller->createEntry($this->_getContainerWithSyncGrant()->getId(), $xml->Collections->Collection->Commands->Change[0]->ApplicationData);
         
         $this->_validateGetServerEntries($record);        
     }
     
-    abstract protected function _validateGetServerEntries(Tinebase_Record_Abstract $_record);
+    abstract protected function _validateGetServerEntries($_recordId);
     
     /**
      * test search records
@@ -235,16 +226,18 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
             $containerWithSyncGrant = Tinebase_Container::getInstance()->getContainerByName(
                 $this->_applicationName, 
                 'ContainerWithSyncGrant-' . $this->_applicationName, 
-                Tinebase_Model_Container::TYPE_PERSONAL
+                Tinebase_Model_Container::TYPE_PERSONAL,
+                Tinebase_Core::getUser()
             );
         } catch (Tinebase_Exception_NotFound $e) {
-	        $containerWithSyncGrant = new Tinebase_Model_Container(array(
-	            'name'              => 'ContainerWithSyncGrant-' . $this->_applicationName,
-	            'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
-	            'backend'           => 'Sql',
-	            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName($this->_applicationName)->getId()
-	        ));
-	        $containerWithSyncGrant = Tinebase_Container::getInstance()->addContainer($containerWithSyncGrant);
+            $containerWithSyncGrant = new Tinebase_Model_Container(array(
+                'name'              => 'ContainerWithSyncGrant-' . $this->_applicationName,
+                'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
+                'owner_id'          => Tinebase_Core::getUser(),
+                'backend'           => 'Sql',
+                'application_id'    => Tinebase_Application::getInstance()->getApplicationByName($this->_applicationName)->getId()
+            ));
+            $containerWithSyncGrant = Tinebase_Container::getInstance()->addContainer($containerWithSyncGrant);
         }
         
         $this->objects['container']['withSyncGrant'] = $containerWithSyncGrant;
@@ -267,7 +260,8 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
             $containerWithoutSyncGrant = Tinebase_Container::getInstance()->getContainerByName(
                 $this->_applicationName, 
                 'ContainerWithoutSyncGrant-' . $this->_applicationName, 
-                Tinebase_Model_Container::TYPE_PERSONAL
+                Tinebase_Model_Container::TYPE_PERSONAL,
+                Tinebase_Core::getUser()
             );
         } catch (Tinebase_Exception_NotFound $e) {
             $creatorGrants = array(
@@ -281,12 +275,13 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
                 //Tinebase_Model_Grants::GRANT_SYNC      => true,
                 // NOTE: Admin Grant implies all other grants
                 //Tinebase_Model_Grants::GRANT_ADMIN     => true,
-            );        	
-        	$grants = new Tinebase_Record_RecordSet('Tinebase_Model_Grants', array($creatorGrants));
-        	
+            );            
+            $grants = new Tinebase_Record_RecordSet('Tinebase_Model_Grants', array($creatorGrants));
+            
             $containerWithoutSyncGrant = new Tinebase_Model_Container(array(
                 'name'              => 'ContainerWithoutSyncGrant-' . $this->_applicationName,
                 'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
+                'owner_id'          => Tinebase_Core::getUser(),
                 'backend'           => 'Sql',
                 'application_id'    => Tinebase_Application::getInstance()->getApplicationByName($this->_applicationName)->getId()
             ));
@@ -312,29 +307,9 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
             return $this->objects['devices'][$_deviceType];
         }
         
-        switch ($_deviceType) {
-            case ActiveSync_Backend_Device::TYPE_IPHONE:
-                $device = ActiveSync_Backend_DeviceTests::getTestDevice();
-                $device->devicetype   = $_deviceType;
-                $device->owner_id     = $this->_testUser->getId();
-                #$palm->contactsfilter_id = $this->objects['filter']->getId();
-                
-                break;
-                
-            case ActiveSync_Backend_Device::TYPE_PALM:
-                $device = ActiveSync_Backend_DeviceTests::getTestDevice();
-                $device->devicetype   = $_deviceType;
-                $device->owner_id     = $this->_testUser->getId();
-                $device->acsversion   = '12.0';
-                #$palm->contactsfilter_id = $this->objects['filter']->getId();
-                
-                break;
-                
-            default:
-                throw new Exception('unsupported device: ' , $_deviceType);
-        }
-        
-        $this->objects['devices'][$_deviceType] = ActiveSync_Controller_Device::getInstance()->create($device);
+        $this->objects['devices'][$_deviceType] = ActiveSync_Controller_Device::getInstance()->create(
+            ActiveSync_Backend_DeviceTests::getTestDevice($_deviceType)
+        );
 
         return $this->objects['devices'][$_deviceType];
     }
@@ -359,7 +334,7 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function _getInputDOMDocument($xml = NULL)
     {
-    	$dom = new DOMDocument();
+        $dom = new DOMDocument();
         $dom->formatOutput = false;
         $dom->encoding     = 'utf-8';
         $dom->loadXML($xml ? $xml : $this->_testXMLInput);
@@ -374,7 +349,7 @@ abstract class ActiveSync_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function _getOutputDOMDocument()
     {
-    	$dom = new DOMDocument();
+        $dom = new DOMDocument();
         $dom->formatOutput = false;
         $dom->encoding     = 'utf-8';
         $dom->loadXML($this->_testXMLOutput);

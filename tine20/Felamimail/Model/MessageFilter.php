@@ -44,7 +44,7 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'id'            => array('filter' => 'Tinebase_Model_Filter_Id'), 
+        'id'            => array('filter' => 'Tinebase_Model_Filter_Id', 'options' => array('modelName' => 'Felamimail_Model_Message')), 
         'query'         => array(
             'filter'        => 'Tinebase_Model_Filter_Query', 
             'options'       => array('fields' => array('subject', 'from_email', 'from_name'))
@@ -214,7 +214,7 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
                 $value[]      = '%' . $customValue . '%';
             }
         }
-                        
+        
         if ($_filterData['field'] == 'flags') {
             if ($_filterData['operator'] == 'equals' || $_filterData['operator'] == 'contains') {
                 $_select->having($db->quoteInto('flags LIKE ?', $value));
@@ -243,6 +243,6 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
                 $db->quoteInto($fieldName  . ' LIKE ?', $value) . ' OR ' .
                 $db->quoteInto($fieldEmail . ' LIKE ?', $value)
             );
-        }        
+        }
     }
 }

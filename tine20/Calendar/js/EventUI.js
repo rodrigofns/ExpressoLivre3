@@ -68,6 +68,15 @@ Tine.Calendar.EventUI.prototype = {
         });
     },
     
+    markOutOfFilter: function() {
+        Ext.each(this.getEls(), function(el) {
+            el.setOpacity(0.5, 0);
+            el.setStyle({'background-color': '#aaa', 'border-color': '#888'});
+            Ext.DomHelper.applyStyles(el.dom.firstChild, {'background-color': '#888'});
+            Ext.DomHelper.applyStyles(el.dom.firstChild.firstChild, {'background-color': '#888'});
+        });
+    },
+    
     onSelectedChange: function(state){
         if(state){
             //this.focus();
@@ -101,7 +110,7 @@ Tine.Calendar.EventUI.prototype = {
     },
     
     render: function() {
-        
+        // do nothing
     },
     
     setOpacity: function(v) {
@@ -187,7 +196,7 @@ Tine.Calendar.DaysViewEventUI = Ext.extend(Tine.Calendar.EventUI, {
     
     render: function(view) {
         this.event.view = view;
-        
+
         this.colorSet = Tine.Calendar.colorMgr.getColor(this.event);
         this.event.colorSet = this.colorSet;
         
@@ -226,7 +235,14 @@ Tine.Calendar.DaysViewEventUI = Ext.extend(Tine.Calendar.EventUI, {
                 status: 'recur',
                 text: this.app.i18n._('recurring event')
             });
+        } else if (this.event.isRecurException()) {
+            this.statusIcons.push({
+                status: 'recurex',
+                text: this.app.i18n._('recurring event exception')
+            });            
         }
+
+        
         
         if (! Ext.isEmpty(this.event.get('alarms'))) {
             this.statusIcons.push({
@@ -235,11 +251,13 @@ Tine.Calendar.DaysViewEventUI = Ext.extend(Tine.Calendar.EventUI, {
             });
         }
         
-        var myAttenderRecord = this.event.getMyAttenderRecord();
-        if (myAttenderRecord) {
+        var myAttenderRecord = this.event.getMyAttenderRecord(),
+            myAttenderStatusRecord = myAttenderRecord ? Tine.Tinebase.widgets.keyfield.StoreMgr.get('Calendar', 'attendeeStatus').getById(myAttenderRecord.get('status')) : null;
+            
+        if (myAttenderStatusRecord && myAttenderStatusRecord.get('system')) {
             this.statusIcons.push({
                 status: myAttenderRecord.get('status'),
-                text: Tine.Calendar.Model.Attender.getAttendeeStatusStore().getById(myAttenderRecord.get('status')).get('status_name')
+                text: myAttenderStatusRecord.get('i18nValue')
             });
         }
         

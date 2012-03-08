@@ -1,5 +1,8 @@
 <?php
-// TODO: rename to config.inc.php and add your database settings
+// NOTE: You can either:
+//  - copy this file to config.inc.php and add change config values
+//  - create an empty config.inc.php, make it writeable to the webserver and edit config via the setup.php interface
+//  - make this directory temporary writeable to the webserver and edit config via the setup.php interface
 
 // minimal configuration
 return array(

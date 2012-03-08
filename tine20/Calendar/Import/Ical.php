@@ -7,6 +7,8 @@
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  * @copyright   Copyright (c) 2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * 
+ * @todo        use more functionality of Tinebase_Import_Abstract (import() and other fns)
  */
 
 /**
@@ -89,15 +91,16 @@ class Calendar_Import_Ical extends Tinebase_Import_Abstract
      * import the data
      *
      * @param  stream $_resource 
+     * @param array $_clientRecordData
      * @return array : 
      *  'results'           => Tinebase_Record_RecordSet, // for dryrun only
      *  'totalcount'        => int,
      *  'failcount'         => int,
      *  'duplicatecount'    => int,
      */
-    public function import($_resource = NULL)
+    public function import($_resource = NULL, $_clientRecordData = array())
     {
-        // forece correct line ends
+        // force correct line ends
         require_once 'StreamFilter/StringReplace.php';
         $filter = stream_filter_append($_resource, 'str.replace', STREAM_FILTER_READ, array(
             'search'            => '/(?<!\r)\n/',
@@ -108,13 +111,6 @@ class Calendar_Import_Ical extends Tinebase_Import_Abstract
         if (! $this->_options['importContainerId']) {
             throw new Tinebase_Exception_InvalidArgument('you need to define a importContainerId');
         }
-        
-        $result = array(
-            'results'           => null,
-            'totalcount'        => 0,
-            'failcount'         => 0,
-            'duplicatecount'    => 0,
-        );
         
         $icalData = stream_get_contents($_resource);
         
@@ -128,7 +124,8 @@ class Calendar_Import_Ical extends Tinebase_Import_Abstract
             throw $isce;
         }
         
-        $events = $result['results'] = $this->_getEvents($ical);
+        $events = $this->_importResult['results'] = $this->_getEvents($ical);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Got ' . count($events) . ' events for import.');
 //        print_r($events->toArray());
         
         // set container
@@ -150,22 +147,22 @@ class Calendar_Import_Ical extends Tinebase_Import_Abstract
             try {
                 if (! $existingEvent) {
                     $cc->create($event, FALSE);
-                    $result['totalcount'] += 1;
+                    $this->_importResult['totalcount'] += 1;
                 } else if ($this->_options['forceUpdateExisting'] || ($this->_options['updateExisting'] && $event->seq > $existingEvent->seq)) {
                     $event->id = $existingEvent->getId();
                     $event->last_modified_time = clone $existingEvent->last_modified_time;
                     $cc->update($event, FALSE);
-                    $result['totalcount'] += 1;
+                    $this->_importResult['totalcount'] += 1;
                 } else {
-                    $result['duplicatecount'] += 1;
+                    $this->_importResult['duplicatecount'] += 1;
                 }
             } catch (Exception $e) {
-                $result['failcount'] += 1;
+                $this->_importResult['failcount'] += 1;
             }
         }
         $cc->sendNotifications($sendNotifications);
         
-        return $result;
+        return $this->_importResult;
     }
     
     /**

@@ -19,8 +19,8 @@ Ext.namespace('Tine.Felamimail');
  * <p>
  * </p>
  * 
- * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Bruno Vieira Costa <bruno.vieira-costa@serpro.gov.br>
+ * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * 
  * @param       {Object} config

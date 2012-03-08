@@ -43,7 +43,7 @@ class Felamimail_Setup_Update_Release3 extends Setup_Update_Abstract
     public function update_1()
     {
         // update account types for users with userEmailAccount preference
-        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::IMAP);
+        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::IMAP);
         
         if (array_key_exists('host', $imapConfig)) {
             $accounts = Felamimail_Controller_Account::getInstance()->getAll();
@@ -77,11 +77,11 @@ class Felamimail_Setup_Update_Release3 extends Setup_Update_Abstract
      */    
     public function update_2()
     {
-        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::IMAP);
+        $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::IMAP);
         if (array_key_exists('useAsDefault', $imapConfig)) {
             $imapConfig['useSystemAccount'] = $imapConfig['useAsDefault'];
             unset($imapConfig['useAsDefault']);
-            Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::IMAP, Zend_Json::encode($imapConfig));
+            Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Config::IMAP, Zend_Json::encode($imapConfig));
         }
         $this->setApplicationVersion('Felamimail', '3.3');
     }
@@ -182,7 +182,7 @@ class Felamimail_Setup_Update_Release3 extends Setup_Update_Abstract
         ));
         $this->_backend->addCol('felamimail_folder', new Setup_Backend_Schema_Field_Xml(
             '<field>
-                    <name>cache_job_actions_estimate</name>
+                    <name>cache_job_actions_est</name>
                     <type>integer</type>
                 </field>'
         ));

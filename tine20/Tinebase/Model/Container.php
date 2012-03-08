@@ -5,7 +5,7 @@
  * @package     Tinebase
  * @subpackage  Record
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -16,6 +16,7 @@
  * @subpackage  Record
  * @property    string application_id
  * @property    string type
+ * @property    sting  owner_id
  * 
  * NOTE: container class is in the transition from int based grants to string based
  *       grants! In the next refactoring step of container class, int based grants 
@@ -26,17 +27,20 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
 {
     /**
      * type for personal containers
-     *
      */
     const TYPE_PERSONAL = 'personal';
     
     /**
      * type for shared container
-     *
      */
     const TYPE_SHARED = 'shared';
     
-	/**
+    /**
+     * type for shared container
+     */
+    const TYPE_OTHERUSERS = 'otherUsers';
+    
+    /**
      * key in $_validators/$_properties array for the filed which 
      * represents the identifier
      * 
@@ -72,13 +76,17 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
     protected $_validators = array(
         'id'                => array('Digits', 'allowEmpty' => true),
         'name'              => array('presence' => 'required'),
-        'type'              => array('InArray' => array(self::TYPE_PERSONAL, self::TYPE_SHARED)),
+        'type'              => array(array('InArray', array(self::TYPE_PERSONAL, self::TYPE_SHARED))),
         'backend'           => array('presence' => 'required'),
         'color'             => array('allowEmpty' => true, array('regex', '/^#[0-9a-fA-F]{6}$/')),
         'application_id'    => array('Alnum', 'presence' => 'required'),
         'account_grants'    => array('allowEmpty' => true), // non persistent
-        'owner_id'          => array('allowEmpty' => true), // non persistent
+        'owner_id'          => array('allowEmpty' => true), // non persistent + only set for personal folders
         'path'              => array('allowEmpty' => true), // non persistent
+        
+    // only gets updated in increaseContentSequence() + readonly in normal record context
+        'content_seq'       => array('allowEmpty' => true),
+    
     // modlog fields
         'created_by'             => array('allowEmpty' => true),
         'creation_time'          => array('allowEmpty' => true),
@@ -99,6 +107,13 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
         'last_modified_time',
         'deleted_time',
     );    
+    
+    /**
+    * name of fields that should not be persisted during create/update in backend
+    *
+    * @var array
+    */
+    protected $_readOnlyFields = array('content_seq');
     
     /**
      * converts a int, string or Tinebase_Model_Container to a containerid
@@ -126,52 +141,83 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
     }
     
     /**
+     * (non-PHPdoc)
+     * @see Tinebase/Record/Tinebase_Record_Abstract#setFromArray($_data)
+     */
+    public function setFromArray(array $_data)
+    {
+        parent::setFromArray($_data);
+        
+        switch ($this->type) {
+            case Tinebase_Model_Container::TYPE_SHARED:
+                $this->path = "/{$this->type}/{$this->getId()}";
+                break;
+                
+            case Tinebase_Model_Container::TYPE_PERSONAL:
+                if (!empty($this->owner_id)) {
+                    $this->path = "/{$this->type}/{$this->owner_id}/{$this->getId()}";
+                }
+                break;
+        }
+    }
+    
+    /**
      * gets path of this container
      *
      * @return string path
      */
     public function getPath()
     {
-        $path = "/{$this->type}";
         switch ($this->type) {
-            case 'internal':
-                break;
-            case 'shared':
-                $path .= "/{$this->getId()}";
-                break;
-            case 'personal':
-                if (! $this->owner_id) {
-                    // we need to find out who has admin grant
-                    $allGrants = Tinebase_Container::getInstance()->getGrantsOfContainer($this, true);
-                    
-                    foreach ($allGrants as $grants) {
-                        if ($grants->{Tinebase_Model_Grants::GRANT_ADMIN} === true) {
-                            $this->owner_id = $grants->account_id;
-                            break;
-                        }
-                    }
-                    if (! $this->owner_id) {
-                        throw new Exception('could not find container admin');
-                    }
-                }
-                
-                $path .= "/{$this->owner_id}/{$this->getId()}";
-                break;
-            default:
-                throw new Exception("unknown container type: '{$this->type}'");
+            case Tinebase_Model_Container::TYPE_PERSONAL:
+                $this->path = "/{$this->type}/{$this->getOwner()}/{$this->getId()}";
                 break;
         }
-        return $path;
+        
+        return $this->path;
     }
     
-    public static function path2node($_path)
+    /**
+     * returns owner of this container
+     * 
+     * @throws Exception
+     */
+    public function getOwner()
     {
+        if ($this->type == self::TYPE_SHARED) return NULL;
         
+        if (! $this->owner_id) {
+            // we need to find out who has admin grant
+            $allGrants = Tinebase_Container::getInstance()->getGrantsOfContainer($this, true);
+            
+            // pick the first user with admin grants
+            foreach ($allGrants as $grants) {
+                if ($grants->{Tinebase_Model_Grants::GRANT_ADMIN} === true) {
+                    $this->owner_id = $grants->account_id;
+                    break;
+                }
+            }
+            if (! $this->owner_id) {
+                throw new Exception('could not find container admin');
+            }
+        }
+        
+        return $this->owner_id;
+    }
+    
+    /**
+     * checks if container is a personal container of given account
+     * 
+     * @param mixed $account
+     */
+    public function isPersonalOf($account)
+    {
+        return $this->type == Tinebase_Model_Container::TYPE_PERSONAL 
+            && $this->getOwner() == Tinebase_Model_User::convertUserIdToInt($account);
     }
     
     /**
      * returns containerId if given path represents a (single) container
-     * 
      * 
      * @static
      * @param  String path
@@ -184,6 +230,43 @@ class Tinebase_Model_Container extends Tinebase_Record_Abstract
         }
         
         return false;
+    }
+
+    /**
+     * resolves container_id property
+     * 
+     * @param Tinebase_Record_Abstract $_record
+     * @param string $_containerProperty
+     */
+    public static function resolveContainerOfRecord($_record, $_containerProperty = 'container_id')
+    {
+        if (! $_record instanceof Tinebase_Record_Abstract) {
+            return;
+        }
+        
+        if (! $_record->has($_containerProperty) || empty($_record->{$_containerProperty})) {
+            return;
+        }
+        
+        try {
+            $container = Tinebase_Container::getInstance()->getContainerById($_record->{$_containerProperty});
+        } catch (Tinebase_Exception_NotFound $tenf) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' . $tenf);
+            return;
+        }
+        
+        $container->resolveGrantsAndPath();
+        
+        $_record->{$_containerProperty} = $container;
+    }
+    
+    /**
+     * resolves container grants and path
+     */
+    public function resolveGrantsAndPath()
+    {
+        $this->account_grants = Tinebase_Container::getInstance()->getGrantsOfAccount(Tinebase_Core::getUser(), $this);
+        $this->path = $this->getPath();
     }
     
     /**

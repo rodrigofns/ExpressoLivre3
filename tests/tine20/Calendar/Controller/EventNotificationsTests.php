@@ -33,7 +33,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
     /**
      * @var Zend_Mail_Transport_Array
      */
-    protected $_mailer = NULL;
+    protected static $_mailer = NULL;
     
     /**
      * @var Tinebase_Model_Container
@@ -56,8 +56,6 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $this->_eventController = Calendar_Controller_Event::getInstance();
         $this->_notificationController = Calendar_Controller_EventNotifications::getInstance();
         
-        $this->_mailer = Tinebase_Smtp::getDefaultTransport();
-        
         $this->_setupPreferences();
     }
     
@@ -69,12 +67,12 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $event = $this->_getEvent();
         $event->attendee = $this->_getPersonaAttendee('jsmith, pwulf, sclever, jmcblack, rwright');
         
-        $this->_flushMailer();
+        self::flushMailer();
         $persistentEvent = $this->_eventController->create($event);
         $this->_assertMail('jsmith', NULL);
         $this->_assertMail('pwulf, sclever, jmcblack, rwright', 'invit');
         
-        $this->_flushMailer();
+        self::flushMailer();
         $persistentEvent = $this->_eventController->delete($persistentEvent);
         $this->_assertMail('jsmith', NULL);
         $this->_assertMail('pwulf, sclever, jmcblack, rwright', 'cancel');
@@ -90,7 +88,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $persistentEvent = $this->_eventController->create($event);
         
         // no updates
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, pwulf, sclever, jmcblack, rwright', NULL);
     }
@@ -113,7 +111,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $persistentEvent->attendee->find('user_id', $this->_personasContacts['jmcblack']->getId())->status =
             Calendar_Model_Attender::STATUS_DECLINED;
             
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, jmcblack', NULL);
         $this->_assertMail('sclever', 'invit');
@@ -134,7 +132,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $persistentEvent->dtstart->addHour(1);
         $persistentEvent->dtend->addHour(1);
         
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, pwulf', NULL);
         $this->_assertMail('sclever, jmcblack, rwright', 'reschedul');
@@ -153,7 +151,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         $persistentEvent->url = 'http://somedetail.com';
         $persistentEvent->attendee[1]->status = Calendar_Model_Attender::STATUS_ACCEPTED;
         
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, pwulf, sclever', NULL);
         $this->_assertMail('jmcblack, rwright', 'update');
@@ -170,7 +168,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         
         $persistentEvent->attendee[1]->status = Calendar_Model_Attender::STATUS_DECLINED;
         
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, pwulf, sclever, jmcblack', NULL);
         $this->_assertMail('rwright', 'decline');
@@ -188,7 +186,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         
         $persistentEvent->attendee[1]->status = Calendar_Model_Attender::STATUS_DECLINED;
         
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith, pwulf', NULL);
     }
@@ -205,7 +203,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         
         $persistentEvent->attendee[1]->status = Calendar_Model_Attender::STATUS_DECLINED;
         
-        $this->_flushMailer();
+        self::flushMailer();
         $updatedEvent = $this->_eventController->update($persistentEvent);
         $this->_assertMail('jsmith', NULL);
         $this->_assertMail('pwulf', 'decline');
@@ -238,7 +236,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         ));
         $updatedEvent = $this->_eventController->update($persistentEvent);
         
-        $this->_flushMailer();
+        self::flushMailer();
 
         $persistentEvent->attendee[1]->status = Calendar_Model_Attender::STATUS_DECLINED;
         $updatedEvent = $this->_eventController->update($persistentEvent);
@@ -251,7 +249,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         // check mailer messages
         $foundNonAccountMessage = FALSE;
         $foundPWulfMessage = FALSE;
-        foreach($this->_mailer->getMessages() as $message) {
+        foreach(self::getMailer()->getMessages() as $message) {
             if (in_array($nonAccountEmail, $message->getRecipients())) {
                 $foundNonAccountMessage = TRUE;
             }
@@ -260,7 +258,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
             }
         }
         
-        $this->assertFalse($foundNonAccountMessage, 'notification has been sent to non-account');
+        $this->assertTrue($foundNonAccountMessage, 'notification has not been sent to non-account');
         $this->assertTrue($foundPWulfMessage, 'notfication for pwulf not found');
     }
     
@@ -272,7 +270,7 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         
         // lets flush mailer so next flushing ist faster!
         Tinebase_Alarm::getInstance()->sendPendingAlarms("Tinebase_Event_Async_Minutely");
-        $this->_flushMailer();
+        self::flushMailer();
         
         // make sure next occurence contains now
         // next occurance now+29min 
@@ -287,9 +285,9 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         ));
         
         $persistentEvent = $this->_eventController->create($event);
-
+        
         // assert alarm
-        $this->_flushMailer();
+        self::flushMailer();
         Tinebase_Alarm::getInstance()->sendPendingAlarms("Tinebase_Event_Async_Minutely");
         $assertString = ' at ' . Tinebase_DateTime::now()->format('M j');
         $this->_assertMail('pwulf', $assertString);
@@ -297,24 +295,78 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
         // check adjusted alarm time
         $loadedEvent = $this->_eventController->get($persistentEvent->getId());
         
-        $orgiginalAlarm = $persistentEvent->alarms->getFirstRecord()->alarm_time;
-        $adjustedAlarm = $loadedEvent->alarms->getFirstRecord()->alarm_time;
-        $this->assertTrue($adjustedAlarm->isLater($orgiginalAlarm), 'alarmtime is not adjusted');
+        $recurid = $loadedEvent->alarms->getFirstRecord()->getOption('recurid');
+        $nextAlarmEventStart = new Tinebase_DateTime(substr($recurid, -19));
+        
+        $this->assertTrue($nextAlarmEventStart > Tinebase_DateTime::now()->addDay(1), 'alarmtime is not adjusted');
+        //$orgiginalAlarm = $persistentEvent->alarms->getFirstRecord()->alarm_time;
+        //$adjustedAlarm = $loadedEvent->alarms->getFirstRecord()->alarm_time;
+        //$this->assertTrue($adjustedAlarm->isLater($orgiginalAlarm), 'alarmtime is not adjusted');
 
         $this->assertEquals(Tinebase_Model_Alarm::STATUS_PENDING, $loadedEvent->alarms->getFirstRecord()->sent_status, 'alarmtime is set to pending');
+    }
+    
+    // test alarm inspection from 24.03.2012 -> 25.03.2012
+    public function testAdoptAlarmDSTBoundary()
+    {
+        $event = $this->_getEvent();
+        $event->rrule = 'FREQ=DAILY;INTERVAL=1';
+        $event->alarms = new Tinebase_Record_RecordSet('Tinebase_Model_Alarm', array(
+            new Tinebase_Model_Alarm(array(
+                'minutes_before' => 30
+            ), TRUE)
+        ));
+        $persistentEvent = $this->_eventController->create($event);
+        
+        // prepare alarm for last non DST instance
+        $exceptions = new Tinebase_Record_RecordSet('Calendar_Model_Event');
+        $from = new Tinebase_DateTime('2012-03-24 00:00:00');
+        $until = new Tinebase_DateTime('2012-03-24 23:59:59');
+        $recurSet =Calendar_Model_Rrule::computeRecurrenceSet($persistentEvent, $exceptions, $from, $until);
+        
+        $alarm = $persistentEvent->alarms->getFirstRecord();
+        $alarm->setOption('recurid', $recurSet[0]->recurid);
+        Tinebase_Alarm::getInstance()->update($alarm);
+        
+        $loadedBaseEvent = $this->_eventController->get($persistentEvent->getId());
+        $alarm = $loadedBaseEvent->alarms->getFirstRecord();
+        $this->assertEquals('2012-03-24', substr($alarm->getOption('recurid'), -19, -9), 'precondition failed');
+        
+        // adopt alarm
+        $this->_eventController->adoptAlarmTime($loadedBaseEvent, $alarm, 'instance');
+        $this->assertEquals('2012-03-25', substr($alarm->getOption('recurid'), -19, -9), 'alarm adoption failed');
+    }
+    
+    public static function getMessages()
+    {
+        // make sure messages are sent if queue is activated
+        if (isset(Tinebase_Core::getConfig()->actionqueue)) {
+            Tinebase_ActionQueue::getInstance()->processQueue(100);
+        }
+        
+        return self::getMailer()->getMessages();
+    }
+    
+    public static function getMailer()
+    {
+        if (! self::$_mailer) {
+            self::$_mailer = Tinebase_Smtp::getDefaultTransport();
+        }
+        
+        return self::$_mailer;
     }
     
     /**
      * flush mailer (send all remaining mails first)
      */
-    protected function _flushMailer()
+    public static function flushMailer()
     {
         // make sure all messages are sent if queue is activated
         if (isset(Tinebase_Core::getConfig()->actionqueue)) {
             Tinebase_ActionQueue::getInstance()->processQueue(10000);
         }
         
-        $this->_mailer->flush();
+        self::getMailer()->flush();
     }
     
     /**
@@ -326,16 +378,13 @@ class Calendar_Controller_EventNotificationsTests extends Calendar_TestCase
      */
     protected function _assertMail($_personas, $_assertString = NULL)
     {
-        // make sure messages are sent if queue is activated
-        if (isset(Tinebase_Core::getConfig()->actionqueue)) {
-            Tinebase_ActionQueue::getInstance()->processQueue(100);
-        }
+        $messages = self::getMessages();
         
         foreach (explode(',', $_personas) as $personaName) {
             $mailsForPersona = array();
             $personaEmail = $this->_personas[trim($personaName)]->accountEmailAddress;
             
-            foreach($this->_mailer->getMessages() as $message) {
+            foreach($messages as $message) {
                 if (array_value(0, $message->getRecipients()) == $personaEmail) {
                     array_push($mailsForPersona, $message);
                 }

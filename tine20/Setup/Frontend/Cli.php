@@ -4,7 +4,7 @@
  * @package     Tinebase
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schüle <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2008-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2008-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  * @todo        add ext check again
  */
@@ -64,6 +64,8 @@ class Setup_Frontend_Cli
             $this->_checkRequirements($_opts);
         } elseif(isset($_opts->setconfig)) {
             $this->_setConfig($_opts);
+        } elseif(isset($_opts->create_admin)) {
+            $this->_createAdminUser($_opts);
         }
     }
     
@@ -145,20 +147,30 @@ class Setup_Frontend_Cli
             
             // initial password
             if (! isset($_options['adminPassword'])) {
-                $password1 = Tinebase_Server_Cli::promptInput('Inital Admin Users Password', TRUE);
-                if (! $password1) {
-                    echo "error: password must not be empty! exiting \n";
-                    exit (1);
-                }
-                $password2 = Tinebase_Server_Cli::promptInput('Confirm Password', TRUE);
-                if ($password1 == $password2) {
-                    $_options['adminPassword'] = $password1;
-                } else {
-                    echo "error: passwords do not match! exiting \n";
-                    exit (1);
-                }
+                $_options['adminPassword'] = $this->_promptPassword();
             }
         }
+    }
+    
+    /**
+     * prompt password
+     * 
+     * @return string
+     */
+    protected function _promptPassword()
+    {
+        $password1 = Tinebase_Server_Cli::promptInput('Admin user password', TRUE);
+        if (! $password1) {
+            echo "Error: Password must not be empty! Exiting ... \n";
+            exit (1);
+        }
+        $password2 = Tinebase_Server_Cli::promptInput('Confirm password', TRUE);
+        if ($password1 !== $password2) {
+            echo "Error: Passwords do not match! Exiting ... \n";
+            exit (1);
+        }
+        
+        return $password1;
     }
     
     /**
@@ -193,16 +205,18 @@ class Setup_Frontend_Cli
                     unset($applications[$key]);
                 }
             } catch (Setup_Exception_NotFound $e) {
-              Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Failed to check if an application needs an update:' . $e->getMessage());
-              unset($applications[$key]);
+                Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Failed to check if an application needs an update:' . $e->getMessage());
+                unset($applications[$key]);
             }
         }
 
+        $updatecount = 0;
         if (count($applications) > 0) {
-            $controller->updateApplications($applications);
+            $result = $controller->updateApplications($applications);
+            $updatecount = $result['updated'];
         }
         
-        echo "Updated " . count($applications) . " applications.\n";        
+        echo "Updated " . $updatecount . " applications.\n";        
     }
 
     /**
@@ -346,6 +360,64 @@ class Setup_Frontend_Cli
     }
     
     /**
+     * create admin user / activate existing user / allow to reset password
+     * 
+     * @param Zend_Console_Getopt $_opts
+     */
+    protected function _createAdminUser(Zend_Console_Getopt $_opts)
+    {
+        if (! Setup_Controller::getInstance()->isInstalled('Tinebase')) {
+            die('Install Tinebase first.');
+        }
+        
+        echo "Please enter a username. If the user already exists, he is reactivated and you can reset the password.\n";
+        $username = Tinebase_Server_Cli::promptInput('Username');
+        $tomorrow = Tinebase_DateTime::now()->addDay(1);
+        
+        try {
+            $user = Tinebase_User::getInstance()->getFullUserByLoginName($username);
+            echo "User $username already exists.\n";
+            $user->accountExpires = $tomorrow;
+            $user->accountStatus = Tinebase_Model_User::ACCOUNT_STATUS_ENABLED;
+            Tinebase_User::getInstance()->updateUser($user);
+            echo "Activated admin user '$username' (expires tomorrow).\n";
+            
+            $resetPw = Tinebase_Server_Cli::promptInput('Do you want to reset the password (default: "no", "y" or "yes" for reset)?');
+            if ($resetPw === 'y' or $resetPw === 'yes') {
+                $password = $this->_promptPassword();
+                Tinebase_User::getInstance()->setPassword($user, $password);
+                echo "User password has been reset.\n";
+            }
+            
+            // check admin group membership
+            $adminGroup = Tinebase_Group::getInstance()->getDefaultAdminGroup();
+            $memberships = Tinebase_Group::getInstance()->getGroupMemberships($user);
+            if (! in_array($adminGroup->getId(), $memberships)) {
+                try {
+                    Tinebase_Group::getInstance()->addGroupMember($adminGroup, $user);
+                    echo "Added user to default admin group\n";
+                } catch (Zend_Ldap_Exception $zle) {
+                    echo "Could not add user to default admin group: " . $zle->getMessage();
+                }
+            }
+            
+        } catch (Tinebase_Exception_NotFound $tenf) {
+            if (Tinebase_User::getConfiguredBackend() === Tinebase_User::LDAP) {
+                die('It is not possible to create a new user with LDAP user backend here.');
+            }
+            
+            // create new admin user that expires tomorrow
+            $password = $this->_promptPassword();
+            Tinebase_User::createInitialAccounts(array(
+                'adminLoginName' => $username,
+                'adminPassword'  => $password,
+                'expires'        => $tomorrow,
+            ));
+            echo "Created new admin user '$username' that expires tomorrow.\n";
+        }
+    }
+    
+    /**
      * parse options
      * 
      * @param string $_value
@@ -353,15 +425,19 @@ class Setup_Frontend_Cli
      */
     public static function parseConfigValue($_value)
     {
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_value, TRUE));
+        
         $result = array(
             'active' => 1
         );
         
-        $_value = preg_replace('/\s*/', '', $_value);
+        $_value = preg_replace(array('/\s*/', '/\\\,/'), array('', ';'), $_value);
         $parts = explode(',', $_value);
         foreach ($parts as $part) {
-            if (preg_match('/_/', $part)) {
-                list($key, $sub) = explode('_', $part);
+            $part = str_replace(';', ',', $part);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $part);
+            if (strpos($part, '_') !== FALSE) {
+                list($key, $sub) = preg_split('/_/', $part, 2);
                 if (preg_match('/:/', $sub)) {
                     list($subKey, $value) = explode(':', $sub);
                     $result[$key][$subKey] = $value;
@@ -376,13 +452,11 @@ class Setup_Frontend_Cli
                     }
                 }
             } else {
-                if (preg_match('/:/', $part)) {
-                    $exploded = explode(':', $part);
-                    // first element is always the key -> no ':' allowed in keys
-                    $key = array_shift($exploded);
-                    $result[$key] = implode(':', $exploded);
+                if (strpos($part, ':') !== FALSE) {
+                    list($key, $value) = preg_split('/:/', $part, 2);
+                    $result[$key] = $value;
                 } else {
-                    $result = $value;
+                    $result = $part;
                 }
             }
         }
@@ -398,14 +472,15 @@ class Setup_Frontend_Cli
      */
     protected function _parseRemainingArgs($_args)
     {
-    	$options = array();
-    	foreach ($_args as $arg) {
-    	    if (strpos($arg, '=') !== FALSE) {
-        		list($key, $value) = explode('=', $arg);
-        		$options[$key] = $value;
-    	    }
-    	}
-    	
-    	return $options;
+        $options = array();
+        foreach ($_args as $arg) {
+            if (strpos($arg, '=') !== FALSE) {
+                if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $arg);
+                list($key, $value) = preg_split('/=/', $arg, 2);
+                $options[$key] = $value;
+            }
+        }
+        
+        return $options;
     }
 }

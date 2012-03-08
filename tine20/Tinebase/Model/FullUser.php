@@ -27,7 +27,7 @@
  * @property    string                  container_id        
  * @property    array                   groups              list of group memberships
  * @property    DateTime                lastLoginFailure    time of last login failure
- * @property    int						loginFailures       number of login failures
+ * @property    int                        loginFailures       number of login failures
  * @subpackage  User
  */
 class Tinebase_Model_FullUser extends Tinebase_Model_User
@@ -86,8 +86,9 @@ class Tinebase_Model_FullUser extends Tinebase_Model_User
             'accountLastLoginfrom'  => array('allowEmpty' => true),
             'accountLastPasswordChange' => array('allowEmpty' => true),
             'accountStatus'         => array(new Zend_Validate_InArray(array(
-                Tinebase_Model_User::ACCOUNT_STATUS_ENABLED, 
+                Tinebase_Model_User::ACCOUNT_STATUS_ENABLED,
                 Tinebase_Model_User::ACCOUNT_STATUS_DISABLED,
+                Tinebase_Model_User::ACCOUNT_STATUS_BLOCKED,
                 Tinebase_Model_User::ACCOUNT_STATUS_EXPIRED)
             ), Zend_Filter_Input::DEFAULT_VALUE => Tinebase_Model_User::ACCOUNT_STATUS_ENABLED),
             'accountExpires'        => array('allowEmpty' => true),
@@ -99,8 +100,8 @@ class Tinebase_Model_FullUser extends Tinebase_Model_User
             'accountEmailAddress'   => array('allowEmpty' => true),
             'accountHomeDirectory'  => array('allowEmpty' => true),
             'accountLoginShell'     => array('allowEmpty' => true),
-            'lastLoginFailure'		=> array('allowEmpty' => true),
-            'loginFailures'			=> array('allowEmpty' => true),
+            'lastLoginFailure'      => array('allowEmpty' => true),
+            'loginFailures'         => array('allowEmpty' => true),
             'sambaSAM'              => array('allowEmpty' => true),
             'openid'                => array('allowEmpty' => true),
             'contact_id'            => array('allowEmpty' => true),
@@ -109,7 +110,10 @@ class Tinebase_Model_FullUser extends Tinebase_Model_User
             'groups'                => array('allowEmpty' => true),
             'imapUser'              => array('allowEmpty' => true),
             'smtpUser'              => array('allowEmpty' => true),
-            'visibility'            => array(new Zend_Validate_InArray(array(Tinebase_Model_User::VISIBILITY_HIDDEN, Tinebase_Model_User::VISIBILITY_DISPLAYED)), Zend_Filter_Input::DEFAULT_VALUE => Tinebase_Model_User::VISIBILITY_DISPLAYED),
+            'visibility'            => array(new Zend_Validate_InArray(array(
+                Tinebase_Model_User::VISIBILITY_HIDDEN, 
+                Tinebase_Model_User::VISIBILITY_DISPLAYED)
+            ), Zend_Filter_Input::DEFAULT_VALUE => Tinebase_Model_User::VISIBILITY_DISPLAYED),
         );
         
         parent::__construct($_data, $_bypassFilters, $_convertDates);

@@ -22,7 +22,21 @@ class Tinebase_Group
     const LDAP = 'Ldap';
     
     const TYPO3 = 'Typo3';
-
+    
+    /**
+     * default admin group name
+     * 
+     * @var string
+     */
+    const DEFAULT_ADMIN_GROUP = 'Administrators';
+    
+    /**
+     * default user group name
+     * 
+     * @var string
+     */
+    const DEFAULT_USER_GROUP = 'Users';
+    
     /**
      * the constructor
      *
@@ -121,7 +135,7 @@ class Tinebase_Group
         $userBackend  = Tinebase_User::getInstance();
         $groupBackend = Tinebase_Group::getInstance();
         
-        $user = $userBackend->getUserByProperty('accountLoginName', $username, 'Tinebase_Model_FullUser');        
+        $user = $userBackend->getUserByProperty('accountLoginName', $username, 'Tinebase_Model_FullUser');
         
         $membershipsSyncBackend = $groupBackend->getGroupMembershipsFromSyncBackend($user);
         if(!in_array($user->accountPrimaryGroup, $membershipsSyncBackend)) {
@@ -145,7 +159,54 @@ class Tinebase_Group
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' group memberships: ' . print_r($membershipsSyncBackend, TRUE));
         
-        $groupBackend->setGroupMembershipsInSqlBackend($user, $membershipsSyncBackend);
+        $groupIds = $groupBackend->setGroupMembershipsInSqlBackend($user, $membershipsSyncBackend);
+        self::syncListsOfUserContact($groupIds, $user->contact_id);
+    }
+    
+    /**
+     * creates or updates addressbook lists for an array of group ids
+     * 
+     * @param array $groupIds
+     * @param string $contactId
+     */
+    public static function syncListsOfUserContact($groupIds, $contactId)
+    {
+        if (! Tinebase_Application::getInstance()->isInstalled('Addressbook')) {
+            return;
+        }
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+            .' Syncing ' . count($groupIds) . ' group -> lists / memberships');
+        
+        $listBackend = new Addressbook_Backend_List();
+        
+        $listIds = array();
+        foreach ($groupIds as $groupId) {
+            // get single groups to make sure that container id is joined
+            $group = Tinebase_Group::getInstance()->getGroupById($groupId);
+
+            if (! empty($group->list_id)) {
+                try {
+                    $list = $listBackend->get($group->list_id);
+                } catch (Tinebase_Exception_NotFound $tenf) {
+                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
+                        .' List ' . $group->name . ' not found.');
+                    $list = Addressbook_Controller_List::getInstance()->createByGroup($group);
+                }
+            } else {
+                $list = Addressbook_Controller_List::getInstance()->createByGroup($group);
+            }
+            
+            if ($group->list_id !== $list->getId()) {
+                // list id changed / is new -> update group
+                $group->list_id = $list->getId();
+                Tinebase_Group::getInstance()->updateGroup($group);
+            }
+            
+            $listIds[] = $list->getId();
+        }
+        
+        $listBackend->setMemberships($contactId, $listIds);
     }
     
     /**
@@ -157,6 +218,8 @@ class Tinebase_Group
         $groupBackend = Tinebase_Group::getInstance();
         
         $groups = $groupBackend->getGroupsFromSyncBackend(NULL, NULL, 'ASC', NULL, NULL, 'Tinebase_Model_FullUser');
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' groups from sync backend: ' . print_r($groups,true));
 
         foreach($groups as $group) {
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .' sync group: ' . $group->name);
@@ -177,19 +240,22 @@ class Tinebase_Group
      */
     public static function createInitialGroups()
     {
-        // add the admin group
+        $defaultAdminGroupName = (Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_ADMIN_GROUP_NAME_KEY)) 
+            ? Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_ADMIN_GROUP_NAME_KEY)
+            : self::DEFAULT_ADMIN_GROUP; 
         $adminGroup = new Tinebase_Model_Group(array(
-            'name'          => Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_ADMIN_GROUP_NAME_KEY),
+            'name'          => $defaultAdminGroupName,
             'description'   => 'Group of administrative accounts'
         ));
         Tinebase_Group::getInstance()->addGroup($adminGroup);
 
-        // add the user group
+        $defaultUserGroupName = (Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_USER_GROUP_NAME_KEY))
+            ? Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_USER_GROUP_NAME_KEY)
+            : self::DEFAULT_USER_GROUP;
         $userGroup = new Tinebase_Model_Group(array(
-            'name'          => Tinebase_User::getBackendConfiguration(Tinebase_User::DEFAULT_USER_GROUP_NAME_KEY),
+            'name'          => $defaultUserGroupName,
             'description'   => 'Group of user accounts'
         ));
         Tinebase_Group::getInstance()->addGroup($userGroup);
     }
-    
 }

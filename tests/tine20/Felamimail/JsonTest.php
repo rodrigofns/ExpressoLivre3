@@ -392,20 +392,37 @@ class Felamimail_JsonTest extends PHPUnit_Framework_TestCase
      */
     public function testUpdateMessageCache()
     {
-        $messageToSend = $this->_getMessageData();
-        $message = $this->_json->saveMessage($messageToSend);
-        $this->_foldersToClear = array('INBOX', $this->_account->sent_folder);
-        
+        $message = $this->_sendMessage();
         $inbox = $this->_getFolder('INBOX');
-        
         // update message cache and check result
         $result = $this->_json->updateMessageCache($inbox['id'], 30);
         
         if ($result['cache_status'] == Felamimail_Model_Folder::CACHE_STATUS_COMPLETE) {
             $this->assertEquals($result['imap_totalcount'], $result['cache_totalcount'], 'totalcounts should be equal');
         } else if ($result['cache_status'] == Felamimail_Model_Folder::CACHE_STATUS_INCOMPLETE) {
-            $this->assertNotEquals(0, $result['cache_job_actions_estimate']);
+            $this->assertNotEquals(0, $result['cache_job_actions_est']);
         }
+    }
+    
+    /**
+     * test folder status
+     */
+    public function testGetFolderStatus()
+    {
+        $filter = $this->_getFolderFilter();
+        $result = $this->_json->searchFolders($filter);
+        $this->assertGreaterThan(1, $result['totalcount']);
+        $expectedFolders = array('INBOX', $this->_testFolderName, $this->_account->trash_folder, $this->_account->sent_folder);
+        
+        foreach ($result['results'] as $folder) {
+            $this->_json->updateMessageCache($folder['id'], 30);
+        }
+        
+        $message = $this->_sendMessage();
+        
+        $status = $this->_json->getFolderStatus(array(array('field' => 'account_id', 'operator' => 'equals', 'value' => $this->_account->getId())));
+        $this->assertEquals(1, count($status));
+        $this->assertEquals($this->_account->sent_folder, $status[0]['localname']);
     }
     
     /**
@@ -883,7 +900,7 @@ class Felamimail_JsonTest extends PHPUnit_Framework_TestCase
                 'test'          => Felamimail_Sieve_Rule_Condition::TEST_ADDRESS,
                 'comperator'    => Felamimail_Sieve_Rule_Condition::COMPERATOR_CONTAINS,
                 'header'        => 'From',
-                'key'           => 'info@example.com',
+                'key'           => '"abcd" <info@example.org>',
             )),
             'enabled'       => 1,
         ), array(
@@ -909,6 +926,37 @@ class Felamimail_JsonTest extends PHPUnit_Framework_TestCase
             )),
             'enabled'       => 1,
         ));
+    }
+    
+    /**
+     * test to set a forward rule to this accounts email address
+     * -> should throw exception to prevent mail cycling
+     */
+    public function testSetForwardRuleToSelf()
+    {
+        $ruleData = array(array(
+            'id'            => 1,
+            'action_type'   => Felamimail_Sieve_Rule_Action::REDIRECT, 
+            'action_argument' => $this->_account->email,
+            'conditions'    => array(array(
+                'test'          => Felamimail_Sieve_Rule_Condition::TEST_ADDRESS,
+                'comperator'    => Felamimail_Sieve_Rule_Condition::COMPERATOR_CONTAINS,
+                'header'        => 'From',
+                'key'           => 'info@example.org',
+            )),
+            'enabled'       => 1,
+        ));
+        
+        try {
+            $this->_sieveTestHelper($ruleData);
+            $this->assertTrue(FALSE, 'it is not allowed to set own email address for redirect!');
+        } catch (Felamimail_Exception_Sieve $e) {
+            $this->assertTrue(TRUE);
+        }
+
+        // this should work
+        $ruleData[0]['enabled'] = 0;
+        $this->_sieveTestHelper($ruleData);
     }
     
     /**

@@ -3,8 +3,8 @@
  * 
  * @package     Felamimail
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Philipp Schüle <p.schuele@metaways.de>
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
  
@@ -63,6 +63,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 // only enable some fields
                 switch(item.name) {
                     case 'signature':
+                    case 'signature_position':
                         break;
                     default:
                         item.setDisabled(true);
@@ -82,8 +83,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
         this.signatureEditor = new Ext.form.HtmlEditor({
             fieldLabel: this.app.i18n._('Signature'),
             name: 'signature',
-            allowBlank: true,
-            height: 220,
+            autoHeight: true,
             getDocMarkup: function(){
                 var markup = '<span id="felamimail\-body\-signature">'
                     + '</span>';
@@ -93,6 +93,14 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 new Ext.ux.form.HtmlEditor.RemoveFormat()
             ]
         });
+        
+        var commonFormDefaults = {
+            xtype: 'textfield',
+            anchor: '100%',
+            labelSeparator: '',
+            maxLength: 256,
+            columnWidth: 1
+        };
         
         return {
             xtype: 'tabpanel',
@@ -105,13 +113,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 border: false,
                 frame: true,
                 xtype: 'columnform',
-                formDefaults: {
-                    xtype:'textfield',
-                    anchor: '90%',
-                    labelSeparator: '',
-                    maxLength: 256,
-                    columnWidth: 1
-                },
+                formDefaults: commonFormDefaults,
                 items: [[{
                     fieldLabel: this.app.i18n._('Account Name'),
                     name: 'name',
@@ -127,7 +129,23 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 }, {
                     fieldLabel: this.app.i18n._('Organization'),
                     name: 'organization'
-                }, this.signatureEditor
+                }, this.signatureEditor,
+                {
+                    fieldLabel: this.app.i18n._('Signature position'),
+                    name: 'signature_position',
+                    typeAhead     : false,
+                    triggerAction : 'all',
+                    lazyRender    : true,
+                    editable      : false,
+                    mode          : 'local',
+                    forceSelection: true,
+                    value: 'below',
+                    xtype: 'combo',
+                    store: [
+                        ['above', this.app.i18n._('Above the quote')],
+                        ['below',  this.app.i18n._('Below the quote')]
+                    ]
+                }
                 ]]
             }, {
                 title: this.app.i18n._('IMAP'),
@@ -135,13 +153,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 border: false,
                 frame: true,
                 xtype: 'columnform',
-                formDefaults: {
-                    xtype:'textfield',
-                    anchor: '90%',
-                    labelSeparator: '',
-                    maxLength: 256,
-                    columnWidth: 1
-                },
+                formDefaults: commonFormDefaults,
                 items: [[{
                     fieldLabel: this.app.i18n._('Host'),
                     name: 'host',
@@ -184,13 +196,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 border: false,
                 frame: true,
                 xtype: 'columnform',
-                formDefaults: {
-                    xtype:'textfield',
-                    anchor: '90%',
-                    labelSeparator: '',
-                    maxLength: 256,
-                    columnWidth: 1
-                },
+                formDefaults: commonFormDefaults,
                 items: [[ {
                     fieldLabel: this.app.i18n._('Host'),
                     name: 'smtp_hostname'
@@ -245,13 +251,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 border: false,
                 frame: true,
                 xtype: 'columnform',
-                formDefaults: {
-                    xtype:'textfield',
-                    anchor: '90%',
-                    labelSeparator: '',
-                    maxLength: 256,
-                    columnWidth: 1
-                },
+                formDefaults: commonFormDefaults,
                 items: [[{
                     fieldLabel: this.app.i18n._('Host'),
                     name: 'sieve_hostname',
@@ -282,13 +282,7 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 border: false,
                 frame: true,
                 xtype: 'columnform',
-                formDefaults: {
-                    xtype:'textfield',
-                    anchor: '90%',
-                    labelSeparator: '',
-                    maxLength: 256,
-                    columnWidth: 1
-                },
+                formDefaults: commonFormDefaults,
                 items: [[{
                     fieldLabel: this.app.i18n._('Sent Folder Name'),
                     name: 'sent_folder',
@@ -353,8 +347,8 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
  */
  Tine.Felamimail.AccountEditDialog.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
-        width: 500,
-        height: 550,
+        width: 580,
+        height: 500,
         name: Tine.Felamimail.AccountEditDialog.prototype.windowNamePrefix + Ext.id(),
         contentPanelConstructor: 'Tine.Felamimail.AccountEditDialog',
         contentPanelConstructorConfig: config

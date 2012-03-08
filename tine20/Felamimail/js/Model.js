@@ -40,9 +40,10 @@ Tine.Felamimail.Model.Message = Tine.Tinebase.data.Record.create([
       { name: 'original_id' },
       { name: 'folder_id' },
       { name: 'note' },
+      { name: 'preparedParts' }, // contains invitation event record
       { name: 'reading_conf' },
       { name: 'smime' },
-      { name: 'signature_info' }
+      { name: 'signature_info' }      
     ], {
     appName: 'Felamimail',
     modelName: 'Message',
@@ -332,6 +333,7 @@ Tine.Felamimail.Model.Account = Tine.Tinebase.data.Record.create(Tine.Tinebase.M
     { name: 'ns_other' },
     { name: 'ns_shared' },
     { name: 'signature' },
+    { name: 'signature_position' },
     { name: 'smtp_port' },
     { name: 'smtp_hostname' },
     { name: 'smtp_auth' },
@@ -480,7 +482,7 @@ Tine.Felamimail.Model.Folder = Tine.Tinebase.data.Record.create([
       { name: 'cache_totalcount',   type: 'int' },
       { name: 'cache_unreadcount',  type: 'int' },
       { name: 'cache_timestamp',    type: 'date', dateFormat: Date.patterns.ISO8601Long  },
-      { name: 'cache_job_actions_estimate',     type: 'int' },
+      { name: 'cache_job_actions_est',     type: 'int' },
       { name: 'cache_job_actions_done',         type: 'int' },
       { name: 'quota_usage',         type: 'int' },
       { name: 'quota_limit',         type: 'int' },

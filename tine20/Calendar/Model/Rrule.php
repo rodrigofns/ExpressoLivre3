@@ -3,9 +3,10 @@
  * Sql Calendar 
  * 
  * @package     Calendar
+ * @subpackage  Model
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
@@ -17,6 +18,7 @@
  * @todo rrule models should  string-->model converted from backend and viceavice
  * 
  * @package Calendar
+ * @subpackage  Model
  */
 class Calendar_Model_Rrule extends Tinebase_Record_Abstract
 {
@@ -76,30 +78,20 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_validators = array(
-        /*
-        // tine record fields
-        'id'                   => array('allowEmpty' => true,  'Alnum'),
-        'created_by'           => array('allowEmpty' => true,  'Int'  ),
-        'creation_time'        => array('allowEmpty' => true          ),
-        'last_modified_by'     => array('allowEmpty' => true          ),
-        'last_modified_time'   => array('allowEmpty' => true          ),
-        'is_deleted'           => array('allowEmpty' => true          ),
-        'deleted_time'         => array('allowEmpty' => true          ),
-        'deleted_by'           => array('allowEmpty' => true          ),
-        'seq'                  => array('allowEmpty' => true,  'Int'  ),
-    
-        'cal_event_id'         => array('allowEmpty' => true,  'Alnum'),
-        */
-    
-        'freq'                 => array('allowEmpty' => true, 'InArray' => array(self::FREQ_DAILY, self::FREQ_MONTHLY, self::FREQ_WEEKLY, self::FREQ_YEARLY)),
+        'freq'                 => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::FREQ_DAILY, self::FREQ_MONTHLY, self::FREQ_WEEKLY, self::FREQ_YEARLY)),
+        ),
         'interval'             => array('allowEmpty' => true, 'Int'   ),
         'byday'                => array('allowEmpty' => true, 'Regex' => '/^[\-0-9A_Z,]{2,}$/'),
         'bymonth'              => array('allowEmpty' => true, 'Int'   ),
         'bymonthday'           => array('allowEmpty' => true, 'Int'   ),
-        'wkst'                 => array('allowEmpty' => true, 'InArray' => array(self::WDAY_SUNDAY, self::WDAY_MONDAY, self::WDAY_TUESDAY, self::WDAY_WEDNESDAY, self::WDAY_THURSDAY, self::WDAY_FRIDAY, self::WDAY_SATURDAY)),
+        'wkst'                 => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::WDAY_SUNDAY, self::WDAY_MONDAY, self::WDAY_TUESDAY, self::WDAY_WEDNESDAY, self::WDAY_THURSDAY, self::WDAY_FRIDAY, self::WDAY_SATURDAY)),
+        ),
         'until'                => array('allowEmpty' => true          ),
-        
-        //'organizer_tz'          => array('allowEmpty' => true         ),
+        'count'                => array('allowEmpty' => true, 'Int'   ),
     );
     
     /**
@@ -108,16 +100,13 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_datetimeFields = array(
-        //'creation_time', 
-        //'last_modified_time', 
-        //'deleted_time', 
         'until',
     );
     
     /**
      * @var array supported rrule parts
      */
-    protected $_rruleParts = array('freq', 'interval', 'until', 'wkst', 'byday', 'bymonth', 'bymonthday');
+    protected $_rruleParts = array('freq', 'interval', 'until', 'count', 'wkst', 'byday', 'bymonth', 'bymonthday');
     
     /**
      * set from ical rrule string
@@ -222,17 +211,40 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
         }
     }
     
-    /************************* recurance computation *****************************/
+    /**
+     * validate and filter the the internal data
+     *
+     * @param $_throwExceptionOnInvalidData
+     * @return bool
+     * @throws Tinebase_Exception_Record_Validation
+     */
+    public function isValid($_throwExceptionOnInvalidData = false)
+    {
+        $isValid = parent::isValid($_throwExceptionOnInvalidData);
+        
+        if (isset($this->_properties['count']) && isset($this->_properties['until'])) {
+            $isValid = $this->_isValidated = false;
+            
+            if ($_throwExceptionOnInvalidData) {
+                $e = new Tinebase_Exception_Record_Validation('count and until can not be set both');
+                Tinebase_Core::getLogger()->err(__METHOD__ . '::' . __LINE__ . $e);
+                throw $e;
+            }
+        }
+        
+        return $isValid;
+    }
+    /************************* Recurrence computation *****************************/
     
     /**
-     * merges recurances of given events into the given event set
+     * merges Recurrences of given events into the given event set
      * 
      * @param  Tinebase_Record_RecordSet    $_events
      * @param  Tinebase_DateTime                    $_from
      * @param  Tinebase_DateTime                    $_until
      * @return void
      */
-    public static function mergeRecuranceSet($_events, $_from, $_until)
+    public static function mergeRecurrenceSet($_events, $_from, $_until)
     {
         //compute recurset
         $candidates = $_events->filter('rrule', "/^FREQ.*/", TRUE);
@@ -241,10 +253,9 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             try {
                 $exceptions = $_events->filter('recurid', "/^{$candidate->uid}-.*/", TRUE);
                 
-                $recurSet = Calendar_Model_Rrule::computeRecuranceSet($candidate, $exceptions, $_from, $_until);
+                $recurSet = Calendar_Model_Rrule::computeRecurrenceSet($candidate, $exceptions, $_from, $_until);
                 foreach ($recurSet as $event) {
                     $_events->addRecord($event);
-                    $event->setId('fakeid' . $candidate->uid . $event->dtstart->getTimeStamp());
                 }
                 
                 // check if candidate/baseEvent has an exception itself -> in this case remove baseEvent from set
@@ -260,6 +271,49 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
     }
     
     /**
+     * add given recurrence to given set and to nessesary adoptions
+     * 
+     * @param Calendar_Model_Event      $_recurrence
+     * @param Tinebase_Record_RecordSet $_eventSet
+     */
+    protected static function addRecurrence($_recurrence, $_eventSet)
+    {
+        $_recurrence->setId('fakeid' . $_recurrence->uid . $_recurrence->dtstart->getTimeStamp());
+        
+        // adjust alarms
+        if ($_recurrence->alarms instanceof Tinebase_Record_RecordSet) {
+            foreach($_recurrence->alarms as $alarm) {
+                $alarm->alarm_time = clone $_recurrence->dtstart;
+                $alarm->alarm_time->subMinute($alarm->getOption('minutes_before'));
+            }
+        }
+        
+        $_eventSet->addRecord($_recurrence);
+    }
+    
+    /**
+     * merge recurrences amd remove all events that do not match period filter
+     * 
+     * @param Tinebase_Record_RecordSet $_events
+     * @param Calendar_Model_EventFilter $_filter
+     */
+    public static function mergeAndRemoveNonMatchingRecurrences(Tinebase_Record_RecordSet $_events, Calendar_Model_EventFilter $_filter)
+    {
+        $period = $_filter->getFilter('period');
+        if ($period) {
+            self::mergeRecurrenceSet($_events, $period->getFrom(), $period->getUntil());
+            
+            foreach ($_events as $event) {
+                if (! $event->isInPeriod($period)) {
+                    if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . ' (' . __LINE__ 
+                        . ') Removing not matching event ' . $event->summary);
+                    $_events->removeRecord($event);
+                }
+            }
+        }
+    }
+    
+    /**
      * returns next occurrence _ignoring exceptions_ or NULL if there is none/not computable
      * 
      * NOTE: computing the next occurrence of an open end rrule can be dangoures, as it might result
@@ -268,9 +322,10 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
      * @param  Calendar_Model_Event         $_event
      * @param  Tinebase_Record_RecordSet    $_exceptions
      * @param  Tinebase_DateTime            $_from
+     * @param  Int                          $_which
      * @return Calendar_Model_Event
      */
-    public static function computeNextOccurrence($_event, $_exceptions, $_from)
+    public static function computeNextOccurrence($_event, $_exceptions, $_from, $_which = 1)
     {
         $freqMap = array(
             self::FREQ_DAILY   => Tinebase_DateTime::MODIFIER_DAY,
@@ -284,6 +339,13 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
         
         $from  = clone $_from;
         $until = clone $from;
+        $interval = $_which * $rrule->interval;
+        
+        // we don't want to compute ourself
+        $ownEvent = clone $_event;
+        $ownEvent->setRecurId();
+        $_exceptions->addRecord($ownEvent);
+        $recurSet = new Tinebase_Record_RecordSet('Calendar_Model_Event');
         
         if ($_from->isEarlier($_event->dtstart)) {
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' from is ealier dtstart -> given event is next occurrence');
@@ -291,24 +353,24 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             return $_event;
         }
         
-        $until->add($rrule->interval, $freqMap[$rrule->freq]);
+        $until->add($interval, $freqMap[$rrule->freq]);
         $attempts = 0;
         
         while (TRUE) {
             
-            if ($rrule->until instanceof DateTime && $from->isLater($rrule->until)) {
+            if ($_event->rrule_until instanceof DateTime && $from->isLater($_event->rrule_until)) {
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' passed rrule_until -> no furthor occurrences');
                 return NULL;
             }
             
-            $until   = ($rrule->until instanceof DateTime && $until->isLater($rrule->until)) ? $rrule->until : $until;
+            $until   = ($_event->rrule_until instanceof DateTime && $until->isLater($_event->rrule_until)) ? $_event->rrule_until : $until;
             
             
             
-            $recurSet = self::computeRecuranceSet($_event, $_exceptions, $from, $until);
+            $recurSet->merge(self::computeRecurrenceSet($_event, $_exceptions, $from, $until));
             $attempts++;
             
-            if (count($recurSet) > 0) {
+            if (count($recurSet) >= $_which) {
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " found next occurrence after $attempts attempt(s)");
                 break;
             }
@@ -318,16 +380,16 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
                 return NULL;
             }
             
-            $from->add($rrule->interval, $freqMap[$rrule->freq]);
-            $until->add($rrule->interval, $freqMap[$rrule->freq]);
+            $from->add($interval, $freqMap[$rrule->freq]);
+            $until->add($interval, $freqMap[$rrule->freq]);
         }
         
         $recurSet->sort('dtstart', 'ASC');
-        return $recurSet->getFirstRecord();
+        return $recurSet[$_which-1];
     }
     
     /**
-     * Computes the recurance set of the given event leaving out $_event->exdate and $_exceptions
+     * Computes the Recurrence set of the given event leaving out $_event->exdate and $_exceptions
      * 
      * @todo respect rrule_until!
      *
@@ -338,7 +400,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
      * @return Tinebase_Record_RecordSet
      * @throws Tinebase_Exception_UnexpectedValue
      */
-    public static function computeRecuranceSet($_event, $_exceptions, $_from, $_until)
+    public static function computeRecurrenceSet($_event, $_exceptions, $_from, $_until)
     {
         if (! $_event->dtstart instanceof Tinebase_DateTime) {
             throw new Tinebase_Exception_UnexpectedValue('Event needs DateTime dtstart: ' . print_r($_event->toArray(), TRUE));
@@ -393,7 +455,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
                     // check if base event (recur instance) needs to be added to the set
                     if ($baseEvent->dtstart->isLater($_event->dtstart) && $baseEvent->dtstart->isLater($_from) && $baseEvent->dtstart->isEarlier($_until)) {
                         if (! in_array($baseEvent->setRecurId(), $exceptionRecurIds)) {
-                            $recurSet->addRecord($baseEvent);
+                            self::addRecurrence($baseEvent, $recurSet);
                         }
                     }
                 }
@@ -413,23 +475,26 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
                 $yearlyrrule->interval = 12;
                 
                 $baseEvent = clone $_event;
+                $originatorsDtstart = clone $baseEvent->dtstart;
+                $originatorsDtstart->setTimezone($_event->originator_tz);
                 
                 // @TODO respect BYMONTH
-                if ($rrule->bymonth && $rrule->bymonth != $baseEvent->dtstart->format('n')) {
+                if ($rrule->bymonth && $rrule->bymonth != $originatorsDtstart->format('n')) {
                     // adopt
-                    
-                    $diff = (12 + $rrule->bymonth - $baseEvent->dtstart->format('n')) % 12;
+                    $diff = (12 + $rrule->bymonth - $originatorsDtstart->format('n')) % 12;
                     
                     // NOTE: skipping must be done in organizer_tz
                     $baseEvent->dtstart->setTimezone($_event->originator_tz);
+                    $baseEvent->dtend->setTimezone($_event->originator_tz);
                     $baseEvent->dtstart->addMonth($diff);
                     $baseEvent->dtend->addMonth($diff);
                     $baseEvent->dtstart->setTimezone('UTC');
+                    $baseEvent->dtend->setTimezone('UTC');
                     
                     // check if base event (recur instance) needs to be added to the set
                     if ($baseEvent->dtstart->isLater($_from) && $baseEvent->dtstart->isEarlier($_until)) {
                         if (! in_array($baseEvent->setRecurId(), $exceptionRecurIds)) {
-                            $recurSet->addRecord($baseEvent);
+                            self::addRecurrence($baseEvent, $recurSet);
                         }
                     }
                 }
@@ -498,7 +563,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
     protected static function _computeRecurDaily($_event, $_rrule, $_exceptionRecurIds, $_from, $_until, $_recurSet)
     {
         $computationStartDate = clone $_event->dtstart;
-        $computationEndDate   = ($_rrule->until instanceof DateTime && $_until->isLater($_rrule->until)) ? $_rrule->until : $_until;
+        $computationEndDate   = ($_event->rrule_until instanceof DateTime && $_until->isLater($_event->rrule_until)) ? $_event->rrule_until : $_until;
         
         // if dtstart is before $_from, we compute the offset where to start our calculations
         if ($_event->dtstart->isEarlier($_from)) {
@@ -534,7 +599,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             $recurEvent->setRecurId();
             
             if (! in_array($recurEvent->recurid, $_exceptionRecurIds)) {
-                $_recurSet->addRecord($recurEvent);
+                self::addRecurrence($recurEvent, $_recurSet);
             }
         }
     }
@@ -571,7 +636,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             $computationStartDateArray = self::addMonthIngnoringDay($computationStartDateArray, -1 * $_rrule->interval);
         }
         
-        $computationEndDate   = ($_rrule->until instanceof DateTime && $_until->isLater($_rrule->until)) ? $_rrule->until : $_until;
+        $computationEndDate   = ($_event->rrule_until instanceof DateTime && $_until->isLater($_event->rrule_until)) ? $_event->rrule_until : $_until;
         
         
         
@@ -617,7 +682,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             
             
             if (! in_array($recurEvent->recurid, $_exceptionRecurIds)) {
-                $_recurSet->addRecord($recurEvent);
+                self::addRecurrence($recurEvent, $_recurSet);
             }
         }
     }
@@ -647,7 +712,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             $computationStartDateArray = self::addMonthIngnoringDay($computationStartDateArray, -1 * $_rrule->interval);
         }
         
-        $computationEndDate   = ($_rrule->until instanceof DateTime && $_until->isLater($_rrule->until)) ? $_rrule->until : $_until;
+        $computationEndDate   = ($_event->rrule_until instanceof DateTime && $_until->isLater($_event->rrule_until)) ? $_event->rrule_until : $_until;
         
         // if dtstart is before $_from, we compute the offset where to start our calculations
         if ($eventInOrganizerTZ->dtstart->isEarlier($_from)) {
@@ -716,7 +781,7 @@ class Calendar_Model_Rrule extends Tinebase_Record_Abstract
             $recurEvent->setRecurId();
             
             if (! in_array($recurEvent->recurid, $_exceptionRecurIds)) {
-                $_recurSet->addRecord($recurEvent);
+                self::addRecurrence($recurEvent, $_recurSet);
             }
         }
     }

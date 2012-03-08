@@ -3,7 +3,7 @@
  * Tine 2.0
  *
  * @package     Tinebase
- * @subpackage  Backend
+ * @subpackage  Preference
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schüle <p.schuele@metaways.de>
  * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
@@ -19,7 +19,7 @@
  * abstract backend for preferences
  *
  * @package     Tinebase
- * @subpackage  Backend
+ * @subpackage  Preference
  */
 abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstract
 {
@@ -155,11 +155,16 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
             }
         }
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_filter->toArray(), TRUE));
+        
         $paging = new Tinebase_Model_Pagination(array(
             'dir'       => 'ASC',
             'sort'      => array('name')
         ));
+        
         $allPrefs = parent::search($_filter, $_pagination, $_onlyIds);
+
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r((is_array($allPrefs)) ? $allPrefs : $allPrefs->toArray(), TRUE));
         
         if (! $_onlyIds) {
             $this->_addDefaultAndRemoveUndefinedPrefs($allPrefs, $_filter);
@@ -225,7 +230,7 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
      */
     public function getValue($_preferenceName, $_default = NULL)
     {
-        $accountId = (Tinebase_Core::getUser()) ? Tinebase_Core::getUser()->getId() : '0';
+        $accountId = $this->_getAccountId();
 
         try {
             $result = $this->getValueForUser(
@@ -247,6 +252,16 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
         }
 
         return $result;
+    }
+    
+    /**
+     * get account id
+     * 
+     * @return string
+     */
+    protected function _getAccountId()
+    {
+        return (is_object(Tinebase_Core::getUser())) ? Tinebase_Core::getUser()->getId() : '0';
     }
 
     /**
@@ -369,8 +384,7 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
      */
     public function setValue($_preferenceName, $_value)
     {
-        $accountId = (Tinebase_Core::isRegistered(Tinebase_Core::USER)) ? Tinebase_Core::getUser()->getId() : '0';
-
+        $accountId = $this->_getAccountId();
         return $this->setValueForUser($_preferenceName, $_value, $accountId);
     }
 
@@ -389,10 +403,10 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
     {
         // check acl first
         if(!$_ignoreAcl){
-            $userId = Tinebase_Core::getUser()->getId();
+            $userId = $this->_getAccountId();
             if (
-            $_accountId !== $userId
-            && !Tinebase_Acl_Roles::getInstance()->hasRight($this->_application, $userId, Tinebase_Acl_Rights_Abstract::ADMIN)
+                $_accountId !== $userId
+                && !Tinebase_Acl_Roles::getInstance()->hasRight($this->_application, $userId, Tinebase_Acl_Rights_Abstract::ADMIN)
             ) {
                 throw new Tinebase_Exception_AccessDenied('You are not allowed to change the preferences.');
             }
@@ -479,7 +493,7 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
             }
             // add default setting to the top of options
             $defaultLabel = Tinebase_Translation::getTranslation('Tinebase')->_('default') . 
-                            ' (' . $valueLabel . ')';
+                ' (' . $valueLabel . ')';
             
             array_unshift($options, array(
                 Tinebase_Model_Preference::DEFAULT_VALUE,
@@ -585,7 +599,7 @@ abstract class Tinebase_Preference_Abstract extends Tinebase_Backend_Sql_Abstrac
                 $this->delete($preference->getId());
             } else {
                 $preference->value = $_data[$preference->getId()]['value'];
-                $preference->type = ($_data[$preference->getId()]['type'] == Tinebase_Model_Preference::TYPE_FORCED) ? $_data[$preference->getId()]['type'] : Tinebase_Model_Preference::TYPE_ADMIN;;
+                $preference->type = ($_data[$preference->getId()]['type'] == Tinebase_Model_Preference::TYPE_FORCED) ? $_data[$preference->getId()]['type'] : Tinebase_Model_Preference::TYPE_ADMIN;
                 $this->update($preference);
             }
         }

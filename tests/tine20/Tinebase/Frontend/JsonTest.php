@@ -96,6 +96,9 @@ class Tinebase_Frontend_JsonTest extends PHPUnit_Framework_TestCase
             );
             Tinebase_Core::getDb()->query($query);
         }
+        
+        // reset tz in core
+        Tinebase_Core::set(Tinebase_Core::USERTIMEZONE, Tinebase_Core::getPreference()->getValue(Tinebase_Preference::TIMEZONE));
     }
     
     /**
@@ -577,9 +580,9 @@ class Tinebase_Frontend_JsonTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * testUpdateUserPofile
+     * testupdateUserProfile
      */
-    public function testUpdateUserPofile()
+    public function testUpdateUserProfile()
     {
         $profile = $this->_instance->getUserProfile(Tinebase_Core::getUser()->getId());
         $profileData = $profile['userProfile'];
@@ -589,7 +592,7 @@ class Tinebase_Frontend_JsonTest extends PHPUnit_Framework_TestCase
         $profileData['tel_home'] = 'mustnotchange';
         $profileData['email_home'] = 'email@userprofile.set';
         
-        $this->_instance->updateUserPofile($profileData);
+        $this->_instance->updateUserProfile($profileData);
         
         $updatedProfile = $this->_instance->getUserProfile(Tinebase_Core::getUser()->getId());
         $updatedProfileData = $updatedProfile['userProfile'];

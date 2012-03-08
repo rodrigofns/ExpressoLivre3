@@ -21,6 +21,19 @@ Tine.Calendar.PagingToolbar = Ext.extend(Ext.Toolbar, {
      * @private periodPicker
      */
     periodPicker: null,
+    /**
+     * @cfg {Boolean} showReloadBtn
+     */    
+    showReloadBtn: true,
+    /**
+     * @cfg {Boolean} showTodayBtn
+     */ 
+    showTodayBtn: true,
+    /**
+     * shows if the periodpicker is active
+     * @type boolean
+     */
+    periodPickerActive: null,
     
     /**
      * @private
@@ -55,7 +68,9 @@ Tine.Calendar.PagingToolbar = Ext.extend(Ext.Toolbar, {
                 change: function(picker, view, period) {
                     this.dtStart = period.from.clone();
                     this.fireEvent('change', this, view, period);
-                }
+                },
+                menushow: function(){this.periodPickerActive = true; },
+                menuhide: function(){this.periodPickerActive = false;}
             }
         });
         
@@ -81,24 +96,30 @@ Tine.Calendar.PagingToolbar = Ext.extend(Ext.Toolbar, {
             iconCls: "x-tbar-page-next",
             handler: this.onClick.createDelegate(this, ["next"])
         });
-        this.addSeparator();
-        this.todayBtn = this.addButton({
-            text: Ext.DatePicker.prototype.todayText,
-            iconCls: 'cal-today-action',
-            handler: this.onClick.createDelegate(this, ["today"])
-        });
-        this.loading = this.addButton({
-            tooltip: Ext.PagingToolbar.prototype.refreshText,
-            iconCls: "x-tbar-loading",
-            handler: this.onClick.createDelegate(this, ["refresh"])
-        });
+        
+        if(this.showTodayBtn || this.showReloadBtn) this.addSeparator();
+        
+        if(this.showTodayBtn) {
+            this.todayBtn = this.addButton({
+                text: Ext.DatePicker.prototype.todayText,
+                iconCls: 'cal-today-action',
+                handler: this.onClick.createDelegate(this, ["today"])
+            });
+        }
+
+        if(this.showReloadBtn) {
+            this.loading = this.addButton({
+                tooltip: Ext.PagingToolbar.prototype.refreshText,
+                iconCls: "x-tbar-loading",
+                handler: this.onClick.createDelegate(this, ["refresh"])
+            });
+        }
         
         this.addFill();
         
         if(this.isLoading){
             this.loading.disable();
         }
-        
     },
     
     /**
@@ -145,8 +166,6 @@ Tine.Calendar.PagingToolbar = Ext.extend(Ext.Toolbar, {
         }
     },
 
-
-    
     /**
      * Unbinds the paging toolbar from the specified {@link Ext.data.Store}
      * @param {Ext.data.Store} store The data store to unbind
@@ -171,6 +190,11 @@ Tine.Calendar.PagingToolbar = Ext.extend(Ext.Toolbar, {
         this.store = store;
     },
 
+    /**
+     * just needed when inserted in an eventpickercombobox
+     */
+    bindStore: function() {},
+    
     // private
     onDestroy : function(){
         if(this.store){
@@ -228,6 +252,7 @@ Tine.Calendar.PagingToolbar.DayPeriodPicker = Ext.extend(Tine.Calendar.PagingToo
             menu: new Ext.menu.DateMenu({
                 listeners: {
                     scope: this,
+                    
                     select: function(field) {
                         if (typeof(field.getValue) == 'function') {
                             this.update(field.getValue());
@@ -392,9 +417,11 @@ Tine.Calendar.PagingToolbar.MonthPeriodPicker = Ext.extend(Tine.Calendar.PagingT
                 menushow: function(btn, menu) {
                     menu.picker.showMonthPicker();
                     menu.picker.monthPickerActive = true;
+                    this.fireEvent('menushow');
                 },
                 menuhide: function(btn, menu) {
                     menu.picker.monthPickerActive = false;
+                    this.fireEvent('menuhide');
                 }
             }
         });

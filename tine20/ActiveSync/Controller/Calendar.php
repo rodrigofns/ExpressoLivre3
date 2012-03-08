@@ -3,6 +3,7 @@
  * Tine 2.0
  *
  * @package     ActiveSync
+ * @subpackage  Controller
  * @license     http://www.tine20.org/licenses/agpl-nonus.txt AGPL Version 1 (Non-US)
  *              NOTE: According to sec. 8 of the AFFERO GENERAL PUBLIC LICENSE (AGPL), 
  *              Version 1, the distribution of the Tine 2.0 ActiveSync module in or to the 
@@ -15,6 +16,7 @@
  * controller events class
  * 
  * @package     ActiveSync
+ * @subpackage  Controller
  */
 class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
 {
@@ -54,26 +56,23 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
     const RECUR_DOW_THURSDAY    = 16;
     const RECUR_DOW_FRIDAY      = 32;
     const RECUR_DOW_SATURDAY    = 64;
-    
+
     /**
-     * filter types
+     * busy status constants
      */
-    const FILTER_NOTHING        = 0;
-    const FILTER_2_WEEKS_BACK   = 4;
-    const FILTER_1_MONTH_BACK   = 5;
-    const FILTER_3_MONTHS_BACK  = 6;
-    const FILTER_6_MONTHS_BACK  = 7;
-    
+    const BUSY_STATUS_FREE      = 0;
+    const BUSY_STATUS_TENATTIVE = 1;
+    const BUSY_STATUS_BUSY      = 2;
     /**
      * available filters
      * 
      * @var array
      */
     protected $_filterArray = array(
-        self::FILTER_2_WEEKS_BACK,
-        self::FILTER_1_MONTH_BACK,
-        self::FILTER_3_MONTHS_BACK,
-        self::FILTER_6_MONTHS_BACK
+        Syncope_Command_Sync::FILTER_2_WEEKS_BACK,
+        Syncope_Command_Sync::FILTER_1_MONTH_BACK,
+        Syncope_Command_Sync::FILTER_3_MONTHS_BACK,
+        Syncope_Command_Sync::FILTER_6_MONTHS_BACK
     );
     
     /**
@@ -83,11 +82,23 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
      * @var array
      */
     protected $_attendeeStatusMapping = array(
-        //self::ATTENDEE_STATUS_UNKNOWN       => Calendar_Model_Attender::STATUS_NEEDSACTION,
+        self::ATTENDEE_STATUS_UNKNOWN       => Calendar_Model_Attender::STATUS_NEEDSACTION,
         self::ATTENDEE_STATUS_TENTATIVE     => Calendar_Model_Attender::STATUS_TENTATIVE,
         self::ATTENDEE_STATUS_ACCEPTED      => Calendar_Model_Attender::STATUS_ACCEPTED,
         self::ATTENDEE_STATUS_DECLINED      => Calendar_Model_Attender::STATUS_DECLINED,
-        self::ATTENDEE_STATUS_NOTRESPONDED  => Calendar_Model_Attender::STATUS_NEEDSACTION
+        //self::ATTENDEE_STATUS_NOTRESPONDED  => Calendar_Model_Attender::STATUS_NEEDSACTION
+    );
+    
+    /**
+     * mapping of busy status
+     *
+     * NOTE: not surjektive
+     * @var array
+     */
+    protected $_busyStatusMapping = array(
+        self::BUSY_STATUS_FREE      => Calendar_Model_Attender::STATUS_DECLINED,
+        self::BUSY_STATUS_TENATTIVE => Calendar_Model_Attender::STATUS_TENTATIVE,
+        self::BUSY_STATUS_BUSY      => Calendar_Model_Attender::STATUS_ACCEPTED
     );
     
     /**
@@ -179,7 +190,7 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_defaultFolderType   = ActiveSync_Command_FolderSync::FOLDERTYPE_CALENDAR;
+    protected $_defaultFolderType   = Syncope_Command_FolderSync::FOLDERTYPE_CALENDAR;
     
     /**
      * default container for new entries
@@ -193,7 +204,7 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_folderType          = ActiveSync_Command_FolderSync::FOLDERTYPE_CALENDAR_USER_CREATED;
+    protected $_folderType          = Syncope_Command_FolderSync::FOLDERTYPE_CALENDAR_USER_CREATED;
     
     /**
      * name of property which defines the filterid for different content classes
@@ -215,37 +226,43 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
      * @todo handle BusyStatus
      * @todo handle TimeZone data
      * 
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
-     * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
+    public function appendXML(DOMElement $_domParrent, $_collectionData, $_serverId)
     {
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " calendar data " . print_r($data->toArray(), true));
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) 
+            Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " calendar data " . print_r($data->toArray(), true));
         
-        foreach($this->_mapping as $key => $value) {
-            $nodeContent = null;
-            
-            if(!empty($data->$value)) {
+        // add calendar namespace
+        $_domParrent->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/' ,'xmlns:Calendar', 'uri:Calendar');
+        
+        foreach ($this->_mapping as $key => $value) {
+            if(!empty($data->$value) || $data->$value == '0') {
+                $nodeContent = null;
                 
                 switch($value) {
                     case 'dtend':
-                        if ($data->is_all_day_event == true) {
-                            // whole day events ends at 23:59:59 in Tine 2.0 but 00:00 the next day in AS
-                            $dtend = clone $data->dtend;
-                            if ($dtend->format('s') == '59') {
-                                $dtend->addSecond(1);
+                        if($data->$value instanceof DateTime) {
+                            if ($data->is_all_day_event == true) {
+                                // whole day events ends at 23:59:59 in Tine 2.0 but 00:00 the next day in AS
+                                $dtend = clone $data->dtend;
+                                $dtend->addSecond($dtend->get('s') == 59 ? 1 : 0);
+                                $dtend->addMinute($dtend->get('i') == 59 ? 1 : 0);
+    
+                                $nodeContent = $dtend->format('Ymd\THis') . 'Z';
+                            } else {
+                                $nodeContent = $data->dtend->format('Ymd\THis') . 'Z';
                             }
-                            $nodeContent = $dtend->format('Ymd\THis') . 'Z';
-                        } else {
-                            $nodeContent = $data->dtend->format('Ymd\THis') . 'Z';
                         }
                         break;
                     case 'dtstart':
-                        $nodeContent = $data->$value->format('Ymd\THis') . 'Z';
+                        if($data->$value instanceof DateTime) {
+                            $nodeContent = $data->$value->format('Ymd\THis') . 'Z';
+                        }
                         break;
                     default:
                         $nodeContent = $data->$value;
@@ -259,25 +276,21 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                     continue;
                 }
                 
-                // create a new DOMElement ...
-                $node = new DOMElement($key, null, 'uri:Calendar');
-
-                // ... append it to parent node aka append it to the document ...
-                $_xmlNode->appendChild($node);
-                
                 // strip off any non printable control characters
                 if (!ctype_print($nodeContent)) {
-                    $nodeContent = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', null, $nodeContent);
+                    $nodeContent = $this->removeControlChars($nodeContent);
                 }
                 
-                // ... and now add the content (DomText takes care of special chars)
-                $node->appendChild(new DOMText($nodeContent));
+                $node = $_domParrent->ownerDocument->createElementNS('uri:Calendar', $key);
+                $node->appendChild($_domParrent->ownerDocument->createTextNode($nodeContent));
+                
+                $_domParrent->appendChild($node);
             }
         }
         
         if(!empty($data->description)) {
             if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
-                $body = $_xmlNode->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+                $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
                 
                 $body->appendChild(new DOMElement('Type', 1, 'uri:AirSyncBase'));
                 
@@ -294,7 +307,7 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                 $node = new DOMElement('Body', null, 'uri:Calendar');
 
                 // ... append it to parent node aka append it to the document ...
-                $_xmlNode->appendChild($node);
+                $_domParrent->appendChild($node);
                 
                 // ... and now add the content (DomText takes care of special chars)
                 $node->appendChild(new DOMText($data->description));
@@ -305,11 +318,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
         if(!empty($data->alarms)) {
             $alarm = $data->alarms->getFirstRecord();
             if($alarm instanceof Tinebase_Model_Alarm) {
-                $start = $data->dtstart;
-                $reminder = $alarm->alarm_time;
-                $reminderMinutes = ($start->getTimestamp() - $reminder->getTimestamp()) / 60;
-                if ($reminderMinutes >= 0) {
-                    $_xmlNode->appendChild(new DOMElement('Reminder', $reminderMinutes, 'uri:Calendar'));
+                // NOTE: option minutes_before is always calculated by Calendar_Controller_Event::_inspectAlarmSet
+                $minutesBefore = (int) $alarm->getOption('minutes_before');
+                if ($minutesBefore >= 0) {
+                    $_domParrent->appendChild(new DOMElement('Reminder', $minutesBefore, 'uri:Calendar'));
                 }
             }
         }
@@ -319,7 +331,7 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " calendar rrule " . $data->rrule);
             $rrule = Calendar_Model_Rrule::getRruleFromString($data->rrule);
             
-            $recurrence = $_xmlNode->appendChild(new DOMElement('Recurrence', null, 'uri:Calendar'));
+            $recurrence = $_domParrent->appendChild(new DOMElement('Recurrence', null, 'uri:Calendar'));
             // required fields
             switch($rrule->freq) {
                 case Calendar_Model_Rrule::FREQ_DAILY:
@@ -373,7 +385,7 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
             
             // handle exceptions of repeating events
             if($data->exdate instanceof Tinebase_Record_RecordSet && $data->exdate->count() > 0) {
-                $exceptionsTag = $_xmlNode->appendChild(new DOMElement('Exceptions', null, 'uri:Calendar'));
+                $exceptionsTag = $_domParrent->appendChild(new DOMElement('Exceptions', null, 'uri:Calendar'));
                 
                 foreach ($data->exdate as $exception) {
                     $exceptionTag = $exceptionsTag->appendChild(new DOMElement('Exception', null, 'uri:Calendar'));
@@ -382,32 +394,41 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                     $exceptionTag->appendChild(new DOMElement('ExceptionStartTime', $exception->getOriginalDtStart()->format('Ymd\THis') . 'Z', 'uri:Calendar'));
                     
                     if ((int)$exception->is_deleted === 0) {
-                        $this->appendXML($exceptionTag, $_folderId, $exception, $_options, $_neverTruncate);
+                        $this->appendXML($exceptionTag, $_collectionData, $exception);
                     }
                 }
             }
             
         }
 
-        
         if(count($data->attendee) > 0) {
             // fill attendee cache
             Calendar_Model_Attender::resolveAttendee($data->attendee, FALSE);
             
-            $attendees = null;
+            $attendees = $_domParrent->ownerDocument->createElementNS('uri:Calendar', 'Attendees');
             
             foreach($data->attendee as $attenderObject) {
-                if($attendees === null) {
-                    $attendees = $_xmlNode->appendChild(new DOMElement('Attendees', null, 'uri:Calendar'));
-                }
                 $attendee = $attendees->appendChild(new DOMElement('Attendee', null, 'uri:Calendar'));
                 $attendee->appendChild(new DOMElement('Name', $attenderObject->getName(), 'uri:Calendar'));
                 $attendee->appendChild(new DOMElement('Email', $attenderObject->getEmail(), 'uri:Calendar'));
                 if(version_compare($this->_device->acsversion, '12.0', '>=') === true) {
-                    $attendee->appendChild(new DOMElement('AttendeeType', array_search($attenderObject->role, $this->_attendeeTypeMapping), 'uri:Calendar'));
-                    $attendee->appendChild(new DOMElement('AttendeeStatus', array_search($attenderObject->status, $this->_attendeeStatusMapping), 'uri:Calendar'));
+                    $acsType = array_search($attenderObject->role, $this->_attendeeTypeMapping);
+                    $attendee->appendChild(new DOMElement('AttendeeType', $acsType ? $acsType : self::ATTENDEE_TYPE_REQUIRED , 'uri:Calendar'));
+                    
+                    $acsStatus = array_search($attenderObject->status, $this->_attendeeStatusMapping);
+                    $attendee->appendChild(new DOMElement('AttendeeStatus', $acsStatus ? $acsStatus : self::ATTENDEE_STATUS_UNKNOWN, 'uri:Calendar'));
                 }
             }
+            
+            if ($attendees->hasChildNodes()) {
+                $_domParrent->appendChild($attendees);
+            }
+            
+            // set own status
+            if (($ownAttendee = Calendar_Model_Attender::getOwnAttender($data->attendee)) !== null && ($busyType = array_search($ownAttendee->status, $this->_busyStatusMapping)) !== false) {
+                $_domParrent->appendChild(new DOMElement('BusyStatus', $busyType, 'uri:Calendar'));
+            }
+        
         }
         
         $timeZoneConverter = ActiveSync_TimezoneConverter::getInstance(
@@ -415,45 +436,95 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
             Tinebase_Core::get(Tinebase_Core::CACHE)
         );
         
-        $_xmlNode->appendChild(new DOMElement('Timezone', $timeZoneConverter->encodeTimezone(
+        $_domParrent->appendChild(new DOMElement('Timezone', $timeZoneConverter->encodeTimezone(
             Tinebase_Core::get(Tinebase_Core::USERTIMEZONE)
         ), 'uri:Calendar'));
+
         
-        $_xmlNode->appendChild(new DOMElement('MeetingStatus', 1, 'uri:Calendar'));
-        $_xmlNode->appendChild(new DOMElement('BusyStatus', 2, 'uri:Calendar'));
-        $_xmlNode->appendChild(new DOMElement('Sensitivity', 0, 'uri:Calendar'));
-        $_xmlNode->appendChild(new DOMElement('DtStamp', $data->creation_time->format('Ymd\THis') . 'Z', 'uri:Calendar'));
-        $_xmlNode->appendChild(new DOMElement('UID', $data->uid, 'uri:Calendar'));
+        $_domParrent->appendChild(new DOMElement('MeetingStatus', 1, 'uri:Calendar'));
+        $_domParrent->appendChild(new DOMElement('Sensitivity', 0, 'uri:Calendar'));
+        $_domParrent->appendChild(new DOMElement('DtStamp', $data->creation_time->format('Ymd\THis') . 'Z', 'uri:Calendar'));
+        $_domParrent->appendChild(new DOMElement('UID', $data->uid, 'uri:Calendar'));
         
         if(!empty($data->organizer)) {
             try {
                 $contact = Addressbook_Controller_Contact::getInstance()->get($data->organizer);
                 
-                $_xmlNode->appendChild(new DOMElement('OrganizerName', $contact->n_fn, 'uri:Calendar'));
-                $_xmlNode->appendChild(new DOMElement('OrganizerEmail', $contact->email, 'uri:Calendar'));
+                $_domParrent->appendChild(new DOMElement('OrganizerName', $contact->n_fileas, 'uri:Calendar'));
+                $_domParrent->appendChild(new DOMElement('OrganizerEmail', $contact->email, 'uri:Calendar'));
             } catch (Tinebase_Exception_AccessDenied $e) {
                 // set the current account as organizer
                 // if organizer is not set, you can not edit the event on the Motorola Milestone
-                $_xmlNode->appendChild(new DOMElement('OrganizerName', Tinebase_Core::getUser()->accountFullName, 'uri:Calendar'));
+                $_domParrent->appendChild(new DOMElement('OrganizerName', Tinebase_Core::getUser()->accountFullName, 'uri:Calendar'));
                 if(isset(Tinebase_Core::getUser()->accountEmailAddress)) {
-                    $_xmlNode->appendChild(new DOMElement('OrganizerEmail', Tinebase_Core::getUser()->accountEmailAddress, 'uri:Calendar'));
+                    $_domParrent->appendChild(new DOMElement('OrganizerEmail', Tinebase_Core::getUser()->accountEmailAddress, 'uri:Calendar'));
                 }
             }
         } else {
             // set the current account as organizer
             // if organizer is not set, you can not edit the event on the Motorola Milestone
-            $_xmlNode->appendChild(new DOMElement('OrganizerName', Tinebase_Core::getUser()->accountFullName, 'uri:Calendar'));
+            $_domParrent->appendChild(new DOMElement('OrganizerName', Tinebase_Core::getUser()->accountFullName, 'uri:Calendar'));
             if(isset(Tinebase_Core::getUser()->accountEmailAddress)) {
-                $_xmlNode->appendChild(new DOMElement('OrganizerEmail', Tinebase_Core::getUser()->accountEmailAddress, 'uri:Calendar'));
+                $_domParrent->appendChild(new DOMElement('OrganizerEmail', Tinebase_Core::getUser()->accountEmailAddress, 'uri:Calendar'));
             }
         }
         
         if (isset($data->tags) && count($data->tags) > 0) {
-            $categories = $_xmlNode->appendChild(new DOMElement('Categories', null, 'uri:Calendar'));
+            $categories = $_domParrent->appendChild(new DOMElement('Categories', null, 'uri:Calendar'));
             foreach ($data->tags as $tag) {
                 $categories->appendChild(new DOMElement('Category', $tag, 'uri:Calendar'));
             }
         }
+    }
+    
+    /**
+     * update existing entry
+     *
+     * @param unknown_type $_collectionId
+     * @param string $_id
+     * @param SimpleXMLElement $_data
+     * @return Tinebase_Record_Abstract
+     */
+    public function change($_folderId, $_id, SimpleXMLElement $_data)
+    {
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " CollectionId: $_folderId Id: $_id");
+    
+        $oldEntry = $this->_contentController->get($_id);
+    
+        $entry = $this->toTineModel($_data, $oldEntry);
+        $entry->last_modified_time = $this->_syncTimeStamp;
+        if ($_folderId != $this->_specialFolderName) {
+            $entry->container_id = $_folderId;
+        }
+                
+        if ($entry->exdate instanceof Tinebase_Record_RecordSet) {
+            foreach ($entry->exdate as $exdate) {
+                if ($exdate->is_deleted == false) {
+                    $exdate->container_id = $entry->container_id;
+                }
+            }
+        }
+
+        if ($oldEntry->organizer == Tinebase_Core::getUser()->contact_id) {
+            $entry = $this->_contentController->update($entry);
+        } else {
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+                Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " current user is not organizer => update attendee status only ");
+            
+            $ownAttendee = Calendar_Model_Attender::getOwnAttender($entry->attendee);
+            
+            if ($_folderId != $this->_specialFolderName) {
+                $ownAttendee->displaycontainer_id = $_folderId;
+            }
+            
+            $entry = Calendar_Controller_MSEventFacade::getInstance()->attenderStatusUpdate($entry, $ownAttendee);
+        }
+    
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " updated entry id " . $entry->getId());
+    
+        return $entry;
     }
     
     /**
@@ -535,14 +606,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
         }
         
         // get body
-        if (isset($xmlData->body)) {
-            // ActiveSync 2.5
-            $event->description = (string)$xmlData->body;
-        } elseif(isset($airSyncBase->Body)) {
-            // ActiveSync >= 12.0
-            $event->description = (string)$airSyncBase->Body->Data;
+        if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+            $event->description = isset($airSyncBase->Body) ? (string)$airSyncBase->Body->Data : null;
         } else {
-            $event->description = null;
+            $event->description = isset($xmlData->Body) ? (string)$xmlData->Body : null;
         }
         
         // whole day events ends at 23:59:59 in Tine 2.0 but 00:00 the next day in AS
@@ -581,102 +648,45 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " timezone data " . $event->originator_tz);
         }
         
-        // handle attendees
-        $addressbook = Addressbook_Controller_Contact::getInstance();
-        
         if(! $event->attendee instanceof Tinebase_Record_RecordSet) {
             $event->attendee = new Tinebase_Record_RecordSet('Calendar_Model_Attender');
         }
         
         if(isset($xmlData->Attendees)) {
-            $newAttendee = array();
+            $newAttendees = array();
             
             foreach($xmlData->Attendees->Attendee as $attendee) {
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " attendee email " . $attendee->Email);
-
-                // search contact from addressbook using the emailaddress
-                $filterArray = array(
-                    array(
-                        'field'     => 'containerType',
-                        'operator'  => 'equals',
-                        'value'     => 'all'
-                    ),
-                    array('condition' => 'OR', 'filters' => array(
-                        array(
-                            'field'     => 'email',
-                            'operator'  => 'equals',
-                            'value'     => (string)$attendee->Email
-                        ),
-                        array(
-                            'field'     => 'email_home',
-                            'operator'  => 'equals',
-                            'value'     => (string)$attendee->Email
-                        ),
-                    )),
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) 
+                    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " attendee email " . $attendee->Email);
+                
+                if(isset($attendee->AttendeeType) && array_key_exists((int)$attendee->AttendeeType, $this->_attendeeTypeMapping)) {
+                    $role = $this->_attendeeTypeMapping[(int)$attendee->AttendeeType];
+                } else {
+                    $role = Calendar_Model_Attender::ROLE_REQUIRED;
+                }
+                
+                // AttendeeStatus send only on repsonse
+                
+                if (preg_match('/(?P<firstName>\S*) (?P<lastNameName>\S*)/', (string)$attendee->Name, $matches)) {
+                    $firstName = $matches['firstName'];
+                    $lastName  = $matches['lastNameName'];
+                } else {
+                    $firstName = null;
+                    $lastName  = $attendee->Name;
+                }
+                
+                // @todo handle resources
+                $newAttendees[] = array(
+                    'userType'  => Calendar_Model_Attender::USERTYPE_USER,
+                    'firstName' => $firstName,
+                	'lastName'  => $lastName,
+                    #'partStat'  => $status,
+                    'role'      => $role,
+                    'email'     => (string)$attendee->Email
                 );
-                                 
-                #$contacts = $addressbook->search(new Addressbook_Model_ContactFilter($filterArray), null, true);
-                $contacts = $addressbook->search(new Addressbook_Model_ContactFilter($filterArray));
-                
-                if(count($contacts) > 0) {
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " found # of contacts " . count($contacts));
-                    $contactId = $contacts->getFirstRecord()->getId();
-                } else {
-                    $contactData = array(
-                        'note'        => 'added by syncronisation',
-                        'email'       => (string)$attendee->Email,
-                        'n_family'    => (string)$attendee->Name,
-                    );
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " add new contact " . print_r($contactData, true));
-                    $contact = new Addressbook_Model_Contact($contactData);
-                    $contactId = $addressbook->create($contact)->getId();
-                }
-                $newAttendee[$contactId] = $contactId;
-                
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " contactId " . $contactId);
-                
-                // find out if the contact_id is already attending the event
-                $matchingAttendee = $event->attendee
-                    ->filter('user_type', Calendar_Model_Attender::USERTYPE_USER)
-                    ->filter('user_id', $contactId);
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " add new contact " . count($matchingAttendee));
-                
-                if(count($matchingAttendee) == 0) {
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " attendee not found, adding as new");
-                    $newAttender = new Calendar_Model_Attender(array(
-                        'user_id'   => $contactId,
-                        'user_type' => Calendar_Model_Attender::USERTYPE_USER,
-                    ));
-                    if(isset($attendee->AttendeeType)) {
-                        $newAttender->role = $this->_attendeeTypeMapping[(int)$attendee->AttendeeType];
-                    } else {
-                        $newAttender->role = Calendar_Model_Attender::ROLE_REQUIRED;
-                    }
-                    if(isset($attendee->AttendeeStatus)) {
-                        $newAttender->status = $this->_attendeeStatusMapping[(int)$attendee->AttendeeStatus];
-                    } else {
-                        $newAttender->status = Calendar_Model_Attender::STATUS_NEEDSACTION;
-                    }
-                    
-                    $event->attendee->addRecord($newAttender);
-                } else {
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " updating attendee");
-                    $currentAttendee = $matchingAttendee->getFirstRecord();
-                    if(isset($attendee->AttendeeType)) {
-                        $currentAttendee->role = $this->_attendeeTypeMapping[(int)$attendee->AttendeeType];
-                    }
-                    if(isset($attendee->AttendeeStatus)) {
-                        $newAttender->status = $this->_attendeeStatusMapping[(int)$attendee->AttendeeStatus];
-                    }
-                }
-            }
-            
-            foreach($event->attendee as $index => $attender) {
-                if(!isset($newAttendee[$attender->user_id])) {
-                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " removed attender from event " . $attender->user_id);
-                    unset($event->attendee[$index]);
-                }
-            }
+            }   
+
+            Calendar_Model_Attender::emailsToAttendee($event, $newAttendees);
         }
         
         // new event, add current user as participant
@@ -695,6 +705,14 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                     'role'      => Calendar_Model_Attender::ROLE_REQUIRED
                 ));
                 $event->attendee->addRecord($newAttender);
+            }
+        }
+        
+        if (isset($xmlData->BusyStatus) && ($ownAttendee = Calendar_Model_Attender::getOwnAttender($event->attendee)) !== null) {
+            if (isset($this->_busyStatusMapping[(string)$xmlData->BusyStatus])) {
+                $ownAttendee->status = $this->_busyStatusMapping[(string)$xmlData->BusyStatus];
+            } else {
+                $ownAttendee->status = Calendar_Model_Attender::STATUS_NEEDSACTION;
             }
         }
         
@@ -781,8 +799,10 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
                 
                 $event->exdate = $exdates;
             }
+        } else {
+            $event->rrule  = null;
+            $event->exdate = null;
         }
-        
         
         if(empty($event->organizer)) {
             $event->organizer = Tinebase_Core::getUser()->contact_id;
@@ -837,23 +857,34 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
     /**
      * return contentfilter array
      * 
-     * @param $_filterType
+     * @param  int $_filterType
      * @return Tinebase_Model_Filter_FilterGroup
      */
-    protected function _getContentFilter(Tinebase_Model_Filter_FilterGroup $_filter, $_filterType)
+    protected function _getContentFilter($_filterType)
     {
+        $filter = parent::_getContentFilter($_filterType);
+        
+        // no persistent filter set -> add default filter
+        if (! $filter ->getId()) {
+            $defaultFilter = $filter->createFilter('container_id', 'equals', array(
+                'path' => '/personal/' . Tinebase_Core::getUser()->getId()
+            ));
+            
+            $filter->addFilter($defaultFilter);
+        }
+        
         if(in_array($_filterType, $this->_filterArray)) {
             switch($_filterType) {
-                case self::FILTER_2_WEEKS_BACK:
+                case Syncope_Command_Sync::FILTER_2_WEEKS_BACK:
                     $from = Tinebase_DateTime::now()->subWeek(2);
                     break;
-                case self::FILTER_1_MONTH_BACK:
+                case Syncope_Command_Sync::FILTER_1_MONTH_BACK:
                     $from = Tinebase_DateTime::now()->subMonth(2);
                     break;
-                case self::FILTER_3_MONTHS_BACK:
+                case Syncope_Command_Sync::FILTER_3_MONTHS_BACK:
                     $from = Tinebase_DateTime::now()->subMonth(3);
                     break;
-                case self::FILTER_6_MONTHS_BACK:
+                case Syncope_Command_Sync::FILTER_6_MONTHS_BACK:
                     $from = Tinebase_DateTime::now()->subMonth(6);
                     break;
             }
@@ -861,85 +892,15 @@ class ActiveSync_Controller_Calendar extends ActiveSync_Controller_Abstract
             $to = Tinebase_DateTime::now()->addYear(10);
             
             // remove all 'old' period filters
-            $_filter->removeFilter('period');
+            $filter->removeFilter('period');
             
             // add period filter
-            $_filter->addFilter(new Calendar_Model_PeriodFilter('period', 'within', array(
+            $filter->addFilter(new Calendar_Model_PeriodFilter('period', 'within', array(
                 'from'  => $from,
                 'until' => $to
             )));
         }
-    }
-    
-    /**
-     * return list of supported folders for this backend
-     *
-     * @return array
-     */
-    public function getSupportedFolders()
-    {
-        // device supports multiple folders ?
-        if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine'))) {
         
-            // get the folders the user has access to
-            $allowedFolders = $this->_getSyncableFolders();
-            
-            $wantedFolders = null;
-            
-            try {
-                $persistentFilterId = $this->_device->{$this->_filterProperty} ? 
-                    $this->_device->{$this->_filterProperty} : 
-                    Tinebase_Core::getPreference($this->_applicationName)->defaultpersistentfilter;
-                    
-                $persistentFilter = Tinebase_PersistentFilter::getFilterById($persistentFilterId);
-                
-                foreach($persistentFilter as $filter) {
-                    if($filter instanceof Tinebase_Model_Filter_Container) {
-                        $wantedFolders = array_flip($filter->getContainerIds());
-                    }
-                }
-            } catch (Tinebase_Exception_NotFound $tenf) {
-                // filter got deleted already
-            }
-            
-            $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
-            
-        } else {
-            
-            $folders[$this->_specialFolderName] = array(
-                'folderId'      => $this->_specialFolderName,
-                'parentId'      => 0,
-                'displayName'   => $this->_applicationName,
-                'type'          => $this->_defaultFolderType
-            );
-            
-        }
-        
-        return $folders;
-    }
-    
-    /**
-     * get syncable folders
-     * 
-     * @return array
-     */
-    protected function _getSyncableFolders()
-    {
-        $folders = array();
-        
-        $containers = Tinebase_Container::getInstance()->getPersonalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Core::getUser(), Tinebase_Model_Grants::GRANT_SYNC)
-            ->merge(Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC));
-//            ->merge(Tinebase_Container::getInstance()->getOtherUsersContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC));
-        
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => (count($folders) == 0) ? $this->_defaultFolderType : $this->_folderType
-            );
-        }
-                
-        return $folders;
+        return $filter;
     }
 }

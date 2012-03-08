@@ -22,17 +22,44 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
     autoEl: 'div',
     value: '',
     increment: 15,
+    timeEditable: true,
     markedInvalid: false,
+    
+    /*
+     * @cfg {String} Default Time in the form HH:MM, if null current time is used
+     */
+    defaultTime: null,
     
     initComponent: function () {
         Ext.ux.form.DateTimeField.superclass.initComponent.call(this);
         this.lastValues = [];
-        
+        this.on('change', this.onChange, this);
+    },
+    
+    /**
+     * Sets the default time when using the first time or after clearing the datefield
+     * @param {Ext.form.Field}
+     * @param {DateTime} newValue
+     * @param {DateTime} oldValue
+     */
+    onChange: function(f, newValue, oldValue) {
+
+        if(oldValue == '' && newValue) {
+            var newDate = newValue.clone(),
+                now = new Date(),
+                times = (this.defaultTime) ? this.defaultTime.split(':') : [now.getHours(), now.getMinutes()];
+                
+            
+            newDate.setHours(parseInt(times[0]));
+            newDate.setMinutes(parseInt(times[1]));
+                
+            f.setValue(newDate);
+        }
     },
     
     clearInvalid: function () {
-    	this.markedInvalid = false;
-    	
+        this.markedInvalid = false;
+        
         if (this.dateField) {
             this.dateField.clearInvalid();
         }
@@ -88,8 +115,8 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
     },
     
     markInvalid: function (msg) {
-    	this.markedInvalid = true;
-    	
+        this.markedInvalid = true;
+        
         this.dateField.markInvalid(msg);
         this.timeField.markInvalid(msg);
     },
@@ -102,7 +129,9 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
         ct.dom.insertBefore(this.el.dom, position);
         this.el.applyStyles('overflow:visible;');
         
-        this.dateField = new Ext.form.DateField({
+        var dateField = (this.allowBlank) ? Ext.ux.form.ClearableDateField : Ext.form.DateField;
+        
+        this.dateField = new dateField({
             lazyRender: false,
             renderTo: this.el,
             readOnly: this.readOnly,
@@ -114,7 +143,9 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
             listeners: {
                 scope: this,
                 change: this.onDateChange,
-                select: this.onDateChange
+                select: this.onDateChange,
+                focus: this.onDateFocus,
+                blur: this.onDateBlur
             }
         });
         
@@ -125,16 +156,29 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
             readOnly: this.readOnly,
             hideTrigger: this.hideTrigger,
             disabled: this.disabled,
+            editable: this.timeEditable,
             tabIndex: this.tabIndex === -1 ? this.tabIndex : false,
             allowBlank: this.allowBlank,
             value: this.value,
             listeners: {
                 scope: this,
                 change: this.onTimeChange,
-                select: this.onTimeChange
+                select: this.onTimeChange,
+                focus: this.onDateFocus,
+                blur: this.onDateBlur
             }
         });
         
+    },
+    
+    onDateFocus: function () {
+        this.hasFocus = true;
+        this.fireEvent('focus', this);
+    },
+    
+    onDateBlur: function () {
+        this.hasFocus = false;
+        this.fireEvent('blur', this);
     },
     
     onDateChange: function () {
@@ -146,18 +190,24 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
     onResize: function (w, h) {
         Ext.ux.form.DateTimeField.superclass.onResize.apply(this, arguments);
         
+        if(this.allowBlank) {
+            var korrel = [0.65, 0.35];
+        } else {
+            var korrel = [0.55, 0.45];
+        }
+        
         // needed for readonly
-        this.el.setHeight(16);
+        this.el.setHeight(20);
         
         this.el.setStyle({'position': 'relative'});
         
         this.dateField.wrap.setStyle({'position': 'absolute'});
-        var dateFieldWidth = Math.abs(w * 0.55 - 5);
+        var dateFieldWidth = Math.abs(w * korrel[0] - 5);
         this.dateField.setWidth(dateFieldWidth);
         this.dateField.wrap.setWidth(dateFieldWidth);
         
         this.timeField.wrap.setStyle({'position': 'absolute'});
-        var timeFieldWidth = Math.abs(w * 0.45);
+        var timeFieldWidth = Math.abs(w * korrel[1]);
         this.timeField.setWidth(timeFieldWidth);
         this.timeField.wrap.setWidth(timeFieldWidth);
         this.timeField.wrap.setLeft(dateFieldWidth + 5);
@@ -176,6 +226,16 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
         
         if (what !== 'date' && this.timeField) {
             this.timeField.setDisabled(bool);
+        }
+    },
+    
+    setReadOnly: function (bool, what) {
+        if (what !== 'time' && this.dateField) {
+            this.dateField.setReadOnly(bool);
+        }
+        
+        if (what !== 'date' && this.timeField) {
+            this.timeField.setReadOnly(bool);
         }
     },
     
@@ -204,7 +264,7 @@ Ext.ux.form.DateTimeField = Ext.extend(Ext.form.Field, {
     },
     
     isValid: function (preventMark) {
-		return this.dateField.isValid(preventMark) && this.timeField.isValid(preventMark) && ! this.markedInvalid;
+        return this.dateField.isValid(preventMark) && this.timeField.isValid(preventMark) && ! this.markedInvalid;
     }
 });
 Ext.reg('datetimefield', Ext.ux.form.DateTimeField);

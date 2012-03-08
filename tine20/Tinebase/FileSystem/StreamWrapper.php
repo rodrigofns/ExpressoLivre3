@@ -6,7 +6,7 @@
  * @subpackage  Filesystem
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2010-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  */
 
@@ -18,24 +18,12 @@
  */
 class Tinebase_Filesystem_StreamWrapper
 {
-    public $context;
-    
     /**
-     * @var Tinebase_Tree_FileObject
-     */
-    protected $_objectBackend;
-    
-    /**
-     * @var Tinebase_Tree_Node
-     */
-    protected $_treeBackend;
-    
-    /**
-     * path where to store physical files
+     * the context
      * 
-     * @var string
+     * @var resource
      */
-    protected $_physicalBasePath;
+    public $context;
     
     /**
      * stores the current treenode
@@ -57,33 +45,29 @@ class Tinebase_Filesystem_StreamWrapper
     protected $_stream;
     
     /**
-     * @var Tinebase_FileSystem
+     * dir_closedir
      */
-    protected $_tinebaseFileSystem;
-
     public function dir_closedir() 
     {
-        $this->_currentNode      = null;
         $this->_readDirRecordSet = null;
         $this->_readDirIterator  = null;
         
         return true;
     }
     
+    /**
+     * dir_opendir
+     * 
+     * @param string $_path
+     * @param array $_options [unused]
+     */
     public function dir_opendir($_path, $_options) 
     {
         try {
-            $path = $this->_validatePath($_path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            trigger_error("invalid path provided", E_USER_WARNING);
-            return false;
-        }
-        
-        try {
-            $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
+            $node = Tinebase_FileSystem::getInstance()->stat(substr($_path, 9));
+        } catch (Tinebase_Exception_NotFound $teia) {
             if (!$quiet) {
-                trigger_error('path not found', E_USER_WARNING);
+                trigger_error($teia->getMessage(), E_USER_WARNING);
             }
             return false;
         }
@@ -93,19 +77,18 @@ class Tinebase_Filesystem_StreamWrapper
             return false;
         }
         
-        $this->_currentNode = $node;
+        $this->_readDirRecordSet = Tinebase_FileSystem::getInstance()->scanDir(substr($_path, 9));
+        $this->_readDirIterator  = $this->_readDirRecordSet->getIterator();
+        reset($this->_readDirIterator);
         
         return true;
     }
     
+    /**
+     * dir_readdir
+     */
     public function dir_readdir() 
     {
-        if ($this->_readDirRecordSet === null) {
-            $this->_readDirRecordSet = $this->_getTreeNodeBackend()->getChildren($this->_currentNode);
-            $this->_readDirIterator  = $this->_readDirRecordSet->getIterator();
-            reset($this->_readDirIterator);
-        }
-        
         if (($node = current($this->_readDirIterator)) === false) {
             return false;
         }
@@ -114,6 +97,9 @@ class Tinebase_Filesystem_StreamWrapper
         return $node->name;
     }
     
+    /**
+     * dir_rewinddir
+     */
     public function dir_rewinddir()
     {
         reset($this->_readDirIterator);
@@ -128,23 +114,7 @@ class Tinebase_Filesystem_StreamWrapper
      */
     public function mkdir($_path, $_mode, $_options)
     {
-        try {
-            $this->_validatePath($_path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            return false;
-        }
-        
-        $recursive       = (bool)($_options & STREAM_MKDIR_RECURSIVE);
-        $pathParts       = $this->_splitPath($_path);
-        $parentDirectory = null;
-        
-        foreach ($pathParts as $directoryName) {
-            try {
-                $parentDirectory = $this->_getTreeNode($parentDirectory, $directoryName);
-            } catch (Tinebase_Exception_InvalidArgument $teia) {
-                $parentDirectory = $this->_createDirectoryTreeNode($parentDirectory, $directoryName);
-            }
-        }
+        Tinebase_FileSystem::getInstance()->mkdir(substr($_path, 9));
         
         return true;
     }
@@ -154,160 +124,46 @@ class Tinebase_Filesystem_StreamWrapper
      * 
      * @param  string  $_oldPath
      * @param  string  $_newPath
+     * @return boolean
      */
     public function rename($_oldPath, $_newPath)
     {
-        try {
-            $oldPath = $this->_validatePath($_oldPath);
-            $newPath = $this->_validatePath($_newPath);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            return false;
-        }
-        
-        try {
-            $node = $this->_getTreeNodeBackend()->getLastPathNode($oldPath);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            trigger_error('path not found', E_USER_WARNING);
-            return false;
-        } catch (Tinebase_Exception_NotFound $tenf) {
-            trigger_error('path not found', E_USER_WARNING);
-            return false;
-        }
-
-        if (dirname($oldPath) != dirname($newPath)) {
-            try {
-                $newParent = $this->_getTreeNodeBackend()->getLastPathNode(dirname($newPath));
-            } catch (Tinebase_Exception_InvalidArgument $teia) {
-                trigger_error('new parent path not found', E_USER_WARNING);
-                return false;
-            } catch (Tinebase_Exception_NotFound $tenf) {
-                trigger_error('new parent path not found', E_USER_WARNING);
-                return false;
-            }
-            
-            $node->parent_id = $newParent->getId();
-        }
-        
-        if (basename($oldPath) != basename($newPath)) {
-            $node->name = basename($newPath);
-        }
-        
-        $this->_getTreeNodeBackend()->update($node);
+        return Tinebase_FileSystem::getInstance()->rename(substr($_oldPath, 9), substr($_newPath, 9));
     }
     
-    public function rmdir($_path, $_options)
+    /**
+     * remove dir
+     * 
+     * @param string $_path
+     * @param resource $_context [unused]
+     * @return boolean
+     */
+    public function rmdir($_path, $_context = NULL)
     {
-        try {
-            $path = $this->_validatePath($_path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            return false;
-        }
-        
-        $recursive       = (bool)($_options & 1);
-        
-        $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-        
-        $children = $this->_getTreeNodeBackend()->getChildren($node);
-        
-        // check if child entries exists and delete if $recursive is true
-        if ($children->count() > 0) {
-            if ($recursive !== true) {
-                trigger_error('directory not empty', E_USER_WARNING);
-                return false;
-            } else {
-                foreach ($children as $child) {
-                    if ($this->isDir($_path . '/' . $child->name)) {
-                        $this->rmdir($_path . '/' . $child->name, STREAM_MKDIR_RECURSIVE);
-                    } else {
-                        $this->unlink($_path . '/' . $child->name);
-                    }
-                }
-            }
-        }
-        
-        // delete tree node
-        $this->_getTreeNodeBackend()->delete($node->getId());
-        
-        // delete object only, if no other tree node refers to it
-        if ($this->_getTreeNodeBackend()->getObjectCount($node->object_id) == 0) {
-            $this->_getObjectBackend()->delete($node->object_id);
-        }
-        
-        return true;
+        return Tinebase_FileSystem::getInstance()->rmdir(substr($_path, 9), true);
     }
     
-    public function filesize($_path)
-    {
-        try {
-            $path = $this->_validatePath($_path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            return false;
-        }
-        
-        $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-        
-        return $node->size;
-    }
-    
+    /**
+     * stream_close
+     * 
+     * @return boolean
+     */
     public function stream_close()
     {
         if (!is_resource($this->_stream)) {
             return false;
         }
-        
-        $options = stream_context_get_options($this->_stream);
-        
-        switch ($options['tine20']['mode']) {
-            case 'w':
-            case 'wb':
-            case 'x':
-            case 'xb':
-                rewind($this->_stream);
-                
-                $ctx = hash_init('sha1');
-                hash_update_stream($ctx, $this->_stream);
-                $hash = hash_final($ctx);
-                
-                $hashDirectory = $this->_getBasePath() . '/' . substr($hash, 0, 3);
-                $hashFile      = $hashDirectory . '/' . substr($hash, 3);
-                
-                if (!file_exists($hashDirectory)) {
-                    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' create hash directory: ' . $hashDirectory);
-                    if(mkdir($hashDirectory, 0700) === false) {
-                        throw new Tinebase_Exception_UnexpectedValue('failed to create directory');
-                    } 
-                }
-                
-                if (!file_exists($hashFile)) {
-                    Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' create hash file: ' . $hashFile);
-                    rewind($this->_stream);
-                    $hashHandle = fopen($hashFile, 'x');
-                    stream_copy_to_stream($this->_stream, $hashHandle);
-                    fclose($hashHandle);
-                }
-                
-                $fileObject = $this->_getObjectBackend()->get($this->_currentNode->object_id);
-                $fileObject->hash = $hash;
-                $fileObject->size = filesize($hashFile);
-                if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $mimeType = finfo_file($finfo, $hashFile);
-                    if ($mimeType !== false) {
-                        $fileObject->contenttype = $mimeType;
-                    }
-                    finfo_close($finfo);
-                }
-                
-                $this->_getObjectBackend()->update($fileObject);
-                
-                break;
-        }
-        
-        fclose($this->_stream);
+         
+        Tinebase_FileSystem::getInstance()->fclose($this->_stream);
         
         return true;
     }
     
+    /**
+     * stream_eof
+     * 
+     * @return boolean
+     */
     public function stream_eof()
     {
         if (!is_resource($this->_stream)) {
@@ -317,121 +173,40 @@ class Tinebase_Filesystem_StreamWrapper
         return feof($this->_stream);
     }
     
+    /**
+     * open stream
+     * 
+     * @param string $_path
+     * @param string $_mode
+     * @param array $_options
+     * @param string $_opened_path
+     * @return boolean
+     */
     public function stream_open($_path, $_mode, $_options, &$_opened_path)
     {
         $quiet    = !(bool)($_options & STREAM_REPORT_ERRORS);
         
-        try {
-            $path = $this->_validatePath($_path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
+        $stream = Tinebase_FileSystem::getInstance()->fopen(substr($_path, 9), $_mode);
+        
+        if (!is_resource($stream)) {
             if (!$quiet) {
-                trigger_error('path must start with tine20://', E_USER_WARNING);
+                trigger_error('falied to open stream', E_USER_WARNING);
             }
             return false;
         }
         
-        switch ($_mode) {
-            case 'x':
-            case 'xb':
-                $dirName  = dirname($path);
-                $fileName = basename($path);
-                
-                try {
-                    $parent = $this->_getTreeNodeBackend()->getLastPathNode($dirName);
-                    if ($parent->type != Tinebase_Model_Tree_FileObject::TYPE_FOLDER) {
-                        if (!$quiet) {
-                            trigger_error('parent must be directory', E_USER_WARNING);
-                        }
-                        return false;
-                    }
-                } catch (Tinebase_Exception_NotFound $tenf) {
-                    if (!$quiet) {
-                        trigger_error('parent directory not found', E_USER_WARNING);
-                    }
-                    return false;
-                    
-                }
-                
-                if ($this->_getTreeNodeBackend()->pathExists($path)) {
-                    if (!$quiet) {
-                        trigger_error('file exists already', E_USER_WARNING);
-                    }
-                    return false;
-                }
-                
-                $this->_currentNode = $this->_createFileTreeNode($parent, $fileName);
-                
-                $this->_stream = tmpfile();
-                $_opened_path = $_path;
-                
-                break;
-                
-            case 'w':
-            case 'wb':
-                $dirName  = dirname($path);
-                $fileName = basename($path);
-                
-                try {
-                    $parent = $this->_getTreeNodeBackend()->getLastPathNode($dirName);
-                    if ($parent->type != Tinebase_Model_Tree_FileObject::TYPE_FOLDER) {
-                        if (!$quiet) {
-                            trigger_error('parent must be directory', E_USER_WARNING);
-                        }
-                        return false;
-                    }
-                } catch (Tinebase_Exception_NotFound $tenf) {
-                    if (!$quiet) {
-                        trigger_error('parent directory not found', E_USER_WARNING);
-                    }
-                    return false;
-                    
-                }
-                
-                try {
-                    $this->_currentNode = $this->_getTreeNodeBackend()->getLastPathNode($path);
-                } catch (Tinebase_Exception_NotFound $tenf) {
-                    $this->_currentNode = $this->_createFileTreeNode($parent, $fileName);
-                }
-                
-                $this->_stream = tmpfile();
-                $_opened_path = $_path;
-                
-                break;
-                
-            case 'r':
-                try {
-                    $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-                    if ($node->type != Tinebase_Model_Tree_FileObject::TYPE_FILE) {
-                        if (!$quiet) {
-                            trigger_error('path is not a file', E_USER_WARNING);
-                        }
-                        return false;
-                    }
-                } catch (Tinebase_Exception_NotFound $tenf) {
-                    if (!$quiet) {
-                        trigger_error('file not found', E_USER_WARNING);
-                    }
-                    return false;
-                    
-                }
-                $this->_currentNode = $node;
-                
-                $hashFile = $this->_getBasePath() . '/' . substr($this->_currentNode->hash, 0, 3) . '/' . substr($this->_currentNode->hash, 3);
-                
-                $this->_stream = fopen($hashFile, 'r');
-                $_opened_path = $_path;
-                
-                break;
-                
-            default:
-                return false;
-        }
-        
-        stream_context_set_option ($this->_stream, 'tine20', 'mode', $_mode);
+        $this->_stream = $stream;
+        $_opened_path = $_path;
         
         return true;
     }
     
+    /**
+     * read stream
+     * 
+     * @param integer $_length
+     * @return boolean|string
+     */
     public function stream_read($_length)
     {
         if (!is_resource($this->_stream)) {
@@ -441,6 +216,13 @@ class Tinebase_Filesystem_StreamWrapper
         return fread($this->_stream, $_length);
     }
     
+    /**
+     * stream_seek
+     * 
+     * @param integer $_offset
+     * @param integer $_whence
+     * @return boolean|integer
+     */
     public function stream_seek($_offset, $_whence = SEEK_SET)
     {
         if (!is_resource($this->_stream)) {
@@ -450,24 +232,27 @@ class Tinebase_Filesystem_StreamWrapper
         return fseek($this->_stream, $_offset, $_whence);
     }
     
+    /**
+     * stream_stat
+     * 
+     * @return boolean|array
+     */
     public function stream_stat()
     {
         if (!is_resource($this->_stream)) {
             return false;
         }
         
-        $node = $this->_currentNode;
         $streamStat = fstat($this->_stream);
          
-        $timestamp = $node->last_modified_time instanceof Tinebase_DateTime ? $node->last_modified_time->getTimestamp() : $node->creation_time->getTimestamp();
+        $timestamp = Tinebase_DateTime::now()->getTimestamp();
         
-        $mode      = 0;
-        // set node type (directory, file, link)
-        $mode      = $node->type == Tinebase_Model_Tree_FileObject::TYPE_FOLDER ? $mode | 0040000 : $mode | 0100000;
+        // set node type (file)
+        $mode      = 0100000;
         
         $stat =  array(
             0  => 0,
-            1  => crc32($node->object_id),
+            1  => 1, // inode
             2  => $mode,
             3  => 0,
             4  => 0,
@@ -476,11 +261,11 @@ class Tinebase_Filesystem_StreamWrapper
             7  => $streamStat['size'],
             8  => $timestamp,
             9  => $timestamp,
-            10 => $node->creation_time->getTimestamp(),
+            10 => $timestamp,
             11 => -1,
             12 => -1,
             'dev'     => 0,
-            'ino'     => crc32($node->object_id),
+            'ino'     => 1,
             'mode'    => $mode,
             'nlink'   => 0,
             'uid'     => 0,
@@ -489,15 +274,20 @@ class Tinebase_Filesystem_StreamWrapper
             'size'    => $streamStat['size'],
             'atime'   => $timestamp,
             'mtime'   => $timestamp, 
-            'ctime'   => $node->creation_time->getTimestamp(),
+            'ctime'   => $timestamp,
             'blksize' => -1,
             'blocks'  => -1
         );
         
         return $stat;
-        
     }
     
+    /**
+     * stream_write
+     * 
+     * @param string $_data
+     * @return boolean|integer
+     */
     public function stream_write($_data)
     {
         if (!is_resource($this->_stream)) {
@@ -514,6 +304,11 @@ class Tinebase_Filesystem_StreamWrapper
         return fwrite($this->_stream, $_data);
     }
     
+    /**
+     * stream_tell
+     * 
+     * @return boolean|integer
+     */
     public function stream_tell()
     {
         if (!is_resource($this->_stream)) {
@@ -523,64 +318,49 @@ class Tinebase_Filesystem_StreamWrapper
         return ftell($this->_stream);
     }
     
+    /**
+     * unlink
+     * 
+     * @param string $_path
+     * @return boolean
+     */
     public function unlink($_path)
     {
         try {
-            $path = $this->_validatePath($_path);
+            $result = Tinebase_FileSystem::getInstance()->unlink(substr($_path, 9));
         } catch (Tinebase_Exception_InvalidArgument $teia) {
-            trigger_error('path must start with tine20://', E_USER_WARNING);
-            return false;
-        }
-        
-        try {
-            $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            trigger_error('path not found', E_USER_WARNING);
+            trigger_error($teia->getMessage(), E_USER_WARNING);
             return false;
         } catch (Tinebase_Exception_NotFound $tenf) {
-            trigger_error('path not found', E_USER_WARNING);
+            trigger_error($tenf->getMessage(), E_USER_WARNING);
             return false;
         }
         
-        if ($node->type !== Tinebase_Model_Tree_FileObject::TYPE_FILE) {
-            trigger_error('can unlink files and links only', E_USER_WARNING);
-            return false;
-        }
-        
-        $this->_getTreeNodeBackend()->delete($node->getId());
-        
-        // delete object only, if no one uses it anymore
-        if ($this->_getTreeNodeBackend()->getObjectCount($node->object_id) == 0) {
-            $this->_getObjectBackend()->delete($node->object_id);
-        }
-        
-        return true;
+        return $result;
     }
     
+    /**
+     * url_stat
+     * 
+     * @param string $_path
+     * @param array $_flags
+     * @return boolean|array
+     */
     public function url_stat($_path, $_flags)
     {
         $statLink = (bool)($_flags & STREAM_URL_STAT_LINK);
         $quiet    = (bool)($_flags & STREAM_URL_STAT_QUIET);
         
         try {
-            $path = $this->_validatePath($_path);
+            $node = Tinebase_FileSystem::getInstance()->stat(substr($_path, 9));
         } catch (Tinebase_Exception_InvalidArgument $teia) {
             if (!$quiet) {
-                trigger_error('path must start with tine20://', E_USER_WARNING);
-            }
-            return false;
-        }
-        
-        try {
-            $node = $this->_getTreeNodeBackend()->getLastPathNode($path);
-        } catch (Tinebase_Exception_InvalidArgument $teia) {
-            if (!$quiet) {
-                trigger_error('path not found', E_USER_WARNING);
+                trigger_error($teia->getMessage(), E_USER_WARNING);
             }
             return false;
         } catch (Tinebase_Exception_NotFound $tenf) {
             if (!$quiet) {
-                trigger_error('path not found', E_USER_WARNING);
+                trigger_error($tenf->getMessage(), E_USER_WARNING);
             }
             return false;
         }
@@ -621,162 +401,5 @@ class Tinebase_Filesystem_StreamWrapper
         );
         
         return $stat;
-    }
-    
-    /**
-     * @param unknown_type $_parentId
-     * @param unknown_type $_name
-     * @throws Tinebase_Exception_InvalidArgument
-     * @return Tinebase_Model_Tree_Nodenager_Model_Tree
-     */
-    protected function _createDirectoryTreeNode($_parentId, $_name)
-    {
-        $parentId = $_parentId instanceof Tinebase_Model_Tree_Node ? $_parentId->getId() : $_parentId;
-        
-        $directoryObject = new Tinebase_Model_Tree_FileObject(array(
-            'type'          => Tinebase_Model_Tree_FileObject::TYPE_FOLDER,
-            'contentytype'  => null,
-            'creation_time' => Tinebase_DateTime::now() 
-        ));
-        $directoryObject = $this->_getObjectBackend()->create($directoryObject);
-        
-        $treeNode = new Tinebase_Model_Tree_Node(array(
-            'name'          => $_name,
-            'object_id'     => $directoryObject->getId(),
-            'parent_id'     => $parentId
-        ));
-        
-        $treeNode = $this->_getTreeNodeBackend()->create($treeNode);
-        
-        return $treeNode;
-    }
-
-    /**
-     * @param unknown_type $_parentId
-     * @param unknown_type $_name
-     * @throws Tinebase_Exception_InvalidArgument
-     * @return Tinebase_Model_Tree_Node
-     */
-    protected function _createFileTreeNode($_parentId, $_name)
-    {
-        $parentId = $_parentId instanceof Tinebase_Model_Tree_Node ? $_parentId->getId() : $_parentId;
-        
-        $fileObject = new Tinebase_Model_Tree_FileObject(array(
-            'type'          => Tinebase_Model_Tree_FileObject::TYPE_FILE,
-            'contentytype'  => null,
-            'creation_time' => Tinebase_DateTime::now() 
-        ));
-        $fileObject = $this->_getObjectBackend()->create($fileObject);
-        
-        $treeNode = new Tinebase_Model_Tree_Node(array(
-            'name'          => $_name,
-            'object_id'     => $fileObject->getId(),
-            'parent_id'     => $parentId
-        ));
-        $treeNode = $this->_getTreeNodeBackend()->create($treeNode);
-        
-        return $treeNode;
-    }
-    
-    protected function _getBasePath()
-    {
-        if ($this->_physicalBasePath === null) {
-            if (empty(Tinebase_Core::getConfig()->filesdir) || !is_writeable(Tinebase_Core::getConfig()->filesdir)) {
-                throw new Tinebase_Exception_InvalidArgument('no base path(filesdir) configured');
-            }
-            
-            $this->_physicalBasePath = Tinebase_Core::getConfig()->filesdir;
-        }
-        
-        return $this->_physicalBasePath;
-    }
-    
-    /**
-     * 
-     * return Tinebase_Tree_Nodeanager_Backend_Tree
-     */
-    protected function _getObjectBackend()
-    {
-        if (!$this->_objectBackend instanceof Tinebase_Tree_FileObject) {
-            $this->_objectBackend = new Tinebase_Tree_FileObject();
-        }
-        
-        return $this->_objectBackend;
-    }
-    
-    /**
-     * 
-     * @return Tinebase_FileSystem
-     */
-    protected function _getTinebaseFileSystem()
-    {
-        if (!$this->_tinebaseFileSystem instanceof Tinebase_FileSystem) {
-            $this->_tinebaseFileSystem = new Tinebase_FileSystem();
-        }
-        
-        return $this->_tinebaseFileSystem;
-    }
-    
-    /**
-     * 
-     * return Tinebase_Tree_Node
-     */
-    protected function _getTreeNodeBackend()
-    {
-        if (!$this->_treeBackend instanceof Tinebase_Tree_Node) {
-            $this->_treeBackend = new Tinebase_Tree_Node();
-        }
-        
-        return $this->_treeBackend;
-    }
-    
-    /**
-     * @param  string  $_parentId  id of the parent node
-     * @param  string  $_name      name of the node
-     * @throws Tinebase_Exception_InvalidArgument
-     * @return Tinebase_Model_Tree_Node
-     */
-    protected function _getTreeNode($_parentId, $_name)
-    {
-        $parentId = $_parentId instanceof Tinebase_Model_Tree_Node ? $_parentId->getId() : $_parentId;
-        
-        $searchFilter = new Tinebase_Model_Tree_NodeFilter(array(
-            array(
-                'field'     => 'name',
-                'operator'  => 'equals',
-                'value'     => $_name
-            ),
-            array(
-                'field'     => 'parent_id',
-                'operator'  => $parentId === null ? 'isnull' : 'equals',
-                'value'     => $parentId
-            )
-        ));
-        
-        $result = $this->_getTreeNodeBackend()->search($searchFilter);
-        
-        if ($result->count() == 0) {
-            throw new Tinebase_Exception_InvalidArgument('directory node not found');
-        }
-        
-        return $result[0];
-    }
-    
-    /**
-     * @param  string  $_path
-     * @return array
-     */
-    protected function _splitPath($_path)
-    {
-        return explode('/', trim(substr($_path, 9), '/'));
-    }
-    
-    protected function _validatePath($_path)
-    {
-        if (substr($_path, 0, 9) != 'tine20://') {
-            throw new Tinebase_Exception_InvalidArgument('path must start with tine20://');
-        }
-        
-        return substr($_path, 9);
     }
 }

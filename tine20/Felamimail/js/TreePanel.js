@@ -172,7 +172,7 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
             isValidDropPoint: function(n, dd, e, data){
                 return n.node.attributes.allowDrop;
             }
-        }
+        };
         
         // init selection model (multiselect)
         this.selModel = new Ext.tree.MultiSelectionModel({});
@@ -247,6 +247,9 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
             
             // get filterToolbar
             var ftb = this.filterPlugin.getGridPanel().filterToolbar;
+            // in case of filterPanel
+            ftb = ftb.activeFilterPanel ? ftb.activeFilterPanel : ftb;
+            
             if (! ftb.rendered) {
                 this.onSelectionChange.defer(150, this, [sm, nodes]);
                 return;
@@ -277,17 +280,7 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
         }
     },
     
-    /**
-     * called on filtertrigger of filter toolbar
-     * clears selection silently
-     */
-    onFilterChange: function() {
-        var sm = this.getSelectionModel();
-        
-        sm.suspendEvents();
-        sm.clearSelections();
-        sm.resumeEvents();
-    },    
+    onFilterChange: Tine.widgets.container.TreePanel.prototype.onFilterChange,
     
    /**
      * returns a filter plugin to be used in a grid
@@ -299,12 +292,21 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
                 treePanel: this,
                 field: 'path',
                 nodeAttributeField: 'path',
-                singleNodeOperator: 'in',
-                selectNodes: false
+                singleNodeOperator: 'in'
             });
         }
         
         return this.filterPlugin;
+    },
+    
+    /**
+     * convert containerPath to treePath
+     * 
+     * @param {String}  containerPath
+     * @return {String} treePath
+     */
+    getTreePath: function(path) {
+        return '/root' + path;
     },
     
     /**
@@ -565,6 +567,11 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
      * @param {Object} folderData
      */
     onFolderDelete: function(folderData) {
+    	// if we deleted account, remove it from account store
+    	if (folderData.record && folderData.record.modelName === 'Account') {
+    		this.accountStore.remove(this.accountStore.getById(folderData.id));
+    	}
+    	
         this.folderStore.remove(this.folderStore.getById(folderData.id));
     },
     
@@ -611,7 +618,7 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
      */
     updateFolderStatus: function(folder) {
         var unreadcount = folder.get('cache_unreadcount'),
-            progress    = Math.round(folder.get('cache_job_actions_done') / folder.get('cache_job_actions_estimate') * 10) * 10,
+            progress    = Math.round(folder.get('cache_job_actions_done') / folder.get('cache_job_actions_est') * 10) * 10,
             node        = this.getNodeById(folder.id),
             ui = node ? node.getUI() : null,
             nodeEl = ui ? ui.getEl() : null,
@@ -720,9 +727,9 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
     updateProgressTip: function(tip) {
         var folderId = this.getElsParentsNodeId(tip.triggerElement),
             folder = this.app.getFolderStore().getById(folderId),
-            progress = Math.round(folder.get('cache_job_actions_done') / folder.get('cache_job_actions_estimate') * 100);
+            progress = Math.round(folder.get('cache_job_actions_done') / folder.get('cache_job_actions_est') * 100);
         if (! this.isDropSensitive) {
-            tip.body.dom.innerHTML = String.format(this.app.i18n._('Fetching messages... ({0}% done)'), progress);
+            tip.body.dom.innerHTML = String.format(this.app.i18n._('Fetching messages... ({0}%% done)'), progress);
         } else {
             return false;
         }

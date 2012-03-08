@@ -21,7 +21,7 @@ Ext.namespace('Tine.Felamimail');
  * TODO         make email note editable
  * </p>
  * 
- * @author      Philipp Schüle <p.schuele@metaways.de>
+ * @author      Antonio Carlos da Silva  <antonio-carlos.silva@serpro.gov.br>
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * 
  * @param       {Object} config

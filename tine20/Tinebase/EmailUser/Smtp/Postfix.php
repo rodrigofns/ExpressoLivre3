@@ -148,7 +148,7 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
      */
     public function __construct(array $_options = array())
     {
-        $smtpConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::SMTP);
+        $smtpConfig = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::SMTP);
         
         // merge _config and postfix smtp
         $this->_config = array_merge($smtpConfig['postfix'], $this->_config);
@@ -180,16 +180,14 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
     /**
      * delete user by id
      *
-     * @param  string  $_userId
+     * @param  Tinebase_Model_FullUser  $_user
      */
-    public function inspectDeleteUser($_userId)
+    public function inspectDeleteUser(Tinebase_Model_FullUser $_user)
     {
-        $userId = $_userId instanceof Tinebase_Model_User ? $_userId->getId() : $_userId;
-        
-        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Postfix settings for user ' . $userId);
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Delete Postfix settings for user ' . $_user->accountLoginName);
 
         $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $userId)
+            $this->_db->quoteInto($this->_db->quoteIdentifier($this->_propertyMapping['emailUserId']) . ' = ?', $_user->getId())
         );
         // append domain if set or domain IS NULL
         if (! empty($this->_clientId)) {
@@ -318,7 +316,7 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
             $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailUserId']) . // ON (right)
             ' AND ' . $userEmailMap . ' = ' . // AND ON (left)
             $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailForwards']) . ')', // AND ON (right)
-            array($this->_propertyMapping['emailAliases'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailAliases']) . ')')); // Select
+        	array($this->_propertyMapping['emailAliases'] => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('aliases.' . $this->_propertyMapping['emailAliases'])))); // Select
         
         // select destination from alias table
         $select->joinLeft(
@@ -326,8 +324,8 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
             '(' . $userIDMap .  ' = ' . // ON (left)
             $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailUserId']) . // ON (right)
             ' AND ' . $userEmailMap . ' = ' . // AND ON (left)
-            $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailAliases']) . ')', // AND ON (right)
-            array($this->_propertyMapping['emailForwards'] => 'GROUP_CONCAT( DISTINCT ' . $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailForwards']) . ')')); // Select
+            $this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailAliases']) . ')', // AND ON (right)           
+            array($this->_propertyMapping['emailForwards'] => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('forwards.' . $this->_propertyMapping['emailForwards'])))); // Select
             
             
         // append domain if set or domain IS NULL
@@ -348,6 +346,12 @@ class Tinebase_EmailUser_Smtp_Postfix extends Tinebase_User_Plugin_Abstract
      */
     protected function _addUser(Tinebase_Model_FullUser $_addedUser, Tinebase_Model_FullUser $_newUserProperties)
     {
+        if (! $_addedUser->accountEmailAddress) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__
+            . ' User ' . $_addedUser->accountDisplayName . ' has no email address defined. Skipping postfix user creation.');
+            return;
+        }
+         
         $smtpSettings = $this->_recordToRawData($_addedUser, $_newUserProperties);
         
         if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Updating postfix user ' . $smtpSettings[$this->_propertyMapping['emailUsername']]);

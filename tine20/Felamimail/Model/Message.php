@@ -3,16 +3,17 @@
  * class to hold message cache data
  * 
  * @package     Felamimail
+ * @subpackage	Model
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
- * 
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
  * class to hold message cache data
  * 
  * @package     Felamimail
+ * @subpackage	Model
  * @property    string  $subject        the subject of the email
  * @property    string  $from_email     the address of the sender (from)
  * @property    string  $from_name      the name of the sender (from)
@@ -23,13 +24,13 @@
  * @property    array   $cc             the cc receipients
  * @property    array   $bcc            the bcc receipients
  * @property    array   $structure      the message structure
+ * @property    array   $attachments    the attachments
  * @property    string  $messageuid     the message uid on the imap server
  * @property    integer $smime          true if is a digitaly signed message
  * @property    integer $reading_conf   true if it must send a reading confirmation
  */
 class Felamimail_Model_Message extends Tinebase_Record_Abstract
 {
-    
     /**
      * message content type (rfc822)
      *
@@ -55,15 +56,20 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     const CONTENT_TYPE_MULTIPART = 'multipart/alternative';
     
     /**
+     * content type text/calendar
+     */
+    const CONTENT_TYPE_CALENDAR = 'text/calendar';
+    
+    /**
+     * content type text/vcard
+     */
+    const CONTENT_TYPE_VCARD = 'text/vcard';
+    
+    /**
      * attachment filename regexp 
      *
      */
     const ATTACHMENT_FILENAME_REGEXP = "/name=\"(.*)\"/";
-    
-    /**
-     * email address regexp
-     */
-    const EMAIL_ADDRESS_REGEXP = '/([a-z0-9_\+-\.]+@[a-z0-9-\.]+\.[a-z]{2,5})/i'; 
     
     /**
      * quote string ("> ")
@@ -98,6 +104,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'account_id'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'original_id'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'original_part_id'      => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'messageuid'            => array(Zend_Filter_Input::ALLOW_EMPTY => false), 
         'folder_id'             => array(Zend_Filter_Input::ALLOW_EMPTY => false), 
         'subject'               => array(Zend_Filter_Input::ALLOW_EMPTY => true), 
@@ -122,13 +129,15 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'body_content_type'     => array(
             Zend_Filter_Input::ALLOW_EMPTY => true,
             Zend_Filter_Input::DEFAULT_VALUE => self::CONTENT_TYPE_PLAIN,
-            'InArray' => array(self::CONTENT_TYPE_HTML, self::CONTENT_TYPE_PLAIN)
+            array('InArray', array(self::CONTENT_TYPE_HTML, self::CONTENT_TYPE_PLAIN)),
         ),
         'attachments'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     // save email as contact note
         'note'                  => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => 0),
     // Felamimail_Message object
         'message'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+    // prepared parts (iMIP invitations, contact vcards, ...)
+        'preparedParts'         => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'smime'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'reading_conf'          => array(Zend_Filter_Input::ALLOW_EMPTY => true,
                                          Zend_Filter_Input::DEFAULT_VALUE => 0),
@@ -176,7 +185,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
             $message->body       = $translate->_('Your message:'). ' ' . $this->subject . "\n" .
                                    $translate->_('Received in')  . ' ' . $this->received . "\n" .
                                    $translate->_('Was readed by:') . ' ' . $from->from .  ' <' . $from->email .'> ' .
-                                   'em' . ' ' . (date('Y-m-d H:i:s'));
+                                   $translate->_('in') . ' ' . (date('Y-m-d H:i:s'));
             Felamimail_Controller_Message_Send::getInstance()->sendMessage($message);
         }
     }
@@ -250,10 +259,9 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     {
         if (array_key_exists('parts', $this->structure)) {
             $bodyContentTypes = $this->_getBodyContentTypes($this->structure['parts']);
-            // HTML > plain
             $this->body_content_type = (in_array(self::CONTENT_TYPE_HTML, $bodyContentTypes)) ? self::CONTENT_TYPE_HTML : self::CONTENT_TYPE_PLAIN;
         } else {
-            $this->body_content_type = $this->content_type;
+            $this->body_content_type = (in_array($this->content_type, array(self::CONTENT_TYPE_HTML, self::CONTENT_TYPE_PLAIN))) ? $this->content_type : self::CONTENT_TYPE_PLAIN;
         }
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Set body content type to ' . $this->body_content_type);
@@ -342,7 +350,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         if (array_key_exists('parts', $structure)) {
             $bodyParts = $bodyParts + $this->_parseMultipart($structure, $_preferedMimeType);
         } else {
-            $bodyParts = $bodyParts + $this->_parseSinglePart($structure);
+            $bodyParts = $bodyParts + $this->_parseSinglePart($structure, in_array($_preferedMimeType, array(Zend_Mime::TYPE_HTML, Zend_Mime::TYPE_TEXT)));
         }
         
         return $bodyParts;
@@ -354,7 +362,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
      * @param array $_structure
      * @return array
      */
-    protected function _parseSinglePart(array $_structure)
+    protected function _parseSinglePart(array $_structure, $_onlyGetNonAttachmentParts = TRUE)
     {
         $result = array();
         
@@ -363,7 +371,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
             return $result;
         }
         
-        if ($this->_partIsAttachment($_structure)) {
+        if ($_onlyGetNonAttachmentParts && $this->_partIsAttachment($_structure)) {
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Part is attachment: ' . $_structure['disposition']);
             return $result;
         }
@@ -403,10 +411,12 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     {
         $result = array();
         
-        //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_structure, TRUE));
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($_structure, TRUE));
         
         if ($_structure['subType'] == 'alternative') {
-            $alternativeType = $_preferedMimeType == Zend_Mime::TYPE_HTML ? Zend_Mime::TYPE_TEXT : Zend_Mime::TYPE_HTML;
+            $alternativeType = ($_preferedMimeType == Zend_Mime::TYPE_HTML) 
+                ? Zend_Mime::TYPE_TEXT 
+                : (($_preferedMimeType == Zend_Mime::TYPE_TEXT) ? Zend_Mime::TYPE_HTML : '');
             
             foreach ($_structure['parts'] as $part) {
                 $foundParts[$part['contentType']] = $part['partId'];
@@ -414,8 +424,10 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
             
             if (array_key_exists($_preferedMimeType, $foundParts)) {
                 $result[$foundParts[$_preferedMimeType]] = $_structure['parts'][$foundParts[$_preferedMimeType]];
-            } elseif (array_key_exists($alternativeType, $foundParts)) {
-                $result[$foundParts[$alternativeType]]   = $_structure['parts'][$foundParts[$alternativeType]];
+            } else if (array_key_exists($alternativeType, $foundParts)) {
+                $result[$foundParts[$alternativeType]] = $_structure['parts'][$foundParts[$alternativeType]];
+            } else if (array_key_exists('multipart/mixed', $foundParts)) {
+                $result = $result + $this->getBodyParts($_structure['parts'][$foundParts['multipart/mixed']], $_preferedMimeType);
             }
         } else {
             foreach ($_structure['parts'] as $part) {
@@ -427,7 +439,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     }
 
     /**
-     * Verify if message is a signed Message
+     * Parses SMIME types
      *
      * @param array $_structure
      * @return void
@@ -579,7 +591,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
                     // get address 
                     // @todo get name here
                     //<*([a-zA-Z@_\-0-9\.]+)>*/
-                    if (preg_match(self::EMAIL_ADDRESS_REGEXP, $recipient, $matches) > 0) {
+                    if (preg_match(Tinebase_Mail::EMAIL_ADDRESS_REGEXP, $recipient, $matches) > 0) {
                         $recipient = $matches[1];
                     }
                     if (empty($recipient)) {
@@ -616,16 +628,32 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
      */
     public static function convertHTMLToPlainTextWithQuotes($_html, $_eol = "\n")
     {
-        $dom = new DOMDocument('1.0', 'utf-8');
-        // use a hack to make sure html is loaded as utf8 (@see http://php.net/manual/en/domdocument.loadhtml.php#95251)
-        $dom->loadHTML('<?xml encoding="UTF-8">' . $_html);
+        $html = $_html;
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Original body string: ' . $_html);
+        
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        
+        // body tag might be missing
+        if (strpos($html, '<body>') === FALSE) {
+            $html = '<body>' . $_html . '</body>';
+        }
+        // need to set meta tag to make sure that the encoding is done right (@see https://bugs.php.net/bug.php?id=32547)
+        if (strpos($html, '<html>') === FALSE) {
+            $html = '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head>' . $html;
+        }
+        // use a hack to make sure html is loaded as utf-8 (@see http://php.net/manual/en/domdocument.loadhtml.php#95251)
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' HTML (DOMDocument): ' . $dom->saveHTML());
+        
         $bodyElements = $dom->getElementsByTagName('body');
         if ($bodyElements->length > 0) {
-            $result = self::addQuotesAndStripTags($bodyElements->item(0), 0, $_eol);
+            $firstBodyNode = $bodyElements->item(0);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Before quoting: ' . $firstBodyNode->nodeValue);
+            $result = self::addQuotesAndStripTags($firstBodyNode, 0, $_eol);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' After quoting: ' . $result);
             $result = html_entity_decode($result, ENT_COMPAT, 'UTF-8');
-        } else {
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No body element found.');
-            $result = self::convertHTMLToPlainTextWithQuotes('<body>' . $_html . '</body>', 0, $_eol);
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Entities decoded: ' . $result);
         }
         
         return $result;
@@ -645,33 +673,39 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
      * 
      * @todo we can transform more tags here, i.e. the <strong>BOLDTEXT</strong> tag could be replaced with *BOLDTEXT*
      * @todo think about removing the tidy code
+     * @todo reduce complexity
      */
-    public static function addQuotesAndStripTags($_node, $_quoteIndent = 0, $_eol = "\n") {
-        
+    public static function addQuotesAndStripTags($_node, $_quoteIndent = 0, $_eol = "\n")
+    {
         $result = '';
         
         $hasChildren = ($_node instanceof DOMNode) ? $_node->hasChildNodes() : $_node->hasChildren();
         $nameProperty = ($_node instanceof DOMNode) ? 'nodeName' : 'name';
         $valueProperty = ($_node instanceof DOMNode) ? 'nodeValue' : 'value';
+
+        $divNewline = FALSE;
         
         if ($hasChildren) {
             $lastChild = NULL;
             $children = ($_node instanceof DOMNode) ? $_node->childNodes : $_node->child;
             
+            if ($_node->{$nameProperty} == 'div') {
+                $divNewline = TRUE;
+            }
+            
             foreach ($children as $child) {
+                
                 $isTextLeaf = ($child instanceof DOMNode) ? $child->{$nameProperty} == '#text' : ! $child->{$nameProperty};
-                if ($isTextLeaf) { 
+                if ($isTextLeaf) {
                     // leaf -> add quotes and append to content string
                     if ($_quoteIndent > 0) {
                         $result .= str_repeat(self::QUOTE, $_quoteIndent) . $child->{$valueProperty};
-                        // add newline if parent is div
-                        if ($_node->{$nameProperty} == 'div') {
-                            $result .=  $_eol . str_repeat(self::QUOTE, $_quoteIndent);
-                        }
                     } else {
-                        // add newline if parent is div
-                        if ($_node->{$nameProperty} == 'div') {
-                            $result .= $_eol;
+                        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . 
+                            "value: " . $child->{$valueProperty} . " / name: " . $_node->{$nameProperty} . "\n");
+                        if ($divNewline) {
+                            $result .=  $_eol . str_repeat(self::QUOTE, $_quoteIndent);
+                            $divNewline = FALSE;
                         }
                         $result .= $child->{$valueProperty};
                     }
@@ -681,15 +715,18 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
                     $_quoteIndent++;
                     
                 } else if ($child->{$nameProperty} == 'br') {
+                    if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' .
+                        "value: " . $child->{$valueProperty} . " / name: " . $_node->{$nameProperty} . "\n");
                     // reset quoted state on newline
                     if ($lastChild !== NULL && $lastChild->{$nameProperty} == 'br') {
                         // add quotes to repeating newlines
                         $result .= str_repeat(self::QUOTE, $_quoteIndent);
                     }
                     $result .= $_eol;
+                    $divNewline = FALSE;
                 }
                 
-                $result .= self::addQuotesAndStripTags($child, $_quoteIndent);
+                $result .= self::addQuotesAndStripTags($child, $_quoteIndent, $_eol);
                 
                 if ($child->{$nameProperty} == 'blockquote') {
                     // closing blockquote
@@ -702,8 +739,13 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
                 
                 $lastChild = $child;
             }
+            
+            // add newline if closing div
+            if ($divNewline) {
+                $result .=  $_eol . str_repeat(self::QUOTE, $_quoteIndent);
+            }
         }
         
         return $result;
-    } 
+    }
 }

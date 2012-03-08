@@ -183,9 +183,9 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     public function login()
     {
         // redirect to REDIRECTURL if set
-        $redirectUrl = Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::REDIRECTURL, NULL, '')->value;
+        $redirectUrl = Tinebase_Config::getInstance()->getConfig(Tinebase_Config::REDIRECTURL, NULL, '')->value;
 
-        if ($redirectUrl !== '' && Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::REDIRECTALWAYS, NULL, FALSE)->value) {
+        if ($redirectUrl !== '' && Tinebase_Config::getInstance()->getConfig(Tinebase_Config::REDIRECTALWAYS, NULL, FALSE)->value) {
             header('Location: ' . $redirectUrl);
             return;
         }
@@ -253,14 +253,33 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
         
         $view->registryData = array();
         
-        header('Content-Type: text/html; charset=utf-8');
-        echo $view->render('jsclient.php');
+        $this->_setMainscreenHeaders();
         
+        echo $view->render('jsclient.php');
+    }
+    
+    /**
+     * set headers for mainscreen
+     * 
+     * @todo think about CSP: is only supported by FF atm, which options/exceptions should we choose?
+     * @todo allow to configure security headers?
+     * @todo add violation report for CSP? @see https://developer.mozilla.org/en/Security/CSP/Using_CSP_violation_reports
+     */
+    protected function _setMainscreenHeaders()
+    {
+        header('Content-Type: text/html; charset=utf-8');
+        
+        // set x-frame header against clickjacking
+        // @see https://developer.mozilla.org/en/the_x-frame-options_response_header
+        header('X-Frame-Options: SAMEORIGIN');
+        
+        // set X-Content-Security-Policy header against clickjacking and XSS
+        // @see https://developer.mozilla.org/en/Security/CSP/CSP_policy_directives
+        //header("X-Content-Security-Policy: allow 'self' https://*.officespot20.com;");
     }
     
     /**
      * renders the setup/update required dialog
-     *
      */
     public function setupRequired()
     {
@@ -271,7 +290,7 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
 
         header('Content-Type: text/html; charset=utf-8');
         echo $view->render('update.php');
-        exit();        
+        exit();
     }
     
     /**
@@ -284,7 +303,7 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     {
         if (!empty($username)) {
             # removed this line on 09-06-2010 Lars
-            #Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::USERBACKEND, null, $_SERVER["HTTP_REFERER"])->value;
+            #Tinebase_Config::getInstance()->getConfig(Tinebase_Config::USERBACKEND, null, $_SERVER["HTTP_REFERER"])->value;
             
             // try to login user
             $success = (Tinebase_Controller::getInstance()->login($username, $password, $_SERVER['REMOTE_ADDR'], 'TineHttpPost') === TRUE); 
@@ -308,7 +327,7 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
         // redirect back to loginurl
         if ($success !== TRUE) {
             $defaultUrl = (array_key_exists('HTTP_REFERER', $_SERVER)) ? $_SERVER['HTTP_REFERER'] : '';
-            $redirectUrl = Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::REDIRECTURL, NULL, $defaultUrl)->value;
+            $redirectUrl = Tinebase_Config::getInstance()->getConfig(Tinebase_Config::REDIRECTURL, NULL, $defaultUrl)->value;
             if (! empty($redirectUrl)) {
                 header('Location: ' . $redirectUrl);
             }
@@ -329,12 +348,10 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     }
     
     /**
-     * hanlde session exception for http requests
+     * handle session exception for http requests
      * 
      * we force the client to delete session cookie, but we don't destroy
      * the session on server side. This way we prevent session DOS from thrid party
-     *
-     *
      */
     public function sessionException()
     {
@@ -368,7 +385,6 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     
     /**
      * generic http exception occurred
-     *
      */
     public function exception()
     {
@@ -556,7 +572,12 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
                     $filesToWatch[] = "{$application}/js/{$application}-FAT"  . (TINE20_BUILDTYPE == 'DEBUG' ? '-debug' : null) . '.js.inc';
                     break;
                 case 'lang':
-                    $filesToWatch[] = "{$application}/js/{$application}-lang-" . Tinebase_Core::getLocale() . (TINE20_BUILDTYPE == 'DEBUG' ? '-debug' : null) . '.js';
+                    $fileName = "{$application}/js/{$application}-lang-" . Tinebase_Core::getLocale() . (TINE20_BUILDTYPE == 'DEBUG' ? '-debug' : null) . '.js';
+                    $lang = Tinebase_Core::getLocale();
+                    $customPath = Tinebase_Config::getInstance()->translations;
+                    $basePath = is_readable("$customPath/$lang/$fileName") ?  "$customPath/$lang" : '.';
+                    
+                    $filesToWatch[] = "{$basePath}/{$application}/js/{$application}-lang-" . Tinebase_Core::getLocale() . (TINE20_BUILDTYPE == 'DEBUG' ? '-debug' : null) . '.js';
                     break;
                 default:
                     throw new Exception('no such fileType');

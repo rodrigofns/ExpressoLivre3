@@ -5,7 +5,7 @@
  * @package     Tinebase
  * @subpackage  Filter
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  */
 
@@ -14,10 +14,11 @@
  * 
  * @package     Timetracker
  * @subpackage  Filter
+ * 
+ * @todo refactor this to comply to default acl filtering (@see Tinebase_Controller_Record_Abstract::checkFilterACL)
  */
 class Timetracker_Model_TimesheetFilter extends Tinebase_Model_Filter_FilterGroup implements Tinebase_Model_Filter_AclFilter 
 {
-    
     /**
      * @var string application of this filter group
      */
@@ -29,11 +30,24 @@ class Timetracker_Model_TimesheetFilter extends Tinebase_Model_Filter_FilterGrou
     protected $_modelName = 'Timetracker_Model_Timesheet';
     
     /**
+     * @var string class name of this filter group
+     *      this is needed to overcome the static late binding
+     *      limitation in php < 5.3
+     */
+    protected $_className = 'Timetracker_Model_TimesheetFilter';
+    
+    /**
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'id'             => array('filter' => 'Tinebase_Model_Filter_Id'),
-        'query'          => array('filter' => 'Tinebase_Model_Filter_Query',        'options' => array('fields' => array('description'))),
+        'id'             => array(
+            'filter'  => 'Tinebase_Model_Filter_Id',
+            'options' => array('modelName' => 'Timetracker_Model_Timesheet')
+        ),
+        'query'          => array(
+            'filter'  => 'Tinebase_Model_Filter_Query',
+            'options' => array('fields' => array('description'))
+        ),
         'description'    => array('filter' => 'Tinebase_Model_Filter_Text'),
         'timeaccount_id' => array('filter' => 'Tinebase_Model_Filter_ForeignId', 
             'options' => array(
@@ -131,7 +145,16 @@ class Timetracker_Model_TimesheetFilter extends Tinebase_Model_Filter_FilterGrou
      */
     protected function _appendAclSqlFilter($_select)
     {
+        if ($this->getCondition() === self::CONDITION_OR) {
+            // ACL filter with OR condition is useless and delivers wrong results!
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' '
+                . ' No ACL filter for OR condition!');
+            return;
+        }
+        
         if (Timetracker_Controller_Timesheet::getInstance()->checkRight(Timetracker_Acl_Rights::MANAGE_TIMEACCOUNTS, FALSE, FALSE)) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' '
+                . ' No ACL filter for MANAGE_TIMEACCOUNTS right!');
             return;
         }
         
@@ -161,5 +184,8 @@ class Timetracker_Model_TimesheetFilter extends Tinebase_Model_Filter_FilterGrou
         }
                 
         $_select->where($where);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__
+            . ' ACL filter: ' . $where);
     }
 }

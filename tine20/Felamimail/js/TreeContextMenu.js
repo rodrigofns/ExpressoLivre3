@@ -4,7 +4,7 @@
  * @package     Felamimail
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schüle <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
  
@@ -117,6 +117,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
                     Ext.Ajax.request({
                         params: params,
                         scope: this,
+                        timeout: 150000, // 2 minutes
                         success: function(_result, _request){
                             var nodeData = Ext.util.JSON.decode(_result.responseText);
                             var newNode = this.loader.createNode(nodeData);
@@ -232,6 +233,8 @@ Tine.Felamimail.setTreeContextMenus = function() {
         scope: this,
         handler: function() {
             if (this.ctxNode) {
+                this.getSelectionModel().clearSelections();
+                
                 var folder = this.app.getFolderStore().getById(this.ctxNode.id),
                     account = folder ? this.app.getAccountStore().getById(folder.get('account_id')) :
                                        this.app.getAccountStore().getById(this.ctxNode.id);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application>
     <name>Crm</name>
-    <version>4.0</version>
+    <version>5.1</version>
     <order>20</order>
     <depends>
         <application>Admin</application>
@@ -220,6 +220,7 @@
                         <table>metacrm_lead</table>
                         <field>id</field>
                         <ondelete>CASCADE</ondelete>
+                        <!-- add onupdate? -->
                     </reference>
                 </index>   
             </declaration>

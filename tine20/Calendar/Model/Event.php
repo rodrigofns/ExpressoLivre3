@@ -5,7 +5,7 @@
  * @package     Calendar
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -25,11 +25,13 @@
  *  - despite RFC2445 we have an expicit isAllDayEvent property
  * 
  * @package Calendar
- * @property Tinnebase_DateTime creation_time
+ * @property Tinebase_Record_RecordSet alarms
+ * @property Tinebase_DateTime creation_time
  * @property string is_all_day_event
  * @property string originator_tz
  * @property string seq
  * @property string uid
+ * @property int container_id
  */
 class Calendar_Model_Event extends Tinebase_Record_Abstract
 {
@@ -62,7 +64,7 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
      */
     protected $_validators = array(
         // tine record fields
-        'id'                   => array('allowEmpty' => true,  'Alnum'),
+        'id'                   => array('allowEmpty' => true,  /*'Alnum'*/),
         'container_id'         => array('allowEmpty' => true,  'Int'  ),
         'created_by'           => array('allowEmpty' => true,         ),
         'creation_time'        => array('allowEmpty' => true          ),
@@ -74,9 +76,15 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         'seq'                  => array('allowEmpty' => true,  'Int'  ),
         // calendar only fields
         'dtend'                => array('allowEmpty' => true          ),
-        'transp'               => array('allowEmpty' => true,  'InArray' => array(self::TRANSP_TRANSP, self::TRANSP_OPAQUE)),
+        'transp'               => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::TRANSP_OPAQUE, self::TRANSP_TRANSP))
+        ),
         // ical common fields
-        'class'                => array('allowEmpty' => true,  'InArray' => array(self::CLASS_PUBLIC, self::CLASS_PRIVATE, /*self::CLASS_CONFIDENTIAL*/)),
+        'class'                => array(
+            'allowEmpty' => true,
+            array('InArray', array(self::CLASS_PUBLIC, self::CLASS_PRIVATE, /*self::CLASS_CONFIDENTIAL*/))
+        ),
         'description'          => array('allowEmpty' => true          ),
         'geo'                  => array('allowEmpty' => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
         'location'             => array('allowEmpty' => true          ),
@@ -167,7 +175,7 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         if ($_name == 'attendee' && is_array($_value)) {
             $_value = new Tinebase_Record_RecordSet('Calendar_Model_Attender', $_value);
         }
-          
+        
         parent::__set($_name, $_value);
     }
     
@@ -281,7 +289,14 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         $hasGrant = array_key_exists($_grant, $this->_properties) && (bool)$this->{$_grant};
         
         if ($this->class !== Calendar_Model_Event::CLASS_PUBLIC) {
-            $hasGrant &= $this->{Tinebase_Model_Grants::GRANT_PRIVATE};
+            $hasGrant &= (
+                // private grant
+                $this->{Tinebase_Model_Grants::GRANT_PRIVATE} ||
+                // I'm organizer
+                Tinebase_Core::getUser()->contact_id == ($this->organizer instanceof Addressbook_Model_Contact ? $this->organizer->getId() : $this->organizer) ||
+                // I'm attendee
+                Calendar_Model_Attender::getOwnAttender($this->attendee)
+            );
         }
         
         return $hasGrant;
@@ -315,6 +330,36 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         $this->recurid = $this->uid . '-' . $dtstart->get(Tinebase_Record_Abstract::ISO8601LONG);
         
         return $this->recurid;
+    }
+    
+    /**
+     * sets rrule until helper field
+     *
+     * @return void
+     */
+    public function setRruleUntil()
+    {
+        if (empty($this->rrule)) {
+            $this->rrule_until = NULL;
+        } else {
+            $rrule = $this->rrule;
+            if (! $this->rrule instanceof Calendar_Model_Rrule) {
+                $rrule = new Calendar_Model_Rrule(array());
+                $rrule->setFromString($this->rrule);
+            }
+            
+            if (isset($rrule->count)) {
+                $this->rrule_until = NULL;
+                $exdates = $this->exdate;
+                $this->exdate = NULL;
+                
+                $lastOccurrence = Calendar_Model_Rrule::computeNextOccurrence($this, new Tinebase_Record_RecordSet('Calendar_Model_Event'), $this->dtend, $rrule->count -1);
+                $this->rrule_until = $lastOccurrence->dtend;
+                $this->exdate = $exdates;
+            } else {
+                $this->rrule_until = $rrule->until;
+            }
+        }
     }
     
     /**
@@ -421,5 +466,47 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         }
         
         return $result;
+    }
+    
+    /**
+     * returns TRUE if given event obsoletes this one
+     * 
+     * @param  Calendar_Model_Event $_event
+     * @return bool
+     */
+    public function isObsoletedBy($_event)
+    {
+        if ($_event->seq != $this->seq) {
+            return $_event->seq > $this->seq;
+        }
+        
+        return $_event->last_modified_time > $this->last_modified_time;
+    }
+    
+    /**
+     * returns TRUE if comparison detects a resechedule / significant change
+     * 
+     * @param  Calendar_Model_Event $_event
+     * @return bool
+     */
+    public function isRescheduled($_event)
+    {
+        return $this->dtstart != $_event->dtstart
+            || $this->dtend != $_event->dtend
+            || $this->rrule != $_event->rrule;
+    }
+    
+    /**
+     * sets and returns the addressbook entry of the organizer
+     * 
+     * @return Addressbook_Model_Contact
+     */
+    public function resolveOrganizer()
+    {
+        if (! $this->organizer instanceof Addressbook_Model_Contact) {
+            $this->organizer = Addressbook_Controller_Contact::getInstance()->getMultiple($this->organizer, TRUE)->getFirstRecord();
+        }
+        
+        return $this->organizer;
     }
 }

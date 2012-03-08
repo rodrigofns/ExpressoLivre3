@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application>
     <name>Felamimail</name>
-    <version>4.8</version>
+    <version>5.6</version>
     <order>30</order>
     <status>enabled</status>
-    <depends>
-        <application>Addressbook</application>
-    </depends>    
     <tables>
         <table>
             <name>felamimail_account</name>
-            <version>15</version>
+            <version>17</version>
             <declaration>
                 <field>
                     <name>id</name>
@@ -65,10 +62,9 @@
                 </field>
                 <field>
                     <name>ssl</name>
-                    <type>enum</type>
-                    <value>none</value>
-                    <value>TLS</value>
-                    <value>SSL</value>
+                    <type>text</type>
+                    <length>32</length>
+                    <default>none</default>
                 </field>
                 <field>
                     <name>sent_folder</name>
@@ -129,6 +125,12 @@
                     <type>text</type>
                 </field>
                 <field>
+                    <name>signature_position</name>
+                    <type>text</type>
+                    <length>64</length>
+                    <default>below</default>
+                </field>
+                <field>
                     <name>smtp_hostname</name>
                     <type>text</type>
                     <length>256</length>
@@ -139,17 +141,15 @@
                 </field>
                 <field>
                     <name>smtp_auth</name>
-                    <type>enum</type>
-                    <value>none</value>
-                    <value>login</value>
-                    <value>plain</value>
+                    <type>text</type>
+                    <length>32</length>
+                    <default>none</default>
                 </field>
                 <field>
                     <name>smtp_ssl</name>
-                    <type>enum</type>
-                    <value>none</value>
-                    <value>TLS</value>
-                    <value>SSL</value>
+                    <type>text</type>
+                    <length>32</length>
+                    <default>none</default>
                 </field>
                 <field>
                     <name>smtp_credentials_id</name>
@@ -171,9 +171,9 @@
                 </field>
                 <field>
                     <name>sieve_ssl</name>
-                    <type>enum</type>
-                    <value>none</value>
-                    <value>TLS</value>
+                    <type>text</type>
+                    <length>32</length>
+                    <default>none</default>
                 </field>
                 <field>
                     <name>created_by</name>
@@ -235,7 +235,7 @@
         </table>
         <table>
             <name>felamimail_folder</name>
-            <version>8</version>
+            <version>10</version>
             <declaration>
                 <field>
                     <name>id</name>
@@ -257,7 +257,6 @@
                 <field>
                     <name>globalname</name>
                     <type>text</type>
-                    <length>256</length>
                 </field>
                 <field>
                     <name>parent</name>
@@ -334,7 +333,7 @@
                     <length>64</length>
                 </field>
                 <field>
-                    <name>cache_job_actions_estimate</name>
+                    <name>cache_job_actions_est</name>
                     <type>integer</type>
                 </field>
                 <field>
@@ -366,7 +365,7 @@
         </table>
         <table>
             <name>felamimail_cache_message</name>
-            <version>8</version>
+            <version>7</version>
             <declaration>
                 <field>
                     <name>id</name>
@@ -460,13 +459,7 @@
                 <field>
                     <name>timestamp</name>
                     <type>datetime</type>
-                </field>
-                <field>
-                    <name>smime</name>
-                    <type>integer</type>
-                    <default>0</default>
-                    <notnull>true</notnull>
-                </field>
+                </field>                
                 <index>
                     <name>id</name>
                     <primary>true</primary>
