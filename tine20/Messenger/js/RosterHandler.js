@@ -52,6 +52,12 @@ Tine.Messenger.RosterHandler = {
         return null;
     },
     
+    getContactElementGroup: function (jid) {
+        var group = Tine.Messenger.RosterHandler.getContactElement(jid).parentNode.text;
+        
+        return (group == _('No group')) ? null : group;
+    },
+    
     removeContactElement: function (jid) {
         Tine.Messenger.RosterHandler.getContactElement(jid).remove(true);
     },
@@ -90,12 +96,17 @@ Tine.Messenger.RosterHandler = {
     },
     
     renameContact: function (jid, name) {
-        var iq = $iq({type: "set"})
+        var group = Tine.Messenger.RosterHandler.getContactElementGroup(jid),
+            iq = $iq({type: "set"})
                     .c("query", {"xmlns": "jabber:iq:roster"})
                     .c("item", {
                         jid: jid,
                         name: name
                     });
+                    
+        if (group != null) {
+            iq.c('group', {}, group);
+        }
                     
         Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
         
