@@ -126,6 +126,76 @@ Tine.Messenger.Window = new Ext.Window({
     
 });
 
+var contextMenu = new Ext.menu.Menu({
+    floating: true,
+    items: [
+        {
+            text: 'Rename',
+            icon: '/images/messenger/user_edit.png',
+            handler: function (choice, ev) {
+                var jid = choice.parentMenu.contactId;
+
+                choice.parentMenu.hide();
+
+                var renameContactWindow = new Ext.Window({
+                    closeAction: 'close',
+                    layout: 'fit',
+                    plain: true,
+                    modal: true,
+                    title: _('Rename Contact') + ' - ' + jid,
+                    items: [
+                        {
+                            xtype: 'form',
+                            border: false,
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    id: 'messenger-contact-mngt-name',
+                                    fieldLabel: _('Name')
+                                },
+                                {
+                                    xtype: 'button',
+                                    id: 'messenger-contact-mngt-button',
+                                    text: _('Rename it!'),
+                                    listeners: {
+                                        click: function () {
+                                            var name = Ext.getCmp('messenger-contact-mngt-name').getValue();
+                                            Tine.Messenger.RosterHandler.renameContact(jid, name);
+                                            renameContactWindow.close();
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                });
+                renameContactWindow.show();
+            }
+        },
+        {
+            text: 'Delete',
+            icon: '/images/messenger/user_delete.png',
+            handler: function (choice, ev) {
+                var jid = choice.parentMenu.contactId,
+                    name = Tine.Messenger.RosterHandler.getContactElement(jid).text;
+
+                choice.parentMenu.hide();
+
+                Ext.Msg.buttonText.yes = _('Yes');
+                Ext.Msg.buttonText.no = _('No');
+                Ext.Msg.minWidth = 300;
+                Ext.Msg.confirm(_('Delete Contact') + ' - ' + jid,
+                                    _('Are you sure to delete ' + name + '?'),
+                                    function (id) {
+                                        if (id == 'yes') {
+                                            Tine.Messenger.RosterHandler.deleteContact(jid);
+                                        }
+                                    }
+                );
+            }
+        }
+    ]
+});
 
 Tine.Messenger.Window.RosterTree = function(iq){
     var NO_GROUP = "No group";
@@ -163,6 +233,10 @@ Tine.Messenger.Window.RosterTree = function(iq){
 //                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
             });
             _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
+            _buddy.on('contextmenu', function (el) {
+                contextMenu.contactId = el.id;
+                contextMenu.show(el.ui.getEl());
+            });
 
             var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
@@ -204,7 +278,10 @@ Tine.Messenger.Window.RosterTree = function(iq){
 //                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
                 });
                 _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
-
+                _buddy.on('contextmenu', function (el) {
+                    contextMenu.contactId = el.id;
+                    contextMenu.show(el.ui.getEl());
+                });
                 var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
                 if($(this).children("group").length > 0){
@@ -270,6 +347,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
             });
         }
     }
+    
     return {
         init : function(){
             createTree(iq);
@@ -282,8 +360,3 @@ Tine.Messenger.Window.RosterTree = function(iq){
         }
     }
 }
-
-//node.on('contextmenu', function (el) {
-//                contextMenu.contactId = el.id;
-//                contextMenu.show(el.ui.getEl());
-//            });
