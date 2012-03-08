@@ -29,7 +29,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     changeStatus: function (jid, status) {
-        var contact = Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+        var contact = this.getContactElement(jid);
         
         Tine.Messenger.RosterHandler.resetStatus(contact.ui);
         contact.ui.addClass('messenger-contact-' + status);
@@ -43,7 +43,13 @@ Tine.Messenger.RosterHandler = {
     },
     
     getContactElement: function (jid) {
-        return Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid);
+        var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+        for(i=0; i < rootNode.childNodes.length ; i++){
+            var buddy = rootNode.childNodes[i].findChild('id', jid);
+            if(buddy != null)
+                return buddy;
+        }
+        return null;
     },
     
     removeContactElement: function (jid) {
