@@ -102,6 +102,7 @@
     background-image: url(/images/messenger/icon_dnd.png);
     background-repeat: no-repeat;
     font-weight: bold;
+    background-position-x: 15px
 }
 
 .messenger-contact-donotdisturb span[unselectable] {
