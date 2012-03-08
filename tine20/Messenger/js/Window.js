@@ -296,9 +296,11 @@ Tine.Messenger.Window.RosterTree = function(iq){
                     });
                 } else {
                     var hasGroupNoGroup = false;
+                    var node = -1;
                     for(i=0; i < rootNode.childNodes.length; i++){
                         if(rootNode.childNodes[i].text == _(NO_GROUP)){
                             hasGroupNoGroup = true;
+                            node = i;
                         }
                     }
                     if(!hasGroupNoGroup){
@@ -306,7 +308,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                         node = Ext.getCmp('messenger-roster').getRootNode().childNodes.length - 1;
                         Ext.getCmp('messenger-roster').getRootNode().childNodes[node].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
                     } else {
-                        rootNode.appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                        rootNode.childNodes[node].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
                     }
                 }
             });
