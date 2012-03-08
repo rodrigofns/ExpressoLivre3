@@ -101,18 +101,18 @@ Tine.Messenger.Window = new Ext.Window({
             }
         },
         {
-        id: 'messenger-connect-button',
-        text: 'Connect',
-        handler: function(){
-            if (this.getText() == 'Connect') {
-                Tine.Messenger.ChatHandler.connect();
-                // Commenting up, uncomment down!!
-                // Start your engines!
-                // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
-            } else if (this.getText() == 'Disconnect') {
-                Tine.Messenger.ChatHandler.diconnect();
+            id: 'messenger-connect-button',
+            text: 'Connect',
+            handler: function() {
+                if (this.getText() == 'Connect') {
+                    Tine.Messenger.ChatHandler.connect();
+                    // Commenting up, uncomment down!!
+                    // Start your engines!
+                    // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+                } else if (this.getText() == 'Disconnect') {
+                    Tine.Messenger.ChatHandler.disconnect();
+                }
             }
-        }
     }],
 
     toggleConnectionButton: function () {

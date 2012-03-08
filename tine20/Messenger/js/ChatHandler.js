@@ -166,7 +166,7 @@ Tine.Messenger.ChatHandler = {
             });
         return message;
     },
-    diconnect: function() {
+    disconnect: function() {
         Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
         Tine.Messenger.RosterHandler.clearRoster();
         Ext.getCmp('messenger-connect-button').setText('Connect');

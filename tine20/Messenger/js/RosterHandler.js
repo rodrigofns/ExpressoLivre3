@@ -5,15 +5,55 @@ var contextMenu = new Ext.menu.Menu({
     items: [
         {
             text: 'Rename',
+            icon: '/images/messenger/user_edit.png',
             handler: function (choice, ev) {
-                alert(choice.parentMenu.contactId);
+                var jid = choice.parentMenu.contactId;
+
                 choice.parentMenu.hide();
+                
+                var contactMngtWindow = new Ext.Window({
+                    closeAction: 'close',
+                    layout: 'fit',
+                    plain: true,
+                    modal: true,
+                    title: _('Rename Contact') + ' - ' + jid,
+                    items: [
+                        {
+                            xtype: 'form',
+                            border: false,
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    id: 'messenger-contact-mngt-name',
+                                    fieldLabel: _('Name')
+                                },
+                                {
+                                    xtype: 'button',
+                                    id: 'messenger-contact-mngt-button',
+                                    text: _('Rename it!'),
+                                    listeners: {
+                                        click: function () {
+                                            var name = Ext.getCmp('messenger-contact-mngt-name').getValue();
+                                            Tine.Messenger.RosterHandler.renameContact(jid, name);
+                                            contactMngtWindow.close();
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                });
+                contactMngtWindow.show();
             }
         },
         {
             text: 'Delete',
+            icon: '/images/messenger/user_delete.png',
             handler: function (choice, ev) {
-                alert(choice.parentMenu.contactId);
+                var jid = choice.parentMenu.contactId;
+                
+                alert('DELETING ' + jid + '!!');
+                
                 choice.parentMenu.hide();
             }
         }
@@ -90,10 +130,10 @@ Tine.Messenger.RosterHandler = {
     },
     
     resetStatus: function (contact) {
-        contact.removeClass('messenger-contact-available');
-        contact.removeClass('messenger-contact-unavailable');
-        contact.removeClass('messenger-contact-away');
-        contact.removeClass('messenger-contact-donotdisturb');
+        contact.removeClass(AVAILABLE_CLASS);
+        contact.removeClass(UNAVAILABLE_CLASS);
+        contact.removeClass(AWAY_CLASS);
+        contact.removeClass(DONOTDISTURB_CLASS);
     },
     
     getContactElement: function (jid) {
@@ -123,10 +163,12 @@ Tine.Messenger.RosterHandler = {
         
         return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
     },
+    
     setStatus: function(status, text) {
         var presence = $pres().c('show').t(status).up().c('status').t(text);
         Tine.Messenger.Application.connection.send(presence);
     },
+    
     getGroupsFromResponse : function(el){
         var group_tree = null;
         var arr_groups = [];
@@ -148,5 +190,26 @@ Tine.Messenger.RosterHandler = {
             }
         });
         return true;
+    },
+    
+    addContact: function(jid, name) {
+        
+    },
+    
+    renameContact: function (jid, name) {
+        var iq = $iq({type: "set"})
+                    .c("query", {"xmlns": "jabber:iq:roster"})
+                    .c("item", {
+                        jid: jid,
+                        name: name
+                    });
+                    
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
+        
+        Tine.Messenger.RosterHandler.getContactElement(jid).setText(name);
+    },
+    
+    deleteContact: function (jid) {
+        
     }
 }
