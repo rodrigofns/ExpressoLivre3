@@ -700,14 +700,28 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @return {void}
      */
     onDeleteRecords: function() {
-        var account = this.app.getActiveAccount(),
-            trashId = (account) ? account.getTrashFolderId() : null,
-            trash = trashId ? this.app.getFolderStore().getById(trashId) : null
-            trashConfigured = (account.get('trash_folder')); 
-            
-        return (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+        if(Tine.Felamimail.registry.get('preferences').get('confirmDelete') === '1')
+            {
+                Ext.MessageBox.confirm('', this.app.i18n._('Confirm Delete') + ' ?', function(btn) {
+                    if(btn == 'yes') {
+                var account = this.app.getActiveAccount(),
+                trashId = (account) ? account.getTrashFolderId() : null,
+                trash = trashId ? this.app.getFolderStore().getById(trashId) : null
+                trashConfigured = (account.get('trash_folder')); 
+                return (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+                }
+                }, this);
+            }
+        else
+            {
+                var account = this.app.getActiveAccount(),
+                trashId = (account) ? account.getTrashFolderId() : null,
+                trash = trashId ? this.app.getFolderStore().getById(trashId) : null
+                trashConfigured = (account.get('trash_folder')); 
+                return (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+            }
     },
-
+   
     /**
      * permanently delete selected messages
      */
