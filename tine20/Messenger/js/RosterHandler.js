@@ -90,9 +90,23 @@ Tine.Messenger.RosterHandler = {
         var presence = $pres().c('show').t(status).up().c('status').t(text);
         Tine.Messenger.Application.connection.send(presence);
     },
-    
-    addContact: function(jid, name) {
-        
+    // TODO-EXP: Better subscription control!
+    addContact: function(jid, name, group) {
+        var iq = $iq({type: "set"})
+                    .c("query", {"xmlns": "jabber:iq:roster"})
+                    .c("item", {
+                        jid: jid,
+                        name: name
+                    })
+                    .c("group", {}, group);
+
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().send(
+            $pres({
+                to: jid,
+                type: 'subscribe'
+            })
+        );
     },
     
     renameContact: function (jid, name) {
@@ -113,7 +127,7 @@ Tine.Messenger.RosterHandler = {
         Tine.Messenger.RosterHandler.getContactElement(jid).setText(name);
     },
     
-    deleteContact: function (jid) {
+    removeContact: function (jid) {
         var iq = $iq({type: "set"})
                     .c("query", {"xmlns": "jabber:iq:roster"})
                     .c("item", {

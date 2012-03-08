@@ -27,10 +27,80 @@ Tine.Messenger.Window = new Ext.Window({
     
     items:       roster,
     
-    buttons: [{
-        id: 'messenger-change-status-button',
-        text: 'Change Status',
-        handler: function(){
+    buttons: [
+        {
+            id: 'messenger-contact-add',
+            icon: '/images/messenger/user_add.png',
+            tooltip: 'Add a Contact',
+            width: 32,
+            disabled: true,
+            handler: function () {
+                var addContactWindow = new Ext.Window({
+                    closeAction: 'close',
+                    layout: 'fit',
+                    plain: true,
+                    modal: true,
+                    title: _('Add Contact'),
+                    items: [
+                        {
+                            xtype: 'form',
+                            border: false,
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    id: 'messenger-contact-add-jid',
+                                    fieldLabel: _('JID')
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    id: 'messenger-contact-add-name',
+                                    fieldLabel: _('Name')
+                                },
+                                {
+                                    xtype: 'combo',
+                                    id: 'messenger-contact-add-group',
+                                    fieldLabel: _('Group'),
+                                    store: new Ext.data.SimpleStore({
+                                                    data: [
+                                                            [1, 'GROUP 1'],
+                                                            [2, 'GROUP 2'],
+                                                            [3, 'GROUP 3']
+                                                    ],
+                                                    id: 0,
+                                                    fields: ['value', 'text']
+                                            }),
+                                    emptyText: _('Select a group') + '...',
+                                    valueField: 'value',
+                                    displayField: 'text',
+                                    triggerAction: 'all',
+                                    editable: false,
+                                    mode : 'local'
+                                },
+                                {
+                                    xtype: 'button',
+                                    id: 'messenger-contact-add-button',
+                                    text: _('Add!'),
+                                    listeners: {
+                                        click: function () {
+                                            var jid = Ext.getCmp('messenger-contact-add-jid').getValue(),
+                                                name = Ext.getCmp('messenger-contact-add-name').getValue(),
+                                                group = Ext.getCmp('messenger-contact-add-group').getValue();
+                                            Tine.Messenger.RosterHandler.addContact(jid, name, group);
+                                            addContactWindow.close();
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                });
+                addContactWindow.show();
+            }
+        },
+        {
+            id: 'messenger-change-status-button',
+            text: 'Change Status',
+            handler: function(){
                 var statusWindow = new Ext.Window({
                     id: 'messenger-change-status-window',
                     closeAction: 'close',
@@ -173,7 +243,7 @@ var contextMenu = new Ext.menu.Menu({
             }
         },
         {
-            text: 'Delete',
+            text: 'Remove',
             icon: '/images/messenger/user_delete.png',
             handler: function (choice, ev) {
                 var jid = choice.parentMenu.contactId,
@@ -188,7 +258,7 @@ var contextMenu = new Ext.menu.Menu({
                                     _('Are you sure to delete ' + name + '?'),
                                     function (id) {
                                         if (id == 'yes') {
-                                            Tine.Messenger.RosterHandler.deleteContact(jid);
+                                            Tine.Messenger.RosterHandler.removeContact(jid);
                                         }
                                     }
                 );

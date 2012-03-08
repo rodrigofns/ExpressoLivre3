@@ -170,6 +170,7 @@ Tine.Messenger.ChatHandler = {
         Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
         Tine.Messenger.RosterHandler.clearRoster();
         Ext.getCmp('messenger-connect-button').setText('Connect');
+        Ext.getCmp('messenger-contact-add').disable();
     },
     connect: function() {
         // TODO-EXP: TEMPORARY - Place your jabber login and password

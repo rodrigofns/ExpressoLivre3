@@ -89,6 +89,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Log.debug("Connected!");
             // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
+            Ext.getCmp('messenger-contact-add').enable();
             
             // START THE HANDLERS
             // Chat Messaging handler
@@ -131,6 +132,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.RosterHandler.clear();
             window.onbeforeunload = null;
             window.onunload = null;
+            Ext.getCmp('messenger-contact-add').disable();
         } else if (status === Strophe.Status.AUTHFAIL) {
             Ext.Msg.show({
                 title:'Error',
