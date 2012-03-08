@@ -104,3 +104,158 @@ Tine.Messenger.Window = new Ext.Window({
 });
 
 
+Tine.Messenger.Window.RosterTree = function(iq){
+    var NO_GROUP = "No group";
+    
+    var createTree = function(xml) {
+        addGroupToTree(null,xml);	//add groups
+        addBuddyToTree(null,xml);	//add buddys
+
+    }
+    var addBuddyToTree = function(f,a){
+            
+        if(f){
+            var item = $(f).find("item");
+            var jid = item.attr("jid"),
+                label = item.attr("name") || jid,
+                subscription = item.attr("subscription");
+            var appended = false;
+            var status = '';
+            var status_text = '';
+
+            jid = Strophe.getBareJidFromJid(jid);
+
+            var _buddy = new Ext.tree.TreeNode({ //buddy adden
+                            id:jid,
+                            status:status,
+                            status_text:status_text,
+                            jid:jid,
+                            subscription:subscription,
+                            hide:false,
+                            text:label,
+//                            icon:"/images/messenger/icon_"+status+".png",
+                            cls:'messenger-contact',
+                            allowDrag:true,
+                            allowDrop:false
+//                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
+            });
+            _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
+
+            var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+
+            if(item.children("group").length > 0){
+                item.children("group").each(function(g){
+                    for(i=0; i < rootNode.childNodes.length; i++){
+                        if(rootNode.childNodes[i].text == item.text()){
+                            rootNode.childNodes[i].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                            appended = true;
+                        }
+                    }
+                });
+            }
+            if(!appended){
+                rootNode.appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+            }
+        }else{
+            $(a).find("item").each(function () {
+                var jid = $(this).attr("jid"),
+                    label = $(this).attr("name") || jid,
+                    subscription = $(this).attr("subscription");
+                var status = '';
+                var status_text = '';
+
+                jid = Strophe.getBareJidFromJid(jid);
+
+                var _buddy = new Ext.tree.TreeNode({ //buddy adden
+                                id:jid,
+                                status:status,
+                                status_text:status_text,
+                                jid:jid,
+                                subscription:subscription,
+                                hide:false,
+                                text:label,
+//                                icon:"/images/messenger/icon_"+status+".png",
+                                cls:'messenger-contact',
+                                allowDrag:true,
+                                allowDrop:false
+//                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
+                });
+                _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
+
+                var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+
+                if($(this).children("group").length > 0){
+                    var i=0;
+                    $(this).children("group").each(function(g){
+                        for(i=0; i < rootNode.childNodes.length; i++){
+                            if(rootNode.childNodes[i].text == $(this).text()){
+                                rootNode.childNodes[i].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                                appended = true;
+                            }
+                        }
+                    });
+                } else {
+                    var hasGroupNoGroup = false;
+                    for(i=0; i < rootNode.childNodes.length; i++){
+                        if(rootNode.childNodes[i].text == _(NO_GROUP)){
+                            hasGroupNoGroup = true;
+                        }
+                    }
+                    if(!hasGroupNoGroup){
+                        Tine.Messenger.Window.RosterTree().addGroup(_(NO_GROUP));
+                        node = Ext.getCmp('messenger-roster').getRootNode().childNodes.length - 1;
+                        Ext.getCmp('messenger-roster').getRootNode().childNodes[node].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                    } else {
+                        rootNode.appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                    }
+                }
+            });
+        }
+    }
+    var addGroupToTree = function(f,a){
+        var _group_name = '';
+        
+        if(f != null){
+            _group_name = f;
+            if(_group_name.trim() != ''){
+                var _group = new Ext.tree.TreeNode({ //group adden
+                                text:_group_name,
+                                iconCls:"display:none;",
+                                expanded:true,
+                                expandable:true,
+                                allowDrag:false,
+                                "gname":_group_name
+                });
+                Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
+            }
+        }else{
+            var _arr_groups = [];
+            $(a).find("group").each(function(){
+                _group_name = $(this).text();
+                if($.inArray(_group_name, _arr_groups) === -1){
+                    _arr_groups.push(_group_name);
+                    var _group = new Ext.tree.TreeNode({ 
+                                    text:_group_name,
+                                    iconCls:"display:none;",
+                                    expanded:true,
+                                    expandable:true,
+                                    allowDrag:false,
+                                    "gname":_group_name
+                    });
+                    Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
+                }
+            });
+        }
+    }
+    return {
+        init : function(){
+            createTree(iq);
+        },
+        addBuddy: function(e){
+            addBuddyToTree(e)
+        },
+        addGroup: function(e){
+            addGroupToTree(e);
+        }
+    }
+}

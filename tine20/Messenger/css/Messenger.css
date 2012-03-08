@@ -72,6 +72,7 @@
 .messenger-contact-unavailable {
     background-image: url(/images/messenger/icon_unavailable.png);
     background-repeat: no-repeat;
+    background-position-x: 15px
 }
 
 .messenger-contact-unavailable span[unselectable] {
@@ -82,12 +83,14 @@
     background-image: url(/images/messenger/icon_available.png);
     background-repeat: no-repeat;
     font-weight: bold;
+    background-position-x: 15px
 }
 
 .messenger-contact-away {
     background-image: url(/images/messenger/icon_away.png);
     background-repeat: no-repeat;
     font-weight: bold;
+    background-position-x: 15px
 }
 
 .messenger-contact-available span[unselectable],
