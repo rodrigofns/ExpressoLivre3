@@ -251,7 +251,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         $attachments = $this->getAttachments($_message, $_partId);
         $this->_attachments = $attachments;
         $body        = $this->getMessageBody($_message, $_partId, $mimeType, $_account, true);
-        $signature   = $this->getDigitalSignature($message, $_partId);
+        $signature   = $this->getDigitalSignature($_message, $_partId);
         
         if ($_partId === null) {
             $message = $_message;
