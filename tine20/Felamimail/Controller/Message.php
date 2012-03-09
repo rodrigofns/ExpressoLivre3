@@ -942,6 +942,33 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         return $attachments;
     }
     
+    // Ignore $_partId
+    public function getDigitalSignature($messageId, $_partId = null)
+    {
+    
+    	$signature = false;
+    
+    	if (! $messageId instanceof Felamimail_Model_Message) {
+    		$message = $this->_backend->get($messageId);
+    	} else {
+    		$message = $messageId;
+    	}
+    
+    	if ($message->smime == Expresso_Smime::TYPE_SIGNED_DATA_VALUE)
+    	{
+    		$imapBackend = $this->_getBackendAndSelectFolder($message->folder_id);
+    
+    		$rawHeaders = $imapBackend->getRawContent($message->messageuid, 'HEADER');
+    		$rawBody = $imapBackend->getRawContent($message->messageuid);
+    		$rawMessage = $rawHeaders . $rawBody;
+    
+    		// do verification
+    		$signature = Expresso_Smime::verifyIntegrity($rawMessage, Tinebase_Core::getTempDir());
+    	}
+    
+    	return  $signature;
+    }    
+    
     /**
      * delete messages from cache by folder
      * 
