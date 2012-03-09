@@ -46,11 +46,11 @@ Tine.Messenger.LogHandler = {
                 var contact = Strophe.getBareJidFromJid(from);
                 var title = $(presence).attr("name") || contact;
                 var message = "";
-
+                
                 if (type != null && type.match(/subscribe/i)) {
                     Tine.Messenger.LogHandler.subscriptionResponse(presence);
                 } else {
-                        if(type === 'unavailable'){
+                    if(type === 'unavailable'){
                         message = _('Unavailable');
                         Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
                     } else {
@@ -76,10 +76,56 @@ Tine.Messenger.LogHandler = {
     
     subscriptionResponse: function (presence) {
         var type = $(presence).attr('type'),
-            from = $(presence).attr('from');
+            from = $(presence).attr('from'),
+            name = $(presence).attr('name') || from,
+            subscription = $(presence).attr('subscription');
         
         if (type == 'subscribed') {
-            Tine.Messenger.LogHandler.status(from, _('Subscribed in your roster'));
+            Tine.Messenger.LogHandler.status(name, _('Accept your subscription'));
+        } else if (type == 'subscribe') {
+            Tine.Messenger.LogHandler.status(name, _('Wants to subscribe you'));
+            Ext.Msg.buttonText.yes = _('Allow');
+            Ext.Msg.buttonText.no = _('Deny');
+            Ext.Msg.minWidth = 300;
+            Ext.Msg.confirm(_('Subscription Approval') + ' - ' + from,
+                            name + ' ' + _('wants to subscribe you.'),
+                            function (id) {
+                                var response;
+                                
+                                if (id == 'yes') {
+                                    response = 'subscribed';
+                                } else if (id == 'no') {
+                                    response = 'unsubscribed';
+                                }
+                                
+                                Tine.Tinebase.appMgr.get('Messenger').getConnection().send(
+                                    $pres({
+                                        to: from,
+                                        type: response
+                                    })
+                                );
+                            }
+            );
+        } else if (type == 'unsubscribed') {
+            Tine.Messenger.LogHandler.status(name, _('Denied/Removed your subscription'));
+        } else {
+            alert('TYPE: ' + type);
+//            Ext.Msg.buttonText.yes = _('Yes');
+//            Ext.Msg.buttonText.no = _('No');
+//            Ext.Msg.minWidth = 300;
+//            Ext.Msg.confirm(_('Unsubscription') + ' - ' + from,
+//                            name + ' ' + _('removed you from roster') + '.<br/>' +
+//                                _('Do you want to remove this contact from your roster too?'),
+//                            function (id) {
+//                                if (id == 'yes') {
+//                                    Tine.Messenger.RosterHandler.removeContact(from);
+//                                } else if (id == 'no') {
+//                                    var contact = Tine.Messenger.RosterHandler.getContactElement(from);
+//                                    Tine.Messenger.RosterHandler.resetStatus(contact);
+//                                    contact.ui.addClass('messenger-contact-unsubscribed');
+//                                }
+//                            }
+//            );
         }
     },
     

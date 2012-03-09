@@ -102,16 +102,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.sendIQ(
                 roster, Tine.Messenger.RosterHandler.onStartRoster
             );
-            
-            // Roster handler
+                
+            // Updating Roster
             Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
+                Tine.Messenger.RosterHandler.onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
 
-            // Log handlers
-//            Tine.Messenger.Application.connection.addHandler(
-//                Tine.Messenger.LogHandler.getPresence, null, 'presence'
-//            );
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );

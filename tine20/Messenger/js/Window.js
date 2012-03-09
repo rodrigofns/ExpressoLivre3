@@ -270,7 +270,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
         addGroupToTree(null,xml);	//add groups
         addBuddyToTree(null,xml);	//add buddys
 
-    }
+    }    
     var addBuddyToTree = function(f,a){
             
         if(f){

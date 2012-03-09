@@ -72,7 +72,7 @@ Tine.Messenger.ChatHandler = {
         var raw_jid = $(message).attr("from"),
             jid = Strophe.getBareJidFromJid(raw_jid),
             name = $(message).attr("name") ||
-                   Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid).text,
+                   Tine.Messenger.RosterHandler.getContactElement(jid).text,
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
         
@@ -82,7 +82,7 @@ Tine.Messenger.ChatHandler = {
         if (body.length === 0) {
             body = $(message).find("body");
         }
-        
+
         // Typing events
         if (paused.length > 0) {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
@@ -91,9 +91,9 @@ Tine.Messenger.ChatHandler = {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
             Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
-            // Shows the chat specifc chat window
+            // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name);
-            
+            // Set received chat message
             Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         }
         
@@ -182,6 +182,7 @@ Tine.Messenger.ChatHandler = {
             width: 300,
             height: 100,
             title: 'Jabber Login',
+            modal: true,
             items: {
                 xtype: 'form',
                 border: false,

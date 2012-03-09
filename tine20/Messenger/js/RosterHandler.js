@@ -19,6 +19,52 @@ Tine.Messenger.RosterHandler = {
         return true;
     },
     
+    onRosterUpdate: function (iq) {
+        try {
+            console.log('ROSTER UPDATING!!!')
+            var query = $(iq).find('query[xmlns="jabber:iq:roster"]'),
+                group = ($(iq).find('group').length > 0) ? 
+                            $(iq).find('group').text() :
+                            null;
+
+            if (query.length > 0) {
+                console.log('Find query jabber:iq:roster');
+                var items = $(query).find('item');
+
+                items.each(function () {
+                    console.log(this);
+                    var jid = $(this).attr('jid'),
+                        name = $(this).attr('name') || jid,
+                        subscription = $(this).attr('subscription'),
+                        ask = $(this).attr('ask'),
+                        contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+
+                    console.log(jid+' / '+name+' / '+subscription+' / '+ask+' / '+group);
+                    // TODO-EXP: Dando erro no REMOVE e ADD (RENAME ok)
+                    if (contact) {
+                        console.log('Contact exist: ' + contact.text + ' (' + jid + ')');
+                        if (subscription == 'remove') {
+                            console.log('Removing '+jid);
+                            Tine.Messenger.RosterHandler.removeContactElement(jid);
+                        } else {
+                            console.log('Renaming '+jid+' to '+name);
+                            Tine.Messenger.RosterHandler.renameContactElement(jid, name);
+                        }
+                    } else {
+                        console.log('Contact DO NOT exist: ' + jid);
+                        console.log('Adding '+name+' ('+jid+')');
+                        Tine.Messenger.RosterHandler.addContactElement(jid, name, group);
+                    }
+                });
+            }
+        } catch (err) {
+            alert('Something go wrong!');
+            console.error(err);
+        }
+        
+        return true;
+    },
+    
     openChat: function(e, t) {
         Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text);
     },
@@ -40,6 +86,29 @@ Tine.Messenger.RosterHandler = {
         contact.removeClass(UNAVAILABLE_CLASS);
         contact.removeClass(AWAY_CLASS);
         contact.removeClass(DONOTDISTURB_CLASS);
+    },
+    
+    addContactElement: function (jid, name, group) {
+        var groupNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', group),
+            newNode = new Ext.tree.TreeNode({
+                id: jid,
+                text: name,
+                cls: 'messenger-contact',
+                allowDrag: true,
+                allowDrop: false
+            });
+            
+        newNode.on("dblclick",Tine.Messenger.RosterHandler.openChat);
+        newNode.on('contextmenu', function (el) {
+            contextMenu.contactId = el.id;
+            contextMenu.show(el.ui.getEl());
+        });
+        
+        groupNode.appendChild(newNode).ui.addClass('messenger-contact-waiting');
+    },
+    
+    renameContactElement: function (jid, name) {
+        Tine.Messenger.RosterHandler.getContactElement(jid).setText(name);
     },
     
     getContactElement: function (jid) {
@@ -134,8 +203,6 @@ Tine.Messenger.RosterHandler = {
         }
                     
         Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
-        
-        Tine.Messenger.RosterHandler.getContactElement(jid).setText(name);
     },
     
     removeContact: function (jid) {
@@ -147,7 +214,5 @@ Tine.Messenger.RosterHandler = {
                     });
                     
         Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
-        
-        Tine.Messenger.RosterHandler.removeContactElement(jid);
     }
 }
