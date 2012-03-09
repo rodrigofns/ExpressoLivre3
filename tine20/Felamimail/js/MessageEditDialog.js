@@ -182,7 +182,7 @@ Ext.namespace('Tine.Felamimail');
             scope: this,
             enableToggle: true
         });
-        this.button_toggleReadingConfirmation = Ext.apply(new Ext.Button(this.action_toogleReadingConfirmation), {
+        this.button_toggleReadingConfirmation = Ext.apply(new Ext.Button(this.action_toggleReadingConfirmation), {
             tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
         });
 
