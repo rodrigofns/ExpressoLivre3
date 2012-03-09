@@ -61,16 +61,12 @@ Tine.Messenger.Window = new Ext.Window({
                                     id: 'messenger-contact-add-group',
                                     fieldLabel: _('Group'),
                                     store: new Ext.data.SimpleStore({
-                                                    data: [
-                                                            [1, 'GROUP 1'],
-                                                            [2, 'GROUP 2'],
-                                                            [3, 'GROUP 3']
-                                                    ],
+                                                    data: [Tine.Messenger.RosterHandler.getUserGroups()],
                                                     id: 0,
-                                                    fields: ['value', 'text']
+                                                    fields: ['text']
                                             }),
                                     emptyText: _('Select a group') + '...',
-                                    valueField: 'value',
+                                    valueField: 'text',
                                     displayField: 'text',
                                     triggerAction: 'all',
                                     editable: false,

@@ -46,28 +46,43 @@ Tine.Messenger.LogHandler = {
                 var contact = Strophe.getBareJidFromJid(from);
                 var title = $(presence).attr("name") || contact;
                 var message = "";
-                if(type === 'unavailable'){
-                    message = _('Unavailable');
-                    Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
+
+                if (type != null && type.match(/subscribe/i)) {
+                    Tine.Messenger.LogHandler.subscriptionResponse(presence);
                 } else {
-                    var show = $(presence).find('show').text();
-                    if(show === '' || show === 'chat'){
-                        message = _('Online');
-                        Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
-                    } else if(show === 'dnd'){
-                        message = _('Do not disturb');
-                        Tine.Messenger.RosterHandler.changeStatus(contact, 'donotdisturb');
+                        if(type === 'unavailable'){
+                        message = _('Unavailable');
+                        Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
                     } else {
-                        message = _('Away');
-                        Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
+                        var show = $(presence).find('show').text();
+                        if(show === '' || show === 'chat'){
+                            message = _('Online');
+                            Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
+                        } else if(show === 'dnd'){
+                            message = _('Do not disturb');
+                            Tine.Messenger.RosterHandler.changeStatus(contact, 'donotdisturb');
+                        } else {
+                            message = _('Away');
+                            Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
+                        }
                     }
+                    Tine.Messenger.LogHandler.status(title, message);
+                    Tine.Messenger.LogHandler.onChatStatusChange(from, title+" "+message);
                 }
-                Tine.Messenger.LogHandler.status(title, message);
-                Tine.Messenger.LogHandler.onChatStatusChange(from, title+" "+message);
             }
         } 
         return true;
     },
+    
+    subscriptionResponse: function (presence) {
+        var type = $(presence).attr('type'),
+            from = $(presence).attr('from');
+        
+        if (type == 'subscribed') {
+            Tine.Messenger.LogHandler.status(from, _('Subscribed in your roster'));
+        }
+    },
+    
     onErrorMessage: function(message){
         var raw_jid = $(message).attr("from");
         var jid = Strophe.getBareJidFromJid(raw_jid);
