@@ -85,11 +85,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // When connecting OK, take off the line below
             Ext.getCmp('messenger-connect-button').setText('Authenticating...');
         } else if (status === Strophe.Status.CONNECTED) {
-            $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
             Tine.Messenger.Log.debug("Connected!");
-            // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
-            Ext.getCmp('messenger-contact-add').enable();
+            
+            // Enable components
+            Tine.Messenger.IM.enableOnConnect();
             
             // START THE HANDLERS
             // Chat Messaging handler
@@ -108,16 +107,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.RosterHandler.onStartRoster, null, "iq", null, "myroster"
             );
 
-            // Log handlers
-//            Tine.Messenger.Application.connection.addHandler(
-//                Tine.Messenger.LogHandler.getPresence, null, 'presence'
-//            );
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );
             
+            // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
-                
+        
             // Start unload events
             window.onbeforeunload = function () {
                 return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
@@ -128,11 +124,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
+            // Disable components
+            Tine.Messenger.IM.disableOnDisconnect();
+            
             Ext.Msg.alert('Expresso Messenger', 'Messenger has been disconnected!');
             Tine.Messenger.RosterHandler.clear();
             window.onbeforeunload = null;
             window.onunload = null;
-            Ext.getCmp('messenger-contact-add').disable();
         } else if (status === Strophe.Status.AUTHFAIL) {
             Ext.Msg.show({
                 title:'Error',
@@ -146,8 +144,30 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     
 });
 
+Tine.Messenger.IM = {
+    enableOnConnect: function(){
+        // Change IM icon
+        $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
+        
+        // When connecting OK, take off the line below
+        Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
+        Ext.getCmp('messenger-contact-add').enable();
+        
+        // Enable action Add Group
+        Ext.getCmp('messenger-group-mngt-add').enable();
+    },
+    disableOnDisconnect: function(){
+        // Change IM icon
+        $("#messenger").parent().removeClass("messenger-icon").addClass("messenger-icon-off");
+        
+        // Disable action Add Group
+        Ext.getCmp('messenger-group-mngt-add').disable();
+        
+        Ext.getCmp('messenger-contact-add').disable();
+    }
+}
+
 Tine.Messenger.Util = {
-    start_time: null,
     
     jidToId: function (jid) {
         return jid.replace(/@/g, "_").replace(/\./g, "-");

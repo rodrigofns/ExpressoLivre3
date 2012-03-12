@@ -138,5 +138,32 @@ Tine.Messenger.RosterHandler = {
         Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
         
         Tine.Messenger.RosterHandler.removeContactElement(jid);
+    },
+    
+    modifyContact: function  (jid, name, group){
+        this.addContact(jid, name, group);
+    },
+    
+    renameGroup: function(gname, n_gname){
+        var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
+        Tine.Messenger.Log.debug("Renomeando o grupo de '"+gname+"' para '"+n_gname+"'");
+        for(i=0; i < grpNode.childNodes.length; i++){
+            var buddy = grpNode.childNodes[i];
+            this.modifyContact(buddy.attributes.jid, buddy.attributes.text, n_gname)
+        }
+        grpNode.setText(n_gname);
+    },
+    
+    moveContactFromGroups: function(jid, new_group){
+        var buddy = this.getContactElement(jid);
+        var group = this.getContactElementGroup(jid);
+        var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', new_group);
+        
+        if(group != new_group){
+            buddy.parentNode.removeChild(buddy);
+            grpNode.appendChild(buddy);
+            this.modifyContact(jid, buddy.text, group);
+        }
+        
     }
 }

@@ -24,6 +24,53 @@ Tine.Messenger.Window = new Ext.Window({
     closeAction: 'hide', //'close' - destroy the component
     plain:       true,
     layout:      'fit',
+    tbar: [{
+                text:'Actions',
+                menu: {
+                    id:"BuddysMenu",
+                    items:[{
+                                id: 'messenger-group-mngt-add',
+                                text: 'Add Group',
+                                icon: '/images/messenger/group_add.png',
+                                disabled: true,
+                                handler: function(){
+                                   var addGroupWindow = new Ext.Window({
+                                            closeAction: 'close',
+                                            layout: 'fit',
+                                            plain: true,
+                                            modal: true,
+                                            title: _('Add Group'),
+                                            items: [{
+                                                    xtype: 'form',
+                                                    border: false,
+                                                    items: [
+                                                        {
+                                                            xtype: 'textfield',
+                                                            id: 'messenger-group-mngt-name',
+                                                            fieldLabel: _('Name')
+                                                        },
+                                                        {
+                                                            xtype: 'button',
+                                                            id: 'messenger-group-mngt-button',
+                                                            text: _('Add'),
+                                                            listeners: {
+                                                                click: function () {
+                                                                    var name = Ext.getCmp('messenger-group-mngt-name').getValue();
+                                                                    Tine.Messenger.Window.RosterTree().addGroup(name);
+                                                                    addGroupWindow.close();
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        });
+                                        addGroupWindow.show();
+                                }
+                                
+                        }]
+                    }
+    }],
     
     items:       roster,
     
@@ -263,6 +310,16 @@ var contextMenu = new Ext.menu.Menu({
                                     }
                 );
             }
+        },
+        {
+            text: 'Move to',
+            icon: '/images/messenger/group_go.png',
+            handler: function (choice, ev) {
+                var jid = choice.parentMenu.contactId;
+                var new_group = "Friends";
+                
+//                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, new_group);
+            }
         }
     ]
 });
@@ -398,6 +455,12 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                 allowDrag:false,
                                 "gname":_group_name
                 });
+                if(_group_name != NO_GROUP){
+                    _group.on('contextmenu', function (el) {
+                        contextMenuGrp.gname = el.text;
+                        contextMenuGrp.show(el.ui.getEl());
+                    });
+                }
                 Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
             }
         }else{
@@ -414,6 +477,10 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                     allowDrag:false,
                                     "gname":_group_name
                     });
+                    _group.on('contextmenu', function (el) {
+                        contextMenuGrp.gname = el.text;
+                        contextMenuGrp.show(el.ui.getEl());
+                    });
                     Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
                 }
             });
@@ -429,6 +496,69 @@ Tine.Messenger.Window.RosterTree = function(iq){
         },
         addGroup: function(e){
             addGroupToTree(e);
+        },
+        getGroupsFromTree: function (){
+            var groups = [];
+            var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+            for(i=0; i < rootNode.childNodes.length ; i++){
+                if(rootNode.childNodes[i].text != 'No groups'){
+                    groups.push(rootNode.childNodes[i].text);
+                }
+            }
+            return groups;
         }
     }
 }
+
+
+var contextMenuGrp = new Ext.menu.Menu({
+    floating: true,
+    items:[{
+        text:'edit',
+        icon:"/images/messenger/group_edit.png",
+        handler: function (choice, ev) {
+            var gname = choice.parentMenu.gname;
+            choice.parentMenu.hide();
+
+            var renameGroupWindow = new Ext.Window({
+                closeAction: 'close',
+                layout: 'fit',
+                plain: true,
+                modal: true,
+                title: _('Rename Group') + ' - ' + gname,
+                items: [
+                    {
+                        xtype: 'form',
+                        border: false,
+                        items: [
+                            {
+                                xtype: 'textfield',
+                                id: 'messenger-group-mngt-name',
+                                fieldLabel: _('Name')
+                            },
+                            {
+                                xtype: 'button',
+                                id: 'messenger-group-mngt-button',
+                                text: _('Rename it!'),
+                                        listeners: {
+                                            click: function () {
+                                                var n_gname = Ext.getCmp('messenger-group-mngt-name').getValue();
+                                                Tine.Messenger.RosterHandler.renameGroup(gname, n_gname);
+                                                renameGroupWindow.close();
+                                            }
+                                        }
+                            }
+                        ]
+                    }
+                ]
+            });
+            renameGroupWindow.show();
+        }
+    },{
+        text:'delete',
+//                handler:ExtJame.backend.Connection.removeGroup,
+//                node:_node,
+        icon:"/images/messenger/group_delete.png"
+    }]
+
+});
