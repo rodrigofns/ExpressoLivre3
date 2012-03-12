@@ -316,9 +316,9 @@ var contextMenu = new Ext.menu.Menu({
             icon: '/images/messenger/group_go.png',
             handler: function (choice, ev) {
                 var jid = choice.parentMenu.contactId;
-                var new_group = "Friends";
-                
-//                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, new_group);
+                var new_group = "Colegas";
+                //TODO: Implements submenu options
+                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, new_group);
             }
         }
     ]
@@ -356,8 +356,8 @@ Tine.Messenger.Window.RosterTree = function(iq){
 //                            icon:"/images/messenger/icon_"+status+".png",
                             cls:'messenger-contact',
                             allowDrag:true,
-                            allowDrop:false
-//                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
+                            allowDrop:false,
+                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>"
             });
             _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
             _buddy.on('contextmenu', function (el) {
@@ -367,7 +367,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
 
             var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
-            if(item.children("group").length > 0){
+            if(item.children("group").text().trim().length > 0){
                 item.children("group").each(function(g){
                     for(i=0; i < rootNode.childNodes.length; i++){
                         if(rootNode.childNodes[i].text == item.text()){
@@ -401,8 +401,8 @@ Tine.Messenger.Window.RosterTree = function(iq){
 //                                icon:"/images/messenger/icon_"+status+".png",
                                 cls:'messenger-contact',
                                 allowDrag:true,
-                                allowDrop:false
-//                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
+                                allowDrop:false,
+                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>"
                 });
                 _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
                 _buddy.on('contextmenu', function (el) {
@@ -411,7 +411,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                 });
                 var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
-                if($(this).children("group").length > 0){
+                if($(this).children("group").text().trim().length > 0){
                     var i=0;
                     $(this).children("group").each(function(g){
                         for(i=0; i < rootNode.childNodes.length; i++){
@@ -467,21 +467,23 @@ Tine.Messenger.Window.RosterTree = function(iq){
             var _arr_groups = [];
             $(a).find("group").each(function(){
                 _group_name = $(this).text();
-                if($.inArray(_group_name, _arr_groups) === -1){
-                    _arr_groups.push(_group_name);
-                    var _group = new Ext.tree.TreeNode({ 
-                                    text:_group_name,
-                                    iconCls:"display:none;",
-                                    expanded:true,
-                                    expandable:true,
-                                    allowDrag:false,
-                                    "gname":_group_name
-                    });
-                    _group.on('contextmenu', function (el) {
-                        contextMenuGrp.gname = el.text;
-                        contextMenuGrp.show(el.ui.getEl());
-                    });
-                    Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
+                if(_group_name.trim() != ''){
+                    if($.inArray(_group_name, _arr_groups) === -1){
+                        _arr_groups.push(_group_name);
+                        var _group = new Ext.tree.TreeNode({ 
+                                        text:_group_name,
+                                        iconCls:"display:none;",
+                                        expanded:true,
+                                        expandable:true,
+                                        allowDrag:false,
+                                        "gname":_group_name
+                        });
+                        _group.on('contextmenu', function (el) {
+                            contextMenuGrp.gname = el.text;
+                            contextMenuGrp.show(el.ui.getEl());
+                        });
+                        Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
+                    }
                 }
             });
         }
@@ -543,6 +545,7 @@ var contextMenuGrp = new Ext.menu.Menu({
                                         listeners: {
                                             click: function () {
                                                 var n_gname = Ext.getCmp('messenger-group-mngt-name').getValue();
+                                                //TODO: Check there's no group with same name
                                                 Tine.Messenger.RosterHandler.renameGroup(gname, n_gname);
                                                 renameGroupWindow.close();
                                             }
@@ -556,9 +559,23 @@ var contextMenuGrp = new Ext.menu.Menu({
         }
     },{
         text:'delete',
-//                handler:ExtJame.backend.Connection.removeGroup,
-//                node:_node,
-        icon:"/images/messenger/group_delete.png"
+        icon:"/images/messenger/group_delete.png",
+        handler: function (choice, ev) {
+            var grp_name = choice.parentMenu.gname;
+            choice.parentMenu.hide();
+
+            Ext.Msg.buttonText.yes = _('Yes');
+            Ext.Msg.buttonText.no = _('No');
+            Ext.Msg.minWidth = 300;
+            Ext.Msg.confirm(_('Delete Group') + ' - ' + grp_name,
+                                _('Are you sure to delete ' + grp_name + '?'),
+                                function (id) {
+                                    if (id == 'yes') {
+                                        Tine.Messenger.RosterHandler.removeGroup(grp_name);
+                                    }
+                                }
+            );
+        }
     }]
 
 });
