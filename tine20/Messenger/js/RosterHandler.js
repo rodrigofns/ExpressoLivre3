@@ -4,55 +4,52 @@ Tine.Messenger.RosterHandler = {
     onStartRoster: function(iq) {
         Tine.Messenger.Log.info("Getting roster...");
         
-        // Building initial Users and Groups Tree
-        new Tine.Messenger.Window.RosterTree(iq).init();
-  
-        // Send user presence
-        Tine.Messenger.Application.connection.send($pres());
-        // Modify Main Menu status
-        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
-        // Adding handler for roster presence
-        Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
-            Tine.Messenger.LogHandler.getPresence, null, 'presence'
-        );
-            
+        try {
+            // Building initial Users and Groups Tree
+            new Tine.Messenger.Window.RosterTree(iq).init();
+
+            // Send user presence
+            Tine.Messenger.Application.connection.send($pres());
+            // Modify Main Menu status
+            Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
+            // Adding handler for roster presence
+            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+                Tine.Messenger.LogHandler.getPresence, 'jabber:client', 'presence'
+            );
+        } catch (e) {
+            alert('Something went wrong!\n'+e.getMessage());
+            console.log(e);
+        }
+        
+        Tine.Messenger.Log.info("ROSTER OK");
+        
         return true;
     },
     
     onRosterUpdate: function (iq) {
         try {
-            console.log('ROSTER UPDATING!!!')
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]'),
                 group = ($(iq).find('group').length > 0) ? 
                             $(iq).find('group').text() :
                             null;
 
             if (query.length > 0) {
-                console.log('Find query jabber:iq:roster');
                 var items = $(query).find('item');
 
                 items.each(function () {
-                    console.log(this);
                     var jid = $(this).attr('jid'),
                         name = $(this).attr('name') || jid,
                         subscription = $(this).attr('subscription'),
                         ask = $(this).attr('ask'),
                         contact = Tine.Messenger.RosterHandler.getContactElement(jid);
 
-                    console.log(jid+' / '+name+' / '+subscription+' / '+ask+' / '+group);
-                    // TODO-EXP: Dando erro no REMOVE e ADD (RENAME ok)
                     if (contact) {
-                        console.log('Contact exist: ' + contact.text + ' (' + jid + ')');
                         if (subscription == 'remove') {
-                            console.log('Removing '+jid);
                             Tine.Messenger.RosterHandler.removeContactElement(jid);
                         } else {
-                            console.log('Renaming '+jid+' to '+name);
                             Tine.Messenger.RosterHandler.renameContactElement(jid, name);
                         }
                     } else {
-                        console.log('Contact DO NOT exist: ' + jid);
-                        console.log('Adding '+name+' ('+jid+')');
                         Tine.Messenger.RosterHandler.addContactElement(jid, name, group);
                     }
                 });
@@ -75,21 +72,29 @@ Tine.Messenger.RosterHandler = {
     },
     
     changeStatus: function (jid, status) {
-        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        var contact;
+
+        if (typeof jid == 'string')
+            contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        else
+            contact = jid;
         
         Tine.Messenger.RosterHandler.resetStatus(contact.ui);
-        contact.ui.addClass('messenger-contact-' + status);
+        contact.ui.addClass(status);
     },
     
     resetStatus: function (contact) {
         contact.removeClass(AVAILABLE_CLASS);
         contact.removeClass(UNAVAILABLE_CLASS);
         contact.removeClass(AWAY_CLASS);
-        contact.removeClass(DONOTDISTURB_CLASS);
+        contact.removeClass(DONOTDISTURB_CLASS);        
+        contact.removeClass(WAITING_CLASS);
+        contact.removeClass(UNSUBSCRIBED_CLASS);
     },
     
     addContactElement: function (jid, name, group) {
-        var groupNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', group),
+        var jid_group = group || _('No group'),
+            groupNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', jid_group),
             newNode = new Ext.tree.TreeNode({
                 id: jid,
                 text: name,
@@ -104,7 +109,8 @@ Tine.Messenger.RosterHandler = {
             contextMenu.show(el.ui.getEl());
         });
         
-        groupNode.appendChild(newNode).ui.addClass('messenger-contact-waiting');
+        groupNode.appendChild(newNode);
+        Tine.Messenger.RosterHandler.changeStatus(newNode, WAITING_CLASS);
     },
     
     renameContactElement: function (jid, name) {
@@ -113,11 +119,13 @@ Tine.Messenger.RosterHandler = {
     
     getContactElement: function (jid) {
         var rootNode = Ext.getCmp('messenger-roster').getRootNode();
-        for(i=0; i < rootNode.childNodes.length ; i++){
+        
+        for(var i = 0; i < rootNode.childNodes.length ; i++){
             var buddy = rootNode.childNodes[i].findChild('id', jid);
             if(buddy != null)
                 return buddy;
         }
+        
         return null;
     },
     
@@ -139,7 +147,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     removeContactElement: function (jid) {
-        Tine.Messenger.RosterHandler.getContactElement(jid).remove(true);
+        Tine.Messenger.RosterHandler.getContactElement(jid).remove();
     },
     
     isContactAvailable: function (jid) {
@@ -187,6 +195,8 @@ Tine.Messenger.RosterHandler = {
                 type: 'subscribe'
             })
         );
+            
+        Tine.Messenger.RosterHandler.contact_added = jid;
     },
     
     renameContact: function (jid, name) {

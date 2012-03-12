@@ -181,7 +181,7 @@ Tine.Messenger.ChatHandler = {
             plain: true,
             width: 300,
             height: 100,
-            title: 'Jabber Login',
+            title: 'Expresso Messenger Login',
             modal: true,
             items: {
                 xtype: 'form',
@@ -203,21 +203,17 @@ Tine.Messenger.ChatHandler = {
                         text: 'GO',
                         listeners: {
                             click: function () {
-                                var user = Ext.getCmp('messenger-connect-login').getValue();
-
-                                if (user.indexOf('@') < 0) {
-                                    user += '@simdev.sdr.serpro/expresso-3.0';
-                                }                                        
-                                if (user.indexOf('expresso-3.0') < 0) {
-                                    user += '/expresso-3.0';
-                                }
-                                Tine.Tinebase.registry.add('messengerAccount', {
-                                    login: user,
-                                    password: Ext.getCmp('messenger-connect-pwd').getValue()
-                                });
-                                Ext.getCmp('messenger-connect-window').close();
-                                Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+                                messengerLogin();
                             }
+                        }
+                    }
+                ],
+                
+                keys: [
+                    {
+                        key: [Ext.EventObject.ENTER],
+                        handler: function () {
+                            messengerLogin();
                         }
                     }
                 ]
@@ -226,4 +222,21 @@ Tine.Messenger.ChatHandler = {
         login.show();
     }
     
+}
+
+function messengerLogin() {
+    var user = Ext.getCmp('messenger-connect-login').getValue();
+
+    if (user.indexOf('@') < 0) {
+        user += '@simdev.sdr.serpro/expresso-3.0';
+    }                                        
+    if (user.indexOf('expresso-3.0') < 0) {
+        user += '/expresso-3.0';
+    }
+    Tine.Tinebase.registry.add('messengerAccount', {
+        login: user,
+        password: Ext.getCmp('messenger-connect-pwd').getValue()
+    });
+    Ext.getCmp('messenger-connect-window').close();
+    Tine.Tinebase.appMgr.get('Messenger').startMessenger();
 }

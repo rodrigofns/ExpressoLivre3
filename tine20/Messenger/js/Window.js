@@ -200,7 +200,7 @@ var contextMenu = new Ext.menu.Menu({
             icon: '/images/messenger/user_edit.png',
             handler: function (choice, ev) {
                 var jid = choice.parentMenu.contactId;
-
+                console.log('Renaming '+jid);
                 choice.parentMenu.hide();
 
                 var renameContactWindow = new Ext.Window({
@@ -222,10 +222,11 @@ var contextMenu = new Ext.menu.Menu({
                                 {
                                     xtype: 'button',
                                     id: 'messenger-contact-mngt-button',
-                                    text: _('Rename it!'),
+                                    text: _('Rename!'),
                                     listeners: {
                                         click: function () {
                                             var name = Ext.getCmp('messenger-contact-mngt-name').getValue();
+                                            console.log('Changing '+jid+' name to '+name);
                                             Tine.Messenger.RosterHandler.renameContact(jid, name);
                                             renameContactWindow.close();
                                         }
@@ -277,7 +278,8 @@ Tine.Messenger.Window.RosterTree = function(iq){
             var item = $(f).find("item");
             var jid = item.attr("jid"),
                 label = item.attr("name") || jid,
-                subscription = item.attr("subscription");
+                subscription = item.attr("subscription"),
+                ask = item.attr('ask');
             var appended = false;
             var status = '';
             var status_text = '';
@@ -298,6 +300,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                             allowDrop:false
 //                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
             });
+            console.log('ROSTER: '+jid+' / '+subscription+' / '+ask);
             _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
             _buddy.on('contextmenu', function (el) {
                 contextMenu.contactId = el.id;
@@ -308,22 +311,37 @@ Tine.Messenger.Window.RosterTree = function(iq){
 
             if(item.children("group").length > 0){
                 item.children("group").each(function(g){
-                    for(i=0; i < rootNode.childNodes.length; i++){
+                    for(var i=0; i < rootNode.childNodes.length; i++){
                         if(rootNode.childNodes[i].text == item.text()){
-                            rootNode.childNodes[i].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                            rootNode.childNodes[i].appendChild(_buddy);
                             appended = true;
+                            if (subscription == 'none') {
+                                if (ask == null)
+                                    Tine.Messenger.RosterHandler.changeStatus(_buddy, UNSUBSCRIBED_CLASS);
+                                else
+                                    Tine.Messenger.RosterHandler.changeStatus(_buddy, WAITING_CLASS);
+                            } else
+                                Tine.Messenger.RosterHandler.changeStatus(_buddy, UNAVAILABLE_CLASS);
                         }
                     }
                 });
             }
             if(!appended){
-                rootNode.appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                rootNode.appendChild(_buddy);
+                if (subscription == 'none') {
+                    if (ask == null)
+                        Tine.Messenger.RosterHandler.changeStatus(_buddy, UNSUBSCRIBED_CLASS);
+                    else
+                        Tine.Messenger.RosterHandler.changeStatus(_buddy, WAITING_CLASS);
+                } else
+                    Tine.Messenger.RosterHandler.changeStatus(_buddy, UNAVAILABLE_CLASS);
             }
         }else{
             $(a).find("item").each(function () {
                 var jid = $(this).attr("jid"),
                     label = $(this).attr("name") || jid,
-                    subscription = $(this).attr("subscription");
+                    subscription = $(this).attr("subscription"),
+                    ask = $(this).attr('ask');
                 var status = '';
                 var status_text = '';
 
@@ -343,6 +361,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                 allowDrop:false
 //                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>Text : "+status_text+"<br/>Subscription : "+subscription
                 });
+                console.log('ROSTER: '+jid+' / '+subscription+' / '+ask);
                 _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
                 _buddy.on('contextmenu', function (el) {
                     contextMenu.contactId = el.id;
@@ -351,19 +370,25 @@ Tine.Messenger.Window.RosterTree = function(iq){
                 var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
                 if($(this).children("group").length > 0){
-                    var i=0;
                     $(this).children("group").each(function(g){
-                        for(i=0; i < rootNode.childNodes.length; i++){
+                        for(var i=0; i < rootNode.childNodes.length; i++){
                             if(rootNode.childNodes[i].text == $(this).text()){
-                                rootNode.childNodes[i].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                                rootNode.childNodes[i].appendChild(_buddy);
                                 appended = true;
+                                if (subscription == 'none') {
+                                    if (ask == null)
+                                        Tine.Messenger.RosterHandler.changeStatus(_buddy, UNSUBSCRIBED_CLASS);
+                                    else
+                                        Tine.Messenger.RosterHandler.changeStatus(_buddy, WAITING_CLASS);
+                                } else
+                                    Tine.Messenger.RosterHandler.changeStatus(_buddy, UNAVAILABLE_CLASS);
                             }
                         }
                     });
                 } else {
                     var hasGroupNoGroup = false;
                     var node = -1;
-                    for(i=0; i < rootNode.childNodes.length; i++){
+                    for(var i=0; i < rootNode.childNodes.length; i++){
                         if(rootNode.childNodes[i].text == _(NO_GROUP)){
                             hasGroupNoGroup = true;
                             node = i;
@@ -372,9 +397,23 @@ Tine.Messenger.Window.RosterTree = function(iq){
                     if(!hasGroupNoGroup){
                         Tine.Messenger.Window.RosterTree().addGroup(_(NO_GROUP));
                         node = Ext.getCmp('messenger-roster').getRootNode().childNodes.length - 1;
-                        Ext.getCmp('messenger-roster').getRootNode().childNodes[node].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                        Ext.getCmp('messenger-roster').getRootNode().childNodes[node].appendChild(_buddy);
+                        if (subscription == 'none') {
+                            if (ask == null)
+                                Tine.Messenger.RosterHandler.changeStatus(_buddy, UNSUBSCRIBED_CLASS);
+                            else
+                                Tine.Messenger.RosterHandler.changeStatus(_buddy, WAITING_CLASS);
+                        } else
+                            Tine.Messenger.RosterHandler.changeStatus(_buddy, UNAVAILABLE_CLASS);
                     } else {
-                        rootNode.childNodes[node].appendChild(_buddy).ui.addClass('messenger-contact-unavailable');
+                        rootNode.childNodes[node].appendChild(_buddy);
+                        if (subscription == 'none') {
+                            if (ask == null)
+                                Tine.Messenger.RosterHandler.changeStatus(_buddy, UNSUBSCRIBED_CLASS);
+                            else
+                                Tine.Messenger.RosterHandler.changeStatus(_buddy, WAITING_CLASS);
+                        } else
+                            Tine.Messenger.RosterHandler.changeStatus(_buddy, UNAVAILABLE_CLASS);
                     }
                 }
             });

@@ -42,9 +42,8 @@ Tine.Messenger.LogHandler = {
         
         if (type !== 'error'){
             if(to !== from){
-                //var contact = Tine.Messenger.Util.jidToId(from);
-                var contact = Strophe.getBareJidFromJid(from);
-                var title = $(presence).attr("name") || contact;
+                var jid = Strophe.getBareJidFromJid(from);
+                var title = $(presence).attr("name") || jid;
                 var message = "";
                 
                 if (type != null && type.match(/subscribe/i)) {
@@ -52,33 +51,33 @@ Tine.Messenger.LogHandler = {
                 } else {
                     if(type === 'unavailable'){
                         message = _('Unavailable');
-                        Tine.Messenger.RosterHandler.changeStatus(contact, 'unavailable');
+                        Tine.Messenger.RosterHandler.changeStatus(jid, UNAVAILABLE_CLASS);
                     } else {
                         var show = $(presence).find('show').text();
-                        if(show === '' || show === 'chat'){
-                            message = _('Online');
-                            Tine.Messenger.RosterHandler.changeStatus(contact, 'available');
+                        if(show == 'away') {
+                            message = _('Away');
+                            Tine.Messenger.RosterHandler.changeStatus(jid, AWAY_CLASS);
                         } else if(show === 'dnd'){
                             message = _('Do not disturb');
-                            Tine.Messenger.RosterHandler.changeStatus(contact, 'donotdisturb');
+                            Tine.Messenger.RosterHandler.changeStatus(jid, DONOTDISTURB_CLASS);
                         } else {
-                            message = _('Away');
-                            Tine.Messenger.RosterHandler.changeStatus(contact, 'away');
+                            message = _('Online');
+                            Tine.Messenger.RosterHandler.changeStatus(jid, AVAILABLE_CLASS);
                         }
                     }
                     Tine.Messenger.LogHandler.status(title, message);
                     Tine.Messenger.LogHandler.onChatStatusChange(from, title+" "+message);
                 }
             }
-        } 
+        }
+
         return true;
     },
     
     subscriptionResponse: function (presence) {
         var type = $(presence).attr('type'),
             from = $(presence).attr('from'),
-            name = $(presence).attr('name') || from,
-            subscription = $(presence).attr('subscription');
+            name = $(presence).attr('name') || $(presence).find('nick').text() || from;
         
         if (type == 'subscribed') {
             Tine.Messenger.LogHandler.status(name, _('Accept your subscription'));
@@ -104,28 +103,48 @@ Tine.Messenger.LogHandler = {
                                         type: response
                                     })
                                 );
+                                // Send a subscription back!
+                                if (Tine.Messenger.RosterHandler.contact_added != from) {
+                                    Ext.Msg.buttonText.yes = _('Yes');
+                                    Ext.Msg.buttonText.no = _('Later');
+                                    Ext.Msg.minWidth = 300;
+                                    Ext.Msg.confirm(_('Send Subscription Back') + ' - ' + from,
+                                                    _('Do you want to subscribe ') + name + ' ' + _('too') + '?',
+                                                    function (id) {
+                                                        if (id == 'yes') {
+                                                            Tine.Tinebase.appMgr.get('Messenger').getConnection().send(
+                                                                $pres({
+                                                                    to: from,
+                                                                    type: 'subscribe',
+                                                                    name: name
+                                                                })
+                                                            );
+                                                        }
+                                                    }
+                                    );
+                                    Tine.Messenger.RosterHandler.contact_added = null;
+                                }
                             }
             );
         } else if (type == 'unsubscribed') {
             Tine.Messenger.LogHandler.status(name, _('Denied/Removed your subscription'));
         } else {
-            alert('TYPE: ' + type);
-//            Ext.Msg.buttonText.yes = _('Yes');
-//            Ext.Msg.buttonText.no = _('No');
-//            Ext.Msg.minWidth = 300;
-//            Ext.Msg.confirm(_('Unsubscription') + ' - ' + from,
-//                            name + ' ' + _('removed you from roster') + '.<br/>' +
-//                                _('Do you want to remove this contact from your roster too?'),
-//                            function (id) {
-//                                if (id == 'yes') {
-//                                    Tine.Messenger.RosterHandler.removeContact(from);
-//                                } else if (id == 'no') {
-//                                    var contact = Tine.Messenger.RosterHandler.getContactElement(from);
-//                                    Tine.Messenger.RosterHandler.resetStatus(contact);
-//                                    contact.ui.addClass('messenger-contact-unsubscribed');
-//                                }
-//                            }
-//            );
+            Ext.Msg.buttonText.yes = _('Yes');
+            Ext.Msg.buttonText.no = _('No');
+            Ext.Msg.minWidth = 300;
+            Ext.Msg.confirm(_('Unsubscription') + ' - ' + from,
+                            name + ' ' + _('removed you from roster') + '.<br/>' +
+                                _('Do you want to remove this contact from your roster too?'),
+                            function (id) {
+                                if (id == 'yes') {
+                                    Tine.Messenger.RosterHandler.removeContact(from);
+                                } else if (id == 'no') {
+                                    var contact = Tine.Messenger.RosterHandler.getContactElement(from);
+                                    Tine.Messenger.RosterHandler.resetStatus(contact);
+                                    Tine.Messenger.RosterHandler.changeStatus(contact, UNSUBSCRIBED_CLASS);
+                                }
+                            }
+            );
         }
     },
     
