@@ -109,6 +109,28 @@
     color: red;
 }
 
+.messenger-contact-unsubscribed {
+    background-image: url(/images/messenger/icon_cancel.png);
+    background-repeat: no-repeat;
+    font-weight: bold;
+    background-position-x: 15px
+}
+
+.messenger-contact-unsubscribed span[unselectable] {
+    color: #B3B3B3;
+}
+
+.messenger-contact-waiting {
+    background-image: url(/images/messenger/icon_question.png);
+    background-repeat: no-repeat;
+    font-weight: bold;
+    background-position-x: 15px
+}
+
+.messenger-contact-waiting span[unselectable] {
+    color: #B3B3B3;
+}
+
 .x-tree-lines .x-tree-elbow {
     background-image: none !important;
     width: 0 !important;

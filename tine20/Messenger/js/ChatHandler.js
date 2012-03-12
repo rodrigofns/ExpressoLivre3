@@ -72,7 +72,7 @@ Tine.Messenger.ChatHandler = {
         var raw_jid = $(message).attr("from"),
             jid = Strophe.getBareJidFromJid(raw_jid),
             name = $(message).attr("name") ||
-                   Ext.getCmp('messenger-roster').getRootNode().findChild('id', jid).text,
+                   Tine.Messenger.RosterHandler.getContactElement(jid).text,
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
         
@@ -82,7 +82,7 @@ Tine.Messenger.ChatHandler = {
         if (body.length === 0) {
             body = $(message).find("body");
         }
-        
+
         // Typing events
         if (paused.length > 0) {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
@@ -91,9 +91,9 @@ Tine.Messenger.ChatHandler = {
             Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
             Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
-            // Shows the chat specifc chat window
+            // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name);
-            
+            // Set received chat message
             Tine.Messenger.ChatHandler.setChatMessage(jid, body.text(), name, 'messenger-receive');
         }
         
@@ -181,7 +181,8 @@ Tine.Messenger.ChatHandler = {
             plain: true,
             width: 300,
             height: 100,
-            title: 'Jabber Login',
+            title: 'Expresso Messenger Login',
+            modal: true,
             items: {
                 xtype: 'form',
                 border: false,
@@ -202,21 +203,17 @@ Tine.Messenger.ChatHandler = {
                         text: 'GO',
                         listeners: {
                             click: function () {
-                                var user = Ext.getCmp('messenger-connect-login').getValue();
-
-                                if (user.indexOf('@') < 0) {
-                                    user += '@simdev.sdr.serpro/expresso-3.0';
-                                }                                        
-                                if (user.indexOf('expresso-3.0') < 0) {
-                                    user += '/expresso-3.0';
-                                }
-                                Tine.Tinebase.registry.add('messengerAccount', {
-                                    login: user,
-                                    password: Ext.getCmp('messenger-connect-pwd').getValue()
-                                });
-                                Ext.getCmp('messenger-connect-window').close();
-                                Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+                                messengerLogin();
                             }
+                        }
+                    }
+                ],
+                
+                keys: [
+                    {
+                        key: [Ext.EventObject.ENTER],
+                        handler: function () {
+                            messengerLogin();
                         }
                     }
                 ]
@@ -225,4 +222,21 @@ Tine.Messenger.ChatHandler = {
         login.show();
     }
     
+}
+
+function messengerLogin() {
+    var user = Ext.getCmp('messenger-connect-login').getValue();
+
+    if (user.indexOf('@') < 0) {
+        user += '@simdev.sdr.serpro/expresso-3.0';
+    }                                        
+    if (user.indexOf('expresso-3.0') < 0) {
+        user += '/expresso-3.0';
+    }
+    Tine.Tinebase.registry.add('messengerAccount', {
+        login: user,
+        password: Ext.getCmp('messenger-connect-pwd').getValue()
+    });
+    Ext.getCmp('messenger-connect-window').close();
+    Tine.Tinebase.appMgr.get('Messenger').startMessenger();
 }
