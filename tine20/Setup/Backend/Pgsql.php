@@ -219,7 +219,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 					 */
 					public function addCol($_tableName, Setup_Backend_Schema_Field_Abstract $_declaration, $_position = NULL)
 					{
-						$statement = "ALTER TABLE '" . SQL_TABLE_PREFIX . $_tableName . "' ADD COLUMN " ;
+						$statement = 'ALTER TABLE "' . SQL_TABLE_PREFIX . $_tableName . '" ADD COLUMN ' ;
 
 						$statement .= $this->getFieldDeclarations($_declaration);
 
@@ -227,8 +227,8 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 							if ($_position == 0) {
 								$statement .= ' FIRST ';
 							} else {
-								$before = $this->execQuery('DESCRIBE \'' . SQL_TABLE_PREFIX . $_tableName . '\' ');
-								$statement .= ' AFTER \'' . $before[$_position]['Field'] . '\'';
+								$before = $this->execQuery('DESCRIBE "' . SQL_TABLE_PREFIX . $_tableName . '" ');
+								$statement .= ' AFTER "' . $before[$_position]['Field'] . '"';
 							}
 						}
 
@@ -267,7 +267,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 					 */
 					public function addIndex($_tableName ,  Setup_Backend_Schema_Index_Abstract $_declaration)
 					{
-						$statement = "ALTER TABLE '" . SQL_TABLE_PREFIX . $_tableName . "' ADD "
+						$statement = 'ALTER TABLE "' . SQL_TABLE_PREFIX . $_tableName . '" ADD '
 						. $this->getIndexDeclarations($_declaration);
 						$this->execQueryVoid($statement);
 					}

@@ -171,7 +171,7 @@ Ext.namespace('Tine.Felamimail');
                 dropElSelector: null
             }],
             handler: function (fileSelector, e) {
-        var uploader = new Ext.ux.file.Uploader({
+        var uploader = new Ext.ux.file.Upload({
             maxFileSize: 67108864, // 64MB
             fileSelector: fileSelector
         });
@@ -695,7 +695,7 @@ Ext.namespace('Tine.Felamimail');
         var attachmentData = null;
         
         this.attachmentGrid.store.each(function(attachment) {
-            this.record.data.attachments.push(Ext.ux.file.Uploader.file.getFileData(attachment));
+            this.record.data.attachments.push(Ext.ux.file.Upload.file.getFileData(attachment));
         }, this);
         
         var accountId = this.accountCombo.getValue();
