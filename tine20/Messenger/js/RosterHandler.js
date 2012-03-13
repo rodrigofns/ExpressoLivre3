@@ -225,29 +225,73 @@ Tine.Messenger.RosterHandler = {
         Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
     },
     
-    modifyContact: function  (jid, name, group){
-        this.addContact(jid, name, group);
+    modifyContacts: function  (buddys){
+        for(i=0; i<buddys.length; i++){
+            var attr = buddys[i];
+            var iq = $iq({type: "set"})
+                            .c("query", {"xmlns": "jabber:iq:roster"})
+                            .c("item", {
+                                jid: attr[0],
+                                name: attr[1]
+                            })
+                            .c("group", {}, attr[2]);
+
+                Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
+        }
     },
     
     renameGroup: function(gname, n_gname){
         var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
-        Tine.Messenger.Log.debug("Renomeando o grupo de '"+gname+"' para '"+n_gname+"'");
-        for(i=0; i < grpNode.childNodes.length; i++){
+        Tine.Messenger.Log.debug("Renaming from '"+gname+"' to '"+n_gname+"'");
+        
+        var length = grpNode.childNodes.length;
+        var buddys = [];
+        for(i=0; i < length; i++){
             var buddy = grpNode.childNodes[i];
-            this.modifyContact(buddy.attributes.jid, buddy.attributes.text, n_gname)
+            var attr = [];
+            attr[0] = buddy.attributes.jid;
+            attr[1] = buddy.text;
+            attr[2] = n_gname;
+            buddys[i] = attr;
         }
+        Tine.Messenger.RosterHandler.modifyContacts(buddys);
         grpNode.setText(n_gname);
     },
     
     moveContactFromGroups: function(jid, new_group){
-        var buddy = this.getContactElement(jid);
-        var group = this.getContactElementGroup(jid);
-        var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', new_group);
-        
+        var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
+        var group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
         if(group != new_group){
+            var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text', new_group);
+            var buddys = [], attr = [];
+            attr[0] = buddy.attributes.jid;
+            attr[1] = buddy.text;
+            attr[2] = new_group;
+            buddys[0] = attr;
+            
+            Tine.Messenger.RosterHandler.modifyContacts(buddys);
             buddy.parentNode.removeChild(buddy);
             grpNode.appendChild(buddy);
-            this.modifyContact(jid, buddy.text, group);
         }
+
+    },
+    
+    removeGroup: function(gname){
+        var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
+        var grpNewNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text','No group');
+        Tine.Messenger.Log.debug("Removing group '"+gname);
+        var length = grpNode.childNodes.length;
+        var buddys = [];
+        for(i=0; i < length; i++){
+            var buddy = grpNode.childNodes[0];
+            grpNewNode.appendChild(buddy);
+            var attr = [];
+            attr[0] = buddy.attributes.jid;
+            attr[1] = buddy.text;
+            buddys[i] = attr;
+        }
+        Tine.Messenger.RosterHandler.modifyContacts(buddys);
+        grpNode.remove();
+
     }
 }
