@@ -278,6 +278,9 @@ Tine.Messenger.RosterHandler = {
     
     removeGroup: function(gname){
         var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
+        if(!Ext.getCmp('messenger-roster').getRootNode().findChild('text','No group')){
+            Tine.Messenger.Window.RosterTree().addGroup('No group');
+        }
         var grpNewNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text','No group');
         Tine.Messenger.Log.debug("Removing group '"+gname);
         var length = grpNode.childNodes.length;

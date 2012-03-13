@@ -321,17 +321,36 @@ var contextMenu = new Ext.menu.Menu({
             }
         },
         {
+            id: 'subMenuGrpItems',
             text: 'Move to',
             icon: '/images/messenger/group_go.png',
-            handler: function (choice, ev) {
-                var jid = choice.parentMenu.contactId;
-                var new_group = "Colegas";
-                //TODO: Implements submenu options
-                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, new_group);
-            }
+            menu: { 
+                    xtype: 'menu'
+                  }
         }
     ]
 });
+
+Tine.Messenger.Window.BuildSubMenuGrpItems = function(jid){
+    var node = contextMenu.findById('subMenuGrpItems');
+    node.menu.removeAll();
+    var groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
+    var user_group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
+    for(i=0; i < groups.length; i++){
+        var group = groups[i];
+        if(group != user_group){
+            node.menu.addItem( 
+                new Ext.menu.Item({
+                    text: group,
+                    handler: function(choice, ev){
+                                Tine.Messenger.Log.debug("Jid:"+jid+"   Grupo:"+choice.text);
+                                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, choice.text);
+                            }
+                })
+            );
+        }
+    }
+};
 
 Tine.Messenger.Window.RosterTree = function(iq){
     var NO_GROUP = "No group";
@@ -373,6 +392,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
             _buddy.on('contextmenu', function (el) {
                 contextMenu.contactId = el.id;
                 contextMenu.show(el.ui.getEl());
+                Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
             });
 
             var rootNode = Ext.getCmp('messenger-roster').getRootNode();
@@ -433,6 +453,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                 _buddy.on('contextmenu', function (el) {
                     contextMenu.contactId = el.id;
                     contextMenu.show(el.ui.getEl());
+                    Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
                 });
                 var rootNode = Ext.getCmp('messenger-roster').getRootNode();
 
@@ -548,17 +569,22 @@ Tine.Messenger.Window.RosterTree = function(iq){
         },
         getGroupsFromTree: function (){
             var groups = [];
+            var index = 0;
             var rootNode = Ext.getCmp('messenger-roster').getRootNode();
             for(i=0; i < rootNode.childNodes.length ; i++){
-                if(rootNode.childNodes[i].text != 'No groups'){
-                    groups.push(rootNode.childNodes[i].text);
+                if(rootNode.childNodes[i].text == NO_GROUP){
+                    index = i;
                 }
+                groups[i] = rootNode.childNodes[i].text;
+            }
+            if(index != 0){
+                groups[index] = groups[i-1];
+                groups.pop();
             }
             return groups;
         }
     }
 }
-
 
 var contextMenuGrp = new Ext.menu.Menu({
     floating: true,
