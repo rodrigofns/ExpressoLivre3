@@ -957,7 +957,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         
         $aggregateFunctionStatement = Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant'));
 
-    	$select = $this->_getSelect(array('container.id'), TRUE)
+    	$select = $this->_getSelect(array('container.id','container.name'), TRUE)
             ->where("{$this->_db->quoteIdentifier('container.id')} = ?", $containerId)
             ->join(array(
                 /* table  */ 'container_acl' => SQL_TABLE_PREFIX . 'container_acl'), 
