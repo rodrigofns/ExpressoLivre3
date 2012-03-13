@@ -137,11 +137,11 @@ Tine.Messenger.RosterHandler = {
     getUserGroups: function () {
         var nodes = Ext.getCmp('messenger-roster').getRootNode().childNodes,
             txtNodes = new Array();
-            
+
         for (var i=0; i<nodes.length; i++) {
-            txtNodes.push(nodes[i].text);
+            txtNodes.push([nodes[i].text]);
         }
-        
+
         return txtNodes;
     },
     

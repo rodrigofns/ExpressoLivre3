@@ -61,7 +61,7 @@ Tine.Messenger.Window = new Ext.Window({
                                                         id: 'messenger-contact-add-group',
                                                         fieldLabel: _('Group'),
                                                         store: new Ext.data.SimpleStore({
-                                                                        data: [Tine.Messenger.RosterHandler.getUserGroups()],
+                                                                        data: Tine.Messenger.RosterHandler.getUserGroups(),
                                                                         id: 0,
                                                                         fields: ['text']
                                                                 }),
