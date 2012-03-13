@@ -26,8 +26,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     init: function () {
-        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
-        
         this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
         this.showMessengerDelayedTask.delay(500);
         
@@ -36,7 +34,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     showMessenger: function () {
-        Tine.Tinebase.MainScreen.getMainMenu().insert(3, {
+        Tine.Tinebase.MainScreen.getMainMenu().insert(2, {
             xtype: 'button',
             html: '<span id="messenger">Messenger</span>',
             cls: 'messenger-icon-off',
@@ -52,7 +50,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     
     stopMessenger: function () {
         Tine.Messenger.Log.debug("Stopping Messenger...");
-        Tine.Messenger.Application.connection.disconnect();
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().disconnect();
         Tine.Messenger.Log.debug("Messenger Stopped!");
     },
 
@@ -69,11 +67,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     connectionHandler: function (status) {
-        Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('offline');
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-button').disable().setText('Connecting...');
+            Ext.getCmp('messenger-connect-button')
+                .disable()
+                .setIcon('/images/messenger/hourglass.png');
         } else if (status === Strophe.Status.CONNFAIL) {
             Tine.Messenger.Log.error("Connection failed!");
             Ext.Msg.show({
@@ -85,7 +84,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         } else if (status === Strophe.Status.AUTHENTICATING) {
             Tine.Messenger.Log.debug("Authenticating...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-button').setText('Authenticating...');
         } else if (status === Strophe.Status.CONNECTED) {
             Tine.Messenger.Log.debug("Connected!");
             
@@ -151,9 +149,15 @@ Tine.Messenger.IM = {
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
         
-        // When connecting OK, take off the line below
-        Ext.getCmp('messenger-connect-button').enable().setText('Disconnect');
+        Ext.getCmp('messenger-connect-button').connectionStatus = 'Disconnect';
+        Ext.getCmp('messenger-connect-button')
+            .enable()
+            .setIcon('/images/messenger/disconnect.png')
+            .setTooltip('Disconnect');
         Ext.getCmp('messenger-contact-add').enable();
+        Ext.getCmp('messenger-change-status-button')
+            .enable()
+            .setIcon('/images/messenger/user_online.png');
         
         // Enable action Add Group
         Ext.getCmp('messenger-group-mngt-add').enable();
@@ -164,8 +168,15 @@ Tine.Messenger.IM = {
         
         // Disable action Add Group
         Ext.getCmp('messenger-group-mngt-add').disable();
-        
         Ext.getCmp('messenger-contact-add').disable();
+        Ext.getCmp('messenger-change-status-button')
+            .disable()
+            .setIcon('/images/messenger/user_offline.png');
+        Ext.getCmp('messenger-connect-button').connectionStatus = 'Connect';
+        Ext.getCmp('messenger-connect-button')
+            .enable()
+            .setIcon('/images/messenger/connect.png')
+            .setTooltip('Connect');
     }
 }
 

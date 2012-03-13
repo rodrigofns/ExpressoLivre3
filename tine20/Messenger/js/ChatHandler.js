@@ -166,12 +166,12 @@ Tine.Messenger.ChatHandler = {
             });
         return message;
     },
+    
     disconnect: function() {
         Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
         Tine.Messenger.RosterHandler.clearRoster();
-        Ext.getCmp('messenger-connect-button').setText('Connect');
-        Ext.getCmp('messenger-contact-add').disable();
     },
+    
     connect: function() {
         // TODO-EXP: TEMPORARY - Place your jabber login and password
         var login = new Ext.Window({
@@ -225,7 +225,8 @@ Tine.Messenger.ChatHandler = {
 }
 
 function messengerLogin() {
-    var user = Ext.getCmp('messenger-connect-login').getValue();
+    var user = Ext.getCmp('messenger-connect-login').getValue(),
+        pwd = Ext.getCmp('messenger-connect-pwd').getValue();
 
     if (user.indexOf('@') < 0) {
         user += '@simdev.sdr.serpro/expresso-3.0';
@@ -235,7 +236,7 @@ function messengerLogin() {
     }
     Tine.Tinebase.registry.add('messengerAccount', {
         login: user,
-        password: Ext.getCmp('messenger-connect-pwd').getValue()
+        password: pwd
     });
     Ext.getCmp('messenger-connect-window').close();
     Tine.Tinebase.appMgr.get('Messenger').startMessenger();

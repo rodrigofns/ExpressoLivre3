@@ -68,7 +68,6 @@ Tine.Messenger.RosterHandler = {
     
     clearRoster: function () {
         Ext.getCmp('messenger-roster').getRootNode().removeAll();
-        Tine.Messenger.Window.toggleConnectionButton();
     },
     
     changeStatus: function (jid, status) {

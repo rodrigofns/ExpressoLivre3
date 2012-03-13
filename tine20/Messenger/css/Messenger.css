@@ -131,6 +131,19 @@
     color: #B3B3B3;
 }
 
+.messenger-group {
+    background-image: url(/images/messenger/group.png);
+    background-position-x: 15px;
+    background-repeat: no-repeat;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.messenger-group img.x-tree-node-icon {
+    background-image: none;
+}
+
 .x-tree-lines .x-tree-elbow {
     background-image: none !important;
     width: 0 !important;
@@ -181,7 +194,7 @@
 }
 
 /* PRESENCE */
-.messenger-presence-offline {
+/*.messenger-presence-offline {
     background-image: url(/images/icon-offline.gif);
     background-repeat: no-repeat;
     padding-left: 12px;
@@ -197,4 +210,4 @@
     background-image: url(/images/icon-presence.gif);
     background-repeat: no-repeat;
     padding-left: 12px;
-}
+}*/
