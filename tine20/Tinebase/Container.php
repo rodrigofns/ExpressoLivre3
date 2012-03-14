@@ -1057,9 +1057,9 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
             ->join(array(
                 /* table  */ 'container_acl' => SQL_TABLE_PREFIX . 'container_acl'), 
                 /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",                
-                /* select */ array('id','account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant')))
+                /* select */ array('container_id','account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant')))
             )
-            ->group(array('container.id', 'container.name', 'container_acl.account_type', 'container_acl.account_id'));
+            ->group(array('container.id', 'container.name', 'container_acl.account_type', 'container_acl.container_id'));
         
         $this->addGrantsSql($select, $accountId, '*');
                 
