@@ -182,7 +182,7 @@ Ext.namespace('Tine.Felamimail');
                 method: 'Felamimail.importMessage',
                 accountId:this.account,
                 folderId: this.folderId,
-                file: fileRecord.get('path')
+                file: fileRecord.get('tempFile').path
             },
             scope: this,
             success: function(_result, _request){
