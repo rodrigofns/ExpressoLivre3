@@ -1013,7 +1013,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
                     /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",
             	    /* select */ array('account_grant', 'account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('container_acl.account_grant')))                    
                 )
-                ->group('container.id','container.name','container_acl.account_grant');
+                ->group(array('container.id','container.name','container_acl.account_grant'));
             
             $this->addGrantsSql($select, $accountId, '*');           
     
@@ -1059,7 +1059,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
                 /* on     */ "{$this->_db->quoteIdentifier('container_acl.container_id')} = {$this->_db->quoteIdentifier('container.id')}",                
                 /* select */ array('id','account_grants' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db,$this->_db->quoteIdentifier('container_acl.account_grant')))
             )
-            ->group('container.id', 'container.name', 'container_acl.account_type', 'container_acl.account_id');
+            ->group(array('container.id', 'container.name', 'container_acl.account_type', 'container_acl.account_id'));
         
         $this->addGrantsSql($select, $accountId, '*');
                 
