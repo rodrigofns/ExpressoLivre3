@@ -336,6 +336,8 @@ Tine.Messenger.Window.BuildSubMenuGrpItems = function(jid){
     node.menu.removeAll();
     var groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
     var user_group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
+    var NO_GROUP = Tine.Messenger.Window.RosterTree().getNoGroup();
+    
     for(i=0; i < groups.length; i++){
         var group = groups[i];
         if(group != user_group){
@@ -348,12 +350,33 @@ Tine.Messenger.Window.BuildSubMenuGrpItems = function(jid){
                             }
                 })
             );
+        } else if(groups.length == 1){
+            node.menu.addItem( 
+                new Ext.menu.Item({
+                    text: _('Empty'),
+                    disabled: true
+                })
+            );
         }
+    }
+    if(user_group != null){
+        node.menu.addItem( 
+            new Ext.menu.Separator()
+        );
+        node.menu.addItem( 
+            new Ext.menu.Item({
+                text: NO_GROUP,
+                handler: function(choice, ev){
+                            Tine.Messenger.Log.debug("Jid:"+jid+"   Grupo:"+NO_GROUP);
+                            Tine.Messenger.RosterHandler.moveContactFromGroups(jid, NO_GROUP);
+                        }
+            })
+        );
     }
 };
 
 Tine.Messenger.Window.RosterTree = function(iq){
-    var NO_GROUP = "No group";
+    var NO_GROUP = "(no group)";
     
     var createTree = function(xml) {
         addGroupToTree(null,xml);	//add groups
@@ -382,11 +405,10 @@ Tine.Messenger.Window.RosterTree = function(iq){
                             subscription:subscription,
                             hide:false,
                             text:label,
-//                            icon:"/images/messenger/icon_"+status+".png",
                             cls:'messenger-contact',
                             allowDrag:true,
                             allowDrop:false,
-                            qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>"
+                            qtip:"JID : "+jid
             });
             _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
             _buddy.on('contextmenu', function (el) {
@@ -443,11 +465,10 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                 subscription:subscription,
                                 hide:false,
                                 text:label,
-//                                icon:"/images/messenger/icon_"+status+".png",
                                 cls:'messenger-contact',
                                 allowDrag:true,
                                 allowDrop:false,
-                                qtip:"JID : "+jid+"<br/>Status : "+status+"<br/>"
+                                qtip:"JID : "+jid
                 });
                 _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
                 _buddy.on('contextmenu', function (el) {
@@ -523,7 +544,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                 allowDrag:false,
                                 "gname":_group_name
                 });
-                if(_group_name != NO_GROUP){
+                if(_group_name != _(NO_GROUP)){
                     _group.on('contextmenu', function (el) {
                         contextMenuGrp.gname = el.text;
                         contextMenuGrp.show(el.ui.getEl());
@@ -568,20 +589,17 @@ Tine.Messenger.Window.RosterTree = function(iq){
             addGroupToTree(e);
         },
         getGroupsFromTree: function (){
-            var groups = [];
-            var index = 0;
+            var groups = new Array();
             var rootNode = Ext.getCmp('messenger-roster').getRootNode();
-            for(i=0; i < rootNode.childNodes.length ; i++){
-                if(rootNode.childNodes[i].text == NO_GROUP){
-                    index = i;
+            for(var i=0; i < rootNode.childNodes.length ; i++){
+                if(rootNode.childNodes[i].text != _(NO_GROUP)){
+                    groups.push(rootNode.childNodes[i].text);
                 }
-                groups[i] = rootNode.childNodes[i].text;
-            }
-            if(index != 0){
-                groups[index] = groups[i-1];
-                groups.pop();
             }
             return groups;
+        },
+        getNoGroup: function(){
+            return _(NO_GROUP);
         }
     }
 }

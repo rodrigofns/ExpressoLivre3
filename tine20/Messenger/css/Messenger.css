@@ -93,6 +93,13 @@
     background-position-x: 15px
 }
 
+.messenger-contact-xa {
+    background-image: url(/images/messenger/icon_xa.png);
+    background-repeat: no-repeat;
+    font-weight: bold;
+    background-position-x: 15px
+}
+
 .messenger-contact-available span[unselectable],
 .messenger-contact-away span[unselectable] {
     color: black;

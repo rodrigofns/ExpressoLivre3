@@ -50,18 +50,21 @@ Tine.Messenger.LogHandler = {
                     Tine.Messenger.LogHandler.subscriptionResponse(presence);
                 } else {
                     if(type === 'unavailable'){
-                        message = _('Unavailable');
+                        message = _('is unavailable');
                         Tine.Messenger.RosterHandler.changeStatus(jid, UNAVAILABLE_CLASS);
                     } else {
                         var show = $(presence).find('show').text();
                         if(show == 'away') {
-                            message = _('Away');
+                            message = _('is away');
                             Tine.Messenger.RosterHandler.changeStatus(jid, AWAY_CLASS);
                         } else if(show === 'dnd'){
-                            message = _('Do not disturb');
+                            message = _('is busy');
                             Tine.Messenger.RosterHandler.changeStatus(jid, DONOTDISTURB_CLASS);
+                        } else if(show === 'xa'){
+                            message = _('auto status (idle)');
+                            Tine.Messenger.RosterHandler.changeStatus(jid, XA_CLASS);
                         } else {
-                            message = _('Online');
+                            message = _('is on-line');
                             Tine.Messenger.RosterHandler.changeStatus(jid, AVAILABLE_CLASS);
                         }
                     }
