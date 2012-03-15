@@ -14,6 +14,7 @@ class Setup_Backend_Schema_Field_Pgsql extends Setup_Backend_Schema_Field_Abstra
 
     public function __construct($_declaration)
     {
+        $this->unsigned = false; //not accepted by PostgreSQL
         $this->_setField($_declaration);
         
         parent::__construct($_declaration);
