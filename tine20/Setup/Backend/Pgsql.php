@@ -89,9 +89,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 								if (isset($field->unsigned)) $field->unsigned = false;
 								$fieldDeclarations = $this->getFieldDeclarations($field,$_table->name);
 								// removes length of integer between parenthesis
-								$fieldDeclarations = preg_replace('/integer\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
-								$fieldDeclarations = preg_replace('/smallint\([0-9][0-9]\)/', 'smallint', $fieldDeclarations);
-								$fieldDeclarations = preg_replace('/bigint\([0-9][0-9]\)/', 'bigint', $fieldDeclarations);
+                                                                $fieldDeclarations = $this->_removeLengthFromIntegerTypes($fieldDeclarations);                                                                
 
 								if (strpos($primaryKey,$field->name)!== false)
 								{
@@ -220,8 +218,8 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 					public function addCol($_tableName, Setup_Backend_Schema_Field_Abstract $_declaration, $_position = NULL)
 					{
 						$statement = 'ALTER TABLE "' . SQL_TABLE_PREFIX . $_tableName . '" ADD COLUMN ' ;
-
-						$statement .= $this->getFieldDeclarations($_declaration);
+                                                
+                                                $statement .= $this->_removeLengthFromIntegerTypes($this->getFieldDeclarations($_declaration));
 
 						if ($_position !== NULL) {
 							if ($_position == 0) {
@@ -395,5 +393,12 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
 							Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 						}
 					}
+                                        
+                                        private function _removeLengthFromIntegerTypes($fieldDeclarations)
+                                        {
+						$fieldDeclarations = preg_replace('/integer\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
+                                                return $fieldDeclarations;
+                                            
+                                        }
 
 }
