@@ -86,8 +86,6 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract {
         foreach ($_table->fields as $field) {
             if (isset($field->name)) {
                 $fieldDeclarations = $this->getFieldDeclarations($field, $_table->name);
-                // removes length of integer between parenthesis
-                $fieldDeclarations = $this->_removeLengthFromIntegerTypes($fieldDeclarations);
 
                 if (strpos($primaryKey, $field->name) !== false) {
                     // replaces integer auto_increment with serial
@@ -207,7 +205,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract {
     public function addCol($_tableName, Setup_Backend_Schema_Field_Abstract $_declaration, $_position = NULL) {
         $statement = 'ALTER TABLE "' . SQL_TABLE_PREFIX . $_tableName . '" ADD COLUMN ';
 
-        $statement .= $this->_removeLengthFromIntegerTypes($this->getFieldDeclarations($_declaration));
+        $statement .= $this->getFieldDeclarations($_declaration);
 
         if ($_position !== NULL) {
             if ($_position == 0) {
@@ -371,9 +369,21 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract {
         }
     }
 
-    private function _removeLengthFromIntegerTypes($fieldDeclarations) {
+      /**
+     * create the right postgreSql-statement-snippet for columns/fields
+     * PostgreSQL has not unsigned modifier
+     *
+     * @param Setup_Backend_Schema_Field_Abstract field / column
+     * @param String | optional $_tableName [Not used in this backend (PostgreSQL)]
+     * @return string
+     */
+    public function getFieldDeclarations(Setup_Backend_Schema_Field_Abstract $_field, $_tableName = '')
+    {
+        $_field->unsigned = false;
+
+        $fieldDeclarations = parent::getFieldDeclarations($_field, $_tableName);
+        
         $fieldDeclarations = preg_replace('/integer\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
         return $fieldDeclarations;
     }
-
 }
