@@ -41,12 +41,7 @@ class Setup_Backend_Schema_Field_Pgsql extends Setup_Backend_Schema_Field_Abstra
                 case('int'):
                     $type = 'integer';
                     $default = intval($default);
-                    $matches = null;
-                    if (preg_match('/\((\d+)\)/', $_declaration['COLUMN_TYPE'], $matches)) {
-                        $length = $matches[1];
-                    } else {
-                        $length = $_declaration['NUMERIC_PRECISION'] + 1;
-                    }
+                    $length = null;
                     break;
 
                 case('decimal'):
