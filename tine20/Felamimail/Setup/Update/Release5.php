@@ -255,7 +255,7 @@ class Felamimail_Setup_Update_Release5 extends Setup_Update_Abstract
 
             $this->_backend->addCol('felamimail_cache_message', $declaration);
 
-            $this->setTableVersion('felamimail_folder', '8');
+            $this->setTableVersion('felamimail_cache_message', '8');
             $this->setApplicationVersion('Felamimail', '5.7');
         }
     }
