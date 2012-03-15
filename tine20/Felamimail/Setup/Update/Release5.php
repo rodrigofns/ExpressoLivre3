@@ -240,4 +240,23 @@ class Felamimail_Setup_Update_Release5 extends Setup_Update_Abstract
         
         $this->setApplicationVersion('Felamimail', '5.6');
     }
+    
+    public function update_6()
+    {
+        if ($this->getTableVersion('felamimail_cache_message') < 8) {
+            $declaration = new Setup_Backend_Schema_Field_Xml(
+                '<field>
+                    <name>smime</name>
+                    <type>integer</type>
+                    <default>0</default>
+                    <notnull>true</notnull>
+                </field>'
+            );
+
+            $this->_backend->addCol('felamimail_cache_message', $declaration);
+
+            $this->setTableVersion('felamimail_folder', '8');
+            $this->setApplicationVersion('Felamimail', '5.7');
+        }
+    }
 }
