@@ -651,7 +651,7 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @return {void}
      */
     onDeleteRecords: function() {
-        if(Tine.Felamimail.registry.get('preferences').get('confirmDelete') === '1')
+        if(Tine.Felamimail.registry.get('preferences').get('confirmDelete') == '1')
             {
                 Ext.MessageBox.confirm('', this.app.i18n._('Confirm Delete') + ' ?', function(btn) {
                     if(btn == 'yes') {
