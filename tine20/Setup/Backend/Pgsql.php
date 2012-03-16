@@ -1,12 +1,11 @@
 <?php
-
 /**
  * Tine 2.0
  *
  * @package     Setup
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Flávio Gomes da Silva Lisboa <flavio.lisboa@serpro.gov.br>
- * @copyright   Copyright (c) 2011-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2011-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -15,8 +14,8 @@
  * based on class Setup_Backend_Mysql
  * @package     Setup
  */
-class Setup_Backend_Pgsql extends Setup_Backend_Abstract {
-
+class Setup_Backend_Pgsql extends Setup_Backend_Abstract
+{
     /**
      * Define how database agnostic data types get mapped to postgresql data types
      * @todo reviews data type
