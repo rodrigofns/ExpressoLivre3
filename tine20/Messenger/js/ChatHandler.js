@@ -105,16 +105,20 @@ Tine.Messenger.ChatHandler = {
         if(Ext.getCmp(chat_id)){
             Tine.Messenger.ChatHandler.resetState(chat_id);
             Ext.getCmp(chat_id).setTitle(Ext.getCmp(chat_id).title + state);
-            setTimeout(
-                function () {
-                    Tine.Messenger.ChatHandler.resetState(chat_id);
-                },
-                3000
-            );
+            if (state == Tine.Messenger.ChatHandler.PAUSED_STATE) {
+                Tine.Messenger.ChatHandler.clearPausedStateMessage = setTimeout(
+                    function () {
+                        Tine.Messenger.ChatHandler.resetState(chat_id, state);
+                    },
+                    1000
+                );
+            } else {
+                clearTimeout(Tine.Messenger.ChatHandler.clearPausedStateMessage);
+            }
         }
     },
     
-    resetState: function (chat_id) {
+    resetState: function (chat_id, current_state) {
         var title = Ext.getCmp(chat_id).title,
             new_title = title;
         
