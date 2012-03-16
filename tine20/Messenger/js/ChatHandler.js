@@ -155,6 +155,7 @@ Tine.Messenger.ChatHandler = {
           
         return true;
     },
+    
     replaceEmotions: function(message){
         var key = '';
         var img = '';
@@ -165,9 +166,10 @@ Tine.Messenger.ChatHandler = {
             $(this).find("string").each(function(){
                 key = $(this).text().trim();
                 img = $(this).parent().attr("file").trim();
-                message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' alt='"+key+"' />");
-                });
+                message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' alt='"+img+"' />");
             });
+        });
+        console.log(message);
         return message;
     },
     
