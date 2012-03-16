@@ -7,6 +7,7 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
     constructor: function () {
         Ext.apply(this, {
             iconCls:     'messenger-icon',
+            cls:         'messenger-chat-window',
             width:       350,
             height:      300,
             closeAction: 'hide', //'close' - destroy the component

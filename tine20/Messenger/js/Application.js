@@ -158,7 +158,7 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-connect-button').connectionStatus = 'Disconnect';
         Ext.getCmp('messenger-connect-button')
             .enable()
-            .setIcon('/images/messenger/disconnect.png')
+            .setIcon('/images/messenger/connected.png')
             .setTooltip('Disconnect');
         Ext.getCmp('messenger-contact-add').enable();
         Ext.getCmp('messenger-change-status-button')
@@ -181,8 +181,14 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-connect-button').connectionStatus = 'Connect';
         Ext.getCmp('messenger-connect-button')
             .enable()
-            .setIcon('/images/messenger/connect.png')
+            .setIcon('/images/messenger/disconnected.png')
             .setTooltip('Connect');
+            
+        // Close all chats
+        var chats = Ext.query('.messenger-chat-window');
+        Ext.each(chats, function (item, index) {
+            Ext.getCmp(item.id).close();
+        });
     }
 }
 

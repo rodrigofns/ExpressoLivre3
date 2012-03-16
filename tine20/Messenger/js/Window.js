@@ -238,7 +238,7 @@ Tine.Messenger.Window = new Ext.Window({
             width: 32,
             tooltip: 'Connect',
             connectionStatus: 'Connect',
-            icon: '/images/messenger/connect.png',
+            icon: '/images/messenger/disconnected.png',
             handler: function() {
                 if (this.connectionStatus == 'Connect') {
                     Tine.Messenger.ChatHandler.connect();
