@@ -75,6 +75,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 .disable()
                 .setIcon('/images/messenger/hourglass.png');
         } else if (status === Strophe.Status.CONNFAIL) {
+            Tine.Messenger.RosterHandler.clearRoster();
+            // Disable components
+            Tine.Messenger.IM.disableOnDisconnect();
             Tine.Messenger.Log.error("Connection failed!");
             Ext.Msg.show({
                 title:'Error',
@@ -125,21 +128,23 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
+            Tine.Messenger.RosterHandler.clearRoster();
             // Disable components
             Tine.Messenger.IM.disableOnDisconnect();
             
             Ext.Msg.alert('Expresso Messenger', 'Messenger has been disconnected!');
-            Tine.Messenger.RosterHandler.clear();
             window.onbeforeunload = null;
             window.onunload = null;
         } else if (status === Strophe.Status.AUTHFAIL) {
+            Tine.Messenger.RosterHandler.clearRoster();
+            // Disable components
+            Tine.Messenger.IM.disableOnDisconnect();
             Ext.Msg.show({
                 title:'Error',
                 msg: 'Authentication failed!',
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.ERROR
             });
-            Ext.getCmp('messenger-connect-button').enable().setText('Connect');
         }
     }
     

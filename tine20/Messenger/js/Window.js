@@ -7,6 +7,7 @@ var roster = new Ext.tree.TreePanel({
      cls:          'messenger-treeview',
      rootVisible:  false,
      renderTo:     Ext.getBody(),
+     autoScroll:   true,
      
      root: new Ext.tree.AsyncTreeNode({
          expanded: true,
