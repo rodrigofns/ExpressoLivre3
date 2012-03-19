@@ -453,6 +453,25 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         return $part;
     }
     
+    
+       /**
+     * get Raw message
+     *
+     * @param string|Felamimail_Model_Message $_id
+     * @return String
+     */
+    public function getRawMessage($_id)
+    {
+        $message = $this->get($_id);
+        
+        $partStructure  = $message->getPartStructure(NULL, FALSE);
+        
+        $rawContent = $this->_getPartContent($message, NULL, $partStructure, FALSE);
+        
+        return $rawContent;
+    }
+    
+    
     /**
      * get part content (and update structure) from message part
      * 

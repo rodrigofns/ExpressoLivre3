@@ -302,6 +302,15 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             scope: this
         });
         
+        this.action_exportMsg = new Ext.Action({
+            requiredGrant: 'readGrant',
+            allowMultiple: true,
+            text: this.app.i18n._('Export'),
+            handler: this.onExportMsgs,
+            iconCls: 'action_exportMsg',
+            scope: this
+        });  
+        
         this.action_addAccount = new Ext.Action({
             text: this.app.i18n._('Add Account'),
             handler: this.onAddAccount,
@@ -350,6 +359,7 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 this.action_forward,
                 this.action_flag,
                 this.action_markUnread,
+                this.action_exportMsg,
                 this.action_deleteRecord
             ]
         });
@@ -688,6 +698,37 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         } else {
             this.filterToolbar.onFilterChange();
         }
+    },
+    
+    /**
+     * Export messages handler
+     * 
+     * @return {void}
+     */
+    onExportMsgs: function() {
+        var sm = this.getGrid().getSelectionModel(),
+            filter = sm.getSelectionFilter(),
+            msgsIds = [];
+            
+        if (sm.isFilterSelect) {
+            var msgs = this.getStore(),
+                nextRecord = null;
+        } else {
+            var msgs = sm.getSelectionsCollection(),
+                nextRecord = this.getNextMessage(msgs);
+        }
+        var increaseUnreadCountInTargetFolder = 0;
+        msgs.each(function(msg) {
+            msgsIds.push(msg.id);
+        },  this);
+        var downloader = new Ext.ux.file.Download({
+            params: {
+                method: 'Felamimail.downloadMessage',
+                requestType: 'HTTP',
+                messageId: msgsIds
+            }
+        }).start(); 
+
     },
     
     /**
