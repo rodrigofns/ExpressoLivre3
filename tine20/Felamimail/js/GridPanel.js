@@ -563,32 +563,51 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     /**
      * Smime renderer
      *
-     * @param {String} value
+     * @param {Integer} value
      * @return {String}
      * @private
      */
     smimeRenderer: function(value) {
         var icons = [], result = '';
 
-        if (value && value.match(/1/))
-        {
-            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-signature.png', qtip: _('Signed')});
-        }
-        if (value && value.match(/2/))
-        {
-            icons.push({src: 'images/oxygen/16x16/actions/encrypted.png', qtip: _('Encrypted')});
-        }
-        if (value && value.match(/3/))
-        {
-            icons.push({src: 'images/oxygen/16x16/mimetypes/application-zip.png', qtip: _('Compressed')});
-        }
-        if (value && value.match(/4/))
-        {
-            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png', qtip: _('Certs Only')});
-        }
-        if (value && value.match(/5/))
-        {
-            icons.push({src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png', qtip: _('pkcs7-mime')});
+        if (typeof(value) != 'undefined' ) {
+
+            if (value == 1)
+            {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-signature.png',
+                    qtip: _('Signed')
+                });
+            }
+            if (value == 2)
+            {
+                icons.push({
+                    src: 'images/oxygen/16x16/actions/encrypted.png',
+                    qtip: _('Encrypted')
+                });
+            }
+            if (value == 3)
+            {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-zip.png',
+                    qtip: _('Compressed')
+                });
+            }
+            if (value == 4)
+            {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
+                    qtip: _('Certs Only')
+                });
+            }
+            if (value == 5)
+            {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
+                    qtip: _('pkcs7-mime')
+                });
+            }
+
         }
 
         Ext.each(icons, function(icon) {
