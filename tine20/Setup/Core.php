@@ -211,8 +211,7 @@ class Setup_Core extends Tinebase_Core
                         break;
                         
                     case self::ORACLE:
-                        // @TODO check client version    
-                        /*
+
                         if (version_compare(self::ORACLE_MINIMAL_VERSION, $serverVersion, '<')) {
                             self::set(Setup_Core::CHECKDB, TRUE);
                         } else {
@@ -221,8 +220,8 @@ class Setup_Core extends Tinebase_Core
                                 . ' < ' . self::ORACLE_MINIMAL_VERSION
                             );
                         }
-                        */
-                        self::set(Setup_Core::CHECKDB, TRUE);
+                        
+                        $dbcheck = TRUE;
                         break;                        
                         
                     case self::PDO_PGSQL:
