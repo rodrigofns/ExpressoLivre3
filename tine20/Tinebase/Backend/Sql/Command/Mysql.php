@@ -54,4 +54,27 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
     {
         return "CASE WHEN $field IS NULL THEN " . (string) $returnIfTrue . " ELSE " . (string) $returnIfFalse . " END";
     }   
+    
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $date
+     * @return string 
+     */
+    public static function setDate($adapter, $date)
+    {
+    	return "DATE({$date})";
+    }
+    
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $value
+     * @return string 
+     */
+    public static function setDateValue($adapter, $value)
+    {
+    	return $value;
+    }    
+	
 }
