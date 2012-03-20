@@ -433,6 +433,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         $this->_addSecondarySort($_pagination);
         $_pagination->appendPaginationSql($select);
         
+        self::traitGroup($this->_db,$this->_tablePrefix, $select);
+        
         if ($getIdValuePair) {
             return $this->_fetch($select, self::FETCH_MODE_PAIR);
         } else {
@@ -496,8 +498,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
         
         $this->_traitGroup($countSelect);
-        
-        if (! empty($this->_additionalSearchCountCols)) {
+        if (! empty($this->_additionalSearchCountCols)) {     	
             $result = $this->_db->fetchRow($countSelect);
         } else {
             $result = $this->_db->fetchOne($countSelect);
@@ -748,6 +749,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     public function create(Tinebase_Record_Interface $_record) 
     {
         $identifier = $_record->getIdProperty();
+        $primaryKey = $this->_getPrimaryKey($this->_tablePrefix . $this->_tableName);
         
         if (!$_record instanceof $this->_modelName) {
             throw new Tinebase_Exception_InvalidArgument('invalid model type: $_record is instance of "' . get_class($_record) . '". but should be instance of ' . $this->_modelName);
@@ -772,9 +774,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         $this->_db->insert($this->_tablePrefix . $this->_tableName, $recordArray);
         
         if (!$this->_hasHashId()) {
-        	$primaryKey = $this->_getPrimaryKey($this->_tablePrefix . $this->_tableName);
             $newId = $this->_db->lastInsertId($this->getTablePrefix() . $this->getTableName(), $primaryKey);
-        }
+            if(!$newId && isset($_record[$identifier])){
+                $newId = $_record[$identifier];                
+            }  
+        }         
 
         // if we insert a record without an id, we need to get back one
         if (empty($_record->$identifier) && $newId == 0) {
@@ -898,9 +902,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
                 
                 if (!empty($idsToRemove)) {
                     $where = '(' . 
-                        $this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) . 
+			$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
                         ' AND ' . 
-                        $this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) . 
+			$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
                     ')';
                         
                     $this->_db->delete($this->_tablePrefix . $join['table'], $where);
