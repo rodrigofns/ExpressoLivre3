@@ -145,7 +145,7 @@ abstract class Tinebase_Controller_Record_Abstract
         $this->_checkRight($_action);
         $this->checkFilterACL($_filter, $_action);
         $this->_addDefaultFilter($_filter);
-
+		
         $result = $this->_backend->search($_filter, $_pagination, $_onlyIds);
 
         if (! $_onlyIds) {

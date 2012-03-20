@@ -502,7 +502,6 @@ class Tinebase_Notes implements Tinebase_Backend_Sql_Interface
      */
     public function getNoteTypeByName($_name)
     {        
-        $row = $this->_noteTypesTable->fetchRow($this->_db->quoteInto('name = ?', $_name));
         $row = $this->_noteTypesTable->fetchRow($this->_db->quoteInto($this->_db->quoteIdentifier('name') . ' = ?', $_name));
         
         if (!$row) {

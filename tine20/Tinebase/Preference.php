@@ -129,7 +129,7 @@ class Tinebase_Preference extends Tinebase_Preference_Abstract
                 $preference->value      = 'Addressbook';
                 break;
             case self::WINDOW_TYPE:
-                $preference->value      = 'Browser';
+                $preference->value      = 'Ext';
                 $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
                     <options>
                         <option>
