@@ -69,4 +69,37 @@ class Tinebase_Backend_Sql_Command implements Tinebase_Backend_Sql_Command_Inter
 	    	
     	return $command->getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);    	
     }    
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @param mixed $returnIfTrue
+     * @param mixed $returnIfFalse
+     */
+    public static function setDate($adapter, $field)
+    {
+        $className = self::_getClassName($adapter);
+        $className = __CLASS__ . '_' . $className;
+        $command = new $className();
+	    	
+    	return $command->setDate($adapter, $field);    	
+    }   
+    
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param string $field
+     * @param mixed $returnIfTrue
+     * @param mixed $returnIfFalse
+     */
+    public static function setDateValue($adapter, $field)
+    {
+        $className = self::_getClassName($adapter);
+        $className = __CLASS__ . '_' . $className;
+        $command = new $className();
+	    	
+    	return $command->setDateValue($adapter, $field);    	
+    }   
+             
 }
