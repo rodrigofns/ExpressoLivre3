@@ -81,11 +81,13 @@ Tine.widgets.customfields.EditDialogPlugin.prototype = {
         
         form.items.each(function(f) {
             var name = f.getName();
-            
-            if (name.match(/^customfield_(.+)$/)) {
-                name = name.match(/^customfield_(.+)$/)[1];
-                
-                this.customfieldsValue[name] = f.getValue();
+            // MOD: if name is empty ignore
+            if (! Ext.isEmpty(name)) {
+	            if (name.match(/^customfield_(.+)$/)) {
+	                name = name.match(/^customfield_(.+)$/)[1];
+	                
+	                this.customfieldsValue[name] = f.getValue();
+	            }
             }
         }, this);
         
