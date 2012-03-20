@@ -40,11 +40,11 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
         'accountEmailAddress'       => 'email',
         'accountHomeDirectory'      => 'home_dir',
         'accountLoginShell'         => 'login_shell',
-        'lastLoginFailure'			=> 'last_login_failure_at',
-        'loginFailures'				=> 'login_failures',
+        'lastLoginFailure'          => 'last_login_failure_at',
+        'loginFailures'             => 'login_failures',
         'openid'                    => 'openid',
         'visibility'                => 'visibility',
-        'contactId'					=> 'contact_id'
+        'contactId'                 => 'contact_id'
     );
     
     /**
@@ -258,18 +258,11 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
          * THEN 'blocked' ELSE 'enabled' END) ELSE 'disabled' END
          */
         $statusSQL = 'CASE WHEN ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountStatus']) . ' = ' . $this->_db->quote('enabled') . ' THEN (';
-        if($this->_db instanceof Zend_Db_Adapter_Oracle){
-            $statusSQL .= "CASE WHEN TO_DATE(NOW(), 'yyyy/mm/dd hh24:mi:ss') > " . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
-            ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND " . 
-            " TO_DATE(" . $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure']) . ", 'yyyy/mm/dd hh24:mi:ss') + INTERVAL '{$this->_blockTime}' MINUTE > TO_DATE( NOW(), 'yyyy/mm/dd hh24:mi:ss')) THEN 'blocked'" . 
-            ' ELSE ' . $this->_db->quote('enabled') . ' END) ELSE ' . $this->_db->quote('disabled') . ' END';
-        } else {
-            $statusSQL .= 'CASE WHEN NOW() > ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
-            ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND " . 
-                $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure']) . " + INTERVAL '{$this->_blockTime}' MINUTE > NOW()) THEN 'blocked'" . 
-            ' ELSE ' . $this->_db->quote('enabled') . ' END) ELSE ' . $this->_db->quote('disabled') . ' END';
-            
-        }        
+        $statusSQL .= 'CASE WHEN '.Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .' > ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
+        ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND " . 
+        Tinebase_Backend_Sql_Command::setDate($this->_db, $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure'])) . " + INTERVAL '{$this->_blockTime}' MINUTE > ". Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .") THEN 'blocked'" . 
+        ' ELSE ' . $this->_db->quote('enabled') . ' END) ELSE ' . $this->_db->quote('disabled') . ' END ';
+
         $select = $this->_db->select()
             ->from(SQL_TABLE_PREFIX . 'accounts', 
                 array(
@@ -290,8 +283,8 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
                     'accountEmailAddress'   => $this->rowNameMapping['accountEmailAddress'],
                     'lastLoginFailure'      => $this->rowNameMapping['lastLoginFailure'],
                     'loginFailures'         => $this->rowNameMapping['loginFailures'],
-                	'contact_id',
-                	'openid',
+                    'contact_id',
+                    'openid',
                     'visibility'
                 )
             )
@@ -579,7 +572,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
             'login_shell'       => $_user->accountLoginShell,
             'openid'            => $_user->openid,
             'visibility'        => $_user->visibility,
-        	'contact_id'		=> $_user->contact_id,
+            'contact_id'        => $_user->contact_id,
             $this->rowNameMapping['accountDisplayName']  => $_user->accountDisplayName,
             $this->rowNameMapping['accountFullName']     => $_user->accountFullName,
             $this->rowNameMapping['accountFirstName']    => $_user->accountFirstName,
@@ -626,7 +619,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      */
     public function addUser(Tinebase_Model_FullUser $_user)
     {
-        if ($this instanceof Tinebase_User_Interface_SyncAble) {
+        if($this instanceof Tinebase_User_Interface_SyncAble) {
             $userFromSyncBackend = $this->addUserToSyncBackend($_user);
             // set accountId for sql backend sql backend
             $_user->setId($userFromSyncBackend->getId());
@@ -678,7 +671,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
             'login_shell'       => $_user->accountLoginShell,
             'openid'            => $_user->openid,
             'visibility'        => $_user->visibility, 
-            'contact_id'		=> $_user->contact_id,
+            'contact_id'        => $_user->contact_id,
             $this->rowNameMapping['accountDisplayName']  => $_user->accountDisplayName,
             $this->rowNameMapping['accountFullName']     => $_user->accountFullName,
             $this->rowNameMapping['accountFirstName']    => $_user->accountFirstName,

@@ -82,7 +82,11 @@ class Tinebase_TransactionManager
         if (! in_array($_transactionable, $this->_openTransactionables)) {
             if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . "  new transactionable. Starting transaction on this resource");
             if ($_transactionable instanceof Zend_Db_Adapter_Abstract) {
-                Tinebase_Backend_Sql_Command::setAutocommit($_transactionable,false);
+                if ($_transactionable instanceof Zend_Db_Adapter_Oracle) {
+                    // Oracle ??? (Oracle does not support nested transactions)
+                } else {
+                   Tinebase_Backend_Sql_Command::setAutocommit($_transactionable,false);
+                }
                 $_transactionable->beginTransaction();
             } else {
                 $this->rollBack();
@@ -118,7 +122,11 @@ class Tinebase_TransactionManager
              foreach ($this->_openTransactionables as $transactionableIdx => $transactionable) {
                  if ($transactionable instanceof Zend_Db_Adapter_Abstract) {
                      $transactionable->commit();
-                     Tinebase_Backend_Sql_Command::setAutocommit($transactionable,true);
+                     if ($transactionable instanceof Zend_Db_Adapter_Oracle) {
+                         // Oracle ??? (Oracle does not support nested transactions)
+                     } else {
+                         Tinebase_Backend_Sql_Command::setAutocommit($transactionable,true);
+                     }
                  }
              }
              $this->_openTransactionables = array();
@@ -139,7 +147,11 @@ class Tinebase_TransactionManager
         foreach ($this->_openTransactionables as $transactionable) {
             if ($transactionable instanceof Zend_Db_Adapter_Abstract) {
                 $transactionable->rollBack();
-                Tinebase_Backend_Sql_Command::setAutocommit($transactionable,true);
+                if ($transactionable instanceof Zend_Db_Adapter_Oracle) {
+                	// Oracle ???
+                } else {
+                	Tinebase_Backend_Sql_Command::setAutocommit($transactionable,true);
+                }
             }
         }
         $this->_openTransactionables = array();
