@@ -67,74 +67,81 @@
 .messenger-contact {
     font-size: 12px;
     margin-bottom: 5px;
-}
-
-.messenger-contact-unavailable {
-    background-image: url(/images/messenger/icon_unavailable.png);
     background-repeat: no-repeat;
-    background-position-x: 15px
+    background-position-x: 15px;
+    font-weight: bold;
 }
 
-.messenger-contact-unavailable span[unselectable] {
+.messenger-contact.unavailable {
+    background-image: url(/images/messenger/icon_unavailable.png);
+    font-weight: 400;
+}
+
+.messenger-contact.unavailable span[unselectable] {
     color: #B3B3B3;
 }
 
-.messenger-contact-available {
+.messenger-contact.available {
     background-image: url(/images/messenger/icon_available.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-away {
+.messenger-contact.away {
     background-image: url(/images/messenger/icon_away.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-xa {
+.messenger-contact.xa {
     background-image: url(/images/messenger/icon_xa.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-available span[unselectable],
-.messenger-contact-away span[unselectable] {
+.messenger-contact.available span[unselectable],
+.messenger-contact.away span[unselectable] {
     color: black;
 }
 
-.messenger-contact-donotdisturb {
+.messenger-contact.donotdisturb {
     background-image: url(/images/messenger/icon_dnd.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-donotdisturb span[unselectable] {
+.messenger-contact.donotdisturb span[unselectable] {
     color: red;
 }
 
-.messenger-contact-unsubscribed {
+.messenger-contact.subscribe {
+    background-image: url(/images/messenger/icon_subscribe.png);
+}
+.messenger-contact.subscribe span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+
+}
+.messenger-contact.none {
+    background-image: url(/images/messenger/icon_none.png);
+}
+.messenger-contact.none span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+
+}
+.messenger-contact.from {
+    background-image: url(/images/messenger/change_status.png);
+}
+.messenger-contact.from span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+}
+.messenger-contact.unsubscribed {
     background-image: url(/images/messenger/icon_cancel.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-unsubscribed span[unselectable] {
+.messenger-contact.unsubscribed span[unselectable] {
     color: #B3B3B3;
 }
 
-.messenger-contact-waiting {
+.messenger-contact.waiting {
     background-image: url(/images/messenger/icon_question.png);
-    background-repeat: no-repeat;
-    font-weight: bold;
-    background-position-x: 15px
 }
 
-.messenger-contact-waiting span[unselectable] {
+.messenger-contact.waiting span[unselectable] {
     color: #B3B3B3;
 }
 

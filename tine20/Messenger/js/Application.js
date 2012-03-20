@@ -2,13 +2,16 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
-    AVAILABLE_CLASS = 'messenger-contact-available',
-    UNAVAILABLE_CLASS = 'messenger-contact-unavailable',
-    AWAY_CLASS = 'messenger-contact-away',
-    XA_CLASS = 'messenger-contact-xa',
-    DONOTDISTURB_CLASS = 'messenger-contact-donotdisturb',
-    WAITING_CLASS = 'messenger-contact-waiting',
-    UNSUBSCRIBED_CLASS = 'messenger-contact-unsubscribed';
+    AVAILABLE_CLASS = 'available',
+    UNAVAILABLE_CLASS = 'unavailable',
+    AWAY_CLASS = 'away',
+    XA_CLASS = 'xa',
+    DONOTDISTURB_CLASS = 'donotdisturb',
+    WAITING_CLASS = 'waiting',
+    SUBSCRIBE_CLASS = 'subscribe',
+    FROM_CLASS = 'from',
+    NONE_CLASS = 'none',
+    UNSUBSCRIBED_CLASS = 'unsubscribed';
     
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
@@ -109,6 +112,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // Updating Roster
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.RosterHandler.onRosterUpdate, 'jabber:client', 'iq', 'set'
+            );
+                
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.RosterHandler.onRosterResult, 'jabber:client', 'iq', 'result'
             );
 
             Tine.Messenger.Application.connection.addHandler(
