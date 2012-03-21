@@ -72,5 +72,24 @@ class Tinebase_Backend_Sql_Command_Oracle implements Tinebase_Backend_Sql_Comman
     {
     	return "TO_DATE('{$value}', 'YYYY-MM-DD hh24:mi:ss') ";
     }
-     
+
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @return mixed
+     */
+    public static function getFalseValue($adapter = null)
+    {
+    	return '0';
+    }
+    
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @return mixed
+     */
+    public static function getTrueValue($adapter = null)
+    {
+    	return '1';
+    }    
 }

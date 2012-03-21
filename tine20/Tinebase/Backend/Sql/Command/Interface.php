@@ -54,6 +54,19 @@ interface Tinebase_Backend_Sql_Command_Interface
      * @param Zend_Db_Adapter_Abstract $adapter
      * @param date $date      
      */
-    public static function setDateValue($adapter, $date);	    
+    public static function setDateValue($adapter, $date);
+
+    
+    /**
+     * returns the false value according to backend
+     * @return mixed
+     */
+    public static function getFalseValue($adapter = null);
+    
+    /**
+     * returns the true value according to backend
+     * @return mixed
+     */
+    public static function getTrueValue($adapter = null);  
  
 }

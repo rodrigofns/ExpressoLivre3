@@ -44,9 +44,9 @@ class Calendar_Model_CalendarFilter extends Tinebase_Model_Filter_Container
         
         $quotedDisplayContainerIdentifier = $_backend->getAdapter()->quoteIdentifier('attendee.displaycontainer_id');
         
-        $where = empty($this->_containerIds) ? '0' : 
+        $where = empty($this->_containerIds) ? Tinebase_Backend_Sql_Command::getFalseValue($_backend->getAdapter()) : 
             $_select->getAdapter()->quoteInto($this->_getQuotedFieldName($_backend) . ' IN (?)', $this->_containerIds);
-        $orWhere = empty($this->_containerIds) ? '0' : 
+        $orWhere = empty($this->_containerIds) ? Tinebase_Backend_Sql_Command::getFalseValue($_backend->getAdapter()) : 
             $_select->getAdapter()->quoteInto($quotedDisplayContainerIdentifier  .  ' IN (?)', $this->_containerIds);
         
         $_select->where($where);
