@@ -76,5 +76,24 @@ class Tinebase_Backend_Sql_Command_Pgsql implements Tinebase_Backend_Sql_Command
     {
     	return $value;
     } 
+
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @return mixed
+     */
+    public static function getFalseValue($adapter = null)
+    {    
+    	return 'FALSE';
+    }
     
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @return mixed
+     */
+    public static function getTrueValue($adapter = null)
+    {  
+    	return 'TRUE';
+    }    
 }
