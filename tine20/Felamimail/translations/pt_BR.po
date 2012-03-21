@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-01-25 09:08-0300\n"
+"PO-Revision-Date: 2012-03-21 09:11-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -1005,6 +1005,14 @@ msgstr "Confirmar exclusão"
 msgid "Show confirmation dialog when deleting mails."
 msgstr "Exibir mensagem de confirmação quando excluir mensagens."
 
+#: Preference.php:133
+msgid "Move Deleted Messages to Trash"
+msgstr "Mover mensagens deletadas para a lixeira"
+
+#: Preference.php:134
+msgid "Choose yes, to Move Deleted Messages to Trash."
+msgstr "Escolher sim, para mover as mensagens para a lixeira."
+
 #: Setup/Initialize.php:34
 msgid "All inboxes of my email accounts"
 msgstr "Todas as caixas de entrada das minhas contas de email"
@@ -1127,3 +1135,4 @@ msgstr "em"
 #: 165
 msgid "File to Import"
 msgstr "Selecionar Arquivo para importar"
+
