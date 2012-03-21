@@ -13,9 +13,9 @@ Tine.Messenger.RosterHandler = {
             // Modify Main Menu status
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             // Adding handler for roster presence
-            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
-                Tine.Messenger.LogHandler.getPresence, 'jabber:client', 'presence'
-            );
+//            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+//                Tine.Messenger.LogHandler.getPresence, 'jabber:client', 'presence'
+//            );
         } catch (e) {
             alert('Something went wrong!\n'+e.getMessage());
             console.log(e);
@@ -27,6 +27,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     onRosterUpdate: function (iq) {
+        
         try {
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]');
 
@@ -35,28 +36,41 @@ Tine.Messenger.RosterHandler = {
 
                 items.each(function () {
                     var jid = $(this).attr('jid'),
-                        name = $(this).attr('name') || jid,
                         subscription = $(this).attr('subscription'),
                         contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-                        
+                    Tine.Messenger.Log.debug("Subsc:"+subscription);    
                     if (contact) {
+                        var name = $(this).attr('name') || jid,
+                            ask = $(this).attr('ask') || '',
+                            group = $(this).find('group').text();
+                        
                         switch(subscription){
                             case 'remove':
                                 Tine.Messenger.RosterHandler.removeContactElement(jid);
                                 break;
                             case 'none':
-                                Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_NONE);
-                            case 'to':
-                                // Subscribed automatically
-                                Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribed');
+                                if(ask == 'subscribe'){
+                                    Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
+                                } else {
+                                    Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_NONE);
+                                }
+                                break;
+//                            case 'to':
+//                                // Subscribe automatically
+//                                Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribed');
+//                                break;
+                            case 'from':
+                                Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribe');
+                                break;
                             default:
                                 // Update the buddy name
                                 contact.setText(name);
-//                                Tine.Messenger.RosterHandler.renameContactElement(jid, name);
+                                if(group && contact.parentNode.text != group){
+                                    Tine.Messenger.RosterHandler.moveContactFromGroups(jid, group);
+                                }
                         }
                     } else if(subscription == 'from'){
-                        //TODO: Call a buddy add window
-                        Tine.Messenger.RosterHandler.addContactElement(jid);
+                        Tine.Messenger.Window.AddBuddyWindow(jid);
                         Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribe');
                     }
                 });
@@ -150,7 +164,6 @@ Tine.Messenger.RosterHandler = {
     
     getContactElement: function (jid) {
         var rootNode = Ext.getCmp('messenger-roster').getRootNode();
-        Tine.Messenger.Log.debug("Searching "+jid);
         for(var i = 0; i < rootNode.childNodes.length ; i++){
             var buddy = rootNode.childNodes[i].findChild('id', jid);
             if(buddy != null)
@@ -238,14 +251,16 @@ Tine.Messenger.RosterHandler = {
 //        Tine.Messenger.RosterHandler.contact_added = jid;
     },
     
-    renameContact: function (jid, name) {
-        var group = Tine.Messenger.RosterHandler.getContactElementGroup(jid),
-            iq = $iq({type: "set"})
-                    .c("query", {"xmlns": "jabber:iq:roster"})
-                    .c("item", {
-                        jid: jid,
-                        name: name
-                    });
+    renameContact: function (jid, name, group) {
+        if(group == null || group == ''){
+            group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
+        }
+        var iq = $iq({type: "set"})
+                .c("query", {"xmlns": "jabber:iq:roster"})
+                .c("item", {
+                    jid: jid,
+                    name: name
+                });
                     
         if (group != null) {
             iq.c('group', {}, group);
@@ -361,13 +376,13 @@ Tine.Messenger.RosterHandler = {
             if(from == to && xmlns == "jabber:client"){
                 
                 // Building initial Users and Groups Tree
-                new Tine.Messenger.Window.RosterTree(iq).init();
+                new Tine.Messenger.Window.RosterTree().init(iq);
                 
                 $(iq).find("item").each(function(){
                     var jid = $(this).attr("jid");
                     if($(this).attr("subscription") == "none"){
 //                        if($(this).attr("ask") == 'subscribe'){
-//                            Tine.Messenger.Window.RosterTree().updateBuddy(jid, NONE_CLASS);
+//                            Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
 //                        } else {
                             Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_NONE);
 //                        }

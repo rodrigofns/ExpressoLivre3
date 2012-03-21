@@ -16,18 +16,19 @@ var AVAILABLE_CLASS = 'available',
     UNSUBSCRIBED_CLASS = 'unsubscribed';
     
 // Status constants
-var ST_AVAILABLE = 'available',
-    ST_UNAVAILABLE = 'unavailable',
-    ST_AWAY = 'away',
-    ST_XA = 'auto status (idle)',
-    ST_DONOTDISTURB = 'do not disturb';
+const ST_AVAILABLE = 'available',
+      ST_UNAVAILABLE = 'unavailable',
+      ST_AWAY = 'away',
+      ST_XA = 'auto status (idle)',
+      ST_DONOTDISTURB = 'do not disturb';
     
 // Subscription constants
-var SB_NONE = 'none',
-    SB_WAITING = 'waiting',
-    SB_SUBSCRIBE = 'subscribe',
-    SB_FROM = 'from',
-    SB_UNSUBSCRIBED = 'unsubscribed';
+const SB_NONE = 'none',
+      SB_WAITING = 'waiting',
+      SB_SUBSCRIBE = 'subscribe',
+      SB_FROM = 'from',
+      SB_UNSUBSCRIBED = 'unsubscribed',
+      SB_BOTH = 'both';
     
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
@@ -137,7 +138,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
             );
-            
+            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+                Tine.Messenger.LogHandler.getPresence, 'jabber:client', 'presence'
+            );
             // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
         
