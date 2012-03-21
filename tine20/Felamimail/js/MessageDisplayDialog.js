@@ -184,7 +184,8 @@ Tine.Felamimail.MessageDisplayDialog = Ext.extend(Tine.Felamimail.GridDetailsPan
             params: {
                 method: 'Felamimail.downloadMessage',
                 requestType: 'HTTP',
-                messageId: this.record.id
+                messageId: this.record.id,
+                filter : ''
             }
         }).start();
     },
