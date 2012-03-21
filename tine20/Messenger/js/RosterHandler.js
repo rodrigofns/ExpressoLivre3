@@ -37,27 +37,22 @@ Tine.Messenger.RosterHandler = {
                     var jid = $(this).attr('jid'),
                         name = $(this).attr('name') || jid,
                         subscription = $(this).attr('subscription'),
-                        ask = $(this).attr('ask'),
                         contact = Tine.Messenger.RosterHandler.getContactElement(jid);
                         
                     if (contact) {
-                        
                         switch(subscription){
                             case 'remove':
                                 Tine.Messenger.RosterHandler.removeContactElement(jid);
                                 break;
                             case 'none':
-                                Tine.Messenger.Window.RosterTree().updateBuddy(jid, NONE_CLASS, subscription);
-                                break;
-                            case 'both':
-                                Tine.Messenger.Window.RosterTree().updateBuddy(jid, AVAILABLE_CLASS, subscription);
-                                break;
+                                Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_NONE);
                             case 'to':
                                 // Subscribed automatically
                                 Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribed');
-                                break;
                             default:
-                                Tine.Messenger.RosterHandler.renameContactElement(jid, name);
+                                // Update the buddy name
+                                contact.setText(name);
+//                                Tine.Messenger.RosterHandler.renameContactElement(jid, name);
                         }
                     } else if(subscription == 'from'){
                         //TODO: Call a buddy add window
@@ -103,6 +98,9 @@ Tine.Messenger.RosterHandler = {
         Tine.Messenger.Window.RosterTree().updateAskSubscriptionButton(jid, status);
     },
     
+    /**
+     * @Deprecated
+     */
     resetStatus: function (contact) {
         contact.removeClass(AVAILABLE_CLASS);
         contact.removeClass(UNAVAILABLE_CLASS);
@@ -140,17 +138,19 @@ Tine.Messenger.RosterHandler = {
         var xml = "<iq><item subscription='to' name='"+label+"' jid='"+jid+"'>"+
 			"	<group>"+((group) ? group : '')+"</group>"+
 			"</item></iq>";
-        Tine.Messenger.Log.debug('Adding '+jid);
         Tine.Messenger.Window.RosterTree().addBuddy(xml);
     },
     
+    /**
+     * @Deprecated
+     */
     renameContactElement: function (jid, name) {
         Tine.Messenger.RosterHandler.getContactElement(jid).setText(name);
     },
     
     getContactElement: function (jid) {
         var rootNode = Ext.getCmp('messenger-roster').getRootNode();
-        
+        Tine.Messenger.Log.debug("Searching "+jid);
         for(var i = 0; i < rootNode.childNodes.length ; i++){
             var buddy = rootNode.childNodes[i].findChild('id', jid);
             if(buddy != null)
@@ -184,26 +184,27 @@ Tine.Messenger.RosterHandler = {
     
     isContactAvailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        
-        return Ext.fly(contact.ui.elNode).hasClass(AVAILABLE_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(ST_AVAILABLE) ? true : false);
+//        return Ext.fly(contact.ui.elNode).hasClass(AVAILABLE_CLASS);
     },
     
     isContactUnavailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        
-        return Ext.fly(contact.ui.elNode).hasClass(UNAVAILABLE_CLASS);
+        Tine.Messenger.Log.debug("Status: "+contact.ui.textNode.getAttribute('status'));
+        return (contact.ui.textNode.getAttribute('status') == _(ST_UNAVAILABLE) ? true : false);
+//        return Ext.fly(contact.ui.elNode).hasClass(UNAVAILABLE_CLASS);
     },
     
     isContactAway: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        
-        return Ext.fly(contact.ui.elNode).hasClass(AWAY_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(ST_AWAY) ? true : false);
+//        return Ext.fly(contact.ui.elNode).hasClass(AWAY_CLASS);
     },
     
     isContactDoNotDisturb: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        
-        return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(ST_DONOTDISTURB) ? true : false);
+//        return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
     },
     
     setStatus: function(status, text) {
@@ -288,21 +289,25 @@ Tine.Messenger.RosterHandler = {
     },
     
     renameGroup: function(gname, n_gname){
-        var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
-        Tine.Messenger.Log.debug("Renaming from '"+gname+"' to '"+n_gname+"'");
-        
-        var length = grpNode.childNodes.length;
-        var buddys = [];
-        for(i=0; i < length; i++){
-            var buddy = grpNode.childNodes[i];
-            var attr = [];
-            attr[0] = buddy.attributes.jid;
-            attr[1] = buddy.text;
-            attr[2] = n_gname;
-            buddys[i] = attr;
+        var _groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
+        var NO_GROUP = Tine.Messenger.Window.RosterTree().getNoGroup();
+        if($.inArray(n_gname, _groups) == -1 && n_gname != NO_GROUP){
+            var grpNode = Ext.getCmp('messenger-roster').getRootNode().findChild('text',gname);
+            var length = grpNode.childNodes.length;
+            var buddys = [];
+            for(i=0; i < length; i++){
+                var buddy = grpNode.childNodes[i];
+                var attr = [];
+                attr[0] = buddy.attributes.jid;
+                attr[1] = buddy.text;
+                attr[2] = n_gname;
+                buddys[i] = attr;
+            }
+            Tine.Messenger.RosterHandler.modifyContacts(buddys);
+            grpNode.setText(n_gname);
+        } else {
+            Tine.Messenger.Log.info("Group name already exist");
         }
-        Tine.Messenger.RosterHandler.modifyContacts(buddys);
-        grpNode.setText(n_gname);
     },
     
     moveContactFromGroups: function(jid, new_group){
@@ -364,12 +369,12 @@ Tine.Messenger.RosterHandler = {
 //                        if($(this).attr("ask") == 'subscribe'){
 //                            Tine.Messenger.Window.RosterTree().updateBuddy(jid, NONE_CLASS);
 //                        } else {
-                            Tine.Messenger.Window.RosterTree().updateBuddy(jid, NONE_CLASS, '', _('unavailable'));
+                            Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_NONE);
 //                        }
                     }else  if($(this).attr("subscription") == "from"){
-                        Tine.Messenger.Window.RosterTree().updateBuddy(jid, FROM_CLASS);
+                        Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_FROM);
                     }else  if($(this).attr("subscription") == "to"){
-                        Tine.Messenger.Window.RosterTree().updateBuddy(jid, SUBSCRIBE_CLASS);
+                        Tine.Messenger.Window.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
                     }
                 });
             }

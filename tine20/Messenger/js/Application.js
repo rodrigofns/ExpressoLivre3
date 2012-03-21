@@ -1,8 +1,10 @@
 Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
-var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
-    AVAILABLE_CLASS = 'available',
+var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
+
+// Not used
+var AVAILABLE_CLASS = 'available',
     UNAVAILABLE_CLASS = 'unavailable',
     AWAY_CLASS = 'away',
     XA_CLASS = 'xa',
@@ -12,6 +14,20 @@ var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
     FROM_CLASS = 'from',
     NONE_CLASS = 'none',
     UNSUBSCRIBED_CLASS = 'unsubscribed';
+    
+// Status constants
+var ST_AVAILABLE = 'available',
+    ST_UNAVAILABLE = 'unavailable',
+    ST_AWAY = 'away',
+    ST_XA = 'auto status (idle)',
+    ST_DONOTDISTURB = 'do not disturb';
+    
+// Subscription constants
+var SB_NONE = 'none',
+    SB_WAITING = 'waiting',
+    SB_SUBSCRIBE = 'subscribe',
+    SB_FROM = 'from',
+    SB_UNSUBSCRIBED = 'unsubscribed';
     
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
@@ -210,5 +226,61 @@ Tine.Messenger.Util = {
             id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
             id;
         return clean.replace(/_/g, "@").replace(/\-/g, ".");
+    },
+    getStatusClass: function(status){
+        var AVAILABLE_CLS = 'available',
+            UNAVAILABLE_CLS = 'unavailable',
+            AWAY_CLS = 'away',
+            XA_CLS = 'xa',
+            DONOTDISTURB_CLS = 'donotdisturb';
+        switch(status){
+            case ST_AVAILABLE:
+                return AVAILABLE_CLS;
+            case ST_UNAVAILABLE:
+                return UNAVAILABLE_CLS;
+            case ST_AWAY:
+                return AWAY_CLS;
+            case ST_XA:
+                return XA_CLS;
+            case ST_DONOTDISTURB:
+                return DONOTDISTURB_CLS;
+            case 'ALL':
+                return  AVAILABLE_CLS
+                  +','+ UNAVAILABLE_CLS
+                  +','+ AWAY_CLS
+                  +','+ XA_CLS
+                  +','+ DONOTDISTURB_CLS;
+            default:
+                return '';
+        }
+        return null;
+    },
+    getSubscriptionClass: function(subscription){
+        var WAITING_CLS = 'waiting',
+            SUBSCRIBE_CLS = 'subscribe',
+            FROM_CLS = 'from',
+            NONE_CLS = 'none',
+            UNSUBSCRIBED_CLS = 'unsubscribed';
+        switch(subscription){
+            case SB_WAITING:
+                return WAITING_CLS;
+            case SB_SUBSCRIBE:
+                return SUBSCRIBE_CLS;
+            case SB_FROM:
+                return FROM_CLS;
+            case SB_NONE:
+                return NONE_CLS;
+            case SB_UNSUBSCRIBED:
+                return UNSUBSCRIBED_CLS;
+            case 'ALL':
+                return  WAITING_CLS
+                  +','+ SUBSCRIBE_CLS
+                  +','+ FROM_CLS
+                  +','+ NONE_CLS
+                  +','+ UNSUBSCRIBED_CLS;
+            default:
+                return '';
+        }
+        return null;
     }
 }

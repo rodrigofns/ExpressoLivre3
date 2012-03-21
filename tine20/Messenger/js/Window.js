@@ -15,8 +15,7 @@ var roster = new Ext.tree.TreePanel({
     })
 });
 
-
-
+            
 Tine.Messenger.Window = new Ext.Window({
     title:       'Expresso Messenger',
     iconCls:     'messenger-icon',
@@ -323,6 +322,15 @@ var contextMenu = new Ext.menu.Menu({
         },
         
         {
+            id: 'subMenuGrpItems',
+            text: 'Move to',
+            icon: '/images/messenger/group_go.png',
+            menu: { 
+                    xtype: 'menu'
+                  }
+        },
+        
+        {
             id: 'req-authorization-button',
             text: 'Request authorization',
             handler: function (choice, ev) {
@@ -331,15 +339,6 @@ var contextMenu = new Ext.menu.Menu({
                 Tine.Messenger.LogHandler.sendSubscribeMessage(jid, type);
             }
             
-        },
-        
-        {
-            id: 'subMenuGrpItems',
-            text: 'Move to',
-            icon: '/images/messenger/group_go.png',
-            menu: { 
-                    xtype: 'menu'
-                  }
         }
     ]
 });
@@ -387,7 +386,7 @@ Tine.Messenger.Window.BuildSubMenuGrpItems = function(jid){
 };
 
 Tine.Messenger.Window.RosterTree = function(iq){
-    var NO_GROUP = "(no group)";
+    var NO_GROUP = '(no group)';
     
     var createTree = function(xml) {
         addGroupToTree(null,xml);	//add groups
@@ -401,10 +400,11 @@ Tine.Messenger.Window.RosterTree = function(iq){
                     label = $(this).attr("name") || jid,
                     subscription = $(this).attr("subscription") || '',
                     ask = $(this).attr('ask');
-                var status = _('off-line');
+                var status = _(ST_UNAVAILABLE);
                 var status_text = '';
-                var cls = UNAVAILABLE_CLASS;
-                cls = (subscription == 'to' ? SUBSCRIBE_CLASS : cls)
+                var cls = Tine.Messenger.Util.getStatusClass(ST_UNAVAILABLE);
+                cls = (subscription == 'to' ? 
+                    Tine.Messenger.Util.getSubscriptionClass(SB_SUBSCRIBE) : cls)
                 if(jid.length > 0){
                     jid = Strophe.getBareJidFromJid(jid);
 
@@ -423,6 +423,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                                             +_('Status')+" : "+status+"<br>"
                                             +_('Subscription')+" : "+subscription
                     });
+                    
                     _buddy.on("dblclick",Tine.Messenger.RosterHandler.openChat);
                     _buddy.on('contextmenu', function (el) {
                         contextMenu.contactId = el.id;
@@ -457,6 +458,7 @@ Tine.Messenger.Window.RosterTree = function(iq){
                         }
                         rootNode.childNodes[node].appendChild(_buddy);
                     }
+                    _buddy.ui.textNode.setAttribute('status', status);
                 }
             });
     }
@@ -464,23 +466,26 @@ Tine.Messenger.Window.RosterTree = function(iq){
         var _group_name = '';
         
         if(f != null){
-            _group_name = f;
+            _group_name = f.toString();
             if(_group_name.trim() != ''){
-                var _group = new Ext.tree.TreeNode({ //group adden
-                                text:_group_name,
-                                cls: "messenger-group",
-                                expanded:true,
-                                expandable:true,
-                                allowDrag:false,
-                                "gname":_group_name
-                });
-                if(_group_name != _(NO_GROUP)){
-                    _group.on('contextmenu', function (el) {
-                        contextMenuGrp.gname = el.text;
-                        contextMenuGrp.show(el.ui.getEl());
+                var _groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
+                if($.inArray(_group_name, _groups) == -1){
+                    var _group = new Ext.tree.TreeNode({ //group adden
+                                    text:_group_name,
+                                    cls: "messenger-group",
+                                    expanded:true,
+                                    expandable:true,
+                                    allowDrag:false,
+                                    "gname":_group_name
                     });
+                    if(_group_name != _(NO_GROUP)){
+                        _group.on('contextmenu', function (el) {
+                            contextMenuGrp.gname = el.text;
+                            contextMenuGrp.show(el.ui.getEl());
+                        });
+                    }
+                    Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
                 }
-                Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
             }
         }else{
             var _arr_groups = [];
@@ -507,16 +512,53 @@ Tine.Messenger.Window.RosterTree = function(iq){
             });
         }
     }
-    
+    var removeBuddyClasses = function(buddy){
+        var old_classes = Tine.Messenger.Util.getStatusClass('ALL') 
+                + ','+Tine.Messenger.Util.getSubscriptionClass('ALL');
+        var v_class = old_classes.split(',');
+        for(var i=0; i < v_class.length; i++){
+            buddy.ui.removeClass(v_class[i]);
+        }
+    }
+    var updateReqAuthorizationButton = function(jid, subscription){
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+        var reqAuth = contextMenu.items.get('req-authorization-button');
+        
+        try{
+        contact.un('contextMenu');
+        contact.on('contextMenu', function(el){
+            contextMenu.contactId = el.id;
+            reqAuth.hide()
+            if(subscription == 'none' || subscription == 'from'){
+                reqAuth.show();
+            }
+            Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
+            contextMenu.show(el.ui.getEl());
+        });
+        }catch(err){
+            Tine.Messenger.Log.error("Error while uptate contextMenu");
+        }
+    }
     return {
         init : function(){
             createTree(iq);
         },
-        addBuddy: function(e){
-            addBuddyToTree(e)
+        /**
+         *  @method addBuddy
+         *  @public
+         *  @param  iq
+         *  @description &lt;iq&gt;<br>
+         *               &nbsp; &lt;item subscription='to' name='_name' jid='_jid'&gt;<br>
+	 *		 &nbsp;&nbsp; &lt;group&gt;_group&lt;/group&gt;<br>
+	 *		 &nbsp; &lt;/item&gt;<br>
+         *               &lt;iq&gt;
+         */
+        
+        addBuddy: function(iq){
+            addBuddyToTree(iq)
         },
-        addGroup: function(e){
-            addGroupToTree(e);
+        addGroup: function(name){
+            addGroupToTree(name);
         },
         getGroupsFromTree: function (){
             var groups = new Array();
@@ -531,38 +573,54 @@ Tine.Messenger.Window.RosterTree = function(iq){
         getNoGroup: function(){
             return _(NO_GROUP);
         },
-        updateReqAuthorizationButton: function(jid, status){
-            var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-            contact.un('contextMenu');
-            var reqAuth = contextMenu.items.get('req-authorization-button');
-            contact.on('contextMenu', function(el){
-                contextMenu.contactId = el.id;
-                reqAuth.hide()
-                if(status == 'none'){
-                    reqAuth.show();
-                }
-                Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
-                contextMenu.show(el.ui.getEl());
-            });
-        },
+        /**
+         * @method updateBuddy
+         * @public
+         * @param  jid
+         * @param  status
+         * @param  subscription
+         * @param  status_text
+         * @param  message
+         * @description 
+         */
         updateBuddy: function(jid, status, subscription, status_text, message){
-            var contact;
+            var _buddy;
 
             if (typeof jid == 'string')
-                contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+                _buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
             else
-                contact = jid;
-            Tine.Messenger.Log.debug("Updating "+jid);
-            if(contact){
-                subscription = subscription || contact.attributes.subscription;
-                Tine.Messenger.RosterHandler.resetStatus(contact.ui);
-                contact.ui.addClass(status);
-                contact.ui.textNode.setAttribute('qtip', "JID : "+jid+"<br>"+
-                                                _('Status')+" : "+(status_text ? status_text : '')+"<br>"+
-                                                _('Subscription')+" : "+ subscription+
-                                                (message ? '<br>'+message : ''));
-
-                Tine.Messenger.Window.RosterTree().updateReqAuthorizationButton(jid, status);
+                _buddy = jid;
+            
+            var status_cls = Tine.Messenger.Util.getStatusClass(status);
+            
+            if(_buddy && status_cls != ''){
+                subscription = subscription || 
+                               _buddy.ui.textNode.getAttribute('subscription') ||
+                               _buddy.attributes.subscription;
+                
+                
+                var subscription_cls = Tine.Messenger.Util.getSubscriptionClass(subscription);
+                
+                removeBuddyClasses(_buddy);
+                
+                _buddy.ui.addClass(status_cls);
+                _buddy.ui.addClass(subscription_cls);
+                
+                status_text = status_text ? status_text : '';
+                message = message ? message : '';
+                _buddy.ui.textNode.setAttribute('status', _(status));
+                _buddy.ui.textNode.setAttribute('status_text', status_text);
+                _buddy.ui.textNode.setAttribute('subscription', subscription);
+                
+                _buddy.ui.textNode.setAttribute('qtip', "JID : "+jid+"<br>"+
+                                                _('Status')+" : "+ _(status) +"<br>"+
+                                                _('Subscription')+" : "+ _(subscription) +
+                                                (status_text.trim() ? '<br>'+status_text : '') +
+                                                (message.trim() ? '<br>'+message : ''));
+                
+                updateReqAuthorizationButton(jid, subscription);
+            } else {
+                Tine.Messenger.Log.error('Error while updating '+jid+". Jid not found or class not found can be the cause.");
             }
         }
     }
