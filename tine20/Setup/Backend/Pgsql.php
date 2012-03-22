@@ -368,7 +368,7 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         }
     }
 
-      /**
+     /**
      * create the right postgreSql-statement-snippet for columns/fields
      * PostgreSQL has not unsigned modifier
      *
@@ -381,8 +381,13 @@ class Setup_Backend_Pgsql extends Setup_Backend_Abstract
         $_field->unsigned = false;
 
         $fieldDeclarations = parent::getFieldDeclarations($_field, $_tableName);
-        
-        $fieldDeclarations = preg_replace('/integer\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
+
+	    $fieldTypes = array ('tinyint', 'mediumint', 'bigint', 'int', 'integer');
+	    foreach ($fieldTypes as $fieldType)
+	    {
+	        $fieldDeclarations = preg_replace('/' . $fieldType . '\([0-9][0-9]\)/', 'integer', $fieldDeclarations);
+	    }     
+
         return $fieldDeclarations;
     }
 }
