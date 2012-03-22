@@ -1285,7 +1285,18 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     					}
     				}
     			}
-    		}    
+    		}
+
+    		foreach($order as $column)    		
+    		{    		
+    			$field = $column[0];    		
+    			if (preg_match('/.*\..*/',$field) && !in_array($field,$group))    		
+    			{    		
+    				// adds column into group by clause (table.field)    		
+    				$group[] = $field;    		
+    			}    		
+    		}    		
+    		
     		$select->reset(Zend_Db_Select::GROUP);
     
     		$select->group($group);
