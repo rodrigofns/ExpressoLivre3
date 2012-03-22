@@ -175,12 +175,12 @@
 #loghandler .msg {
     width: 95%;
     min-height: 25px;
-    background-color: #555;
+    background-color: #444;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    opacity: 0.85;
+    opacity: 0.9;
     float: left;
-    font: 1.2em;
+    font: 1.1em;
     color: #fff;
     margin-top: 5px;
     padding: 6px 10px;

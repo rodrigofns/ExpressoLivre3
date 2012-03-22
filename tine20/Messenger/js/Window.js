@@ -15,6 +15,9 @@ var roster = new Ext.tree.TreePanel({
     })
 });
 
+Tine.Messenger.RootNode = function() {
+    return Ext.getCmp('messenger-roster').getRootNode();
+};
             
 Tine.Messenger.Window = new Ext.Window({
     title:       'Expresso Messenger',
@@ -34,63 +37,8 @@ Tine.Messenger.Window = new Ext.Window({
                                 icon: '/images/messenger/user_add.png',
                                 text: 'Add Contact',
                                 disabled: true,
-                                handler: function () {
-                                    var addContactWindow = new Ext.Window({
-                                        closeAction: 'close',
-                                        layout: 'fit',
-                                        plain: true,
-                                        modal: true,
-                                        title: _('Add Contact'),
-                                        items: [
-                                            {
-                                                xtype: 'form',
-                                                border: false,
-                                                items: [
-                                                    {
-                                                        xtype: 'textfield',
-                                                        id: 'messenger-contact-add-jid',
-                                                        fieldLabel: _('JID')
-                                                    },
-                                                    {
-                                                        xtype: 'textfield',
-                                                        id: 'messenger-contact-add-name',
-                                                        fieldLabel: _('Name')
-                                                    },
-                                                    {
-                                                        xtype: 'combo',
-                                                        id: 'messenger-contact-add-group',
-                                                        fieldLabel: _('Group'),
-                                                        store: new Ext.data.SimpleStore({
-                                                                        data: Tine.Messenger.RosterHandler.getUserGroups(),
-                                                                        id: 0,
-                                                                        fields: ['text']
-                                                                }),
-                                                        emptyText: _('Select a group') + '...',
-                                                        valueField: 'text',
-                                                        displayField: 'text',
-                                                        triggerAction: 'all',
-                                                        editable: false,
-                                                        mode : 'local'
-                                                    },
-                                                    {
-                                                        xtype: 'button',
-                                                        id: 'messenger-contact-add-button',
-                                                        text: _('Add'),
-                                                        listeners: {
-                                                            click: function () {
-                                                                var jid = Ext.getCmp('messenger-contact-add-jid').getValue(),
-                                                                    name = Ext.getCmp('messenger-contact-add-name').getValue(),
-                                                                    group = Ext.getCmp('messenger-contact-add-group').getValue();
-                                                                Tine.Messenger.RosterHandler.addContact(jid, name, group);
-                                                                addContactWindow.close();
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    });
-                                    addContactWindow.show();
+                                handler: function(){
+                                    Tine.Messenger.Window.AddBuddyWindow();
                                 }
                             },
                             {
@@ -99,38 +47,7 @@ Tine.Messenger.Window = new Ext.Window({
                                 icon: '/images/messenger/group_add.png',
                                 disabled: true,
                                 handler: function() {
-                                    var addGroupWindow = new Ext.Window({
-                                        closeAction: 'close',
-                                        layout: 'fit',
-                                        plain: true,
-                                        modal: true,
-                                        title: _('Add Group'),
-                                        items: [{
-                                                xtype: 'form',
-                                                border: false,
-                                                items: [
-                                                    {
-                                                        xtype: 'textfield',
-                                                        id: 'messenger-group-mngt-name',
-                                                        fieldLabel: _('Name')
-                                                    },
-                                                    {
-                                                        xtype: 'button',
-                                                        id: 'messenger-group-mngt-button',
-                                                        text: _('Add'),
-                                                        listeners: {
-                                                            click: function () {
-                                                                var name = Ext.getCmp('messenger-group-mngt-name').getValue();
-                                                                Tine.Messenger.Window.RosterTree().addGroup(name);
-                                                                addGroupWindow.close();
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    });
-                                    addGroupWindow.show();
+                                    Tine.Messenger.Window._AddGroupWindow();
                                 }
                                 
                         }]
@@ -343,14 +260,15 @@ var contextMenu = new Ext.menu.Menu({
     ]
 });
 
-Tine.Messenger.Window.BuildSubMenuGrpItems = function(jid){
-    var node = contextMenu.findById('subMenuGrpItems');
+Tine.Messenger.Window._BuildSubMenuGrpItems = function(jid){
+    var node = contextMenu.findById('subMenuGrpItems'),
+        groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree(),
+        user_group = Tine.Messenger.RosterHandler.getContactElementGroup(jid),
+        NO_GROUP = Tine.Messenger.Window.RosterTree().getNoGroup();
+        
     node.menu.removeAll();
-    var groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
-    var user_group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
-    var NO_GROUP = Tine.Messenger.Window.RosterTree().getNoGroup();
     
-    for(i=0; i < groups.length; i++){
+    for(var i=0; i < groups.length; i++){
         var group = groups[i];
         if(group != user_group){
             node.menu.addItem( 
@@ -389,20 +307,19 @@ Tine.Messenger.Window.RosterTree = function(){
     var NO_GROUP = '(no group)';
     
     var createTree = function(xml) {
-        addGroupToTree(null,xml);	//add groups
+        addGroupToTree(xml);	//add groups
         addBuddyToTree(xml);	//add buddys
 
     }    
-    var addBuddyToTree = function(a){
+    var addBuddyToTree = function(xml){
         
-            $(a).find("item").each(function () {
+            $(xml).find("item").each(function () {
                 var jid = $(this).attr("jid"),
                     label = $(this).attr("name") || jid,
                     subscription = $(this).attr("subscription") || '',
-                    ask = $(this).attr('ask');
-                var status = _(ST_UNAVAILABLE);
-                var status_text = '';
-                var cls = Tine.Messenger.Util.getStatusClass(ST_UNAVAILABLE);
+                    status = _(ST_UNAVAILABLE),
+                    status_text = '',
+                    cls = Tine.Messenger.Util.getStatusClass(ST_UNAVAILABLE);
                 cls = (subscription == 'to' ? 
                     Tine.Messenger.Util.getSubscriptionClass(SB_SUBSCRIBE) : cls)
                 if(jid.length > 0){
@@ -428,10 +345,10 @@ Tine.Messenger.Window.RosterTree = function(){
                     _buddy.on('contextmenu', function (el) {
                         contextMenu.contactId = el.id;
                         contextMenu.show(el.ui.getEl());
-                        Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
+                        Tine.Messenger.Window._BuildSubMenuGrpItems(el.id);
                     });
                     
-                    var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+                    var rootNode = Tine.Messenger.RootNode();
 
 
                     if($(this).children("group").text().trim().length > 0){
@@ -446,7 +363,7 @@ Tine.Messenger.Window.RosterTree = function(){
                     } else {
                         var hasGroupNoGroup = false,
                             node = -1;
-                        for(var i=0; i < rootNode.childNodes.length; i++){
+                        for(i=0; i < rootNode.childNodes.length; i++){
                             if(rootNode.childNodes[i].text == _(NO_GROUP)){
                                 hasGroupNoGroup = true;
                                 node = i;
@@ -454,7 +371,7 @@ Tine.Messenger.Window.RosterTree = function(){
                         }
                         if(!hasGroupNoGroup){
                             Tine.Messenger.Window.RosterTree().addGroup(_(NO_GROUP));
-                            node = Ext.getCmp('messenger-roster').getRootNode().childNodes.length - 1;
+                            node = Tine.Messenger.RootNode().childNodes.length - 1;
                         }
                         rootNode.childNodes[node].appendChild(_buddy);
                     }
@@ -462,17 +379,18 @@ Tine.Messenger.Window.RosterTree = function(){
                 }
             });
     }
-    var addGroupToTree = function(f,a){
+    var addGroupToTree = function(xml){
         var _group_name = '';
         
-        if(f != null){
-            _group_name = f.toString();
+        var _arr_groups = [];
+        $(xml).find("group").each(function(){
+            _group_name = $(this).text();
             if(_group_name.trim() != ''){
-                var _groups = Tine.Messenger.Window.RosterTree().getGroupsFromTree();
-                if($.inArray(_group_name, _groups) == -1){
-                    var _group = new Ext.tree.TreeNode({ //group adden
+                if($.inArray(_group_name, _arr_groups) === -1){
+                    _arr_groups.push(_group_name);
+                    var _group = new Ext.tree.TreeNode({ 
                                     text:_group_name,
-                                    cls: "messenger-group",
+                                    cls:"messenger-group",
                                     expanded:true,
                                     expandable:true,
                                     allowDrag:false,
@@ -484,33 +402,11 @@ Tine.Messenger.Window.RosterTree = function(){
                             contextMenuGrp.show(el.ui.getEl());
                         });
                     }
-                    Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
+                    Tine.Messenger.RootNode().appendChild(_group);
                 }
             }
-        }else{
-            var _arr_groups = [];
-            $(a).find("group").each(function(){
-                _group_name = $(this).text();
-                if(_group_name.trim() != ''){
-                    if($.inArray(_group_name, _arr_groups) === -1){
-                        _arr_groups.push(_group_name);
-                        var _group = new Ext.tree.TreeNode({ 
-                                        text:_group_name,
-                                        cls:"messenger-group",
-                                        expanded:true,
-                                        expandable:true,
-                                        allowDrag:false,
-                                        "gname":_group_name
-                        });
-                        _group.on('contextmenu', function (el) {
-                            contextMenuGrp.gname = el.text;
-                            contextMenuGrp.show(el.ui.getEl());
-                        });
-                        Ext.getCmp('messenger-roster').getRootNode().appendChild(_group);
-                    }
-                }
-            });
-        }
+        });
+        
     }
     var removeBuddyClasses = function(buddy){
         var old_classes = Tine.Messenger.Util.getStatusClass('ALL') 
@@ -525,44 +421,66 @@ Tine.Messenger.Window.RosterTree = function(){
         var reqAuth = contextMenu.items.get('req-authorization-button');
         
         try{
-        contact.un('contextMenu');
-        contact.on('contextMenu', function(el){
-            contextMenu.contactId = el.id;
-            reqAuth.hide()
-            if(subscription == 'none' || subscription == 'from'){
-                reqAuth.show();
-            }
-            Tine.Messenger.Window.BuildSubMenuGrpItems(el.id);
-            contextMenu.show(el.ui.getEl());
-        });
+            contact.un('contextMenu');
+            contact.on('contextMenu', function(el){
+                contextMenu.contactId = el.id;
+                reqAuth.hide()
+                if(subscription == SB_NONE || subscription == SB_FROM){
+                    reqAuth.show();
+                }
+                Tine.Messenger.Window._BuildSubMenuGrpItems(el.id);
+                contextMenu.show(el.ui.getEl());
+            });
         }catch(err){
-            Tine.Messenger.Log.error("Error while uptate contextMenu");
+            Tine.Messenger.Log.error("Error while updating contextMenu");
         }
     }
     return {
         init : function(iq){
             createTree(iq);
         },
+        
         /**
          *  @method addBuddy
          *  @public
-         *  @param  iq
+         *  @param  jid string (required)
+         *  @param  _name string (optional)
+         *  @param  _group string (optional)
          *  @description &lt;iq&gt;<br>
          *               &nbsp; &lt;item subscription='to' name='_name' jid='_jid'&gt;<br>
 	 *		 &nbsp;&nbsp; &lt;group&gt;_group&lt;/group&gt;<br>
 	 *		 &nbsp; &lt;/item&gt;<br>
          *               &lt;iq&gt;
          */
+        addBuddy: function(jid, _name, _group){
+            if (typeof jid == 'string'){
+                var _buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
+                if(!_buddy){
+                    var label = _name || '';
+                    var xml = "<iq>"
+                            +"  <item subscription='to' name='"+label+"' jid='"+jid+"'>"
+                            +"	   <group>"+((_group) ? _group : '')+"</group>"
+                            +"  </item>"
+                            +"</iq>";
+                    addBuddyToTree(xml);
+                    return true;
+                }
+            }
+            return false;
+        },
         
-        addBuddy: function(iq){
-            addBuddyToTree(iq)
+        addGroup: function(gname){
+            if (typeof gname == 'string'){
+                var xml = "<item><group>"+gname+"</group></item>";
+                addGroupToTree(xml);
+                return true;
+            }
+            return false;
         },
-        addGroup: function(name){
-            addGroupToTree(name);
-        },
+        
         getGroupsFromTree: function (){
             var groups = new Array();
-            var rootNode = Ext.getCmp('messenger-roster').getRootNode();
+            var rootNode = Tine.Messenger.RootNode();
             for(var i=0; i < rootNode.childNodes.length ; i++){
                 if(rootNode.childNodes[i].text != _(NO_GROUP)){
                     groups.push([rootNode.childNodes[i].text]);
@@ -570,19 +488,31 @@ Tine.Messenger.Window.RosterTree = function(){
             }
             return groups;
         },
+        
         getNoGroup: function(){
             return _(NO_GROUP);
         },
-        /**
-         * @method updateBuddy
-         * @public
-         * @param  jid
-         * @param  status
-         * @param  subscription
-         * @param  status_text
-         * @param  message
-         * @description 
-         */
+        
+        groupExist: function(_group){
+            var groups = this.getGroupsFromTree();
+            for(var i=0; i<groups.length; i++){
+                if(_group == groups[i][0]){
+                    return true;
+                }
+            }
+            return false;
+        },
+        
+       /**
+        * @method updateBuddy
+        * @public
+        * @param  jid (required)
+        * @param  status (required)
+        * @param  subscription (optional)
+        * @param  status_text (optional)
+        * @param  message (optional)
+        * @description 
+        */
         updateBuddy: function(jid, status, subscription, status_text, message){
             var _buddy;
 
@@ -649,7 +579,8 @@ var contextMenuGrp = new Ext.menu.Menu({
                             {
                                 xtype: 'textfield',
                                 id: 'messenger-group-mngt-name',
-                                fieldLabel: _('Name')
+                                fieldLabel: _('Name'),
+                                value: gname
                             },
                             {
                                 xtype: 'button',
@@ -657,12 +588,29 @@ var contextMenuGrp = new Ext.menu.Menu({
                                 text: _('Rename it!'),
                                         listeners: {
                                             click: function () {
-                                                var n_gname = Ext.getCmp('messenger-group-mngt-name').getValue();
-                                                //TODO: Check there's no group with same name
-                                                Tine.Messenger.RosterHandler.renameGroup(gname, n_gname);
-                                                renameGroupWindow.close();
+                                                var n_gname = Ext.getCmp('messenger-group-mngt-name').getValue().trim();
+                                                
+                                                if(Tine.Messenger.RosterHandler.renameGroup(gname, n_gname)){
+                                                    renameGroupWindow.close();
+                                                } else {
+                                                    Ext.Msg.alert(_('Add Group'),_('The group name already exists!'));
+                                                }
                                             }
                                         }
+                            }
+                        ],
+                        keys: [
+                            {
+                                key: [Ext.EventObject.ENTER],
+                                handler: function () {
+                                    var n_gname = Ext.getCmp('messenger-group-mngt-name').getValue().trim();
+                                                
+                                    if(Tine.Messenger.RosterHandler.renameGroup(gname, n_gname)){
+                                        renameGroupWindow.close();
+                                    } else {
+                                        Ext.Msg.alert(_('Add Group'),_('The group name already exists!'));
+                                    }
+                                }
                             }
                         ]
                     }
@@ -693,16 +641,20 @@ var contextMenuGrp = new Ext.menu.Menu({
 
 });
 
-Tine.Messenger.Window.AddBuddyWindow = function(jid){
+Tine.Messenger.Window.AddBuddyWindow = function(_jid) {
     
-    Tine.Messenger.RosterHandler.addContactElement(jid);
+    if(_jid){
+        Tine.Messenger.Window.RosterTree().addBuddy(_jid);
+    } else {
+        _jid = '';
+    }
     
     var addContactWindow = new Ext.Window({
         closeAction: 'close',
         layout: 'fit',
         plain: true,
         modal: true,
-        title: _('Add Contact') + jid,
+        title: _('Add Contact') + ' - ' + _jid,
         items: [
             {
                 xtype: 'form',
@@ -712,7 +664,7 @@ Tine.Messenger.Window.AddBuddyWindow = function(jid){
                         xtype: 'textfield',
                         id: 'messenger-contact-add-jid',
                         fieldLabel: _('JID'),
-                        value: jid,
+                        value: _jid,
                         disabled: true
                     },
                     {
@@ -742,12 +694,28 @@ Tine.Messenger.Window.AddBuddyWindow = function(jid){
                         text: _('Add'),
                         listeners: {
                             click: function () {
-//                                var jid = Ext.getCmp('messenger-contact-add-jid').getValue(),
-                                var name = Ext.getCmp('messenger-contact-add-name').getValue(),
+                                var jid = Ext.getCmp('messenger-contact-add-jid').getValue().trim(),
+                                    name = Ext.getCmp('messenger-contact-add-name').getValue().trim(),
                                     group = Ext.getCmp('messenger-contact-add-group').getValue();
                                 
-//                                Tine.Messenger.RosterHandler.addContactElement(jid, name, group);
-                                Tine.Messenger.RosterHandler.renameContact(jid, name, group);
+                                var result = Tine.Messenger.Window._addBuddyAction(_jid, jid, name, group);
+                                if(result){
+                                    addContactWindow.close();
+                                } 
+                            }
+                        }
+                    }
+                ],
+                keys: [
+                    {
+                        key: [Ext.EventObject.ENTER],
+                        handler: function () {
+                            var jid = Ext.getCmp('messenger-contact-add-jid').getValue().trim(),
+                                name = Ext.getCmp('messenger-contact-add-name').getValue().trim(),
+                                group = Ext.getCmp('messenger-contact-add-group').getValue();
+
+                            var result = Tine.Messenger.Window._addBuddyAction(_jid, jid, name, group);
+                            if(result){
                                 addContactWindow.close();
                             }
                         }
@@ -756,5 +724,88 @@ Tine.Messenger.Window.AddBuddyWindow = function(jid){
             }
         ]
     });
+    if(!_jid){
+        Ext.getCmp('messenger-contact-add-jid').disabled = false;
+    }
     addContactWindow.show();
+}
+
+Tine.Messenger.Window._AddGroupWindow = function(){
+    
+    var addGroupWindow = new Ext.Window({
+            closeAction: 'close',
+            layout: 'fit',
+            plain: true,
+            modal: true,
+            title: _('Add Group'),
+            items: [{
+                    xtype: 'form',
+                    border: false,
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            id: 'messenger-group-mngt-name',
+                            fieldLabel: _('Name')
+                        },
+                        {
+                            xtype: 'button',
+                            id: 'messenger-group-mngt-button',
+                            text: _('Add'),
+                            listeners: {
+                                click: function () {
+                                    var gname = Ext.getCmp('messenger-group-mngt-name').getValue().trim();
+                                    if(Tine.Messenger.Window._addGroupAction(gname)){
+                                        addGroupWindow.close();
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            keys: [
+                {
+                    key: [Ext.EventObject.ENTER],
+                    handler: function () {
+                        var gname = Ext.getCmp('messenger-group-mngt-name').getValue().trim();
+                        if(Tine.Messenger.Window._addGroupAction(gname)){
+                            addGroupWindow.close();
+                        }
+                    }
+                }
+            ]
+        });
+        
+    addGroupWindow.show();
+}
+
+Tine.Messenger.Window._addGroupAction = function(name){
+    if(name){
+        if(!Tine.Messenger.Window.RosterTree().groupExist(name)){
+            Tine.Messenger.Window.RosterTree().addGroup(name);
+            Tine.Messenger.LogHandler.status(name, _('Group created successfully!'));
+            return true;
+        } else {
+            Ext.Msg.alert(_('Add Group'),_('The group already exists!'));
+        }
+    }
+    return false;
+}
+
+Tine.Messenger.Window._addBuddyAction = function(_jid, jid, name, group){
+    if(_jid){
+        Tine.Messenger.RosterHandler.renameContact(jid, name, group);
+        Tine.Messenger.LogHandler.status(jid || name, _('Added successfuly!'));
+        return true;
+    } else {
+        if(jid){
+            if(Tine.Messenger.RosterHandler.addContact(jid, name, group)){
+                Tine.Messenger.LogHandler.status(jid || name, _('Added successfuly!'));
+            } else {
+                Ext.Msg.alert(_('Add Buddy'),_('Buddy not added!'))
+            }
+            return true;
+        }
+    }
+    return false;
 }

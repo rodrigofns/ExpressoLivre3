@@ -123,23 +123,23 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // Getting Roster
             var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
             Tine.Messenger.Application.connection.sendIQ(
-                roster, Tine.Messenger.RosterHandler.onStartRoster
+                roster, Tine.Messenger.RosterHandler._onStartRoster
             );
                 
             // Updating Roster
             Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.RosterHandler.onRosterUpdate, 'jabber:client', 'iq', 'set'
+                Tine.Messenger.RosterHandler._onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
                 
             Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.RosterHandler.onRosterResult, 'jabber:client', 'iq', 'result'
+                Tine.Messenger.RosterHandler._onRosterResult, 'jabber:client', 'iq', 'result'
             );
 
             Tine.Messenger.Application.connection.addHandler(
-                Tine.Messenger.LogHandler.onErrorMessage, null, 'message', 'error'
+                Tine.Messenger.LogHandler._onErrorMessage, null, 'message', 'error'
             );
             Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
-                Tine.Messenger.LogHandler.getPresence, 'jabber:client', 'presence'
+                Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
             );
             // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
