@@ -99,6 +99,19 @@ class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
         
         return $this->search($filter, $pagination, array('messageuid' => 'messageuid', 'id' => self::IDCOL, 'flags' => 'felamimail_cache_message_flag.flag'));
     }
+    
+     /**
+     * get ids from messagens from filter
+     *
+     * @param string $filter
+     * @return Tinebase_Record_RecordSet
+     */
+    public function getMessageIdsFromFilter($filter)    
+    {
+        
+        return $this->search($filter, NULL, array('messageuid' => 'messageuid', 'id' => self::IDCOL));
+    }
+    
         
     /**
      * update foreign key values

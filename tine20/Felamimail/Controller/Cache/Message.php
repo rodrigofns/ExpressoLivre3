@@ -120,6 +120,19 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
     }
     
     /**
+    * get the message IDs from a filter
+    *
+    * @param string  $filter
+    * @return Tinebase_Record_RecordSet
+    */
+    public function getMessageIdsFromFilter($filter)
+    {
+        
+        return $this->_backend->getMessageIdsFromFilter($filter);
+        
+    }
+    
+    /**
     * get folder status and return all folders where something needs to be done
     *
     * @param Felamimail_Model_FolderFilter  $_filter
