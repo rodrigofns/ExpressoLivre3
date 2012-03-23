@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<application>
-	<name>Admin</name>
-	<version>5.0</version>
-	<order>1</order>
-    <depends>
-        <application>Tinebase</application>
-    </depends>
-</application>
