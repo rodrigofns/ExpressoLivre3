@@ -41,21 +41,28 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
      * download message
      *
      * @param  string  $messageId
-     * @param  string  $filter
      */
-    public function downloadMessage($messageId,$filter)
+    public function downloadMessage($messageId)
     {
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Downloading Message ' . $messageId);
-        if($filter){
-            $filterData = Zend_Json::decode($filter);
-            $filter = new Felamimail_Model_MessageFilter(array());
-            $filter->setFromArrayInUsersTimezone($filterData);
-            $messages = Felamimail_Controller_Cache_Message::getInstance()->getMessageIdsFromFilter($filter);
-        }else{
-            $messages = explode(',',$messageId);
-        }
-       $this->_downloadMessagePart($messages);
-
+        
+        $messages = explode(',',$messageId);
+        
+        $this->_downloadMessagePart($messages);
+    }
+    
+     /**
+     * download all messages from folder
+     *
+     * @param  string  $folderId
+     */
+    public function downloadAllMessagesFromFolder($folderId)
+    {
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Downloading Messages from folder  ' . $folderId);
+        
+        $folderId = explode(',',$messageId);
+        
+        $this->_downloadMessagePart($messages);
     }
     
     /**
@@ -69,6 +76,7 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
         $oldMaxExcecutionTime = Tinebase_Core::setExecutionLifeTime(0);
         
         try {
+            
             if(count($_messageId) == 1){
                 $part = Felamimail_Controller_Message::getInstance()->getMessagePart($_messageId[0], $_partId);
                 if ($part instanceof Zend_Mime_Part) {
@@ -112,7 +120,7 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
                 header("Expires: " . gmdate('D, d M Y H:i:s', Tinebase_DateTime::now()->addSecond($maxAge)->getTimestamp()) . " GMT");
                 // overwrite Pragma header from session
                 header("Pragma: cache");
-                header('Content-Disposition: attachment; filename="menssagens.zip"');
+                header('Content-Disposition: attachment; filename="menssagem.zip"');
                 header("Content-Type: application/zip");
                 
                 $stream = fopen($tmpFile, 'r');
