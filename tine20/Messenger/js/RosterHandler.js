@@ -35,10 +35,7 @@ Tine.Messenger.RosterHandler = {
                     
                     if (contact) {
                         var name = $(this).attr('name') || jid,
-                            ask = $(this).attr('ask') || '',
-                            group = $(this).find('group').text();
-                        Tine.Messenger.Log.debug('_onRosterUpdate: '+jid+' - '+name+' - '+group);
-                        Tine.Messenger.Log.debug("grupo: "+contact.parentNode.text);
+                            ask = $(this).attr('ask') || '';
                         switch(subscription){
                             case 'remove':
 //                                Tine.Messenger.RosterHandler.removeContactElement(jid);
@@ -289,14 +286,14 @@ Tine.Messenger.RosterHandler = {
     },
     
    /**
-    * @method modifyContacts
+    * @method modifyBuddys
     * @public
     * @param  buddys (array)
     * @description buddys[][0] = jid of buddy<br>
     *              buddys[][1] = name of buddy <br>
     *              buddys[][2] = group of buddy
     */
-    modifyContacts: function  (buddys){
+    modifyBuddys: function(buddys){
         
         for(var i=0; i<buddys.length; i++){
             var attr = buddys[i];
@@ -325,7 +322,7 @@ Tine.Messenger.RosterHandler = {
             var grpNode = Tine.Messenger.RootNode().findChild('text',gname);
             var length = grpNode.childNodes.length;
             var buddys = [];
-            for(i=0; i < length; i++){
+            for(var i=0; i < length; i++){
                 var buddy = grpNode.childNodes[i];
                 var attr = [];
                 attr[0] = buddy.attributes.jid;
@@ -333,7 +330,7 @@ Tine.Messenger.RosterHandler = {
                 attr[2] = n_gname;
                 buddys[i] = attr;
             }
-            Tine.Messenger.RosterHandler.modifyContacts(buddys);
+            Tine.Messenger.RosterHandler.modifyBuddys(buddys);
             grpNode.setText(n_gname);
             Tine.Messenger.LogHandler.status(_('Successful'), _('The group ') + gname + _(' was successfully renamed to ') + n_gname);
             
@@ -347,9 +344,8 @@ Tine.Messenger.RosterHandler = {
     
     moveContactFromGroups: function(jid, new_group){
         var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
-        var group = Tine.Messenger.RosterHandler.getContactElementGroup(jid);
-        if(group != new_group){ // Not necessary
-            var grpNode = Tine.Messenger.RootNode().findChild('text', new_group);
+        var grpNode = Tine.Messenger.RootNode().findChild('text', new_group);
+        if(grpNode && buddy){
             var buddys = new Array(), 
                 attr = [];
                 
@@ -360,7 +356,7 @@ Tine.Messenger.RosterHandler = {
             
             buddy.parentNode.removeChild(buddy);
             grpNode.appendChild(buddy);
-            Tine.Messenger.RosterHandler.modifyContacts(buddys);
+            Tine.Messenger.RosterHandler.modifyBuddys(buddys);
         }
 
     },
@@ -376,7 +372,7 @@ Tine.Messenger.RosterHandler = {
         var grpNewNode = root_node.findChild('text', NO_GROUP);
         var length = grpNode.childNodes.length;
         var buddys = [];
-        for(i=0; i < length; i++){
+        for(var i=0; i < length; i++){
             var buddy = grpNode.childNodes[0];
             grpNewNode.appendChild(buddy);
             var attr = [];
@@ -384,7 +380,7 @@ Tine.Messenger.RosterHandler = {
             attr[1] = buddy.text;
             buddys[i] = attr;
         }
-        Tine.Messenger.RosterHandler.modifyContacts(buddys);
+        Tine.Messenger.RosterHandler.modifyBuddys(buddys);
         if(grpNode.remove()){
             Tine.Messenger.LogHandler.status(_('Successful'), _('The group ') + gname + _(' was successfully removed!'));
         } else {

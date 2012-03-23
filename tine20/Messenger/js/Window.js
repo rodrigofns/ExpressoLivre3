@@ -356,7 +356,7 @@ Tine.Messenger.Window.RosterTree = function(){
                         $(this).children("group").each(function(g){
                             for(var i=0; i < rootNode.childNodes.length; i++){
                                 if(rootNode.childNodes[i].text == $(this).text()){
-                                    rootNode.childNodes[i].appendChild(_buddy);
+                                    addOrderedOnTreeNodeLevel(_buddy, rootNode.childNodes[i]);
                                 }
                             }
                         });
@@ -373,7 +373,7 @@ Tine.Messenger.Window.RosterTree = function(){
                             Tine.Messenger.Window.RosterTree().addGroup(_(NO_GROUP));
                             node = Tine.Messenger.RootNode().childNodes.length - 1;
                         }
-                        rootNode.childNodes[node].appendChild(_buddy);
+                        addOrderedOnTreeNodeLevel(_buddy, rootNode.childNodes[node]);
                     }
                     _buddy.ui.textNode.setAttribute('status', status);
                 }
@@ -402,10 +402,28 @@ Tine.Messenger.Window.RosterTree = function(){
                             contextMenuGrp.show(el.ui.getEl());
                         });
                     }
-                    Tine.Messenger.RootNode().appendChild(_group);
+                    addOrderedOnTreeNodeLevel(_group, Tine.Messenger.RootNode());
                 }
             }
         });
+        
+    }
+    var addOrderedOnTreeNodeLevel = function(node, parentNode){
+        var v_nodes = parentNode.childNodes;
+        if(v_nodes.length == 0 || node.text == _(NO_GROUP)){
+            parentNode.appendChild(node);
+        } else {
+            var node_not_inserted = true;
+            for(var i=0; i < v_nodes.length && node_not_inserted; i++){
+                if(node.text < v_nodes[i].text || v_nodes[i].text == _(NO_GROUP)){
+                    parentNode.insertBefore(node, v_nodes[i]);
+                    node_not_inserted = false;
+                }
+            }
+            if(node_not_inserted){
+                parentNode.appendChild(node);
+            }
+        }
         
     }
     var removeBuddyClasses = function(buddy){
