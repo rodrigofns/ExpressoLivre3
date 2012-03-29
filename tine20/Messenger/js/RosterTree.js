@@ -1,7 +1,8 @@
 Ext.ns('Tine.Messenger');
 
-Tine.Messenger.RosterTree = function(){
+Tine.Messenger.RosterTree = function(iq){
     var NO_GROUP = '(no group)';
+    var rootNode = Tine.Messenger.RootNode();
     
     var createTree = function(xml) {
         addGroupToTree(xml);	//add groups
@@ -50,8 +51,14 @@ Tine.Messenger.RosterTree = function(){
                     blankText:'A name is required',
                     selectOnFocus:true
             });
-            treeEditor.on("complete",Tine.Messenger.RosterHandler.renameContact2, this);
+            treeEditor.on("complete",renameContact, this);
             treeEditor.triggerEdit(_node.node);
+    }
+    
+    var renameContact = function (_e, new_name) {
+        var jid = _e.editNode.attributes.jid;
+        
+        Tine.Messenger.RosterHandler.renameContact(jid, new_name);
     }
     
     var removeBuddy = function(_node, e){
@@ -150,6 +157,7 @@ Tine.Messenger.RosterTree = function(){
             treeEditor.on("complete",Tine.Messenger.RosterHandler.renameGroup,this);
             treeEditor.triggerEdit(_node.node);
     }
+    
     var renameGroupAction = function(_e, name){
         if(name && name != _e.startValue){
             if(groupExist(name)){
@@ -161,6 +169,7 @@ Tine.Messenger.RosterTree = function(){
         }
         return false;
     }
+    
     var removeGroup = function(_node, e){
         var grp_name = _node.node.text;
         Ext.Msg.buttonText.yes = _('Yes');
@@ -207,20 +216,8 @@ Tine.Messenger.RosterTree = function(){
                     });
                     
                     _buddy.on("dblclick", Tine.Messenger.RosterHandler.openChat);
-//                    _buddy.un("contextmenu");
-                    _buddy.on("contextmenu", function(el){
-                            buddyContext(el);
-//                            buildSubMenuGrpItems(el);
-                    });
-//                    _buddy.on('contextmenu', function (el) {
-//                        contextMenu.contactId = el.id;
-//                        contextMenu.show(el.ui.getEl());
-//                        Tine.Messenger.Window._BuildSubMenuGrpItems(el.id);
-//                    });
+                    _buddy.on("contextmenu", buddyContext);
                     
-                    var rootNode = Tine.Messenger.RootNode();
-
-
                     if($(this).children("group").text().trim().length > 0){
                         var i=0;
                         $(this).children("group").each(function(g){
@@ -268,14 +265,9 @@ Tine.Messenger.RosterTree = function(){
                                     "gname":_group_name
                     });
                     if(_group_name != _(NO_GROUP)){
-//                        _group.on('contextmenu', function (el) {
-//                            contextMenuGrp.gname = el.text;
-//                            contextMenuGrp.show(el.ui.getEl());
-//                        });
-//                        _group.un('contextmenu');
                         _group.on('contextmenu', groupContext, this);
                     }
-                    addOrderedOnTreeNodeLevel(_group, Tine.Messenger.RootNode());
+                    addOrderedOnTreeNodeLevel(_group, rootNode);
                 }
             }
         });
@@ -312,7 +304,6 @@ Tine.Messenger.RosterTree = function(){
     
     var getGroupsFromTree = function() {
         var groups = new Array();
-        var rootNode = Tine.Messenger.RootNode();
         for(var i=0; i < rootNode.childNodes.length ; i++){
             if(rootNode.childNodes[i].text != _(NO_GROUP)){
                 groups.push([rootNode.childNodes[i].text]);
@@ -332,7 +323,7 @@ Tine.Messenger.RosterTree = function(){
     }
     
     return {
-        init : function(iq){
+        init : function(){
             createTree(iq);
         },
         
@@ -350,17 +341,14 @@ Tine.Messenger.RosterTree = function(){
          */
         addBuddy: function(jid, _name, _group){
             if (typeof jid == 'string'){
-//                var _buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
-//                if(!_buddy){
-                    var label = _name || '';
-                    var xml = "<iq>"
-                            +"  <item subscription='to' name='"+label+"' jid='"+jid+"'>"
-                            +"	   <group>"+((_group) ? _group : '')+"</group>"
-                            +"  </item>"
-                            +"</iq>";
-                    addBuddyToTree(xml);
-                    return true;
-//                }
+                var label = _name || '';
+                var xml = "<iq>"
+                        +"  <item subscription='to' name='"+label+"' jid='"+jid+"'>"
+                        +"	   <group>"+((_group) ? _group : '')+"</group>"
+                        +"  </item>"
+                        +"</iq>";
+                addBuddyToTree(xml);
+                return true;
             }
             return false;
         },

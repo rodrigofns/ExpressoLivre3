@@ -3,25 +3,13 @@ Ext.ns('Tine.Messenger');
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
 
-// Not used
-var AVAILABLE_CLASS = 'available',
-    UNAVAILABLE_CLASS = 'unavailable',
-    AWAY_CLASS = 'away',
-    XA_CLASS = 'xa',
-    DONOTDISTURB_CLASS = 'donotdisturb',
-    WAITING_CLASS = 'waiting',
-    SUBSCRIBE_CLASS = 'subscribe',
-    FROM_CLASS = 'from',
-    NONE_CLASS = 'none',
-    UNSUBSCRIBED_CLASS = 'unsubscribed';
-
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
         fields:["value","text"],
         data:[
               ["available","Online"]
              ,["away","Away"]
-             ,["dnd","DND"]
+             ,["dnd","Do Not Disturb"]
              ,["unavailable","Unavailable"]
 //             ,["chat","Chat"]
 //             ,["xa","XA"]
@@ -31,17 +19,23 @@ Tine.Messenger.factory={
 
 Tine.Messenger.Credential = {
     
-    getName: function(){
-        return 'Bruno Ferraz Dourado'
+    myJid: function(){
+        return '';
     }
-    ,getHtml: function(){
+  , myNick: function(){
+        return '<Name>';
+    }
+  , myAvatar: function(){
+        return '/images/empty_photo_male.png';
+    }
+  , getHtml: function(){
             return '<div id="credential">'+
-                    '     <img src="/images/empty_photo_male.png" />'+
-                    '     <span class="name">'+ this.getName() +'</span>'+
-                    '</div>'
+                    '     <img src="'+ this.myAvatar() +'" />'+
+                    '     <span class="name">'+ this.myJid() +'</span>'+
+                    '</div>';
     }
 }
-var IMConst={
+const IMConst = {
    // Status constants
     ST_AVAILABLE : "avaiable",
     ST_UNAVAILABLE : "unavailable",
@@ -92,7 +86,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             cls: 'messenger-icon-off',
             listeners: {
                 click: function () {
-//                    Tine.Messenger.Window.show();
                       if(!Ext.WindowMgr.get("ClientDialog")){
                         new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
                       }
@@ -128,10 +121,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-//            Ext.getCmp('messenger-connect-button')
-//                .disable()
-//                .setIcon('/images/messenger/hourglass.png');
-            
             Ext.getCmp('messenger-connect-cmd').setText('Connecting...').disable();
             $('.messenger-connect-display img').css('display','block');
             
@@ -221,14 +210,10 @@ Tine.Messenger.IM = {
     enableOnConnect: function(){
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
+        
         Ext.getCmp("ClientDialog").setIconClass('messenger-icon');
         Ext.getCmp("ClientDialog").connected = true;
         
-//        Ext.getCmp('messenger-connect-button').connectionStatus = 'Disconnect';
-//        Ext.getCmp('messenger-connect-button')
-//            .enable()
-//            .setIcon('/images/messenger/connected.png')
-//            .setTooltip('Disconnect');
         Ext.getCmp('messenger-contact-add').enable();
         Ext.getCmp('messenger-change-status-button')
             .enable()
@@ -242,6 +227,7 @@ Tine.Messenger.IM = {
     disableOnDisconnect: function(){
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon").addClass("messenger-icon-off");
+        
         Ext.getCmp("ClientDialog").setIconClass('messenger-icon-off');
         Ext.getCmp("ClientDialog").connected = false;
         
@@ -251,11 +237,6 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-change-status-button')
             .disable()
             .setIcon('/images/messenger/user_offline.png');
-//        Ext.getCmp('messenger-connect-button').connectionStatus = 'Connect';
-//        Ext.getCmp('messenger-connect-button')
-//            .enable()
-//            .setIcon('/images/messenger/disconnected.png')
-//            .setTooltip('Connect');
             
         // Close all chats
         var chats = Ext.query('.messenger-chat-window');

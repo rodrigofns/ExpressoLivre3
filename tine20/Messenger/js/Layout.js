@@ -9,7 +9,7 @@ Tine.Messenger.ClientDialog = function(_config){
     var status = "";
     var createDialog=function(){
         extDialog=new Ext.Window(config);
-//        extDialog.setTitle(ExtJame.myJid);
+//        extDialog.setTitle(Tine.Messenger.Credential.myJid());
         extDialog.show(opener);
         Ext.getCmp('status-box').on("select", changeState);
         Ext.getCmp('status-box').on("specialkey", changeState);
@@ -17,7 +17,6 @@ Tine.Messenger.ClientDialog = function(_config){
     }
     
     var changeState = function(_box,_data,_val){
-//                console.log(_box); console.log(_data); console.log(_val);
                 var value = _box.value,
                     valueText = _box.lastSelectionText,
                     message = _box.lastQuery;
@@ -25,11 +24,9 @@ Tine.Messenger.ClientDialog = function(_config){
                     if(_data.ENTER){
                         if(_box.lastQuery){
                             changeStateAction(value, valueText, message);
-//                                Tine.Messenger.Log.debug("On enter: "+ value+":"+ valueText +" - "+ message);
                         }
                     }else if(_data.data){
                         changeStateAction(value, valueText, message);
-//                            Tine.Messenger.Log.debug("On data: "+ value+":"+ valueText +" - "+ message);
                     }
 		}catch(e){
 			//TODO
@@ -147,7 +144,6 @@ Tine.Messenger.Config = {
                                             icon: '/images/messenger/group_add.png',
                                             disabled: true,
                                             handler: function() {
-//                                                Tine.Messenger.Window._AddGroupWindow();
                                                 new Tine.Messenger.SimpleDialog(
                                                         Tine.Messenger.Config.AddGroupLayout
                                                     ).init();
@@ -212,24 +208,6 @@ Tine.Messenger.Config = {
                                     emptyText:'your Status...',
                                     selectOnFocus:true
                                 }
-//                                ,{xtype: 'tbspacer'},
-//                                {
-//                                    id: 'messenger-connect-button',
-//                                    width: 32,
-//                                    tooltip: 'Connect',
-//                                    connectionStatus: 'Connect',
-//                                    icon: '/images/messenger/disconnected.png',
-//                                    handler: function() {
-//                                        if (this.connectionStatus == 'Connect') {
-//                                            Tine.Messenger.ChatHandler.connect();
-//                                            // Commenting up, uncomment down!!
-//                                            // Start your engines!
-//                                            // Tine.Tinebase.appMgr.get('Messenger').startMessenger();
-//                                        } else if (this.connectionStatus == 'Disconnect') {
-//                                            Tine.Messenger.ChatHandler.disconnect();
-//                                        }
-//                                    }
-//                                }
                             ]
                         }
 		}]
