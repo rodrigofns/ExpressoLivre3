@@ -86,17 +86,25 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             cls: 'messenger-icon-off',
             listeners: {
                 click: function () {
-                      if(!Ext.WindowMgr.get("ClientDialog")){
+                      if(!Ext.getCmp("ClientDialog")){
                         new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
                       }
                       else{
-                        Ext.WindowMgr.get("ClientDialog").show();
+                        Ext.getCmp("ClientDialog").show();
                       }
                 }
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
         $("body").append('<div id="loghandler"></div>');
+        $(window).resize(function(){
+            Tine.Messenger.Window._onMoveWindowAction(Ext.getCmp('ClientDialog'));
+            // Do to all open chats
+            var chats = Ext.query('.messenger-chat-window');
+            Ext.each(chats, function (item, index) {
+                Tine.Messenger.Window._onMoveWindowAction(Ext.getCmp(item.id));
+            });
+        });
     },
     
     stopMessenger: function () {

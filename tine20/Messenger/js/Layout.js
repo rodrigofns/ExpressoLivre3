@@ -117,6 +117,11 @@ Tine.Messenger.Config = {
             plain: true,
             border: false,
             layout: 'border', // 'fit'
+            listeners: {
+                move: function(_box){
+                    Tine.Messenger.Window._onMoveWindowAction(_box);
+                }
+            },
             tbar: {
                     cls: 'messenger-client-tbar',
                     items:[
