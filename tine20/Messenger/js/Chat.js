@@ -9,6 +9,7 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
             width:       350,
             height:      300,
             closeAction: 'hide', //'close' - destroy the component
+            collapsible:true,
             plain:       true,
             layout: 'border',            
             items: [

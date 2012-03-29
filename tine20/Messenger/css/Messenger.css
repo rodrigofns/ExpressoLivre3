@@ -154,6 +154,11 @@
     margin-bottom: 5px;
 }
 
+.messenger-client-tbar {
+    background: transparent;
+    border-bottom-color: #bebebe
+}
+
 .messenger-group img.x-tree-node-icon {
     background-image: none;
 }
@@ -225,3 +230,37 @@
     background-repeat: no-repeat;
     padding-left: 12px;
 }*/
+
+#credential {
+    font-size: 100%;
+    width: 145px;
+    height: 35px;
+    display: block;
+    float: left;
+    overflow: hidden;
+}
+
+#credential img {
+    width: 40px;
+    height: 99%;
+    float: left;
+}
+
+#credential .name {
+    max-width: 100px;
+    font-size: 100%;
+    font-weight: bold;
+    float: left;
+    white-space: pre-line;
+    margin: 3px 0 5px 5px;
+}
+.messenger-connect-display img{
+    position: absolute;
+    top: 115px;
+    left: 70px;
+}
+.messenger-connect-cmd {
+    position: absolute;
+    top: 140px;
+    left: 68px;
+}

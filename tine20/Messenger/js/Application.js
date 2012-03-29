@@ -14,22 +14,53 @@ var AVAILABLE_CLASS = 'available',
     FROM_CLASS = 'from',
     NONE_CLASS = 'none',
     UNSUBSCRIBED_CLASS = 'unsubscribed';
+
+Tine.Messenger.factory={
+    statusStore : new Ext.data.SimpleStore({
+        fields:["value","text"],
+        data:[
+              ["available","Online"]
+             ,["away","Away"]
+             ,["dnd","DND"]
+             ,["unavailable","Unavailable"]
+//             ,["chat","Chat"]
+//             ,["xa","XA"]
+            ]
+        })
+}
+
+Tine.Messenger.Credential = {
     
-// Status constants
-const ST_AVAILABLE = 'available',
-      ST_UNAVAILABLE = 'unavailable',
-      ST_AWAY = 'away',
-      ST_XA = 'auto status (idle)',
-      ST_DONOTDISTURB = 'do not disturb';
+    getName: function(){
+        return 'Bruno Ferraz Dourado'
+    }
+    ,getHtml: function(){
+            return '<div id="credential">'+
+                    '     <img src="/images/empty_photo_male.png" />'+
+                    '     <span class="name">'+ this.getName() +'</span>'+
+                    '</div>'
+    }
+}
+var IMConst={
+   // Status constants
+    ST_AVAILABLE : "avaiable",
+    ST_UNAVAILABLE : "unavailable",
+    ST_AWAY : "away",
+    ST_XA : "auto status (idle)",
+    ST_DONOTDISTURB : "do not disturb",
     
-// Subscription constants
-const SB_NONE = 'none',
-      SB_WAITING = 'waiting',
-      SB_SUBSCRIBE = 'subscribe',
-      SB_FROM = 'from',
-      SB_UNSUBSCRIBED = 'unsubscribed',
-      SB_BOTH = 'both';
+  // Subscription constants  
+    SB_NONE : "none",
+    SB_FROM : "from",
+    SB_BOTH : "both",
+    SB_TO : "to",
+    SB_WAITING : "waiting",
+    SB_SUBSCRIBE : "subscribe",
+    SB_SUBSCRIBED : "subscribed",
+    SB_UNSUBSCRIBE : "unsubscribe",
+    SB_UNSUBSCRIBED : "unsubscribed"
     
+}
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
     hasMainScreen: false,
@@ -61,7 +92,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             cls: 'messenger-icon-off',
             listeners: {
                 click: function () {
-                    Tine.Messenger.Window.show();
+//                    Tine.Messenger.Window.show();
+                      if(!Ext.WindowMgr.get("ClientDialog")){
+                        new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
+                      }
+                      else{
+                        Ext.WindowMgr.get("ClientDialog").show();
+                      }
                 }
             }
         });
@@ -91,9 +128,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-button')
-                .disable()
-                .setIcon('/images/messenger/hourglass.png');
+//            Ext.getCmp('messenger-connect-button')
+//                .disable()
+//                .setIcon('/images/messenger/hourglass.png');
+            
+            Ext.getCmp('messenger-connect-cmd').setText('Connecting...').disable();
+            $('.messenger-connect-display img').css('display','block');
+            
         } else if (status === Strophe.Status.CONNFAIL) {
             Tine.Messenger.RosterHandler.clearRoster();
             // Disable components
@@ -180,12 +221,14 @@ Tine.Messenger.IM = {
     enableOnConnect: function(){
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
+        Ext.getCmp("ClientDialog").setIconClass('messenger-icon');
+        Ext.getCmp("ClientDialog").connected = true;
         
-        Ext.getCmp('messenger-connect-button').connectionStatus = 'Disconnect';
-        Ext.getCmp('messenger-connect-button')
-            .enable()
-            .setIcon('/images/messenger/connected.png')
-            .setTooltip('Disconnect');
+//        Ext.getCmp('messenger-connect-button').connectionStatus = 'Disconnect';
+//        Ext.getCmp('messenger-connect-button')
+//            .enable()
+//            .setIcon('/images/messenger/connected.png')
+//            .setTooltip('Disconnect');
         Ext.getCmp('messenger-contact-add').enable();
         Ext.getCmp('messenger-change-status-button')
             .enable()
@@ -193,10 +236,14 @@ Tine.Messenger.IM = {
         
         // Enable action Add Group
         Ext.getCmp('messenger-group-mngt-add').enable();
+        
+        Ext.getCmp('messenger-connect-display').hide();
     },
     disableOnDisconnect: function(){
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon").addClass("messenger-icon-off");
+        Ext.getCmp("ClientDialog").setIconClass('messenger-icon-off');
+        Ext.getCmp("ClientDialog").connected = false;
         
         // Disable action Add Group
         Ext.getCmp('messenger-group-mngt-add').disable();
@@ -204,17 +251,21 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-change-status-button')
             .disable()
             .setIcon('/images/messenger/user_offline.png');
-        Ext.getCmp('messenger-connect-button').connectionStatus = 'Connect';
-        Ext.getCmp('messenger-connect-button')
-            .enable()
-            .setIcon('/images/messenger/disconnected.png')
-            .setTooltip('Connect');
+//        Ext.getCmp('messenger-connect-button').connectionStatus = 'Connect';
+//        Ext.getCmp('messenger-connect-button')
+//            .enable()
+//            .setIcon('/images/messenger/disconnected.png')
+//            .setTooltip('Connect');
             
         // Close all chats
         var chats = Ext.query('.messenger-chat-window');
         Ext.each(chats, function (item, index) {
             Ext.getCmp(item.id).close();
         });
+        
+        Ext.getCmp('messenger-connect-display').show();
+        Ext.getCmp('messenger-connect-cmd').setText('Connect').enable();
+        $('.messenger-connect-display img').css('display','none');
     }
 }
 
@@ -230,57 +281,76 @@ Tine.Messenger.Util = {
             id;
         return clean.replace(/_/g, "@").replace(/\-/g, ".");
     },
+    
     getStatusClass: function(status){
+        
         var AVAILABLE_CLS = 'available',
             UNAVAILABLE_CLS = 'unavailable',
             AWAY_CLS = 'away',
             XA_CLS = 'xa',
             DONOTDISTURB_CLS = 'donotdisturb';
+            
         switch(status){
-            case ST_AVAILABLE:
+            case IMConst.ST_AVAILABLE:
                 return AVAILABLE_CLS;
-            case ST_UNAVAILABLE:
+                
+            case IMConst.ST_UNAVAILABLE:
                 return UNAVAILABLE_CLS;
-            case ST_AWAY:
+                
+            case IMConst.ST_AWAY:
                 return AWAY_CLS;
-            case ST_XA:
+                
+            case IMConst.ST_XA:
                 return XA_CLS;
-            case ST_DONOTDISTURB:
+                
+            case IMConst.ST_DONOTDISTURB:
                 return DONOTDISTURB_CLS;
+                
             case 'ALL':
                 return  AVAILABLE_CLS
                   +','+ UNAVAILABLE_CLS
                   +','+ AWAY_CLS
                   +','+ XA_CLS
                   +','+ DONOTDISTURB_CLS;
+              
             default:
                 return '';
         }
         return null;
     },
+    
     getSubscriptionClass: function(subscription){
+        
         var WAITING_CLS = 'waiting',
             SUBSCRIBE_CLS = 'subscribe',
             FROM_CLS = 'from',
             NONE_CLS = 'none',
             UNSUBSCRIBED_CLS = 'unsubscribed';
+            
         switch(subscription){
-            case SB_WAITING:
+            case IMConst.SB_WAITING:
                 return WAITING_CLS;
-            case SB_SUBSCRIBE:
+                
+            case IMConst.SB_SUBSCRIBE:
+            case IMConst.SB_TO:
                 return SUBSCRIBE_CLS;
-            case SB_FROM:
+                
+            case IMConst.SB_FROM:
                 return FROM_CLS;
-            case SB_NONE:
+                
+            case IMConst.SB_NONE:
                 return NONE_CLS;
-            case SB_UNSUBSCRIBED:
+                
+            case IMConst.SB_UNSUBSCRIBED:
                 return UNSUBSCRIBED_CLS;
+                
             case 'ALL':
                 return  WAITING_CLS
                   +','+ SUBSCRIBE_CLS
                   +','+ FROM_CLS
                   +','+ NONE_CLS
                   +','+ UNSUBSCRIBED_CLS;
+              
             default:
                 return '';
         }

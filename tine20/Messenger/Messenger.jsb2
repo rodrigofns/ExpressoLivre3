@@ -42,6 +42,14 @@
         {
           "text": "strophe.min.js",
           "path": "js/"
+        },
+        {
+          "text": "Layout.js",
+          "path": "js/"
+        },
+        {
+          "text": "RosterTree.js",
+          "path": "js/"
         }
       ]
     },
