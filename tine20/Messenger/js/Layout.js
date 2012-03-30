@@ -7,57 +7,51 @@ Tine.Messenger.ClientDialog = function(_config){
     var id="ClientDialog";
     var opener=Ext.getBody();
     var status = "";
+    var statusText = "";
     var createDialog=function(){
         extDialog=new Ext.Window(config);
 //        extDialog.setTitle(Tine.Messenger.Credential.myJid());
         extDialog.show(opener);
-        Ext.getCmp('status-box').on("select", changeState);
-        Ext.getCmp('status-box').on("specialkey", changeState);
+//        Ext.getCmp('status-box').on("select", changeState);
+        Ext.getCmp('status-box').on("specialkey", changeStateText);
+        Ext.getCmp('messenger-change-status-button').on("click", statusMenu);
         extDialog.doLayout();
     }
     
-    var changeState = function(_box,_data,_val){
-                var value = _box.value,
-                    valueText = _box.lastSelectionText,
-                    message = _box.lastQuery;
-		try{
-                    if(_data.ENTER){
-                        if(_box.lastQuery){
-                            changeStateAction(value, valueText, message);
-                        }
-                    }else if(_data.data){
-                        changeStateAction(value, valueText, message);
-                    }
-		}catch(e){
-			//TODO
-		}
-	}
-    var changeStateAction = function(value, valueText, message) {
-        
-        if(value != 'unavailable' && !Ext.getCmp('ClientDialog').connected){
-            Tine.Messenger.ChatHandler.connect();
-        } else {
-            switch(value){
-                case 'available':
-                    value = 'online';
-                    break;
-
-                case 'away':
-                case 'dnd':
-                    Tine.Messenger.RosterHandler.setStatus(value, message);
-                    break;
-
-                case 'unavailable':
-                    Tine.Messenger.ChatHandler.disconnect();
-                    value = 'offline';
-                    break;
-            }
-            Ext.getCmp('messenger-change-status-button')
-                    .setIcon('/images/messenger/user_'+value+'.png')
-                    .setTooltip(_(valueText));
+    var changeStateText = function(_box){
+        var stText = _box.getValue().trim();
+        if(stText != statusText && Ext.getCmp('ClientDialog').connected){
+            statusText = stText;
+            Tine.Messenger.RosterHandler.changeStatus(status, statusText);
         }
-        
-    }       
+    }
+    
+    var changeStateHandler = function(_e){
+        if(_e.value != status){
+            Ext.getCmp('ClientDialog').status = status = _e.value;
+            Tine.Messenger.RosterHandler.changeStatus(status, statusText);
+        }
+    }
+    
+    var statusMenu = function(_box){
+            var items = Array(),
+                statusItems = Tine.Messenger.factory.statusStore.data.items;
+            
+            for(var i=0; i < statusItems.length; i++){
+                var text = _(statusItems[i].data.text),
+                    value = statusItems[i].data.value;
+                items.push({text: text,
+                            value: value,
+                            icon: '/images/messenger/user_'+value+'.png',
+                            handler: changeStateHandler
+                      });
+            }
+            
+            var menu = new Ext.menu.Menu({
+                            items: items
+                    });
+            menu.show(_box.getPositionEl());
+    }
     
     return{
         init:function(){
@@ -75,11 +69,11 @@ Tine.Messenger._Roster = new Ext.tree.TreePanel({
                                     cls:          'messenger-treeview',
                                     rootVisible:  false,
 //                                    renderTo:     Ext.getBody(),
-                                    autoScroll:   true,
                                     
                                     root: new Ext.tree.AsyncTreeNode({
                                         expanded: true,
-                                        leaf:     false
+                                        leaf:     false,
+                                        cls:          'messenger-treeview'
                                     })
                                 })
                                 
@@ -108,6 +102,7 @@ Tine.Messenger.Config = {
             title: 'Expresso Messenger',
             iconCls: 'messenger-icon-off',
             connected: false,
+            status: '',
             width: 220,
             minWidth: 220,
             height: 420,
@@ -115,6 +110,7 @@ Tine.Messenger.Config = {
             closeAction: 'hide', //'close' - destroy the component
             collapsible: true,
             plain: true,
+            autoScroll:   true,
             border: false,
             layout: 'border', // 'fit'
             listeners: {
@@ -153,13 +149,21 @@ Tine.Messenger.Config = {
                                                         Tine.Messenger.Config.AddGroupLayout
                                                     ).init();
                                             }
-                                        }]
+                                     },
+                                     {
+                                         id: 'messenger-logout',
+                                         text: 'Logout',
+                                         disabled: true,
+                                         handler: function() {
+                                             Tine.Messenger.ChatHandler.disconnect();
+                                         }
+                                     }
+                                    ]
                                 }
                         }]
             },
             items:[{
 			region:'center',
-			minHeight:190,
 			border:false,
                         bodyStyle:'padding:6px 3px 0 3px;',
 			layout:'fit',
@@ -183,39 +187,32 @@ Tine.Messenger.Config = {
                                 }
                             ]
                     }
-                        
-                    ,{
-			region:'south',
-			id:'status-container',
-			height:27,
-			bodyStyle:'background:transparent;padding:0px;',
-			border:false,
-			xtype:'form',
-			hideLabels:true,
-			bodyBorder:false,
-                        tbar: {
-                            cls: 'messenger-client-tbar',
-                            items: [{   
-                                    id: 'messenger-change-status-button',
-                                    icon: '/images/messenger/user_offline.png'
-                                },
-                                {xtype: 'tbspacer', width: 5},
-                                {
-                                    xtype:'combo',
-                                    store: Tine.Messenger.factory.statusStore,
-                                    displayField:'text',
-                                    valueField:'value',
-                                    typeAhead: true,
-                                    name:'message',
-                                    mode: 'local',
-                                    triggerAction: 'all',
-                                    id:'status-box',
-                                    emptyText:'your Status...',
-                                    selectOnFocus:true
-                                }
-                            ]
-                        }
-		}]
+		]
+            ,bbar:{
+                id: 'status-container',
+                height: 27,
+                cls: 'messenger-client-tbar',
+                items: [{   
+                        id: 'messenger-change-status-button',
+                        icon: '/images/messenger/user_offline.png'
+                    },
+                    {xtype: 'tbspacer', width: 5},
+                    {
+                        xtype:'textfield',
+//                        store: Tine.Messenger.factory.statusStore,
+                        displayField:'text',
+                        width: 175,
+                        valueField:'value',
+                        typeAhead: true,
+                        name:'message',
+                        mode: 'local',
+                        triggerAction: 'all',
+                        id:'status-box',
+                        emptyText:'your Status... (press ENTER after)',
+                        selectOnFocus:true
+                    }
+                ]
+            }
     }
     
     , AddBuddyLayout: {

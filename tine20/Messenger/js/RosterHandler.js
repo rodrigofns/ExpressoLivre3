@@ -11,6 +11,8 @@ Tine.Messenger.RosterHandler = {
             // Modify Main Menu status
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             
+            Tine.Messenger.RosterHandler.changeStatus(Ext.getCmp('ClientDialog').status);
+            
         } catch (e) {
             alert('Something went wrong!\n'+e.getMessage());
             console.log(e);
@@ -133,6 +135,41 @@ Tine.Messenger.RosterHandler = {
     setStatus: function(status, text) {
         var presence = $pres().c('show').t(status).up().c('status').t(text);
         Tine.Messenger.Application.connection.send(presence);
+    },
+    
+    changeStatus: function(status, statusText) {
+        
+        var statusValue = '',
+            statusItems = Tine.Messenger.factory.statusStore.data.items;
+        statusText = statusText ? statusText : '';
+        for(var i=0; i < statusItems.length; i++){
+            if(statusItems[i].data.value == status){
+                statusValue = statusItems[i].data.text;
+            }
+        }
+        
+        if(status != 'unavailable' && !Ext.getCmp('ClientDialog').connected){
+            Tine.Messenger.ChatHandler.connect();
+        } else {
+            switch(status){
+                case 'available':
+                case 'away':
+                case 'dnd':
+                    var presence = $pres().c('show').t(status).up().c('status').t(statusText);
+                    break;
+
+                case 'unavailable':
+                    Tine.Messenger.ChatHandler.disconnect();
+                    break;
+            }
+            if(statusValue != ''){
+                Tine.Messenger.Application.connection.send(presence);
+                Ext.getCmp('messenger-change-status-button')
+                        .setIcon('/images/messenger/user_'+status+'.png')
+                        .setTooltip(_(statusValue));
+            }
+        }
+        
     },
 
     addContact: function(jid, name, group) {
@@ -310,29 +347,29 @@ Tine.Messenger.RosterHandler = {
             to = $(iq).attr("to"),
             xmlns = $(iq).attr("xmlns");
             
-            from = Strophe.getBareJidFromJid(from);
-            to = Strophe.getBareJidFromJid(to);
-        
-            if(from == to && xmlns == "jabber:client"){
-                
-                // Building initial Users and Groups Tree
-                new Tine.Messenger.RosterTree(iq).init();
-                
-                $(iq).find("item").each(function(){
-                    var jid = $(this).attr("jid");
-                    if($(this).attr("subscription") == "none"){
+        from = Strophe.getBareJidFromJid(from);
+        to = Strophe.getBareJidFromJid(to);
+
+        if(from == to && xmlns == "jabber:client"){
+
+            // Building initial Users and Groups Tree
+            new Tine.Messenger.RosterTree(iq).init();
+
+            $(iq).find("item").each(function(){
+                var jid = $(this).attr("jid");
+                if($(this).attr("subscription") == "none"){
 //                        if($(this).attr("ask") == 'subscribe'){
 //                            Tine.Messenger.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
 //                        } else {
-                            Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
+                        Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
 //                        }
-                    }else  if($(this).attr("subscription") == "from"){
-                        Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_FROM);
-                    }else  if($(this).attr("subscription") == "to"){
-                        Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_SUBSCRIBE);
-                    }
-                });
-            }
+                }else  if($(this).attr("subscription") == "from"){
+                    Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_FROM);
+                }else  if($(this).attr("subscription") == "to"){
+                    Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_SUBSCRIBE);
+                }
+            });
+        }
         return true;
     }
     

@@ -231,6 +231,8 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-group-mngt-add').enable();
         
         Ext.getCmp('messenger-connect-display').hide();
+        
+        Ext.getCmp('messenger-logout').enable();
     },
     disableOnDisconnect: function(){
         // Change IM icon
@@ -242,9 +244,9 @@ Tine.Messenger.IM = {
         // Disable action Add Group
         Ext.getCmp('messenger-group-mngt-add').disable();
         Ext.getCmp('messenger-contact-add').disable();
+        Ext.getCmp('messenger-logout').disable();
         Ext.getCmp('messenger-change-status-button')
-            .disable()
-            .setIcon('/images/messenger/user_offline.png');
+            .setIcon('/images/messenger/user_unavailable.png');
             
         // Close all chats
         var chats = Ext.query('.messenger-chat-window');

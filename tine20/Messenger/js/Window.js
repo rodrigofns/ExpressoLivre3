@@ -26,15 +26,13 @@ Tine.Messenger.Window._addGroupAction = function(name){
 
 Tine.Messenger.Window.AddBuddyWindow = function(_jid){
     
-    if(_jid){
+    if(_jid)
         Tine.Messenger.RosterTree().addBuddy(_jid);
-    } else {
-        _jid = '';
-    }
     
     var dialog = new Tine.Messenger.SimpleDialog(Tine.Messenger.Config.AddBuddyLayout).init();
-         
-    dialog.findById('messenger-contact-add-jid').setValue(_jid).disable();
+    
+    if(_jid)
+        dialog.findById('messenger-contact-add-jid').setValue(_jid).disable();
 }
 
 Tine.Messenger.Window.AddBuddyHandler = function(dialog){
@@ -51,13 +49,9 @@ Tine.Messenger.Window.AddBuddyHandler = function(dialog){
 }
 
 Tine.Messenger.Window._addBuddyAction = function(jid, name, group){
-    
     var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
     if(buddy){
-        var buddys = new Array();
-        buddys.push([jid, name, group]);
-//        Tine.Messenger.RosterHandler.renameContact(jid, name, group);
-        Tine.Messenger.RosterHandler.modifyBuddys(buddys);
+        Tine.Messenger.RosterHandler.renameContact(jid, name, group);
         Tine.Messenger.LogHandler.status(jid || name, _('Added successfuly!'));
         return true;
     } else {

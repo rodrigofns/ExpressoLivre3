@@ -28,7 +28,7 @@ Tine.Messenger.RosterTree = function(iq){
                     items.push({text: 'Subscribe', 
                                   handler: subscribeBuddy,
                                   node:_node,
-                                  icon:"images/jame/group_go.png"});
+                                  icon:""});
             items.push({text: 'Move to',
                           node:_node,
                           listeners: {
@@ -36,7 +36,7 @@ Tine.Messenger.RosterTree = function(iq){
                                   buildSubMenuGrpItems(e);
                               }
                           },
-                          icon:"",
+                          icon:"/images/messenger/group_go.png",
                           menu: {xtype: 'menu'}
                       });
             var menu = new Ext.menu.Menu({
@@ -93,40 +93,32 @@ Tine.Messenger.RosterTree = function(iq){
             jid = _node.attributes.jid;
 
         menu_node.removeAll();
-
+        
+        var items = Array();
         for(var i=0; i < groups.length; i++){
             var group = groups[i];
             if(group != user_group){
-                menu_node.addItem( 
-                    new Ext.menu.Item({
-                        text: group,
-                        handler: function(choice, ev){
-                                    Tine.Messenger.RosterHandler.moveContactFromGroups(jid, choice.text);
-                                }
-                    })
-                );
+                items.push({text: group,
+                            icon: '/images/messenger/group.png',
+                            handler: function(choice, ev){
+                                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, choice.text);
+                            }
+                });
             } else if(groups.length == 1){
-                menu_node.addItem( 
-                    new Ext.menu.Item({
-                        text: _('Empty'),
-                        disabled: true
-                    })
-                );
+                items.push({text: _('Empty'),
+                            disabled: true 
+                        });
             }
         }
         if(user_group != NO_GROUP){
-            menu_node.addItem( 
-                new Ext.menu.Separator()
-            );
-            menu_node.addItem( 
-                new Ext.menu.Item({
-                    text: NO_GROUP,
-                    handler: function(choice, ev){
-                                Tine.Messenger.RosterHandler.moveContactFromGroups(jid, NO_GROUP);
-                            }
-                })
-            );
+            items.push(new Ext.menu.Separator());
+             items.push({text: _(NO_GROUP),
+                         handler: function(choice, ev){
+                            Tine.Messenger.RosterHandler.moveContactFromGroups(jid, _(NO_GROUP));
+                        }
+                    });
         }
+        menu_node.addItem(items);
     }
     
     var groupContext = function(_node, e){
