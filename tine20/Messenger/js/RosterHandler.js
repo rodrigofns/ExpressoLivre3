@@ -144,17 +144,17 @@ Tine.Messenger.RosterHandler = {
             }
         }
         
-        if(status != IMConst.ST_UNAVAILABLE && !Ext.getCmp('ClientDialog').connected){
+        if(status != 'unavailable' && !Ext.getCmp('ClientDialog').connected){
             Tine.Messenger.ChatHandler.connect();
         } else {
             switch(status){
-                case IMConst.ST_AVAILABLE:
-                case IMConst.ST_AWAY:
-                case IMConst.ST_DONOTDISTURB:
+                case 'available':
+                case 'away':
+                case 'dnd':
                     var presence = $pres().c('show').t(status).up().c('status').t(statusText);
                     break;
 
-                case IMConst.ST_UNAVAILABLE:
+                case 'unavailable':
                     Tine.Messenger.ChatHandler.disconnect();
                     break;
             }
