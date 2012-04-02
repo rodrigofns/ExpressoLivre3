@@ -1,8 +1,8 @@
 Ext.ns('Tine.Messenger');
 
 Tine.Messenger.RosterTree = function(iq){
-    var NO_GROUP = '(no group)';
-    var rootNode = Tine.Messenger.RootNode();
+    var NO_GROUP = '(no group)',
+        rootNode = Tine.Messenger.RootNode();
     
     var createTree = function(xml) {
         addGroupToTree(xml);	//add groups
@@ -14,22 +14,22 @@ Tine.Messenger.RosterTree = function(iq){
             
             var items = Array();
             
-            items.push({text: 'Rename',
+            items.push({text: _('Rename'),
                           handler: renameBuddy,
                           node:_node,
                           icon: '/images/messenger/user_edit.png'});
-            items.push({text: 'Remove', 
+            items.push({text: _('Remove'), 
                           handler: removeBuddy,
                           node:_node, 
                           icon:"/images/messenger/user_delete.png"});
             if( _node.attributes.subscription == "none" || 
                 _node.attributes.subscription == "to" || 
                 _node.attributes.subscription == "from")
-                    items.push({text: 'Subscribe', 
+                    items.push({text: _('Subscribe'), 
                                   handler: subscribeBuddy,
                                   node:_node,
                                   icon:""});
-            items.push({text: 'Move to',
+            items.push({text: _('Move to'),
                           node:_node,
                           listeners: {
                               render: function(e){
@@ -48,7 +48,7 @@ Tine.Messenger.RosterTree = function(iq){
     var renameBuddy = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
                     allowBlank:false,
-                    blankText:'A name is required',
+                    blankText:_('A name is required'),
                     selectOnFocus:true
             });
             treeEditor.on("complete",renameContact, this);
@@ -79,10 +79,9 @@ Tine.Messenger.RosterTree = function(iq){
     }
     
     var subscribeBuddy = function(_node, e){
-        var jid = _node.node.attributes.jid,
-            type = 'subscribe';
-            
-        Tine.Messenger.LogHandler.sendSubscribeMessage(jid, type);
+        Tine.Messenger.LogHandler.sendSubscribeMessage(
+                                        _node.node.attributes.jid
+                                      , IMConst.SB_SUBSCRIBE);
     }
     
     var buildSubMenuGrpItems = function(e){
@@ -110,11 +109,11 @@ Tine.Messenger.RosterTree = function(iq){
                         });
             }
         }
-        if(user_group != NO_GROUP){
+        if(user_group != _(NO_GROUP)){
             items.push(new Ext.menu.Separator());
              items.push({text: _(NO_GROUP),
                          handler: function(choice, ev){
-                            Tine.Messenger.RosterHandler.moveContactFromGroups(jid, _(NO_GROUP));
+                            Tine.Messenger.RosterHandler.moveContactFromGroups(jid, choice.text);
                         }
                     });
         }
@@ -124,16 +123,15 @@ Tine.Messenger.RosterTree = function(iq){
     var groupContext = function(_node, e){
             var items = Array();
             
-            items.push({text: 'Rename',
+            items.push({text: _('Rename'),
                           handler: renameGroup,
                           node:_node,
                           icon: '/images/messenger/group_edit.png'});
-            items.push({text: 'Remove', 
+            items.push({text: _('Remove'), 
                           handler: removeGroup,
                           node:_node, 
                           icon:"/images/messenger/group_delete.png"});
             var menu = new Ext.menu.Menu({ 
-//                            id: 'contextMenuGroup',
                             items: items
                     }); 
             menu.show(_node.ui.getAnchor());
@@ -142,7 +140,7 @@ Tine.Messenger.RosterTree = function(iq){
     var renameGroup = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
                     allowBlank:false,
-                    blankText:'A name is required',
+                    blankText: _('A name is required'),
                     selectOnFocus:true
             });
             treeEditor.on("beforecomplete",renameGroupAction,this);
@@ -240,9 +238,8 @@ Tine.Messenger.RosterTree = function(iq){
     }
     
     var addGroupToTree = function(xml){
-        var _group_name = '';
-        
-        var _arr_groups = [];
+        var _group_name = '',
+            _arr_groups = [];
         $(xml).find("group").each(function(){
             _group_name = $(this).text();
             if(_group_name.trim() != ''){
@@ -413,7 +410,6 @@ Tine.Messenger.RosterTree = function(iq){
                                                 (status_text.trim() ? '<br>'+status_text : '') +
                                                 (message.trim() ? '<br>'+message : ''));
                 
-//                updateReqAuthorizationButton(jid, subscription);
             } else {
                 Tine.Messenger.Log.error('Error while updating '+jid+". Jid not found or class not found can be the cause.");
             }

@@ -37,11 +37,11 @@ Tine.Messenger.Credential = {
 }
 const IMConst = {
    // Status constants
-    ST_AVAILABLE : "avaiable",
-    ST_UNAVAILABLE : "unavailable",
-    ST_AWAY : "away",
-    ST_XA : "auto status (idle)",
-    ST_DONOTDISTURB : "do not disturb",
+    ST_AVAILABLE : "Avaiable",
+    ST_UNAVAILABLE : "Unavailable",
+    ST_AWAY : "Away",
+    ST_XA : "Auto Status (idle)",
+    ST_DONOTDISTURB : "Do Not Disturb",
     
   // Subscription constants  
     SB_NONE : "none",
@@ -96,7 +96,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
-        $("body").append('<div id="loghandler"></div>');
+        $("body").append('<div id="messenger-loghandler-status"></div>');
         $(window).resize(function(){
             Tine.Messenger.Window._onMoveWindowAction(Ext.getCmp('ClientDialog'));
             // Do to all open chats

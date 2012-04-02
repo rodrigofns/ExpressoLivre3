@@ -175,7 +175,7 @@
     background-image: none !important;
 }
 
-#loghandler .msg {
+#messenger-loghandler-status .msg {
     width: 95%;
     min-height: 25px;
     background-color: #444;
@@ -190,15 +190,15 @@
     overflow: hidden;
     white-space: pre-line;
 }
-#loghandler .msg .title {
+#messenger-loghandler-status .msg .title {
     font-size: 120%;
     font-weight: bold;
     display: block;
 }
-#loghandler .msg .body {
+#messenger-loghandler-status .msg .body {
     display: block;
 }
-#loghandler {
+#messenger-loghandler-status {
     width: 250px;
     min-height: 10px;
     position: fixed;

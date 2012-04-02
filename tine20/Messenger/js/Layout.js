@@ -72,8 +72,7 @@ Tine.Messenger._Roster = new Ext.tree.TreePanel({
                                     
                                     root: new Ext.tree.AsyncTreeNode({
                                         expanded: true,
-                                        leaf:     false,
-                                        cls:          'messenger-treeview'
+                                        leaf:     false
                                     })
                                 })
                                 
@@ -270,7 +269,9 @@ Tine.Messenger.Config = {
                         text: 'Add',
                         listeners: {
                             click: function () {
-                               Tine.Messenger.Window.AddBuddyHandler(Ext.getCmp('messenger-contact-add-client'));
+                               Tine.Messenger.Window.AddBuddyHandler(
+                                                        Ext.getCmp('messenger-contact-add-client')
+                                                    );
                             }
                         }
                     }
@@ -279,7 +280,9 @@ Tine.Messenger.Config = {
                     {
                         key: [Ext.EventObject.ENTER],
                         handler: function () {
-                            Tine.Messenger.Window.AddBuddyHandler(Ext.getCmp('messenger-contact-add-client'));
+                            Tine.Messenger.Window.AddBuddyHandler(
+                                                    Ext.getCmp('messenger-contact-add-client')
+                                                );
                         }
                     }
                 ]
@@ -309,7 +312,9 @@ Tine.Messenger.Config = {
                         text: 'Add',
                         listeners: {
                             click: function () {
-                                Tine.Messenger.Window.AddGroupHandler(Ext.getCmp('messenger-group-add-client'));
+                                Tine.Messenger.Window.AddGroupHandler(
+                                                        Ext.getCmp('messenger-group-add-client')
+                                                    );
                             }
                         }
                     }
@@ -320,7 +325,9 @@ Tine.Messenger.Config = {
             {
                 key: [Ext.EventObject.ENTER],
                 handler: function () {
-                    Tine.Messenger.Window.AddGroupHandler(Ext.getCmp('messenger-group-add-client'));
+                    Tine.Messenger.Window.AddGroupHandler(
+                                            Ext.getCmp('messenger-group-add-client')
+                                        );
                 }
             }
         ]

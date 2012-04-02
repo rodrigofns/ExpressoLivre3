@@ -27,12 +27,12 @@ Tine.Messenger.LogHandler = {
 
     log: function (msg) {
         var handler = $("<div class='msg'>"+msg+"</div>");
-        $("#loghandler").append(handler);
+        $("#messenger-loghandler-status").append(handler);
         handler.delay(8000).fadeOut("slow");
     },
     status: function(title, message){
         var handler = $("<div class='msg'><span class='title'>"+title+"</span><span class='body'>"+message+"</span></div>");
-        $("#loghandler").append(handler);
+        $("#messenger-loghandler-status").append(handler);
         handler.delay(8000).fadeOut("slow");
     },
     
@@ -57,12 +57,12 @@ Tine.Messenger.LogHandler = {
                         var title = contact.text || jid;
                         var status = "";
                         
-                        if(type === 'unavailable'){
+                        if(type == 'unavailable'){
                             status = _('is unavailable');
                             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE);
                         } else {
-                            var show = $(presence).find('show').text();
-                            var status_text = $(presence).find('status').text() ? 
+                            var show = $(presence).find('show').text(),
+                                status_text = $(presence).find('status').text() ? 
                                                 _('Status text')+': '+ $(presence).find('status').text() : '';
                             if(show == 'away') {
                                 status = _('is away');

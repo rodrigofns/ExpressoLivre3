@@ -66,7 +66,7 @@ Tine.Messenger.RosterHandler = {
                         }
                         // Update the buddy name
                         contact.setText(name);
-                    } else if(subscription == 'from'){
+                    } else if(subscription == IMConst.SB_FROM){
 //                        Tine.Messenger.Window.AddBuddyWindow(jid);
                         Tine.Messenger.Window.AddBuddyWindow(jid);
                         Tine.Messenger.LogHandler.sendSubscribeMessage(jid, IMConst.SB_SUBSCRIBE);
@@ -144,17 +144,17 @@ Tine.Messenger.RosterHandler = {
             }
         }
         
-        if(status != 'unavailable' && !Ext.getCmp('ClientDialog').connected){
+        if(status != IMConst.ST_UNAVAILABLE && !Ext.getCmp('ClientDialog').connected){
             Tine.Messenger.ChatHandler.connect();
         } else {
             switch(status){
-                case 'available':
-                case 'away':
-                case 'dnd':
+                case IMConst.ST_AVAILABLE:
+                case IMConst.ST_AWAY:
+                case IMConst.ST_DONOTDISTURB:
                     var presence = $pres().c('show').t(status).up().c('status').t(statusText);
                     break;
 
-                case 'unavailable':
+                case IMConst.ST_UNAVAILABLE:
                     Tine.Messenger.ChatHandler.disconnect();
                     break;
             }
@@ -184,7 +184,7 @@ Tine.Messenger.RosterHandler = {
                 Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
 
                 // Ask subscription
-                Tine.Messenger.LogHandler.sendSubscribeMessage(jid, 'subscribe');
+                Tine.Messenger.LogHandler.sendSubscribeMessage(jid, IMConst.SB_SUBSCRIBE);
                 
                 return true;
              }
@@ -261,10 +261,9 @@ Tine.Messenger.RosterHandler = {
     
     renameGroup: function(_et, n_gname, gname){
         
-        var NO_GROUP = Tine.Messenger.RosterTree().getNoGroup(),
-            group_exist = Tine.Messenger.RosterTree().groupExist(n_gname);
+        var NO_GROUP = Tine.Messenger.RosterTree().getNoGroup();
         if(n_gname != NO_GROUP){
-            var grpNode = Tine.Messenger.RootNode().findChild('text',n_gname);
+            var grpNode = Tine.Messenger.RootNode().findChild('text', n_gname);
             var length = grpNode.childNodes.length;
             var buddys = [];
             for(var i=0; i < length; i++){
@@ -282,7 +281,7 @@ Tine.Messenger.RosterHandler = {
             return true;
         } else {
 //            Tine.Messenger.LogHandler.status(_('Error'), n_gname + _(' already exist. It was not renamed.'));
-            Tine.Messenger.Log.info("Group name already exist");
+            Tine.Messenger.Log.info("Rename to No Group name is not permitted.");
         }
         return false;
     },
