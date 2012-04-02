@@ -109,27 +109,23 @@ Tine.Messenger.RosterHandler = {
     
     isContactAvailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AVAILABLE) ? true : false);
-//        return Ext.fly(contact.ui.elNode).hasClass(AVAILABLE_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AVAILABLE));
     },
     
     isContactUnavailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
         Tine.Messenger.Log.debug("Status: "+contact.ui.textNode.getAttribute('status'));
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_UNAVAILABLE) ? true : false);
-//        return Ext.fly(contact.ui.elNode).hasClass(UNAVAILABLE_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_UNAVAILABLE));
     },
     
     isContactAway: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AWAY) ? true : false);
-//        return Ext.fly(contact.ui.elNode).hasClass(AWAY_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AWAY));
     },
     
     isContactDoNotDisturb: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_DONOTDISTURB) ? true : false);
-//        return Ext.fly(contact.ui.elNode).hasClass(DONOTDISTURB_CLASS);
+        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_DONOTDISTURB));
     },
     
     setStatus: function(status, text) {
