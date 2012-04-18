@@ -73,9 +73,6 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
     public function login($_loginname, $_password, $_ipAddress, $_clientIdString = NULL, $securitycode = NULL)
     {
         if(isset(Tinebase_Core::getConfig()->captcha->count) && Tinebase_Core::getConfig()->captcha->count != 0){
-            if(!isset($_SESSION['tinebase']['code'])) {
-                $_SESSION['tinebase']['code'] = 'code';
-            }
             if($_SESSION['tinebase']['code'] != $securitycode) {
                     return FALSE;
                    }
@@ -103,6 +100,7 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
             $result = true;
         } else {
             $this->_loginFailed($_loginname, $accessLog);
+            $_SESSION['tinebase']['code'] = 'code';
             $result = false;
         } 
         
