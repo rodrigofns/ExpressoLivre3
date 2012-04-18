@@ -432,12 +432,13 @@ class Tinebase_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      *
      * @param  string $username the username
      * @param  string $password the password
+     * @param  string $securitycode the security code(captcha)
      * @return array
      */
-    public function login($username, $password)
+    public function login($username, $password, $securitycode=NULL)
     {
         // try to login user
-        $success = (Tinebase_Controller::getInstance()->login($username, $password, $_SERVER['REMOTE_ADDR'], 'TineJson') === TRUE);
+        $success = (Tinebase_Controller::getInstance()->login($username, $password, $_SERVER['REMOTE_ADDR'], 'TineJson', $securitycode) === TRUE);
 
         if ($success) {
             $response = array(

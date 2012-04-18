@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-01-19 18:12-0300\n"
+"PO-Revision-Date: 2012-04-18 09:21-0300\n"
 "Last-Translator: Bruno <bruno.vieira-costa@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -2004,4 +2004,8 @@ msgstr "Exibir diálogo de confirmação ao sair."
 #, fuzzy
 msgid "Your session is not valid. You need to login again."
 msgstr "Sua sessão não é válida. É necessário logar novamente."
+
+#: LoginPanel.js:384
+msgid "Security Code"
+msgstr "Código de Segurança"
 
