@@ -18,7 +18,26 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
      * @var string
      */
     protected $_applicationName = 'Felamimail';
+
+	/**
+	 * upload image
+	 */
+    public function uploadImage(){
+        $tmpFile = tempnam(Tinebase_Core::getTempDir(), '');
+        if(move_uploaded_file($_FILES['upload']['tmp_name'], $tmpFile))
+                echo '{"success":true , "id":"'.str_replace(Tinebase_Core::getTempDir().'/','',$tmpFile).'"}';
+        else
+                echo '{"success":false}';
+    }
     
+    public function showTempImage($tempImageId){
+        
+        header("Content-Type: image/jpeg");
+	header("Content-Disposition: inline");
+        $stream = fopen(Tinebase_Core::getTempDir().'/'.$tempImageId, 'r');
+        fpassthru($stream);
+        fclose($stream);
+    }
 
     /**
      * download email attachment
