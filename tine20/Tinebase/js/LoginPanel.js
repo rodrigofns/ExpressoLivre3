@@ -31,8 +31,12 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
     /**
      * @cfg {String} defaulSecuritCode prefilled Security Code
      */
-    defaulSecuritCode: 'Security Code',   
+    defaulSecuritCode: 'Security Code',  
     
+    /**
+     * @cfg {String} defaulSecuritCode prefilled Security Code
+     */
+    loginPanelheight: 250,      
     /**
      * @cfg {String} loginMethod server side login method
      */
@@ -70,7 +74,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
         if (! this.loginPanel) {
             this.loginPanel = new Ext.FormPanel({
                 width: 460,
-                height: 290,
+                //height: this.loginPanelheight,
                 frame: true,
                 labelWidth: 90,
                 cls: 'tb-login-panel',
@@ -380,6 +384,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                                 fn: function () {
                                     this.getLoginPanel().getForm().findField('password').focus(true);
                                     if(document.getElementById('useCaptcha')) {
+                                    this.loginPanelheight = 290;
                                     document.getElementById('imgCaptcha').src = 'index.php?method=Tinebase.RequestImage&i=' + Math.floor(Math.random()*1000000001);
                                     document.getElementById('contImgCaptcha').style.display = ''; 
                                     document.getElementById('security_code').value = _('Security Code');
@@ -413,7 +418,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
         this.supr().onResize.apply(this, arguments);
 
         var box 	 = this.getBox(),
-        	loginBox = this.getLoginPanel().rendered ? this.getLoginPanel().getBox() : {width : this.getLoginPanel().width, height: this.getLoginPanel().height},
+        	loginBox = {width : this.getLoginPanel().width, height: this.loginPanelheight},
         	infoBox  = this.infoPanel.rendered ? this.infoPanel.getBox() : {width : this.infoPanel.width, height: this.infoPanel.height};
 
         var top = (box.height - loginBox.height) / 2;
