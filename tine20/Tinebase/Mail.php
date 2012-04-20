@@ -219,7 +219,8 @@ class Tinebase_Mail extends Zend_Mail
     public function processEmbeddedImagesInHtmlBody($html)
     {
    //todo achar tudo no formato <img alt="'+data.name+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+data.url+'"/>, criar as partes multipart/related e substituir o src por CID:cid
-        $expImages = '/<img alt="([a-z0-9A-Z.]+)" src="index.php\?method=Felamimail\.showTempImage&amp;tempImageId=([a-z0-9A-Z]+)">/';
+        $expImages = '/<img alt="([^\"]+)" src="index.php\?method=Felamimail\.showTempImage&amp;tempImageId=([a-z0-9A-Z]+)">/';
+       //a-z0-9A-Z. _-
         preg_match_all($expImages, $html, $result);
         $return = array();
         foreach($result[0] as $key => $embeddedImage){

@@ -25,7 +25,7 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     public function uploadImage(){
         $tmpFile = tempnam(Tinebase_Core::getTempDir(), '');
         if(move_uploaded_file($_FILES['upload']['tmp_name'], $tmpFile))
-                echo '{"success":true , "id":"'.str_replace(Tinebase_Core::getTempDir().'/','',$tmpFile).'"}';
+                echo '{"success":true , "id":"' . str_replace(Tinebase_Core::getTempDir().'/','',$tmpFile) . '", "size":"' . filesize($tmpFile) . '"}';
         else
                 echo '{"success":false}';
     }

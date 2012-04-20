@@ -29,7 +29,6 @@ Ext.ux.HtmlEditor.ButtonImage = Ext.extend(Ext.util.Observable, {
 	,lookup : {}
 
 	,show : function(el, callback){
-		//if(!this.win){
                     this.initTemplates();
                     this.view=null;
                     this.store=null;
@@ -118,32 +117,7 @@ Ext.ux.HtmlEditor.ButtonImage = Ext.extend(Ext.util.Observable, {
 							dialog.show();
 	
 						},
-						scope: this
-//					  }, '-', {
-//						iconCls:'delete-image',
-//						text:'Excluir',
-//						handler: this.deleteFile,
-//						scope: this
-//					  }, 
-//                                        }, '-',					
-//					
-//					{
-//                    	text: 'Pesquisar:'
-//                    },{
-                        }
-//                        {xtype: 'textfield',
-//                    	id: 'filter',
-//                    	selectOnFocus: true,
-//                    	width: 100,
-//                    	listeners: {
-//                    		'render': {fn:function(){
-//						    	Ext.getCmp('filter').getEl().on('keyup', function(){
-//						    		this.filter();
-//						    	}, this, {buffer:500});
-//                    		}, scope:this}
-//                    	}
-//                    }
-                ]
+						scope: this}]
 				},{
 					id: 'img-detail-panel',
 					region: 'east',
@@ -209,13 +183,15 @@ Ext.ux.HtmlEditor.ButtonImage = Ext.extend(Ext.util.Observable, {
 	,onUploadSuccess : function(dialog, filename, resp_data, record){
                 var imageRecord = Ext.data.Record.create([ // creates a subclass of Ext.data.Record
                     'name',
-                    'url'
+                    'url',
+                    'size'
                 ]);
                 
                 var myNewRecord = new imageRecord(
                 {
-                  name: filename,
-                  url: resp_data.id
+                  name: filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, ''),
+                  url: resp_data.id,
+                  size: resp_data.size
                 }
               
             )
@@ -287,7 +263,8 @@ Ext.ux.HtmlEditor.ButtonImage = Ext.extend(Ext.util.Observable, {
 		
 		var data = lookup[selNode.id];
 		var img = Ext.getCmp('message_editor_body');
-		img.append('<img alt="'+data.name+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+data.url+'"/>');   			
+                var fileName = data.name.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
+		img.append('<img alt="'+fileName+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+data.url+'"/>');   			
 
 		this.win.destroy();	
     }
