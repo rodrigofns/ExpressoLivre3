@@ -324,10 +324,21 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message
     protected function _setMailBody(Tinebase_Mail $_mail, Felamimail_Model_Message $_message)
     {
         if ($_message->content_type == Felamimail_Model_Message::CONTENT_TYPE_HTML) {
+            $embeddedImages = $_mail->processEmbeddedImagesInHtmlBody($_message->body);
+            if(count($embeddedImages)>0){
+                    $_message->body = str_ireplace('src="index.php?method=Felamimail.showTempImage&amp;tempImageId=','src="cid:', $_message->body);
+            }
             $_mail->setBodyHtml(Felamimail_Message::addHtmlMarkup($_message->body));
+            if(count($embeddedImages)>0){
+                    foreach($embeddedImages as $embeddedImage ){
+                           $file = Tinebase_Core::getTempDir().'/'.$embeddedImage[1];
+                           $image = file_get_contents($file);
+                           $_mail->createHtmlRelatedAttachment($image,$embeddedImage[1],'image/jpg',Zend_Mime::DISPOSITION_INLINE,Zend_Mime::ENCODING_BASE64,$embeddedImage[0]);
+                    }
+                }
+
             if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_mail->getBodyHtml(TRUE));
         }
-        
         $plainBodyText = $_message->getPlainTextBody();
         $_mail->setBodyText($plainBodyText);
         if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_mail->getBodyText(TRUE));

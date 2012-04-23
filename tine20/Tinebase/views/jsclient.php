@@ -44,6 +44,11 @@
     <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/css/htmleditorplugins.css" />
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.MidasCommand.js"></script>
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.SpellChecker.js"></script>
+	<link rel="stylesheet" type="text/css" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/resources/css/Ext.ux.UploadDialog.css" />
+	<link rel="stylesheet" type="text/css" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/resources/css/chooser.css" />
+	<script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.UploadDialog.js"></script>	
+	<script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.HtmlEditor.ButtonImage.js"></script>
+	<script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/DataView-more.js"></script>		
     <noscript><p>You need to enable javascript to use <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
 </body>
 </html>
