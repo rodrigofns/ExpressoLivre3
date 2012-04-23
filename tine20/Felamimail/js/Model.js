@@ -43,7 +43,8 @@ Tine.Felamimail.Model.Message = Tine.Tinebase.data.Record.create([
       { name: 'preparedParts' }, // contains invitation event record
       { name: 'reading_conf' },
       { name: 'smime' },
-      { name: 'signature_info' }      
+      { name: 'signature_info' },
+      { name: 'embedded_images' } 
     ], {
     appName: 'Felamimail',
     modelName: 'Message',

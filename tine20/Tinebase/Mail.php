@@ -27,6 +27,20 @@ class Tinebase_Mail extends Zend_Mail
      * @var string
      */
     protected $_sender = null;
+    protected $_htmlRelatedAttachments = null;
+    
+    
+     /**
+     * Public constructor
+     *
+     * @param string $charset
+     */
+    public function __construct($charset = 'iso-8859-1')
+    {
+        $this->_charset = $charset;
+        $this->_htmlRelatedAttachments = new Zend_Mime_Message();
+    }
+
     
     /**
      * create Tinebase_Mail from Zend_Mail_Message
@@ -196,6 +210,27 @@ class Tinebase_Mail extends Zend_Mail
         return $this;
     }
     
+        /**
+     * Find and process Embedded imagens in HTML body.
+     *
+     * @param  string|Zend_Mime_Part    $html
+     * @return array
+     */
+    public function processEmbeddedImagesInHtmlBody($html)
+    {
+   //todo achar tudo no formato <img alt="'+data.name+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+data.url+'"/>, criar as partes multipart/related e substituir o src por CID:cid
+        $expImages = '/<img alt="([^\"]+)" src="index.php\?method=Felamimail\.showTempImage&amp;tempImageId=([a-z0-9A-Z]+)">/';
+       //a-z0-9A-Z. _-
+        preg_match_all($expImages, $html, $result);
+        $return = array();
+        foreach($result[0] as $key => $embeddedImage){
+            $return[$key][0] = $result[1][$key];
+            $return[$key][1] = $result[2][$key];
+        }
+        
+        return $return;
+    }
+    
     /**
      * Sets the text body for the message.
      *
@@ -265,4 +300,73 @@ class Tinebase_Mail extends Zend_Mail
             return sprintf($format, $encodedName, $email);
         }
     }
+    
+      /**
+     * Adds an existing attachment related to the HTML part of the message
+     *
+     * @param  Zend_Mime_Part $attachment
+     * @return Zend_Mail Provides fluent interface
+     */
+    public function addHtmlRelatedAttachment(Zend_Mime_Part $attachment)
+    {
+        if (!$this->_bodyHtml) {
+            /**
+             * @see Zend_Mail_Exception
+             */
+            require_once 'Zend/Mail/Exception.php';
+            throw new Zend_Mail_Exception('No HTML Body defined');
+        }
+        $this->_htmlRelatedAttachments->addPart($attachment);
+        return $this;
+    }
+
+    /**
+     * Creates a Zend_Mime_Part attachment related to the HTML part of the message
+     *
+     * Attachment is automatically added to the mail object after creation. The
+     * attachment object is returned to allow for further manipulation.
+     *
+     * @param  string         $body
+     * @param  string         $cid The Content Id
+     * @param  string         $mimeType
+     * @param  string         $disposition
+     * @param  string         $encoding
+     * @param  string         $filename OPTIONAL A filename for the attachment
+     * @return Zend_Mime_Part Newly created Zend_Mime_Part object (to allow
+     * advanced settings)
+     */
+    public function createHtmlRelatedAttachment($body, $cid = null,
+                                     $mimeType    = Zend_Mime::TYPE_OCTETSTREAM,
+                                     $disposition = Zend_Mime::DISPOSITION_INLINE,
+                                     $encoding    = Zend_Mime::ENCODING_BASE64,
+                                     $filename    = null)
+    {
+
+        if (null === $cid) {
+            static $unique = 0;
+            $cid = md5($body . ($unique++));
+        }
+        $mp = new Zend_Mime_Part($body);
+        $mp->id = $cid;
+        $mp->encoding = $encoding;
+        $mp->type = $mimeType;
+        $mp->disposition = $disposition;
+        $mp->filename = $filename;
+
+        $this->addHtmlRelatedAttachment($mp);
+
+        return $mp;
+    }
+
+    /**
+     * Returns the list of all Zend_Mime_Parts related to the HTML part of the message
+     *
+     * @return array of Zend_Mime_Part
+     */
+    public function getHtmlRelatedAttachments()
+    {
+      return $this->_htmlRelatedAttachments;
+    }
+    
+    
 }
