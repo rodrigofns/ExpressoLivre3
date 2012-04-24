@@ -42,10 +42,17 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array $paging
      * @return array
      */
-    public function searchExampleRecords($filter, $paging)
+/*    public function searchExampleRecords($filter, $paging)
     {
         return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_ExampleRecordFilter', TRUE);
     }     
+*/    
+    
+    public function searchWebconferenceConfig($filter, $paging)
+    {
+        return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
+    }    
+    
     
     /**
      * Return a single record
@@ -53,18 +60,30 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param   string $id
      * @return  array record data
      */
-    public function getExampleRecord($id)
+/*    public function getExampleRecord($id)
+    {
+        return $this->_get($id, $this->_controller);
+    }
+*/
+    public function getWebconferenceConfig($id)
     {
         return $this->_get($id, $this->_controller);
     }
 
+    
     /**
      * creates/updates a record
      *
      * @param  array $recordData
      * @return array created/updated record
      */
+    /*
     public function saveExampleRecord($recordData)
+    {
+        return $this->_save($recordData, $this->_controller, 'ExampleRecord');        
+    }
+    */
+    public function saveWebconferenceConfig($recordData)
     {
         return $this->_save($recordData, $this->_controller, 'ExampleRecord');        
     }
@@ -75,16 +94,22 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array  $ids 
      * @return string
      */
+/*
     public function deleteExampleRecords($ids)
     {
         return $this->_delete($ids, $this->_controller);
     }    
-
+*/
+    public function deleteWebconferenceConfig($ids)
+    {
+        return $this->_delete($ids, $this->_controller);
+    } 
     /**
      * Returns registry data
      * 
      * @return array
      */
+    /*
     public function getRegistryData()
     {   
         $defaultContainerArray = Tinebase_Container::getInstance()->getDefaultContainer(Tinebase_Core::getUser()->getId(), $this->_applicationName)->toArray();
@@ -94,6 +119,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
             'defaultContainer' => $defaultContainerArray
         );
     }
+     */
     
     public function getSettings()
     {
