@@ -29,7 +29,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         
     onBeforeActivate: function(){
     	
-    	//Ext.getCmp('west').toggleCollapse();
+    	
     	Ext.getCmp('west').collapse( Ext.Component.DIRECTION_LEFT );
     	
     	
