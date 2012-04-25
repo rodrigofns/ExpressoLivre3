@@ -65,3 +65,24 @@ Tine.Webconference.recordBackend = new Tine.Tinebase.data.RecordProxy({
     modelName: 'ExampleRecord',
     recordClass: Tine.Webconference.Model.ExampleRecord
 });
+
+
+
+Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
+    {name: 'id'},
+    {name: 'name'},
+    {name: 'description'},
+    {name: 'email'},
+    
+    {name: 'tags'},
+    {name: 'notes'}
+]), {
+    appName: 'Webconference',
+    modelName: 'Configuration',
+    idProperty: 'id',
+    titleProperty: 'name',
+    // ngettext('Resource', 'Resources', n); gettext('Resources');
+    recordName: 'Configuration',
+    recordsName: 'Configurations',
+    containerProperty: null
+});

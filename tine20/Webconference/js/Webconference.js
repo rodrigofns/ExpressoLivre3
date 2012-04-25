@@ -111,7 +111,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                                 iconAlign: 'top',
                                 iconCls: 'action_add',
                                 text: this.app.i18n._('Add User'),
-                                handler: this.onAddUser,
+                                handler: this.onAddUser
                             })
                         ]
                     }]
@@ -203,7 +203,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
 //            }, 0)
 //        });
     	
-    },
+    }
     
        
    
