@@ -32,7 +32,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     public function __construct()
     {
         $this->_applicationName = 'Webconference';
-        $this->_controller = Webconference_Controller_ExampleRecord::getInstance();
+        $this->_controller = Webconference_Controller_WebconferenceConfig::getInstance();
     }
     
     /**
@@ -85,8 +85,34 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     */
     public function saveWebconferenceConfig($recordData)
     {
-        return $this->_save($recordData, $this->_controller, 'ExampleRecord');        
+        //throw new Tinebase_Exception_UnexpectedValue('----criando: '.  print_r($recordData) );
+        //$recordData = Zend_Json::decode($recordData);
+        
+//        $model = new Webconference_Model_WebconferenceConfig(
+//                $recordData
+//        );
+        
+        return $this->_controller->saveWebconferenceConfig($recordData);
+        
+        
+        //return $this->_save($recordData, $this->_controller, 'WebconferenceConfig');        
     }
+    
+    public function loadWebconferenceConfig()
+    {
+        
+        return $this->_controller->loadWebconferenceConfig();
+        
+        
+//        return array(
+//            'bbbUrl'       => 'http://10.200.118.61/',
+//            'securitySalt' => 'saltTest',
+//            'description'  => 'description test'
+//            
+//        );
+    }
+    
+    
     
     /**
      * deletes existing records

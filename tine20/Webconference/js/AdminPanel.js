@@ -54,9 +54,9 @@ Tine.Webconference.AdminPanel = Ext.extend(Ext.TabPanel, {
  */
 Tine.Webconference.AdminPanel.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
-        width: 500,
-        height: 470,
-        name: 'tinebase-admin-panel',
+        width: 400,
+        height: 300,
+        name: 'webconference-admin-panel',
         contentPanelConstructor: 'Tine.Webconference.AdminPanel',
         contentPanelConstructorConfig: config
     }); 
@@ -83,7 +83,6 @@ Tine.Webconference.ConfigPanel = Ext.extend(Ext.Panel, { // TODO: extend some ki
         });
         this.buttons = [this.applyAction];
         
-        //Tine.Tinebase.getUserProfileConfig(this.initProfileTable, this);
         this.initForm();
         
         this.supr().initComponent.call(this);
@@ -93,75 +92,111 @@ Tine.Webconference.ConfigPanel = Ext.extend(Ext.Panel, { // TODO: extend some ki
         this.supr().afterRender.apply(this, arguments);
         
         this.loadMask = new Ext.LoadMask(this.getEl(), {msg: _('Please Wait')});
-        if (! this.store) {
-            (function () {
-            	this.loadMask.show();
-            }).defer(50, this);
-        }
+       	this.loadMask.show();
     },
     
-    // Aplicar
+    // Save configuration
     applyConfig: function () {
         
-        
-        // pegar campos do form
+        var config = new Object();
+        config.url = Ext.get('url').getValue();
+        config.salt = Ext.get('salt').getValue();
+        config.description = Ext.get('description').getValue();
         
         this.loadMask.show();
-        Tine.Tinebase.setUserProfileConfig(userProfileConfig, function () {
-            
-            // enviar dados
-            //this.store.commitChanges();
-            
-            this.applyAction.setDisabled(true);
-            this.loadMask.hide();
-        }, this);
+        
+        // load configuration
+        Ext.Ajax.request({
+            params: {
+                method: 'Webconference.saveWebconferenceConfig',
+                recordData:config
+                
+            },
+            scope: this,
+            success: function(_result, _request){
+                //var result = Ext.util.JSON.decode(_result.responseText);
+                //this.applyAction.setDisabled(false);
+                if (this.loadMask) {
+                    this.loadMask.hide();
+                }
+                
+            },
+            failure: function(response, options) {
+                var responseText = Ext.util.JSON.decode(response.responseText);
+                var exception = responseText.data ? responseText.data : responseText;
+                Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+                
+                this.applyAction.setDisabled(false);
+                if (this.loadMask) {
+                    this.loadMask.hide();
+                }               
+            }
+        });
+       
         
     },
     
-    // // Carregar
+    // Carregar
     initForm: function () {
+       
+        // load configuration
+        Ext.Ajax.request({
+            params: {
+                method: 'Webconference.loadWebconferenceConfig'
+                
+            },
+            scope: this,
+            success: function(_result, _request){
+                var result = Ext.util.JSON.decode(_result.responseText);
+                
+                Ext.get('url').set({'value':result.url});
+                Ext.get('salt').set({'value':result.salt});
+                Ext.get('description').set({'value':result.description});
+                
+                
+                if (this.loadMask) {
+                    this.loadMask.hide();
+                }
+                
+            }
+        });
         
-        // buscar dados
         
-        // criar form
+        
+        // create form
         this.configForm = new Ext.FormPanel({
             labelWidth: 75,
-            id:'configForm',
             frame:true,
-            title: 'Webconference Config',
+            name:'configForm',
             bodyStyle:'padding:5px 5px 0',
             width: 350,
             defaults: {width: 230},
             defaultType: 'textfield',
             border:false,
             items: [
+                
                 {
-                    fieldLabel: 'First Name',
-                    name: 'first',
+                    id:'url', 
+                    name: 'url',
+                    fieldLabel: 'BBB Url',
                     allowBlank:false
                 },{
-                    fieldLabel: 'Last Name',
-                    name: 'last'
+                    id: 'salt',
+                    name: 'salt',
+                    fieldLabel: 'Security Salt',
+                    allowBlank:false
+                    
                 },{
-                    fieldLabel: 'Company',
-                    name: 'company'
-                }, {
-                    fieldLabel: 'Email',
-                    name: 'email',
-                    vtype:'email'
+                    id:'description',
+                    name: 'description',
+                    fieldLabel: 'Description'
                 }
             ]
         });
         
-       
-        
-        //this.add(this.configForm);
-        this.items = [this.configForm];
+        this.items=[this.configForm];
         this.doLayout();
-        
-        if (this.loadMask) {
-            this.loadMask.hide();
-        }
+        this.applyAction.setDisabled(false);
     }
     
     

@@ -41,7 +41,7 @@ class Webconference_Model_WebconferenceConfig extends Tinebase_Record_Abstract
     protected $_validators = array(
         'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'name'                  => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'container_id'          => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
+        'container_id'          => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     // @todo add more fields
     // modlog information
         'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),

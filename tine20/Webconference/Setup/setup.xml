@@ -84,7 +84,7 @@
         </table>
                 <!-- Table Webconference Config -->
         <table>
-            <name>webconferece_config</name>
+            <name>webconference_config</name>
             <version>1</version>
             <declaration>
                 <field>

@@ -16,7 +16,7 @@
  * @package     Webconference
  * @subpackage  Controller
  */
-class Webconference_Controller_WebconfernceConfig extends Tinebase_Controller_Record_Abstract
+class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_Record_Abstract
 {
     /**
      * the constructor
@@ -25,6 +25,7 @@ class Webconference_Controller_WebconfernceConfig extends Tinebase_Controller_Re
      */
     private function __construct() {        
         $this->_applicationName = 'Webconference';
+        $this->_modelName       = 'Webconference_Model_WebconferenceConfig';
         $this->_backend = new Webconference_Backend_WebconferenceConfig();
         $this->_currentAccount = Tinebase_Core::getUser();   
         $this->_purgeRecords = FALSE;
@@ -54,5 +55,58 @@ class Webconference_Controller_WebconfernceConfig extends Tinebase_Controller_Re
     }        
 
     /****************************** overwritten functions ************************/    
-    
+
+    public function saveWebconferenceConfig($recordData){
+       $recordData = (object) $recordData;
+       
+       $configArray = $this->_backend->getAll();//->toArray();
+       
+       if(count($configArray) > 0)
+       {
+           $config = $configArray[0];
+           $config->url = $recordData->url;
+           $config->salt = $recordData->salt;
+           $config->description = $recordData->description;
+           
+           return $this->update($config);
+       }
+       else
+       {
+           $config = new Webconference_Model_WebconferenceConfig(
+                   array(
+                       'url' => $recordData->url,
+                       'salt'=> $recordData->salt,
+                       'description'=> $recordData->description
+                   )
+                   //,true
+                   );
+
+           return $this->create($config);
+           
+       }
+       
+    }
+    public function loadWebconferenceConfig()
+    {
+        $configArray = $this->_backend->getAll()->toArray();
+        
+        if(count($configArray) > 0)
+        {
+            //throw new Tinebase_Exception_UnexpectedValue('----size: '.count($configArray));
+            return $configArray[0];
+        }
+        else
+        {
+            $config = new Webconference_Model_WebconferenceConfig(
+                    array(
+                        'url' => '',
+                        'salt'=> '',
+                        'description' => ''
+                    ),
+                    true
+                    );
+            
+            return $config->toArray();
+        }
+    }
 }
