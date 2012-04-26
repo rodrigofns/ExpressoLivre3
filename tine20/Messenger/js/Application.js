@@ -23,7 +23,7 @@ Tine.Messenger.Credential = {
         return '';
     }
   , myNick: function(){
-        return '<Name>';
+        return 'ME';
     }
   , myAvatar: function(){
         return '/images/empty_photo_male.png';
@@ -37,11 +37,11 @@ Tine.Messenger.Credential = {
 }
 const IMConst = {
    // Status constants
-    ST_AVAILABLE : "Avaiable",
-    ST_UNAVAILABLE : "Unavailable",
-    ST_AWAY : "Away",
-    ST_XA : "Auto Status (idle)",
-    ST_DONOTDISTURB : "Do Not Disturb",
+    ST_AVAILABLE : { id:"available", text:"Available"},
+    ST_UNAVAILABLE : { id:"unavailable", text:"Unavailable"},
+    ST_AWAY : { id:"away", text:"Away"},
+    ST_XA : { id:"xa", text:"Auto Status (idle)"},
+    ST_DONOTDISTURB : { id:"dnd", text:"Do Not Disturb"},
     
   // Subscription constants  
     SB_NONE : "none",
@@ -157,6 +157,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
             );
+                
+            // Conference handler
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.ChatHandler.onMUCMessage, null, 'message', 'normal'
+            );
             
             // Getting Roster
             var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
@@ -263,14 +268,14 @@ Tine.Messenger.IM = {
 Tine.Messenger.Util = {
     
     jidToId: function (jid) {
-        return jid.replace(/@/g, "_").replace(/\./g, "-");
+        return jid.replace(/@/g, "_").replace(/\./g, "-").replace(/\//g, "__");
     },
     
     idToJid: function (id) {
         var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
             id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
             id;
-        return clean.replace(/_/g, "@").replace(/\-/g, ".");
+        return clean.replace(/\__/g, "/").replace(/\-/g, ".").replace(/_/g, "@");
     },
     
     getStatusClass: function(status){
@@ -346,5 +351,29 @@ Tine.Messenger.Util = {
                 return '';
         }
         return null;
+    },
+    
+    getStatusObject: function(_show){
+        switch(_show){
+            case 'away':
+                return IMConst.ST_AWAY;
+            case 'dnd':
+                return IMConst.ST_DONOTDISTURB;
+            case 'xa':
+                return IMConst.ST_XA;
+            case 'unavailable':
+                return IMConst.ST_UNAVAILABLE;
+            default:
+                return IMConst.ST_AVAILABLE
+        }
+    },
+    
+    returnTimestamp: function(stamp){
+        const TZ = 3;
+        if(stamp){
+            var t = stamp.match(/(\d{2})\:(\d{2})\:(\d{2})/);
+            return t[1] - TZ + ":" + t[2] + ":" + t[3];
+        }
+        return Date().match(/\d{2}\:\d{2}\:\d{2}/)[0];
     }
 }

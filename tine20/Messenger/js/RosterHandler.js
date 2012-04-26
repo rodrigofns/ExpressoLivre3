@@ -82,7 +82,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     openChat: function(e, t) {
-        Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text);
+        Tine.Messenger.ChatHandler.showChatWindow(e.id, e.text, 'chat');
     },
     
     clearRoster: function () {
@@ -109,23 +109,30 @@ Tine.Messenger.RosterHandler = {
     
     isContactAvailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AVAILABLE));
+        if(contact)
+            return (contact.attributes.status == IMConst.ST_AVAILABLE.id);
+        return null;
     },
     
     isContactUnavailable: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        Tine.Messenger.Log.debug("Status: "+contact.ui.textNode.getAttribute('status'));
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_UNAVAILABLE));
+        if(contact)
+            return (contact.attributes.status == IMConst.ST_UNAVAILABLE.id);
+        return null;
     },
     
     isContactAway: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_AWAY));
+        if(contact)
+            return (contact.attributes.status == IMConst.ST_AWAY.id);
+        return null;
     },
     
     isContactDoNotDisturb: function (jid) {
         var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
-        return (contact.ui.textNode.getAttribute('status') == _(IMConst.ST_DONOTDISTURB));
+        if(contact)
+            return (contact.attributes.status == IMConst.ST_DONOTDISTURB.id);
+        return null;
     },
     
     setStatus: function(status, text) {
