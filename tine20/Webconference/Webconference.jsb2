@@ -20,14 +20,6 @@
           "path": "js/"
         },
         {
-          "text": "ExampleRecordGridPanel.js",
-          "path": "js/"
-        },
-        {
-          "text": "ExampleRecordEditDialog.js",
-          "path": "js/"
-        },
-        {
           "text": "AdminPanel.js",
           "path": "js/"
         },
