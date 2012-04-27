@@ -152,9 +152,15 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     	return $result;
     }
     
+    public function createRoom()
+    {
+        return Webconference_Controller_BigBlueButton::getInstance()->createRoom();
+        //return 'http://10.200.118.61/bigbluebutton/api/join?meetingID=sala01&fullName=expressov3&password=serpromod&checksum=40a7e5aaee6dd86a11192984139a858528c03bd2';
+    }
+    
     
     public function getTest($param1)
     {
     	return $param1;	
-	}
+    }
 }
