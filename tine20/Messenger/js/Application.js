@@ -173,6 +173,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
+              
+            Tine.Messenger.Application.connection.addHandler(
+                Tine.Messenger.RosterHandler._onRosterGet, 'jabber:client', 'iq', 'get'
+            );
                 
             Tine.Messenger.Application.connection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterResult, 'jabber:client', 'iq', 'result'
