@@ -1,7 +1,10 @@
 Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
-var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
+var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
+    MESSENGER_DOMAIN = 'simdev.sdr.serpro',
+    MESSENGER_RESOURCE = 'expresso-3.0',
+    MESSENGER_DEBUG = true;
 
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
@@ -37,11 +40,11 @@ Tine.Messenger.Credential = {
 }
 const IMConst = {
    // Status constants
-    ST_AVAILABLE : { id:"available", text:"Available"},
-    ST_UNAVAILABLE : { id:"unavailable", text:"Unavailable"},
-    ST_AWAY : { id:"away", text:"Away"},
-    ST_XA : { id:"xa", text:"Auto Status (idle)"},
-    ST_DONOTDISTURB : { id:"dnd", text:"Do Not Disturb"},
+    ST_AVAILABLE : {id:"available", text:"Available"},
+    ST_UNAVAILABLE : {id:"unavailable", text:"Unavailable"},
+    ST_AWAY : {id:"away", text:"Away"},
+    ST_XA : {id:"xa", text:"Auto Status (idle)"},
+    ST_DONOTDISTURB : {id:"dnd", text:"Do Not Disturb"},
     
   // Subscription constants  
     SB_NONE : "none",
@@ -74,9 +77,29 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     init: function () {
         this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
         this.showMessengerDelayedTask.delay(500);
-        
-        //this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
-        //this.startMessengerDelayedTask.delay(500);
+        this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
+        this.startMessengerDelayedTask.delay(500);
+    },
+    
+    debugFunction: function () {
+        Tine.Messenger.Application.connection.xmlInput = function (xml) {
+            console.log('\\/ |\\/| |     |  |\\ |');
+            console.log('/\\ |  | |__   |  | \\|');
+            console.log(xml);
+            var challenge = $(xml).find('challenge');
+            if (challenge.length > 0)
+                console.log(challenge.text());
+            console.log('============================');
+        };
+        Tine.Messenger.Application.connection.xmlOutput = function (xml) {
+            console.log('\\/ |\\/| |     /==\\ | | ====');
+            console.log('/\\ |  | |__   \\__/ |_|   |');
+            console.log(xml);
+            var response = $(xml).find('response');
+            if (response.length > 0)
+                console.log(response.text());
+            console.log('============================');
+        };
     },
     
     showMessenger: function () {
@@ -115,10 +138,23 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
+        var jid = Tine.Messenger.Util.extractNameFromEmail(Tine.Tinebase.registry.get('userContact').email);
+            jid += '@' + MESSENGER_DOMAIN + '/' + MESSENGER_RESOURCE;
+        // BEGINS HERE!! When registry set working, take off the following lines
+        Tine.Tinebase.registry.add('messengerAccount', {
+            JID: jid,
+            PWD: '7c67e713a4b4139702de1a4fac672344'
+        });
+        // ENDS HERE!!
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').login,
-                                                      Tine.Tinebase.registry.get('messengerAccount').password,
+        if (MESSENGER_DEBUG)
+            this.debugFunction();
+        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').JID,
+                                                      Tine.Tinebase.registry.get('messengerAccount').PWD,
                                                       this.connectionHandler);
+        if(!Ext.getCmp("ClientDialog")){
+            new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
+        }
     },
     
     getConnection: function () {
@@ -126,6 +162,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     connectionHandler: function (status) {
+        console.log('STATUS: ' + status);
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
@@ -146,15 +183,16 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         } else if (status === Strophe.Status.AUTHENTICATING) {
             Tine.Messenger.Log.debug("Authenticating...");
             // When connecting OK, take off the line below
-        } else if (status === Strophe.Status.CONNECTED) {
+        } else if (status === Strophe.Status.CONNECTED || status == Strophe.Status.ATTACHED) {
             Tine.Messenger.Log.debug("Connected!");
-            
+            var XMPPConnection = Tine.Tinebase.appMgr.get('Messenger').getConnection();
+            console.log(XMPPConnection);
             // Enable components
             Tine.Messenger.IM.enableOnConnect();
             
             // START THE HANDLERS
             // Chat Messaging handler
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
             );
                 
@@ -165,12 +203,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             
             // Getting Roster
             var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
-            Tine.Messenger.Application.connection.sendIQ(
+            XMPPConnection.sendIQ(
                 roster, Tine.Messenger.RosterHandler._onStartRoster
             );
                 
             // Updating Roster
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
               
@@ -178,16 +216,18 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.RosterHandler._onRosterGet, 'jabber:client', 'iq', 'get'
             );
                 
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterResult, 'jabber:client', 'iq', 'result'
             );
 
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._onErrorMessage, null, 'message', 'error'
             );
-            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+                
+            XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
             );
+
             // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
         
@@ -198,7 +238,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
+                XMPPConnection.disconnect('Leaving the Expresso Messenger page!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
@@ -225,6 +265,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
 Tine.Messenger.IM = {
     enableOnConnect: function(){
+        console.log('======> CHEGOU EM enableOnConnect');
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
         
@@ -270,6 +311,10 @@ Tine.Messenger.IM = {
 }
 
 Tine.Messenger.Util = {
+    
+    extractNameFromEmail: function (email) {
+        return (email.indexOf('@') > 0) ? email.substring(0, email.indexOf('@')) : email;
+    },
     
     jidToId: function (jid) {
         return jid.replace(/@/g, "_").replace(/\./g, "-").replace(/\//g, "__");
