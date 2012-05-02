@@ -76,6 +76,22 @@ Tine.Messenger._Roster = new Ext.tree.TreePanel({
                                     })
                                 })
                                 
+Tine.Messenger._ChatRoster = new Ext.tree.TreePanel({
+//                                    id:           'messenger-groupchat-roster',
+                                    loader:       new Ext.tree.TreeLoader(),
+                                    border:       false,
+                                    cls:          'messenger-groupchat-roster',
+                                    rootVisible:  false,
+//                                    width: 200,
+//                                    renderTo:     Ext.getBody(),
+                                    
+                                    root: new Ext.tree.AsyncTreeNode({
+                                        expanded: true,
+                                        leaf:     false,
+                                        cls:      'messenger-groupchat-roster-tree'
+                                    })
+                                })
+                                
 Tine.Messenger.SimpleDialog = function(_config){
     var extDialog=null;
     var config=_config;
@@ -334,4 +350,224 @@ Tine.Messenger.Config = {
         
     }
     
+    , ChatWindowLayout : {
+        iconCls:     'messenger-icon',
+        cls:         'messenger-chat-window',
+        width:       460,
+        minWidth:    400,
+        height:      360,
+        minHeight:   280,
+        closeAction: 'hide', //'close' - destroy the component
+        collapsible: true,
+        plain:       true,
+        layout:      'border',
+        listeners: {
+            beforerender: function(_box){
+                Tine.Messenger.AddItems(_box);
+            },
+            resize: function(_box, _width, _height){
+                Tine.Messenger.ChatHandler.adjustChatAreaHeight(_box.id, _width, _height);
+            }
+        }
+  }
+  
+ ,JoinChatLogin : {
+    id: 'messenger-groupchat',
+    layout: 'anchor',
+    closeAction: 'close',
+    plain: true,
+    width: 300,
+    height: 150,
+    minHeight: 150,
+    title: 'Join Groupchat',
+    modal: true,
+    items: {
+        xtype: 'form',
+        border: false,
+        items: [
+            {
+                xtype: 'textfield',
+                id: 'messenger-groupchat-identity',
+                fieldLabel: 'Identity',
+                disabled: true
+            },
+            {
+                xtype: 'textfield',
+                id: 'messenger-groupchat-host',
+                fieldLabel: 'Host'
+            },
+            {
+                xtype: 'textfield',
+                id: 'messenger-groupchat-room',
+                fieldLabel: 'Room'
+            },
+            {
+                xtype: 'textfield',
+                id: 'messenger-groupchat-nick',
+                fieldLabel: 'Nickname'
+            },
+            {
+                xtype: 'textfield',
+                inputType: 'password',
+                id: 'messenger-groupchat-pwd',
+                fieldLabel: 'Password'
+            },
+            {
+                xtype: 'button',
+                text: 'Join',
+                listeners: {
+                    click: function (ev, data) {
+                        Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
+                    }
+                }
+            }
+        ],
+
+        keys: [
+            {
+                key: [Ext.EventObject.ENTER],
+                handler: function () {
+                    Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
+                }
+            }
+        ]
+    }
+ }
+    
+}
+
+Tine.Messenger.AddItems = function(_box) {
+    if(!_box.items){
+        var items = Array();
+        var colW = 1,
+            bodyroster = {},
+            styleCls = '';
+        if(_box.type == 'groupchat' && !_box.privy){
+            colW = .75;
+            styleCls += 'border-right-width: 2px;';
+            bodyroster = ({
+                            itemId: 'messenger-chat-body-roster',
+                            columnWidth: .2,
+                            border: false,
+                            items: new Ext.tree.TreePanel({
+                                    loader:       new Ext.tree.TreeLoader(),
+                                    border:       false,
+                                    cls:          'messenger-groupchat-roster',
+                                    rootVisible:  false,
+                                    
+                                    root: new Ext.tree.AsyncTreeNode({
+                                        expanded: true,
+                                        leaf:     false,
+                                        cls:      'messenger-groupchat-roster-tree'
+                                    })
+                                })
+                        });
+        }
+        
+        items.push(
+                {
+                    itemId: 'messenger-chat-table',
+                    layout: 'column',
+                    region: 'center',
+                    minWidth: 210,
+                    border: false,
+                    autoScroll: true,
+                    items: [{
+                                itemId: 'messenger-chat-body',
+                                xtype: 'panel',
+                                border: styleCls ? true : false,
+                                autoScroll: true,
+                                cls: 'messenger-chat-body',
+                                style: styleCls,
+                                columnWidth: colW
+                            }
+                            ,bodyroster
+                        ]
+                }
+            );
+        items.push(
+                {
+                    itemId: 'messenger-chat-notifications',
+                    cls: 'messenger-chat-notifications',
+                    border: false,
+                    html: ''  
+                },
+                {
+                    itemId: 'messenger-chat-field',
+                    region: 'south',
+                    xtype: 'textfield',
+                    height: 30,
+                    cls:   'text-sender',
+                    handleMouseEvents: true,
+                    enableKeyEvents: true,
+                    listeners: {
+                        scope: this,
+            //                        specialkey: function (field, ev) {
+            //                             if (ev.getKey() == ev.ENTER && field.getValue().trim() != '') {
+            //                                 Tine.Messenger.ChatHandler.sendMessage(field.getValue(), this.id);
+            //                                 field.setValue("");
+            //                                 Tine.Messenger.Chat.textToSend = '';
+            //                             }
+            //                        },
+                        keypress: function (field, ev) {
+                            var chatId = field.ownerCt.id,
+                                type = field.ownerCt.type,
+                                privy = field.ownerCt.privy,
+                                old_id = field.ownerCt.initialConfig.id;
+                            if(type == 'chat' || privy){
+                                if(type == 'chat')
+                                    Tine.Messenger.ChatHandler.sendState(chatId, 'composing');
+                                if(type == 'groupchat')
+                                    try{
+                                        Tine.Messenger.Groupie.sendState(chatId, 'composing');
+                                    }catch(err){
+                                        Tine.Messenger.Log.error(err);
+                                    }
+                                if (ev.getKey() != ev.ENTER) {
+//                                    if (Tine.Messenger.Chat.checkPauseInterval == null) {
+//                                        Tine.Messenger.Chat.checkPauseInterval = setInterval(
+//                                            function () {
+//                                                Tine.Messenger.Log.debug('Set Interval '+Date());
+//        //                                        console.log(Tine.Messenger.Chat.textToSend);
+//                                                if (field.getValue() == Tine.Messenger.Chat.textToSend) {
+//                                                    Tine.Messenger.ChatHandler.sendState(chatId, 'paused');
+//                                                } else {
+//                                                    Tine.Messenger.Chat.textToSend = field.getValue();
+//                                                }
+//                                            },
+//                                            1000
+//                                        );
+//                                            //TODO: rever essa funcao. manda paused direto
+//                                        setTimeout(
+//                                            function(){
+//                                                Tine.Messenger.Log.debug('Set Timeout: '+Date());
+//                                                clearInterval(Tine.Messenger.Chat.checkPauseInterval);
+//                                            },
+//                                            3000
+//                                        );
+//                                    }
+                                } else if (field.getValue().trim() != '') {
+                                    Tine.Messenger.Chat.checkPauseInterval = null;
+                                    if(type == 'chat')
+                                        Tine.Messenger.ChatHandler.sendMessage(field.getValue(), chatId);
+                                    if(type == 'groupchat')
+                                        Tine.Messenger.Groupie.sendPrivMessage(field.getValue(), chatId, old_id);
+                                    field.setValue("");
+                                    Tine.Messenger.Chat.textToSend = '';
+                                }
+                            } else if (ev.getKey() == ev.ENTER && field.getValue().trim() != '') {
+                                if(privy)
+                                    Tine.Messenger.Groupie.sendPrivMessage(field.getValue(), chatId);
+                                else
+                                    Tine.Messenger.Groupie.sendPublMessage(field.getValue(), chatId);
+                                field.setValue("");
+                            }
+                        }
+                    }
+                }
+            );
+//        return items;
+        _box.add(items);
+    }
+
 }

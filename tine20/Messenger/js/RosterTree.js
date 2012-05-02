@@ -181,7 +181,7 @@ Tine.Messenger.RosterTree = function(iq){
                 var jid = $(this).attr("jid"),
                     label = $(this).attr("name") || jid,
                     subscription = $(this).attr("subscription") || '',
-                    status = _(IMConst.ST_UNAVAILABLE),
+                    status = IMConst.ST_UNAVAILABLE,
                     status_text = '',
                     cls = Tine.Messenger.Util.getStatusClass(IMConst.ST_UNAVAILABLE);
                 cls = (subscription == IMConst.SB_TO ? 
@@ -190,18 +190,18 @@ Tine.Messenger.RosterTree = function(iq){
                     jid = Strophe.getBareJidFromJid(jid);
 
                     var _buddy = new Ext.tree.TreeNode({ //buddy adden
-                                    id:jid,
-                                    status:status,
-                                    status_text:status_text,
-                                    jid:jid,
-                                    subscription:subscription,
-                                    hide:false,
-                                    text:label,
+                                    id: jid,
+                                    status: status.id,
+                                    status_text: status_text,
+                                    jid: jid,
+                                    subscription: subscription,
+                                    hide: false,
+                                    text: label,
                                     cls: 'messenger-contact '+cls,
-                                    allowDrag:true,
-                                    allowDrop:false,
+                                    allowDrag: true,
+                                    allowDrop: false,
                                     qtip: "JID : "+jid+"<br>"
-                                            +_('Status')+" : "+status+"<br>"
+                                            +_('Status')+" : "+_(status.text)+"<br>"
                                             +_('Subscription')+" : "+subscription
                     });
                     
@@ -261,6 +261,36 @@ Tine.Messenger.RosterTree = function(iq){
             }
         });
         
+    }
+    
+    var addGroupChatToTree = function(_jid, _name){
+        var _chat = new Ext.tree.TreeNode({ //buddy adden
+                            id:_jid,
+                            jid:_jid,
+                            hide:false,
+                            text:_name,
+                            cls: 'messenger-groupchat',
+                            allowDrag:true,
+                            allowDrop:false
+    //                                    qtip: "JID : "+jid+"<br>"
+    //                                            +_('Status')+" : "+status+"<br>"
+    //                                            +_('Subscription')+" : "+subscription
+            });
+//        _chat.on("dblclick", Tine.Messenger.RosterHandler.openChat);
+//        _chat.on("contextmenu", buddyContext);
+        var hasGroupNoGroup = false,
+            node = -1;
+        for(var i=0; i < rootNode.childNodes.length; i++){
+            if(rootNode.childNodes[i].text == _(NO_GROUP)){
+                hasGroupNoGroup = true;
+                node = i;
+            }
+        }
+        if(!hasGroupNoGroup){
+            Tine.Messenger.RosterTree().addGroup(_(NO_GROUP));
+            node = rootNode.childNodes.length - 1;
+        }
+        addOrderedOnTreeNodeLevel(_chat, rootNode.childNodes[node]);
     }
     
     var addOrderedOnTreeNodeLevel = function(node, parentNode){
@@ -351,6 +381,10 @@ Tine.Messenger.RosterTree = function(iq){
             return false;
         },
         
+        addGroupChat: function(_jid, _name){
+            addGroupChatToTree(_jid, _name);
+        },
+        
         getGroupsFromTree: function (){
             
             return getGroupsFromTree();
@@ -382,6 +416,9 @@ Tine.Messenger.RosterTree = function(iq){
             else
                 _buddy = jid;
             
+            if (typeof status == 'string')
+                status = Tine.Messenger.Util.getStatusObject(status);
+            
             var status_cls = Tine.Messenger.Util.getStatusClass(status);
             
             if(_buddy && status_cls != ''){
@@ -399,13 +436,16 @@ Tine.Messenger.RosterTree = function(iq){
                 
                 status_text = status_text ? status_text : '';
                 message = message ? message : '';
-                _buddy.ui.textNode.setAttribute('status', _(status));
+                _buddy.ui.textNode.setAttribute('status', _(status.text));
                 _buddy.ui.textNode.setAttribute('status_text', status_text);
                 _buddy.ui.textNode.setAttribute('subscription', subscription);
+                
+                _buddy.attributes.status = status.id;
+                _buddy.attributes.status_text = status_text;
                 _buddy.attributes.subscription = subscription;
                 
                 _buddy.ui.textNode.setAttribute('qtip', "JID : "+jid+"<br>"+
-                                                _('Status')+" : "+ _(status) +"<br>"+
+                                                _('Status')+" : "+ _(status.text) +"<br>"+
                                                 _('Subscription')+" : "+ _(subscription) +
                                                 (status_text.trim() ? '<br>'+status_text : '') +
                                                 (message.trim() ? '<br>'+message : ''));

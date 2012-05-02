@@ -50,6 +50,10 @@
         {
           "text": "RosterTree.js",
           "path": "js/"
+        },
+        {
+          "text": "Groupie.js",
+          "path": "js/"
         }
       ]
     },
