@@ -3,11 +3,12 @@ Ext.ns('Tine.Messenger');
 Tine.Messenger.RosterHandler = {
     
     _onStartRoster: function(iq) {
+        console.log('======> CHEGOU EM _onStartRoster');
         Tine.Messenger.Log.info("Getting roster...");
         
         try {
             // Send user presence
-            Tine.Messenger.Application.connection.send($pres());
+            Tine.Tinebase.appMgr.get('Messenger').getConnection().send($pres());
             // Modify Main Menu status
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             
@@ -24,7 +25,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     _onRosterUpdate: function (iq) {
-        
+        console.log('======> CHEGOU EM _onRosterUpdate');
         try {
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]');
 

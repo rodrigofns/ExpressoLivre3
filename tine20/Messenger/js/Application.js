@@ -74,9 +74,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     init: function () {
         this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
         this.showMessengerDelayedTask.delay(500);
-        
-        //this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
-        //this.startMessengerDelayedTask.delay(500);
+        this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
+        this.startMessengerDelayedTask.delay(500);
     },
     
     showMessenger: function () {
@@ -116,9 +115,37 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').login,
-                                                      Tine.Tinebase.registry.get('messengerAccount').password,
+//        Tine.Messenger.Application.connection.xmlInput = function (xml) {
+//            console.log('\\  /  |\\    /|  |        |  |\\   |');
+//            console.log(' \\/   | \\  / |  |        |  | \\  |');
+//            console.log(' /\\   |  \\/  |  |        |  |  \\ |');
+//            console.log('/  \\  |      |  |=====   |  |   \\|');
+//            console.log(xml);
+//            var challenge = $(xml).find('challenge');
+//            if (challenge.length > 0)
+//                console.log(challenge.text());
+//            console.log('============================');
+//        };
+//        Tine.Messenger.Application.connection.xmlOutput = function (xml) {
+//            console.log('\\  /  |\\    /|  |         /==\\   |   |  -----');
+//            console.log(' \\/   | \\  / |  |        |    |  |   |    |');
+//            console.log(' /\\   |  \\/  |  |        |    |  |   |    |');
+//            console.log('/  \\  |      |  |====     \\==/   |===|    |');
+//            console.log(xml);
+//            var response = $(xml).find('response');
+//            if (response.length > 0)
+//                console.log(response.text());
+//            console.log('============================');
+//        };
+        Tine.Messenger.Application.connection.connect('marcio@simdev.sdr.serpro/expresso-3.0',
+                                                      'abc',
                                                       this.connectionHandler);
+        if(!Ext.getCmp("ClientDialog")){
+            new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
+        }
+//        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').login,
+//                                                      Tine.Tinebase.registry.get('messengerAccount').password,
+//                                                      this.connectionHandler);
     },
     
     getConnection: function () {
@@ -126,6 +153,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     
     connectionHandler: function (status) {
+        console.log('STATUS: ' + status);
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
@@ -146,39 +174,42 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         } else if (status === Strophe.Status.AUTHENTICATING) {
             Tine.Messenger.Log.debug("Authenticating...");
             // When connecting OK, take off the line below
-        } else if (status === Strophe.Status.CONNECTED) {
+        } else if (status === Strophe.Status.CONNECTED || status == Strophe.Status.ATTACHED) {
             Tine.Messenger.Log.debug("Connected!");
-            
+            var XMPPConnection = Tine.Tinebase.appMgr.get('Messenger').getConnection();
+            console.log(XMPPConnection);
             // Enable components
             Tine.Messenger.IM.enableOnConnect();
             
             // START THE HANDLERS
             // Chat Messaging handler
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
             );
             
             // Getting Roster
             var roster = $iq({"type": "get"}).c("query", {"xmlns": "jabber:iq:roster"});
-            Tine.Messenger.Application.connection.sendIQ(
+            XMPPConnection.sendIQ(
                 roster, Tine.Messenger.RosterHandler._onStartRoster
             );
                 
             // Updating Roster
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
                 
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterResult, 'jabber:client', 'iq', 'result'
             );
 
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._onErrorMessage, null, 'message', 'error'
             );
-            Tine.Tinebase.appMgr.get('Messenger').getConnection().addHandler(
+                
+            XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
             );
+
             // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
         
@@ -189,7 +220,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                Tine.Messenger.Application.connection.disconnect('Leaving the Expresso Messenger page!');
+                XMPPConnection.disconnect('Leaving the Expresso Messenger page!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
@@ -216,6 +247,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
 Tine.Messenger.IM = {
     enableOnConnect: function(){
+        console.log('======> CHEGOU EM enableOnConnect');
         // Change IM icon
         $("#messenger").parent().removeClass("messenger-icon-off").addClass("messenger-icon");
         
