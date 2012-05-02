@@ -1,7 +1,10 @@
 Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
-var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-';
+var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
+    MESSENGER_DOMAIN = 'simdev.sdr.serpro',
+    MESSENGER_RESOURCE = 'expresso-3.0',
+    MESSENGER_DEBUG = true;
 
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
@@ -37,11 +40,11 @@ Tine.Messenger.Credential = {
 }
 const IMConst = {
    // Status constants
-    ST_AVAILABLE : { id:"available", text:"Available"},
-    ST_UNAVAILABLE : { id:"unavailable", text:"Unavailable"},
-    ST_AWAY : { id:"away", text:"Away"},
-    ST_XA : { id:"xa", text:"Auto Status (idle)"},
-    ST_DONOTDISTURB : { id:"dnd", text:"Do Not Disturb"},
+    ST_AVAILABLE : {id:"available", text:"Available"},
+    ST_UNAVAILABLE : {id:"unavailable", text:"Unavailable"},
+    ST_AWAY : {id:"away", text:"Away"},
+    ST_XA : {id:"xa", text:"Auto Status (idle)"},
+    ST_DONOTDISTURB : {id:"dnd", text:"Do Not Disturb"},
     
   // Subscription constants  
     SB_NONE : "none",
@@ -76,6 +79,27 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         this.showMessengerDelayedTask.delay(500);
         this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
         this.startMessengerDelayedTask.delay(500);
+    },
+    
+    debugFunction: function () {
+        Tine.Messenger.Application.connection.xmlInput = function (xml) {
+            console.log('\\/ |\\/| |     |  |\\ |');
+            console.log('/\\ |  | |__   |  | \\|');
+            console.log(xml);
+            var challenge = $(xml).find('challenge');
+            if (challenge.length > 0)
+                console.log(challenge.text());
+            console.log('============================');
+        };
+        Tine.Messenger.Application.connection.xmlOutput = function (xml) {
+            console.log('\\/ |\\/| |     /==\\ | | ====');
+            console.log('/\\ |  | |__   \\__/ |_|   |');
+            console.log(xml);
+            var response = $(xml).find('response');
+            if (response.length > 0)
+                console.log(response.text());
+            console.log('============================');
+        };
     },
     
     showMessenger: function () {
@@ -114,38 +138,23 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
+        var jid = Tine.Messenger.Util.extractNameFromEmail(Tine.Tinebase.registry.get('userContact').email);
+            jid += '@' + MESSENGER_DOMAIN + '/' + MESSENGER_RESOURCE;
+        // BEGINS HERE!! When registry set working, take off the following lines
+        Tine.Tinebase.registry.add('messengerAccount', {
+            JID: jid,
+            PWD: '7c67e713a4b4139702de1a4fac672344'
+        });
+        // ENDS HERE!!
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-//        Tine.Messenger.Application.connection.xmlInput = function (xml) {
-//            console.log('\\  /  |\\    /|  |        |  |\\   |');
-//            console.log(' \\/   | \\  / |  |        |  | \\  |');
-//            console.log(' /\\   |  \\/  |  |        |  |  \\ |');
-//            console.log('/  \\  |      |  |=====   |  |   \\|');
-//            console.log(xml);
-//            var challenge = $(xml).find('challenge');
-//            if (challenge.length > 0)
-//                console.log(challenge.text());
-//            console.log('============================');
-//        };
-//        Tine.Messenger.Application.connection.xmlOutput = function (xml) {
-//            console.log('\\  /  |\\    /|  |         /==\\   |   |  -----');
-//            console.log(' \\/   | \\  / |  |        |    |  |   |    |');
-//            console.log(' /\\   |  \\/  |  |        |    |  |   |    |');
-//            console.log('/  \\  |      |  |====     \\==/   |===|    |');
-//            console.log(xml);
-//            var response = $(xml).find('response');
-//            if (response.length > 0)
-//                console.log(response.text());
-//            console.log('============================');
-//        };
-        Tine.Messenger.Application.connection.connect('marcio@simdev.sdr.serpro/expresso-3.0',
-                                                      'abc',
+        if (MESSENGER_DEBUG)
+            this.debugFunction();
+        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').JID,
+                                                      Tine.Tinebase.registry.get('messengerAccount').PWD,
                                                       this.connectionHandler);
         if(!Ext.getCmp("ClientDialog")){
             new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
         }
-//        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').login,
-//                                                      Tine.Tinebase.registry.get('messengerAccount').password,
-//                                                      this.connectionHandler);
     },
     
     getConnection: function () {
@@ -298,6 +307,10 @@ Tine.Messenger.IM = {
 }
 
 Tine.Messenger.Util = {
+    
+    extractNameFromEmail: function (email) {
+        return (email.indexOf('@') > 0) ? email.substring(0, email.indexOf('@')) : email;
+    },
     
     jidToId: function (jid) {
         return jid.replace(/@/g, "_").replace(/\./g, "-").replace(/\//g, "__");
