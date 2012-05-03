@@ -11,6 +11,9 @@
     <version>0.1</version>
     <order>60</order>
     <status>enabled</status>
+    <depends>
+        <application>Admin</application>
+    </depends>    
     <tables>
         <table>
             <name>example_application_record</name>
