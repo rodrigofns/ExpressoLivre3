@@ -140,7 +140,7 @@ Tine.Messenger.ChatHandler = {
         });
         chat_area.doLayout();
         
-        var scrolled = chat_table.body.scroll('down',500);
+        chat_area.body.scroll('down', 500); 
 //        $(panel_id).scrollTop($(panel_id).get(0).scrollHeight);
 //        Tine.Messenger.Log.debug(((flow) ? 'Incoming: ' : 'Outgo: ') + msg);
     },
@@ -392,8 +392,7 @@ function messengerLogin() {
         pwd = Ext.getCmp('messenger-connect-pwd').getValue();
 
     if (user.indexOf('@') < 0) {
-        //user += '@simdev.sdr.serpro/expresso-3.0';
-        user += '@localhost/expresso-3.0';
+        user += '@simdev.sdr.serpro/expresso-3.0';
     }                                        
     if (user.indexOf('expresso-3.0') < 0) {
         user += '/expresso-3.0';

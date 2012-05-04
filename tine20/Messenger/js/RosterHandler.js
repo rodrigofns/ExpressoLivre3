@@ -3,11 +3,12 @@ Ext.ns('Tine.Messenger');
 Tine.Messenger.RosterHandler = {
     
     _onStartRoster: function(iq) {
+        console.log('======> CHEGOU EM _onStartRoster');
         Tine.Messenger.Log.info("Getting roster...");
         
         try {
             // Send user presence
-            Tine.Messenger.Application.connection.send($pres());
+            Tine.Tinebase.appMgr.get('Messenger').getConnection().send($pres());
             // Modify Main Menu status
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             
@@ -24,7 +25,7 @@ Tine.Messenger.RosterHandler = {
     },
     
     _onRosterUpdate: function (iq) {
-        
+        console.log('======> CHEGOU EM _onRosterUpdate');
         try {
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]');
 
@@ -183,7 +184,6 @@ Tine.Messenger.RosterHandler = {
                         name: name
                     })
                     .c("group", {}, group);
-
          try{
              // Add buddy to list
              if(Tine.Messenger.RosterTree().addBuddy(jid, name, group)){
@@ -202,6 +202,25 @@ Tine.Messenger.RosterHandler = {
          }
          return false;
 //        Tine.Messenger.RosterHandler.contact_added = jid;
+    },
+    
+    _onRosterGet: function(iq){
+        var type = $(iq).find("query").attr("xmlns");
+        
+        if(type == "http://jabber.org/protocol/disco#info"){
+            var iq = $iq({to: 'fulano@simdev.sdr.serpro/expresso-3.0', type: "result"})
+                    .c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
+                    .c("feature", {"var": "http://jabber.org/protocol/bytestreams"}).up()
+                    .c("feature", {"var": "http://jabber.org/protocol/disco#info"}).up()
+                    .c("feature", {"var": "http://jabber.org/protocol/disco#items"}).up()
+                    .c("feature", {"var": "http://jabber.org/protocol/muc"}).up()
+                    .c("feature", {"var": "http://jabber.org/protocol/si/profile/file-transfer"}).up()
+                    .c("feature", {"var": "urn:xmpp:jingle:transports:raw-udp:1"}).up()
+                    .c("feature", {"var": "http://www.google.com/xmpp/protocol/session"}).up();
+
+            Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
+            Tine.Messenger.Log.debug("Eniou o iq result");
+        }
     },
     
     renameContact: function (jid, name, group) {
