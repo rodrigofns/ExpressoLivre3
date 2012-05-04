@@ -1,21 +1,14 @@
 <?php
 /**
- * Tine 2.0
+ * backend for WebconferenceConfig
  *
  * @package     Webconference
  * @subpackage  Backend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Philipp Schuele <p.schuele@metaways.de>
+ * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>
  * @copyright   Copyright (c) 2009 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
-
-/**
- * backend for ExampleRecords
- *
- * @package     Webconference
- * @subpackage  Backend
- */
 class Webconference_Backend_WebconferenceConfig extends Tinebase_Backend_Sql_Abstract
 {
     /**
