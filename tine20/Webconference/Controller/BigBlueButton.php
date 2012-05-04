@@ -69,12 +69,12 @@ class Webconference_Controller_BigBlueButton
         {
             throw  new Tinebase_Exception_NotFound("Erro ({$ret->messageKey}): {$ret->message}");
         }
-		
+/*		
 	else if($ret->returncode == 'SUCCESS' && $ret->messageKey == 'duplicateWarning')
         {
             throw  new Tinebase_Exception_Duplicate("Já existe uma sala chamada \"{$ret->meetingID}\", escolha outro nome.");
         }
-        
+*/        
         return $this->_joinRoom($roomName, $username, $mPW, $salt, $url);
         
         
@@ -124,7 +124,7 @@ class Webconference_Controller_BigBlueButton
      *
      * @param int $_length
      */
-    public static function getRandomString($_length)
+    private function _getRandomString($_length)
     {
         $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         

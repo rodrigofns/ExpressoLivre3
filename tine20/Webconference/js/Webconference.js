@@ -17,7 +17,9 @@ Ext.ns('Tine.Webconference');
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	
-		
+    bbbUrl : '',
+    roomCreated: false,
+    loadMask: null,
     /**
      * Get translated application title of the calendar application
      * 
@@ -26,46 +28,118 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     getTitle: function() {
         return this.i18n.gettext('Webconference');
     },
-        
+    isRoomCreated: function(){
+        return this.roomCreated;
+    },
+    getBbbUrl: function(){
+        return this.bbbUrl;
+    },
+    getLoadMask: function(){
+        return this.loadMask;
+    },
+    setLoadMask: function(mask){
+        this.loadMask = mask;
+    },
+    init: function() {
+        //Tine.Webconference.Application.superclass.init.apply(this, arguments);
+        this.roomCreated = false;
+       
+    },
     onBeforeActivate: function(){
+        
+        
+        if(!this.roomCreated){
+            this.createRoom();
+            
+        }
+        
+               
     	
+        Ext.getCmp('west').collapse( Ext.Component.DIRECTION_LEFT );
+        var west = Ext.get('west'); // this is west panel region
+        west.hide();
     	
-    	Ext.getCmp('west').collapse( Ext.Component.DIRECTION_LEFT );
-    	
-    	
-    	var west = Ext.get('west'); // this is west panel region
-    	west.hide();
-    	
-    	var westx = Ext.getCmp('west'); // this is west panel region
-    	westx.doLayout();
-
-    	
+        var westx = Ext.getCmp('west'); // this is west panel region
+        westx.doLayout();
+        
+        if(this.roomCreated)
+        {
+            var bbb = Ext.fly('bbb-panel'); 
+            bbb.setWidth('100%');
+            bbb.setHeight('100%');
+        }
     	
     },
-    
+            
     onBeforeDeActivate: function(){
     	
-    	var west = Ext.get('west'); // this is west panel region
-    	west.show();
-    	//Ext.getCmp('west').toggleCollapse();
-    	Ext.getCmp('west').expand();
-    	//Ext.getCmp('west').showVerticalScroller();
+        var west = Ext.get('west'); // this is west panel region
+        west.show();
+        //Ext.getCmp('west').toggleCollapse();
+        //Ext.getCmp('west').showVerticalScroller();
+        
+        
+        //Ext.getCmp('west').expand();
 
+        var westx = Ext.getCmp('west'); // this is west panel region
+        westx.expand();
+        westx.doLayout();
+        
+        var bbb = Ext.fly('bbb-panel');
+        bbb.setWidth(0);
+        bbb.setHeight(0);
+        
 
-    	var westx = Ext.getCmp('west'); // this is west panel region
-    	westx.doLayout();
+    },
 
-    	
+    createRoom: function(){
+        console.debug('creating webconference room...');
+        // console.debug(this.getMainScreen().getCenterPanel());
+        
+        
+        Ext.Ajax.request({
+            params: {
+                method: 'Webconference.createRoom'
+                
+            },
+            scope: this,
+            success: function(_result, _request){
+                var result = Ext.util.JSON.decode(_result.responseText);
+                this.bbbUrl = result;
+                Tine.log.debug(this.bbbUrl);
+                this.roomCreated = true;
+                
+                
+                Ext.get('iframe-bbb').dom.src = this.bbbUrl;
+                
+                this.loadMask.hide();
+                
+            
+            }
+            ,
+            failure: function(response, options) {
+                var responseText = Ext.util.JSON.decode(response.responseText);
+                var exception = responseText.data ? responseText.data : responseText;
+                Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+
+            }
+        });
+        
+        
+        
     }
-
 	
 });
 
 
-
 Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
     onRender : function(ct, position){
-         this.el = ct.createChild({tag: 'iframe', id: 'iframe-'+ this.id, frameBorder: 0, src: this.url});
+        this.el = ct.createChild({
+            tag: 'iframe', 
+            id: 'iframe-bbb', 
+            frameBorder: 0, 
+            src: this.url
+        });
     }
 });
 
@@ -86,9 +160,9 @@ Tine.Webconference.MainScreen = function(config) {
 };
 
 Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
+   
     
-	
-	getNorthPanel: function(contentType) {
+    getNorthPanel: function(contentType) {
         contentType = contentType || this.getActiveContentType();
         
         if (! this[contentType + 'ActionToolbar']) {
@@ -98,35 +172,34 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                 var actionToolbar = new Ext.Toolbar({
                     items: [{
                         xtype: 'buttongroup',
-//                        columns: 3 + (Ext.isArray(additionalItems) ? additionalItems.length : 0),
-                        plugins: [{
-                            ptype: 'ux.itemregistry',
-                            key:   this.app.appName + '-GridPanel-ActionToolbar-leftbtngrp'
-                        }],
+                        columns: 1,
                         items: [
                            
-                            Ext.apply(new Ext.Button(), {
-                                scale: 'medium',
-                                rowspan: 2,
-                                iconAlign: 'top',
-                                iconCls: 'action_add',
-                                text: this.app.i18n._('Add User'),
-                                handler: this.onAddUser
-                            })
+                        Ext.apply(new Ext.Button(), {
+                            scale: 'medium',
+                            rowspan: 2,
+                            iconAlign: 'top',
+                            iconCls: 'action_add',
+                            text: this.app.i18n._('Add User'),
+                            handler: this.onAddUser
+                        })
                         ]
                     }]
                 });
+               
                 
                 this[contentType + 'ActionToolbar'] = new Ext.Panel({
                 		
-                	items: [ actionToolbar]
+                    items: [ actionToolbar]
                 });
                 
                 
             } catch (e) {
                 Tine.log.err('Could not create northPanel');
                 Tine.log.err(e);
-                this[contentType + 'ActionToolbar'] = new Ext.Panel({html: 'ERROR'});
+                this[contentType + 'ActionToolbar'] = new Ext.Panel({
+                    html: 'ERROR'
+                });
             }
         }
         
@@ -135,20 +208,33 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
 	
     getCenterPanel: function() {
         if (! this.contentPanel) {
-            //this.contentPanel = new Ext.Button({text:'BBB'});
-        	var uri = 'http://10.200.118.61/';
+            
+            //var uri = window.location;
+            if(this.app.isRoomCreated())
+                var uri = this.app.getBbbUrl();
+            else
+                var uri = window.location;
+        
         	
-        	this.contentPanel = new Ext.Panel({
-        	     id: 'bbb',
-        	     title: 'bbb',
-        	     header: false,
-        	     closable:false,
-        	     hideMode:'visibility',
-        	     // layout to fit child component
-        	     layout:'fit', 
-        	     // add iframe as the child component
-        	     items: [ new Ext.ux.IFrameComponent({ id: id, url: uri }) ]
-        	});
+            this.contentPanel = new Ext.Panel({
+                id: 'bbb-panel',
+                title: 'bbb',
+                header: false,
+                closable:false,
+                hideMode:'visibility',
+                
+                // layout to fit child component
+                layout:'fit', 
+                // add iframe as the child component
+                items: [ new Ext.ux.IFrameComponent({
+                    id: id, 
+                    url: uri
+                }) ]
+
+                
+            });
+
+
         }
         
         return this.contentPanel;
@@ -156,19 +242,39 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
     
     getWestPanel: function() {
         if (! this.westPanel) {
-        	this.westPanel = new Ext.Panel({
-        		html:''
-    	});
+            this.westPanel = new Ext.Panel({
+                html:''
+            });
         }
         
         return this.westPanel;
     },
     
+    
+    show: function() {
+        if(this.fireEvent("beforeshow", this) !== false){
+            this.showWestPanel();
+            this.showCenterPanel();
+            this.showNorthPanel();
+
+            this.fireEvent('show', this);
+        }
+        var loadMask = new Ext.LoadMask(this.getCenterPanel().getEl(), {
+            msg: String.format(_('Please wait'))
+            });
+        if(!this.app.isRoomCreated()){
+            loadMask.show();
+            this.app.setLoadMask(loadMask);
+        }
+        return this;
+        
+    },
+    
+    
     onAddUser: function(btn) {
-    	//alert('add user');
+        
     	
-    	
-    	Ext.Ajax.request({
+        Ext.Ajax.request({
             params: {
                 method: 'Webconference.getTest',
                 param1: 'abc'
@@ -179,29 +285,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
             }
         });
     	
-    	
-    	
-//        var popupWindow = Tine.widgets.dialog.ImportDialog.openWindow({
-//            appName: 'Addressbook',
-//            // update grid after import
-//            listeners: {
-//                scope: this,
-//                'update': function(record) {
-//                    this.loadGridData({
-//                        preserveCursor:     false, 
-//                        preserveSelection:  false, 
-//                        preserveScroller:   false,
-//                        removeStrategy:     'default'
-//                    });
-//                }
-//            },
-//            record: new Tine.Tinebase.Model.ImportJob({
-//                // TODO get selected container -> if no container is selected use default container
-//                container_id: Tine.Addressbook.registry.get('defaultAddressbook'),
-//                model: this.recordClass,
-//                import_definition_id:  Tine.Addressbook.registry.get('defaultImportDefinition').id
-//            }, 0)
-//        });
+ 
     	
     }
     

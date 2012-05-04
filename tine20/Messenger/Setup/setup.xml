@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+    <name>Messenger</name>
+    <version>0.1</version>
+    <order>50</order>
+</application>
