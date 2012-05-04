@@ -1294,15 +1294,20 @@ Ext.extend(Tine.Calendar.DaysView, Ext.util.Observable, {
     updateDayHeaders: function() {
         var dayHeaders = Ext.DomQuery.select('div[class=cal-daysviewpanel-dayheader-day]', this.innerHd);
         
-        for (var i=0, date, isToDay, headerEl, dayColEl; i<dayHeaders.length; i++) {
+        for (var i=0, date, isToDay, isHolliday, headerEl, dayColEl; i<dayHeaders.length; i++) {
             
             date = this.startDate.add(Date.DAY, i);
             isToDay = date.getTime() == this.toDay.getTime();
-            
+            if(date.getFullYear() != ano || date.getMonth()+1 != mes){
+            prepara_feriados(date.getFullYear(),date.getMonth()+1);
+            }
+            isHolliday = feriados[date.format('j')];
+            VisHolliday = isHolliday ? 'Title="' + feriados[date.format('j')] + '"' : '';
             headerEl = Ext.fly(dayHeaders[i]);
-            
-            headerEl.update(String.format(this.dayFormatString, date.format('l'), date.format('j'), date.format('F')));
+            //alert(String.format(this.dayFormatString, date.format('l'), date.format('j'), date.format('F')));
+            headerEl.update('<span ' + VisHolliday +'>' + String.format(this.dayFormatString, date.format('l'), date.format('j'), date.format('F')) + '</span>');
             headerEl.parent()[(isToDay ? 'add' : 'remove') + 'Class']('cal-daysviewpanel-dayheader-today');
+            headerEl.parent()[(isHolliday ? 'add' : 'remove') + 'Class']('cal-daysviewpanel-dayheader-holliday');
             Ext.fly(this.dayCols[i])[(isToDay ? 'add' : 'remove') + 'Class']('cal-daysviewpanel-body-daycolumn-today');
         }
     },
