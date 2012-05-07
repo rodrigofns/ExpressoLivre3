@@ -19,6 +19,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	
     bbbUrl : '',
     roomCreated: false,
+    roomName:'',
     loadMask: null,
     /**
      * Get translated application title of the calendar application
@@ -33,6 +34,9 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     getBbbUrl: function(){
         return this.bbbUrl;
+    },
+    getRoomName: function(){
+        return this.roomName;  
     },
     getLoadMask: function(){
         return this.loadMask;
@@ -105,7 +109,9 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             scope: this,
             success: function(_result, _request){
                 var result = Ext.util.JSON.decode(_result.responseText);
-                this.bbbUrl = result;
+                this.bbbUrl = result.bbbUrl;
+                this.roomName = result.roomName;
+                
                 Tine.log.debug(this.bbbUrl);
                 this.roomCreated = true;
                 
@@ -273,6 +279,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
     
     onAddUser: function(btn) {
         
+        //console.debug(Tine.Tinebase.appMgr.get('Webconference').roomName);
     	
         Ext.Ajax.request({
             params: {

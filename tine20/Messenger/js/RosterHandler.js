@@ -208,7 +208,7 @@ Tine.Messenger.RosterHandler = {
         var type = $(iq).find("query").attr("xmlns");
         
         if(type == "http://jabber.org/protocol/disco#info"){
-            var iq = $iq({to: 'fulano@simdev.sdr.serpro/expresso-3.0', type: "result"})
+            var iq = $iq({to: 'fulano@localhost/expresso-3.0', type: "result"})
                     .c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
                     .c("feature", {"var": "http://jabber.org/protocol/bytestreams"}).up()
                     .c("feature", {"var": "http://jabber.org/protocol/disco#info"}).up()

@@ -392,12 +392,13 @@ function messengerLogin() {
         pwd = Ext.getCmp('messenger-connect-pwd').getValue();
 
     if (user.indexOf('@') < 0) {
-        user += '@simdev.sdr.serpro/expresso-3.0';
+        //user += '@simdev.sdr.serpro/expresso-3.0';
+        user += '@localhost/expresso-3.0';
     }                                        
     if (user.indexOf('expresso-3.0') < 0) {
         user += '/expresso-3.0';
     }
-    Tine.Tinebase.registry.add('messengerAccount', {
+    Tine.Tinebase.registry.add('messengerAccount1', {
         login: user,
         password: pwd
     });

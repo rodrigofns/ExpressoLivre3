@@ -2,7 +2,7 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
-    MESSENGER_DOMAIN = 'simdev.sdr.serpro',
+    MESSENGER_DOMAIN = 'localhost',
     MESSENGER_RESOURCE = 'expresso-3.0',
     MESSENGER_DEBUG = true;
 
@@ -140,12 +140,13 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Messenger.Log.debug("Starting Messenger...");
         var jid = Tine.Messenger.Util.extractNameFromEmail(Tine.Tinebase.registry.get('userContact').email);
             jid += '@' + MESSENGER_DOMAIN + '/' + MESSENGER_RESOURCE;
-        // BEGINS HERE!! When registry set working, take off the following lines
+                
         Tine.Tinebase.registry.add('messengerAccount', {
-            JID: jid,
-            PWD: '7c67e713a4b4139702de1a4fac672344'
+            JID: Tine.Tinebase.registry.get('messengerAccount1').login,
+            PWD: Tine.Tinebase.registry.get('messengerAccount1').password
         });
-        // ENDS HERE!!
+    
+       
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
         if (MESSENGER_DEBUG)
             this.debugFunction();

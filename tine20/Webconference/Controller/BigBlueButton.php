@@ -56,6 +56,14 @@ class Webconference_Controller_BigBlueButton
     private function _createRoomName() {
         return Tinebase_Core::getUser()->accountLoginName;
     }
+    
+    private function _joinUrl($roomName, $username, $mPW, $salt, $url)
+    {
+        return (object)array(
+            bbbUrl => $this->_backend->joinURL($roomName, $username, $mPW, $salt, $url),
+            roomName => $roomName
+        );
+    }
 
     /**
      * This method creates a meeting
@@ -82,7 +90,7 @@ class Webconference_Controller_BigBlueButton
         if ($ret->returncode == 'FAILED') {
             throw new Tinebase_Exception_NotFound("Error ({$ret->messageKey}): {$ret->message}");
         }
-        return $this->_backend->joinURL($roomName, $username, $mPW, $salt, $url);
+        return $this->_joinURL($roomName, $username, $mPW, $salt, $url);
     }
 
     private function _getBigBlueButtonConfig() {
@@ -131,7 +139,13 @@ class Webconference_Controller_BigBlueButton
         } else {
             $pw = ATTENDEE_PW;
         }
-        return $this->_backend->joinURL($roomName, $username, $pw, $salt, $url);
+        
+        //Tinebase_Core::getSession()->webconferenceRoomName = $roomName;
+        
+        return array(
+            bbbUrl => $this->_joinURL($roomName, $username, $pw, $salt, $url),
+            roomName => $roomName
+        );
     }
 
     /**
