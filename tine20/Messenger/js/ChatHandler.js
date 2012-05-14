@@ -140,7 +140,7 @@ Tine.Messenger.ChatHandler = {
         });
         chat_area.doLayout();
         
-        var scrolled = chat_table.body.scroll('down',500);
+        chat_area.body.scroll('down', 500); 
 //        $(panel_id).scrollTop($(panel_id).get(0).scrollHeight);
 //        Tine.Messenger.Log.debug(((flow) ? 'Incoming: ' : 'Outgo: ') + msg);
     },
