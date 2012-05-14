@@ -18,9 +18,9 @@ $server = $_SERVER['SERVER_NAME'].' ('.$_SERVER['SERVER_ADDR'].')';
 $remote = (isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '') . 
           ' ('.$_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT'].')';
 
-file_put_contents('/home/91900603500/tmp/ws.log', "$remote => $server\n", FILE_APPEND);
-file_put_contents('/home/91900603500/tmp/ws.log', "$user_access->ip / $user_access->login_name\n", FILE_APPEND);
-file_put_contents('/home/91900603500/tmp/ws.log', "============================================\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "$remote => $server\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "$user_access->ip / $user_access->login_name\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "============================================\n", FILE_APPEND);
 
 header('Content-type: application/json');
 echo json_encode(array(
