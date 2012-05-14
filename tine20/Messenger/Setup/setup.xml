@@ -3,4 +3,24 @@
     <name>Messenger</name>
     <version>0.1</version>
     <order>50</order>
+    <tables>
+        <table>
+            <name>messenger_config</name>
+            <version>1</version>
+            <declaration>
+                <field>
+                    <name>domain</name>
+                    <type>text</type>
+                    <length>255</length>
+                    <notnull>true</notnull>
+                </field>
+                <field>
+                    <name>resource</name>
+                    <type>text</type>
+                    <length>255</length>
+                    <notnull>true</notnull>
+                </field>
+            </declaration>
+        </table>
+    </tables>
 </application>

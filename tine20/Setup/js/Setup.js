@@ -79,6 +79,12 @@ Tine.Setup.TreePanel = Ext.extend(Ext.tree.TreePanel, {
                 id: 'EmailPanel',
                 leaf: true
             }, {
+                text: this.app.i18n._('Messenger'),
+                iconCls: 'setup_messenger-icon',
+                disabled: termsFailed || testsFailed || configMissing || dbMissing || setupRequired,
+                id: 'MessengerPanel',
+                leaf: true
+            }, {
                 text: this.app.i18n._('Application Manager'),
                 iconCls: 'setup_application_manager',
                 disabled: termsFailed || testsFailed || configMissing || dbMissing || setupRequired,
@@ -143,6 +149,7 @@ Tine.Setup.TreePanel = Ext.extend(Ext.tree.TreePanel, {
         this.getNodeById('AuthenticationPanel')[termsChecks && setupChecks && configExists && checkDB ? 'enable': 'disable']();
         this.getNodeById('ApplicationGridPanel')[termsChecks && setupChecks && configExists && checkDB && !setupRequired ? 'enable': 'disable']();
         this.getNodeById('EmailPanel')[termsChecks && setupChecks && configExists && checkDB && !setupRequired ? 'enable': 'disable']();
+        this.getNodeById('MessengerPanel')[termsChecks && setupChecks && configExists && checkDB && !setupRequired ? 'enable': 'disable']();
     },
     
     setNodeIcon: function (nodeId, success) {

@@ -37,6 +37,13 @@ class Tinebase_Model_Config extends Tinebase_Record_Abstract
      * @var string
      */
     const SIEVE = 'sieve';
+    
+    /**
+     * messenger config name
+     * 
+     * @var string 
+     */
+    const MESSENGERCONFIG = 'messenger';
 
     /**
      * authentication backend config

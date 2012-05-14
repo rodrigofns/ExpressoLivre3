@@ -275,6 +275,33 @@ class Setup_Frontend_Json extends Tinebase_Frontend_Abstract
     }
     
     /**
+     * Update messenger config data
+     * 
+     * @param  array $data
+     * @return array [success status]
+     */
+    public function saveMessengerConfig($data)
+    {
+        Setup_Core::getLogger()->debug('INICIANDO CONFIG MESSENGER ====================');
+        $this->_controller->saveMessengerConfig($data);
+        return array(
+            'success' => true,
+        );
+    }
+    
+    /**
+     * load email config data
+     * 
+     * @todo implement controller function
+     * 
+     * @return array
+     */
+    public function getMessengerConfig()
+    {
+        return $this->_controller->getMessengerConfig();
+    }
+        
+    /**
      * Returns registry data of setup
      * .
      * @see Tinebase_Application_Json_Abstract
@@ -305,6 +332,7 @@ class Setup_Frontend_Json extends Tinebase_Frontend_Abstract
 	            'setupChecks'          => $this->envCheck(),
 	            'configData'           => $this->loadConfig(),
         	    'emailData'            => (! empty($registryData['checkDB']) && $this->_controller->isInstalled('Tinebase')) ? $this->getEmailConfig() : array(),
+                    'messengerData'        => (! empty($registryData['checkDB']) && $this->_controller->isInstalled('Tinebase')) ? $this->getMessengerConfig() : array(),
 	        ));
         }
         

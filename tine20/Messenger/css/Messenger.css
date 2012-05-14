@@ -1,3 +1,7 @@
+.MessengerIconCls {
+    background-image: url(../../images/messenger/talk-balloons.png) !important;
+}
+
 #messenger {
     color: #000000;
     cursor: pointer;

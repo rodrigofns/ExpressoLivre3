@@ -931,6 +931,27 @@ class Setup_Controller
     }
     
     /**
+     * save email config
+     * 
+     * @param array $_data
+     * @return void
+     */
+    public function saveMessengerConfig($_data)
+    {
+        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::MESSENGERCONFIG, $_data);
+    }
+    
+    /**
+     * get messenger config data
+     * 
+     * @return array
+     */
+    public function getMessengerConfig()
+    {
+        return Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::MESSENGERCONFIG, 'Tinebase', array());
+    }
+    
+    /**
      * returns all email config keys
      * 
      * @return array

@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>TESTS</title>
+        <script src="jquery-1.7.2.min.js"></script>
+        <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+        <script type="text/javascript" src="qunit.js"></script>
+        <script type="text/javascript" src="mocks.js"></script>
+        <script>
+            $(document).ready(function () {
+                test('Extracting name from e-mail.', function () {
+                    equal(Util.extractNameFromEmail('marcio@email.com'), 'marcio', 'Name should be "marcio"!');
+                    equal(Util.extractNameFromEmail('marcio.albuquerque@serpro.gov.br'), 'marcio.albuquerque', 'Name should be "marcio.albuquerque"!');
+                    equal(Util.extractNameFromEmail('marcio.albuquerque_serpro.gov.br'), 'marcio.albuquerque_serpro.gov.br', 'Name should be "marcio.albuquerque_serpro.gov.br"!');
+                });
+                
+                test('Sanitizing name', function () {
+                    equal(Util.sanitizeName('Maria Jose'), 'Maria-Jose', 'Name should be "Maria-Jose"');
+                    equal(Util.sanitizeName('Maria Jose dos Santos'), 'Maria-Jose-dos-Santos', 'Name should be "Maria-Jose-dos-Santos"');
+                });
+                
+                test('Sanitizing surname', function () {
+                    equal(Util.sanitizeName('Lima Albuquerque'), 'Albuquerque', 'Surname should be "Albuquerque"');
+                    equal(Util.sanitizeName('dos Santos'), 'Santos', 'Surname should be "Santos"');
+                    equal(Util.sanitizeName('Souza dos Santos'), 'Santos', 'Surname should be "Santos"');
+                });
+                
+                test('Creating name from First Name and Last Name.', function () {
+                    equal(Util.createJabberIDFromName('Carlos', 'Pilla'), 'carlos.pilla', 'For "Pilla, Carlos" ID should be "carlos.pilla"');
+                    equal(Util.createJabberIDFromName('Marcio', 'Albuquerque'), 'marcio.albuquerque', 'For "da Albuquerque, Marcio" ID should be "marcio.albuquerque"');
+                    equal(Util.createJabberIDFromName('Joao', 'da Silva'), 'joao.silva', 'For "da Silva, Joao" ID should be "joao.silva"');
+                    equal(Util.createJabberIDFromName('Jose Maria', 'Calado Santos'), 'jose-maria.santos', 'For "Calado Santos, Jose Maria" ID should be "jose-maria.santos"');
+                    equal(Util.createJabberIDFromName('Maria do Rosario', 'dos Santos'), 'maria-rosario.santos', 'For "dos Santos, Maria do Rosario" ID should be "maria-rosario.santos"');
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <h1 id="qunit-header">Tests for Messenger Application</h1>
+        <h2 id="qunit-banner"></h2>
+        <div id="qunit-testrunner-toolbar"></div>
+        <h2 id="qunit-userAgent"></h2>
+        <ol id="qunit-tests"></ol>
+        <!-- If you want some extras markups or anything else -->
+        <div id="qunit-fixture">test markup, will be hidden</div>
+    </body>
+</html>

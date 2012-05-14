@@ -54,6 +54,10 @@
         {
           "text": "Groupie.js",
           "path": "js/"
+        },
+        {
+          "text": "base64.js",
+          "path": "js/"
         }
       ]
     },

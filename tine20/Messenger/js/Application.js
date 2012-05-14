@@ -2,10 +2,8 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
-    MESSENGER_DOMAIN = 'simdev.sdr.serpro',
-    MESSENGER_RESOURCE = 'expresso-3.0',
     MESSENGER_DEBUG = true;
-
+    
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
         fields:["value","text"],
@@ -60,7 +58,7 @@ const IMConst = {
 }
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
-    hasMainScreen: false,
+    hasMainScreen: true,
     
     // Delayed Tasks
     showMessengerDelayedTask: null,
@@ -138,12 +136,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
-        var jid = Tine.Messenger.Util.extractNameFromEmail(Tine.Tinebase.registry.get('userContact').email);
-            jid += '@' + MESSENGER_DOMAIN + '/' + MESSENGER_RESOURCE;
+        var jid = Tine.Messenger.Util.getJidFromConfig();
+        
         // BEGINS HERE!! When registry set working, take off the following lines
         Tine.Tinebase.registry.add('messengerAccount', {
             JID: jid,
-            PWD: '7c67e713a4b4139702de1a4fac672344'
+            PWD: base64.encode('{"pwd"="b1v9jhkuqrm54vp0tlub4sdrlkeoa5un","ip"="10.200.237.159"}')
         });
         // ENDS HERE!!
         Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
@@ -308,8 +306,40 @@ Tine.Messenger.IM = {
 
 Tine.Messenger.Util = {
     
+    getJidFromConfig: function () {
+        var domain = Tine.Tinebase.registry.get('messenger').messenger.domain,
+            resource = Tine.Tinebase.registry.get('messenger').messenger.resource,
+            name = Tine.Messenger.Util.getJabberName(Tine.Tinebase.registry.get('messenger').messenger.format);
+        
+        return name + '@' + domain + '/' + resource;
+    },
+    
+    getJabberName: function (format) {
+        var name = '';
+        
+        switch (format) {
+            case 'email':
+                name = Tine.Messenger.Util.extractNameFromEmail(Tine.Tinebase.registry.get('userContact').email);
+                break;
+            case 'login':
+                name = Tine.Tinebase.registry.get('userContact').account_id;
+                break;
+            default:
+                name = Tine.Tinebase.registry.get('messenger').messenger.custom_name;
+        }
+        
+        return name;
+    },
+    
     extractNameFromEmail: function (email) {
-        return (email.indexOf('@') > 0) ? email.substring(0, email.indexOf('@')) : email;
+        return (email.indexOf('@') >= 0) ? email.substring(0, email.indexOf('@')) : email;
+    },
+    
+    createJabberIDFromName: function () {
+        var first_name = Tine.Tinebase.registry.get('userContact').n_given,
+            last_name = Tine.Tinebase.registry.get('userContact').n_family;
+
+        return first_name.toLowerCase() + '.' + last_name.toLowerCase();
     },
     
     jidToId: function (jid) {

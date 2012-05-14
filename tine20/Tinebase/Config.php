@@ -160,7 +160,9 @@ class Tinebase_Config
         if (! is_object($config)) {
             throw new Tinebase_Exception_NotFound('Config object ' . $_name . ' not found or is not an object!');
         }
-        
+        Setup_Core::getLogger()->debug('/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\');
+        Setup_Core::getLogger()->debug($config);
+        Setup_Core::getLogger()->debug('/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\');
         $result = (is_array($config->value)) ? $config->value : Zend_Json::decode($config->value);
         
         return $result;
@@ -216,11 +218,15 @@ class Tinebase_Config
                 
         try {
             $config = $this->getConfig($_config->name, $_config->application_id, NULL, FALSE);
-
+            Setup_Core::getLogger()->debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+            Setup_Core::getLogger()->debug($config);
+            Setup_Core::getLogger()->debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
             // update
             $config->value = $_config->value;
             $result = $this->_backend->update($config);
-            
+            Setup_Core::getLogger()->debug('00000000000000000000000000000000000');
+            Setup_Core::getLogger()->debug($config);
+            Setup_Core::getLogger()->debug('00000000000000000000000000000000000');
         } catch (Tinebase_Exception_NotFound $e) {
             // create new
             $result = $this->_backend->create($_config);
@@ -242,13 +248,13 @@ class Tinebase_Config
     public function setConfigForApplication($_name, $_value, $_applicationName = 'Tinebase')
     {
         $value = (is_array($_value)) ? Zend_Json::encode($_value) : $_value;
-        
+
         $configRecord = new Tinebase_Model_Config(array(
             "application_id"    => Tinebase_Application::getInstance()->getApplicationByName($_applicationName)->getId(),
             "name"              => $_name,
             "value"             => $value,              
         ));
-        
+
         return $this->setConfig($configRecord);
     }
 

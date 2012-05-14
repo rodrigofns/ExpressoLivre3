@@ -47,6 +47,10 @@
         {
           "text": "EmailPanel.js",
           "path": "js/"
+        },
+        {
+          "text": "MessengerPanel.js",
+          "path": "js/"
         }
       ]
     },

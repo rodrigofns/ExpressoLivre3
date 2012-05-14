@@ -129,3 +129,8 @@
 .x-btn-large .setup_action_download_config {
     background-image:url(../../images/oxygen/32x32/actions/mail-get.png) !important;
 }
+
+
+.setup_messenger-icon {
+    background-image:url(../../images/messenger/talk-balloons.png) !important;
+}
