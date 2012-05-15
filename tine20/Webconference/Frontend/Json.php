@@ -167,6 +167,52 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
     }
     
+    public function getJoinInvites()
+    {
+        
+        //if(hasInvitesToMe)
+        //{
+            return array(
+                'type'=>'event',
+                'name'=>'joinInvite',
+                'data'=>'Successfully polled at: '. date('g:i:s a')
+            );
+//        }
+//        else
+//        {
+//            return null;
+//        }
+        
+    }
+    public function inviteUsersToJoin($users, $moderator, $roomName)
+    {
+        $fullUser = Tinebase_Core::getUser();
+        
+        $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator);
+        throw new Tinebase_Exception($url);
+        $url = $url->bbbUrl;
+        
+
+
+        $subject = "invite Users To Join";
+        $messagePlain = null;
+         $_messageHtml = "O " . Tinebase_Core::getUser()->accountFullName . ' está convidando você para uma webconferencia. <br/><br/> <a id="url:'. $url.' class="webconference-join-link"> Entrar na webconferencia  </a>'.$url;
+        
+        $recipients=array();
+        foreach($users as $user){
+            array_push($recipients, new Addressbook_Model_Contact($user));
+            
+        }
+        
+        
+        Tinebase_Notification::getInstance()->send( $fullUser, $recipients, $subject, $messagePlain, $_messageHtml);
+        //foreach user
+        return array(
+                'users'=>$recipients,
+                'name'=>'joinInvite',
+                'data'=>'Successfully polled at: '. date('g:i:s a')
+            );
+    }
     
     /**
      * Search for records matching given arguments
