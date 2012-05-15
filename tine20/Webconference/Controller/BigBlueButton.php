@@ -127,23 +127,24 @@ class Webconference_Controller_BigBlueButton
      * @param Boolean $moderator -- is moderator in meeting
      * @return String -- URL of the meeting
      */
-    public function joinRoom($roomName, $moderator) 
+    public function joinRoom($roomName, $moderator, $userName = null) 
     {
         $config = $this->_getBigBlueButtonConfig();
         $config = (object) $config;
         $salt = $config->salt;
         $url = $config->url;
-        $username = Tinebase_Core::getUser()->accountFullName;
+        if (is_null($userName))
+        {
+            $userName = Tinebase_Core::getUser()->accountFullName;
+        }
         if ($moderator) {
             $pw = MODERATOR_PW;
         } else {
             $pw = ATTENDEE_PW;
         }
-        
         //Tinebase_Core::getSession()->webconferenceRoomName = $roomName;
-        
-        return array(
-            bbbUrl => $this->_joinURL($roomName, $username, $pw, $salt, $url),
+        return (object) array(
+            bbbUrl => $this->_joinURL($roomName, $userName, $pw, $salt, $url),
             roomName => $roomName
         );
     }

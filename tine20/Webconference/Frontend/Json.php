@@ -184,29 +184,23 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 //        }
         
     }
+    
+    
     public function inviteUsersToJoin($users, $moderator, $roomName)
     {
         $fullUser = Tinebase_Core::getUser();
-        
-        $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator);
-        throw new Tinebase_Exception($url);
-        $url = $url->bbbUrl;
-        
-
-
-        $subject = "invite Users To Join";
-        $messagePlain = null;
-         $_messageHtml = "O " . Tinebase_Core::getUser()->accountFullName . ' está convidando você para uma webconferencia. <br/><br/> <a id="url:'. $url.' class="webconference-join-link"> Entrar na webconferencia  </a>'.$url;
-        
-        $recipients=array();
-        foreach($users as $user){
-            array_push($recipients, new Addressbook_Model_Contact($user));
+        $recipients = array();
+        foreach ($users as $user) {
+            $userName = $user[n_fn];
             
+            $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
+            $subject = "invite Users To Join";
+            $messagePlain = null;
+            $_messageHtml = "O " . Tinebase_Core::getUser()->accountFullName . ' está convidando você para uma webconferencia. <br/><br/> <a id="url:'. $url.' class="webconference-join-link"> Entrar na webconferencia  </a>'.$url;
+            $recipient = array(new Addressbook_Model_Contact($user));
+            Tinebase_Notification::getInstance()->send( $fullUser, $recipient, $subject, $messagePlain, $_messageHtml);
+            array_push($recipients, $user);
         }
-        
-        
-        Tinebase_Notification::getInstance()->send( $fullUser, $recipients, $subject, $messagePlain, $_messageHtml);
-        //foreach user
         return array(
                 'users'=>$recipients,
                 'name'=>'joinInvite',
