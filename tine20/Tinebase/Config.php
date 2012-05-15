@@ -160,9 +160,7 @@ class Tinebase_Config
         if (! is_object($config)) {
             throw new Tinebase_Exception_NotFound('Config object ' . $_name . ' not found or is not an object!');
         }
-        Setup_Core::getLogger()->debug('/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\');
-        Setup_Core::getLogger()->debug($config);
-        Setup_Core::getLogger()->debug('/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\');
+        
         $result = (is_array($config->value)) ? $config->value : Zend_Json::decode($config->value);
         
         return $result;

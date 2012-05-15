@@ -2,7 +2,7 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
-    MESSENGER_DEBUG = true;
+    MESSENGER_DEBUG = false;
     
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
@@ -136,20 +136,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 
     startMessenger: function () {
         Tine.Messenger.Log.debug("Starting Messenger...");
-        var jid = Tine.Messenger.Util.getJidFromConfig();
         
-        // BEGINS HERE!! When registry set working, take off the following lines
-        Tine.Tinebase.registry.add('messengerAccount', {
-            JID: jid,
-            PWD: base64.encode('{"pwd"="b1v9jhkuqrm54vp0tlub4sdrlkeoa5un","ip"="10.200.237.159"}')
-        });
-        // ENDS HERE!!
-        Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-        if (MESSENGER_DEBUG)
-            this.debugFunction();
-        Tine.Messenger.Application.connection.connect(Tine.Tinebase.registry.get('messengerAccount').JID,
-                                                      Tine.Tinebase.registry.get('messengerAccount').PWD,
-                                                      this.connectionHandler);
+        this.getPasswordForJabber();
+        
         if(!Ext.getCmp("ClientDialog")){
             new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
         }
@@ -157,6 +146,37 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     
     getConnection: function () {
         return Tine.Messenger.Application.connection;
+    },
+    
+    getPasswordForJabber: function () {
+        Ext.Ajax.request({
+            params: {
+                method: Tine.Messenger.IM.getLocalServerInfo,
+                login: Tine.Tinebase.registry.get('currentAccount').accountLoginName
+            },
+            
+            failure: function () {
+                
+            },
+            
+            success: function (response, request) {
+                Tine.Tinebase.registry.add('messengerAccount', {
+                    JID: Tine.Messenger.Util.getJidFromConfig(),
+                    PWD: base64.encode(response.responseText)
+                });
+
+                Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
+                
+                if (MESSENGER_DEBUG)
+                    Tine.Tinebase.appMgr.get('Messenger').debugFunction();
+                
+                Tine.Messenger.Application.connection.connect(
+                    Tine.Tinebase.registry.get('messengerAccount').JID,
+                    Tine.Tinebase.registry.get('messengerAccount').PWD,
+                    Tine.Tinebase.appMgr.get('Messenger').connectionHandler
+                );
+            }
+        });
     },
     
     connectionHandler: function (status) {
@@ -262,6 +282,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
 });
 
 Tine.Messenger.IM = {
+    getLocalServerInfo: 'Messenger.getLocalServerInfo',
+    
     enableOnConnect: function(){
         console.log('======> CHEGOU EM enableOnConnect');
         // Change IM icon

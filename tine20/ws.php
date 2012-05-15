@@ -12,12 +12,16 @@ $st = $pdo->prepare($sql);
 $st->bindParam(':sessionid', $session_id, PDO::PARAM_STR);
 $st->bindParam(':search', $login_name, PDO::PARAM_STR);
 $st->execute();
+$sql_executed = $st->queryString;
 $user_access = $st->fetch(PDO::FETCH_OBJ);
 
 $server = $_SERVER['SERVER_NAME'].' ('.$_SERVER['SERVER_ADDR'].')';
 $remote = (isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '') . 
           ' ('.$_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT'].')';
 
+file_put_contents('/tmp/ws.log', "$session_id\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "$login_name\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "$sql_executed\n", FILE_APPEND);
 file_put_contents('/tmp/ws.log', "$remote => $server\n", FILE_APPEND);
 file_put_contents('/tmp/ws.log', "$user_access->ip / $user_access->login_name\n", FILE_APPEND);
 file_put_contents('/tmp/ws.log', "============================================\n", FILE_APPEND);

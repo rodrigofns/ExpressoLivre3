@@ -12,9 +12,9 @@ class Messenger_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     /**
     * controller
     *
-    * @var Clients_Controller_Client
+    * @var Controller_Client
     */
-   protected $_recordController = NULL;
+   protected $_controller = NULL;
 
    /**
     * the constructor
@@ -23,6 +23,15 @@ class Messenger_Frontend_Json extends Tinebase_Frontend_Json_Abstract
    public function __construct()
    {
        $this->_applicationName = 'Messenger';
-       //$this->_recordController = Clients_Controller_Client::getInstance();
+       $this->_controller = Messenger_Controller::getInstance();
    }
+   
+   /**
+    *  
+    */
+   public function getLocalServerInfo($login)
+   {
+       return $this->_controller->getLocalServerInfo($login);
+   }
+   
 }

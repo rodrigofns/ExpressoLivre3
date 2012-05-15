@@ -155,7 +155,7 @@ class JabberAuth
     {
         $this->logg('Checking the password...');
         $this->logg('Before transforming: ' . $this->jabber_pass);
-        $json = str_replace('=', ':', base64_decode($this->jabber_pass));
+        $json = base64_decode($this->jabber_pass);
 	$this->logg('JSON => ' . $json);
 	$local_info = json_decode($json);
 
