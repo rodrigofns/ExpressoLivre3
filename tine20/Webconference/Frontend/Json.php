@@ -17,8 +17,8 @@
  * @package     Webconference
  * @subpackage  Frontend
  */
-class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract 
-{
+class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
+
     /**
      * the controller
      * 
@@ -29,8 +29,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     /**
      * the constructor
      */
-    public function __construct() 
-    {
+    public function __construct() {
         $this->_applicationName = 'Webconference';
         $this->_controller = Webconference_Controller_WebconferenceConfig::getInstance();
     }
@@ -42,8 +41,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array $paging
      * @return array
      */
-    public function searchWebconferenceConfig($filter, $paging) 
-    {
+    public function searchWebconferenceConfig($filter, $paging) {
         return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
     }
 
@@ -53,8 +51,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param   string $id
      * @return  array record data
      */
-    public function getWebconferenceConfig($id) 
-    {
+    public function getWebconferenceConfig($id) {
         return $this->_get($id, $this->_controller);
     }
 
@@ -64,8 +61,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array $recordData
      * @return array created/updated record
      */
-    public function saveWebconferenceConfig($recordData) 
-    {
+    public function saveWebconferenceConfig($recordData) {
         return $this->_controller->saveWebconferenceConfig($recordData);
     }
 
@@ -74,8 +70,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * 
      * @return array -- record data  
      */
-    public function loadWebconferenceConfig() 
-    {
+    public function loadWebconferenceConfig() {
         return $this->_controller->loadWebconferenceConfig();
     }
 
@@ -85,8 +80,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param  array  $ids 
      * @return string
      */
-    public function deleteWebconferenceConfig($ids) 
-    {
+    public function deleteWebconferenceConfig($ids) {
         return $this->_delete($ids, $this->_controller);
     }
 
@@ -95,8 +89,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * 
      * @return array --settings 
      */
-    public function getSettings() 
-    {
+    public function getSettings() {
         $result = Webconference_Controller::getInstance()->getConfigSettings()->toArray();
         return $result;
     }
@@ -106,8 +99,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * 
      * @return String -- URL of the meeting 
      */
-    public function createRoom() 
-    {
+    public function createRoom() {
         return Webconference_Controller_BigBlueButton::getInstance()->createRoom();
     }
 
@@ -119,8 +111,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param String $moderator
      * @return String -- URL of the meeting  
      */
-    public function joinRoom($roomName, $moderator = false) 
-    {
+    public function joinRoom($roomName, $moderator = false) {
         return Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator);
     }
 
@@ -128,13 +119,12 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * Search meetings active on the server
      * 
      * @return
-     *	- Null if the server is unreachable
-     *	- If FAILED then returns an array containing a returncode, messageKey, message.
-     *	- If SUCCESS then returns an array of all the meetings. Each element in the array is an array containing a meetingID,
+     * 	- Null if the server is unreachable
+     * 	- If FAILED then returns an array containing a returncode, messageKey, message.
+     * 	- If SUCCESS then returns an array of all the meetings. Each element in the array is an array containing a meetingID,
      *           moderatorPW, attendeePW, hasBeenForciblyEnded, running.
      */
-    public function getMeetings() 
-    {
+    public function getMeetings() {
         return Webconference_Controller_BigBlueButton::getInstance()->getMeetings();
     }
 
@@ -144,70 +134,90 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
      * @param moderatorPassword -- the moderator password of the meeting
      * @return
-     *	- Null if the server is unreachable
+     * 	- Null if the server is unreachable
      * 	- An array containing a returncode, messageKey, message.
-     */ 
-    public function endMeeting($roomName, $moderatorPassword = null)
-    {
+     */
+    public function endMeeting($roomName, $moderatorPassword = null) {
         return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomName, $moderatorPassword);
     }
-    
+
     /**
      * This method returns an array of the attendees in the specified meeting.
      *
      * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
      * @param moderatorPassword -- the moderator password of the meeting
      * @return
-     *	- Null if the server is unreachable.
-     *	- If FAILED, returns an array containing a returncode, messageKey, message.
-     *	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
-     */    
-    public function getUsers($roomName, $moderatorPassword = null)
-    {
+     * 	- Null if the server is unreachable.
+     * 	- If FAILED, returns an array containing a returncode, messageKey, message.
+     * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
+     */
+    public function getUsers($roomName, $moderatorPassword = null) {
         return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
     }
-    
-    public function getJoinInvites()
-    {
-        
+
+    public function getJoinInvites() {
+
         //if(hasInvitesToMe)
         //{
-            return array(
-                'type'=>'event',
-                'name'=>'joinInvite',
-                'data'=>'Successfully polled at: '. date('g:i:s a')
-            );
+        return array(
+            'type' => 'event',
+            'name' => 'joinInvite',
+            'data' => 'Successfully polled at: ' . date('g:i:s a')
+        );
 //        }
 //        else
 //        {
 //            return null;
 //        }
-        
     }
-    
-    
-    public function inviteUsersToJoin($users, $moderator, $roomName)
-    {
+
+    public function inviteUsersToJoin($users, $moderator, $roomName) {
+
+
+        $translate = Tinebase_Translation::getTranslation('Webconference');
+        $messageSubject = $translate->_('Your container has been changed');
+
+
+
         $fullUser = Tinebase_Core::getUser();
         $recipients = array();
         foreach ($users as $user) {
             $userName = $user[n_fn];
-            
+
             $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
+            //$url = "texto";
             $subject = "invite Users To Join";
             $messagePlain = null;
-            $_messageHtml = "O " . Tinebase_Core::getUser()->accountFullName . ' está convidando você para uma webconferencia. <br/><br/> <a id="url:'. $url.' class="webconference-join-link"> Entrar na webconferencia  </a>'.$url;
+            $_messageHtml = "O usuário " . Tinebase_Core::getUser()->accountFullName . " está convidando você para uma webconferencia. <br/><br/> ";
+            $_messageHtml.= "<div>";
+            $_messageHtml .= "<span class=\"$url\" />";
+            $_messageHtml .= "<span class=\"tinebase-webconference-link\">Entrar na webconferencia</span>";
+            $_messageHtml.= "</div>";
+            
+            //throw new Tinebase_Exception($_messageHtml);
+            //$_messageHtml = Felamimail_Message::addHtmlMarkup($_messageHtml);
+            //throw new Tinebase_Exception($_messageHtml);
+
+//            $view = new Zend_View();
+//            $view->setScriptPath(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'views');
+//            $view->mailTextWelcome = "Welcome to Tine 2.0";
+//            $view->accountFullName = Tinebase_Core::getUser()->accountFullName;
+//            $view->url = $url;
+//            $_messageHtml = $view->render('inviteMailHtml.php');
+
+
+
             $recipient = array(new Addressbook_Model_Contact($user));
-            Tinebase_Notification::getInstance()->send( $fullUser, $recipient, $subject, $messagePlain, $_messageHtml);
+            //Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, $_messageHtml, null);
+            Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, null, $_messageHtml);
             array_push($recipients, $user);
         }
         return array(
-                'users'=>$recipients,
-                'name'=>'joinInvite',
-                'data'=>'Successfully polled at: '. date('g:i:s a')
-            );
+            'message' => 'Usuários convidados com sucesso!'
+            
+        );
     }
-    
+
     /**
      * Search for records matching given arguments
      *
