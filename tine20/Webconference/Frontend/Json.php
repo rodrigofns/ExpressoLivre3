@@ -43,6 +43,9 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      */
     public function searchWebconferenceConfig($filter, $paging) {
         return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
+        // teste
+        // asdfasdf
+        // lerolero
     }
 
     /**
