@@ -52,7 +52,7 @@ Tine.clientVersion.releaseTime      = 'none';
  * 
  * @type String
  */
-Tine.title = 'Expresso 3.0';
+Tine.title = 'Tine 2.0';
 Tine.weburl = 'http://www.tine20.org/';
 
 /**
@@ -96,7 +96,7 @@ Tine.Tinebase.tineInit = {
     
     initWindow: function () {
         Ext.getBody().on('keydown', function (e) {
-            if (e.ctrlKey && e.getKey() === e.A) {
+            if (e.ctrlKey && e.getKey() === e.A && ! (e.getTarget('form') || e.getTarget('input') || e.getTarget('textarea'))) {
                 // disable the native 'select all'
                 e.preventDefault();
             } else if (e.getKey() === e.BACKSPACE && ! (e.getTarget('form') || e.getTarget('input') || e.getTarget('textarea'))) {
@@ -154,6 +154,7 @@ Tine.Tinebase.tineInit = {
             	xtype: 'container',
                 id: 'tine-viewport-maincardpanel',
                 ref: 'tineViewportMaincardpanel',
+                isWindowMainCardPanel: true,
                 layout: 'card',
                 border: false,
                 activeItem: 0,
@@ -205,6 +206,8 @@ Tine.Tinebase.tineInit = {
         // todo: find a better place for stuff to do after successfull login
         Tine.Tinebase.tineInit.initAppMgr();
         
+        Tine.Tinebase.tineInit.initUploadMgr();
+        
         /** temporary Tine.onReady for smooth transition to new window handling **/
         if (typeof(Tine.onReady) === 'function') {
             Tine.Tinebase.viewport.destroy();
@@ -225,6 +228,8 @@ Tine.Tinebase.tineInit = {
         card.doLayout();
         
         //var ping = new Tine.Tinebase.sync.Ping({});
+        
+        window.initializationComplete = true;
     },
 
     initAjax: function () {
@@ -442,6 +447,7 @@ Tine.Tinebase.tineInit = {
         Ext.namespace('Tine.Tinebase.registry');
         if (window.isMainWindow) {
             Ext.Ajax.request({
+                timeout: 120000, // 2 minutes
                 params: {
                     method: Tine.Tinebase.tineInit.getAllRegistryDataMethod
                 },
@@ -489,6 +495,8 @@ Tine.Tinebase.tineInit = {
                         }
                     }
                     
+                    Tine.Tinebase.tineInit.overrideFields();
+                    
                     Tine.Tinebase.tineInit.initList.initRegistry = true;
                 }
             });
@@ -496,13 +504,27 @@ Tine.Tinebase.tineInit = {
             var mainWindow = Ext.ux.PopupWindowMgr.getMainWindow();
             
             for (var p in mainWindow.Tine) {
-                if (mainWindow.Tine[p].hasOwnProperty('registry') && Tine.hasOwnProperty(p)) {
+                if (Object.prototype.hasOwnProperty.call(mainWindow.Tine[p], 'registry') && Tine.hasOwnProperty(p)) {
                     Tine[p].registry = mainWindow.Tine[p].registry;
                 }
             }
             
+            Tine.Tinebase.tineInit.overrideFields();
+            
             Tine.Tinebase.tineInit.initList.initRegistry = true;
         }
+    },
+    
+    /**
+     * Applying registry entries to Tine classes
+     */
+    overrideFields: function () {
+    	
+    	Ext.override(Ext.ux.file.Upload, {
+            maxFileUploadSize: Tine.Tinebase.registry.get('maxFileUploadSize'),
+            maxPostSize: Tine.Tinebase.registry.get('maxPostSize')
+        });
+            	
     },
     
     /**
@@ -676,6 +698,13 @@ Tine.Tinebase.tineInit = {
     },
     
     /**
+     * initialise upload manager
+     */
+    initUploadMgr: function () {       
+        Tine.Tinebase.uploadManager = new Ext.ux.file.UploadManager();
+    },
+    
+    /**
      * config locales
      */
     initLocale: function () {
@@ -693,7 +722,8 @@ Tine.Tinebase.tineInit = {
      */
     onLangFilesLoad: function () {
     	//Ext.ux.form.DateTimeField.prototype.format = Locale.getTranslationData('Date', 'medium') + ' ' + Locale.getTranslationData('Time', 'medium');
-    }
+    }    
+    
 };
 
 Ext.onReady(function () {

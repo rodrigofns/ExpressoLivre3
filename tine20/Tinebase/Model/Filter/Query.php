@@ -95,5 +95,6 @@ class Tinebase_Model_Filter_Query extends Tinebase_Model_Filter_Abstract
              default:
                  throw new Tinebase_Exception_InvalidArgument('Operator not defined: ' . $this->_operator);
          }
+         Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' SQL filter: ' . $_select->assemble());
      }
 }

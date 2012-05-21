@@ -24,7 +24,15 @@
           "path": "js/"
         },
         {
-          "text": "TimeaccountSelect.js",
+          "text": "TimeaccountPickerCombo.js",
+          "path": "js/"
+        },
+        {
+          "text": "TimeAccountFilterModel.js",
+          "path": "js/"
+        },
+        {
+          "text": "TimeAccountStatusFilterModel.js",
           "path": "js/"
         },
         {

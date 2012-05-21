@@ -37,7 +37,7 @@ class Addressbook_Model_ContactFilter extends Tinebase_Model_Filter_FilterGroup
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'id'                   => array('filter' => 'Tinebase_Model_Filter_Id'),
+        'id'                   => array('filter' => 'Addressbook_Model_ContactIdFilter', 'options' => array('modelName' => 'Addressbook_Model_Contact')),
         'query'                => array(
             'filter' => 'Tinebase_Model_Filter_Query', 
             'options' => array('fields' => array('n_family', 'n_given', 'org_name', 'org_unit', 'email', 'email_home', 'adr_one_locality'))
@@ -114,5 +114,8 @@ class Addressbook_Model_ContactFilter extends Tinebase_Model_Filter_FilterGroup
         'container_id'         => array('filter' => 'Tinebase_Model_Filter_Container', 'options' => array('applicationName' => 'Addressbook')),
         'type'                 => array('filter' => 'Tinebase_Model_Filter_Text'),
         'customfield'          => array('filter' => 'Tinebase_Model_Filter_CustomField', 'options' => array('idProperty' => 'addressbook.id')),
+        'showDisabled'		   => array('filter' => 'Addressbook_Model_ContactDisabledFilter', 'options' => array(
+            'requiredCols'  => array('account_id' => 'accounts.id')
+        )),
     );
 }

@@ -94,11 +94,20 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
         var sm = this.treePanel.getSelectionModel();
         sm.clearSelections(true);
         
+        // use first OR panel in case of filterPanel
+        Ext.each(filters, function(filterData) {
+            if (filterData.condition && filterData.condition == 'OR') {
+                filters = filterData.filters[0].filters;
+                return false;
+            }
+        }, this);
+        
         Ext.each(filters, function(filter) {
-            if (filter.field !== this.field) {
+            if (filter.field !== this.field || Ext.isEmpty(filter.value)) {
                 return;
             }
             
+            this.lastFocusEl = document.activeElement;
             this.treePanel.getSelectionModel().suspendEvents();
             this.selectValue(filter.value);
         }, this);
@@ -111,7 +120,11 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
      */
     selectValue: function(value) {
         var values = Ext.isArray(value) ? value : [value];
-        Ext.each(values, function(value) {
+        Ext.each(values, function(value, idx) {
+            if (Ext.isString(value) && ! value.path) {
+                value = values[idx] = {path: value};
+            }
+            
             var treePath = this.treePanel.getTreePath(value.path);
             this.selectPath.call(this.treePanel, treePath, null, function() {
                 // mark this expansion as done and check if all are done
@@ -123,8 +136,13 @@ Tine.widgets.tree.FilterPlugin = Ext.extend(Tine.widgets.grid.FilterPlugin, {
                 
                 if (allValuesExpanded) {
                     this.treePanel.getSelectionModel().resumeEvents();
+                    try {
+                        if (this.lastFocusEl) {
+                            Ext.fly(this.lastFocusEl).focus(10);
+                        }
+                    } catch (e) {}
                 }
-            }.createDelegate(this), true)
+            }.createDelegate(this), true);
         }, this);
     },
     

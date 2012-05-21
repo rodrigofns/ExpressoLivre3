@@ -36,19 +36,20 @@ Tine.widgets.persistentfilter.store.PersistentFilterStore = Ext.extend(Ext.data.
  */
 Tine.widgets.persistentfilter.store.getPersistentFilterStore = function() {
     if (! Tine.widgets.persistentfilter.store.persistentFilterStore) {
-        
         if (window.isMainWindow) {
+            var fields = Tine.widgets.persistentfilter.model.PersistentFilter.getFieldDefinitions();
+            
             // create store
             var s = Tine.widgets.persistentfilter.store.persistentFilterStore = new Tine.widgets.persistentfilter.store.PersistentFilterStore({
-                fields: Tine.widgets.persistentfilter.model.PersistentFilter.getFieldDefinitions(),
-                sortInfo: {field: 'name', direction: 'ASC'}
+                fields: fields
             });
             
             // populate store
             var persistentFiltersData = Tine.Tinebase.registry.get("persistentFilters").results;
-            Ext.each(persistentFiltersData, function(data) {
-                var r = new Tine.widgets.persistentfilter.model.PersistentFilter(data);
-                s.addSorted(r);
+
+            Ext.each(persistentFiltersData, function(data,index) {
+                var filterRecord = new Tine.widgets.persistentfilter.model.PersistentFilter(data);
+                s.add(filterRecord);
             }, this);
         } else {
             // TODO test this in IE!

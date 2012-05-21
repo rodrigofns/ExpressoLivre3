@@ -60,6 +60,10 @@ Tine.Calendar.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Calendar.Application.superclass.init.apply(this.arguments);
         
         new Tine.Calendar.AddressbookGridPanelHook({app: this});
+        
+        if (Tine.Felamimail) {
+            Tine.Felamimail.MimeDisplayManager.register('text/calendar', Tine.Calendar.iMIPDetailsPanel);
+        }
     }
 });
 
@@ -80,12 +84,9 @@ Tine.Calendar.MainScreen = function(config) {
     Tine.Calendar.colorMgr = new Tine.Calendar.ColorManager({});
     
     Tine.Calendar.MainScreen.superclass.constructor.apply(this, arguments);
-}
+};
 
 Ext.extend(Tine.Calendar.MainScreen, Tine.widgets.MainScreen, {
-    
-    
-    westPanelXType: 'tine.calendar.mainscreenwestpanel',
     
     /**
      * Get content panel of calendar application

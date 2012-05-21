@@ -3,12 +3,12 @@
  * Tine 2.0
  *
  * @package     ActiveSync
- * @subpackage  ActiveSync
+ * @subpackage  Controller
  * @license     http://www.tine20.org/licenses/agpl-nonus.txt AGPL Version 1 (Non-US)
  *              NOTE: According to sec. 8 of the AFFERO GENERAL PUBLIC LICENSE (AGPL), 
  *              Version 1, the distribution of the Tine 2.0 ActiveSync module in or to the 
  *              United States of America is excluded from the scope of this license.
- * @copyright   Copyright (c) 2008-2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2008-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -16,7 +16,7 @@
  * class documentation
  *
  * @package     ActiveSync
- * @subpackage  ActiveSync
+ * @subpackage  Controller
  */
  
 class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract 
@@ -26,7 +26,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         #'AssistantName'         => 'assistantname',
         'AssistnamePhoneNumber' => 'tel_assistent',
         'Birthday'              => 'bday',
-        #'Body'                  => 'body',
+        #'Body'                  => 'note',
         #'BodySize'              => 'bodysize',
         #'BodyTruncated'         => 'bodytruncated',
         #'Business2PhoneNumber'  => 'business2phonenumber',
@@ -99,7 +99,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_defaultFolderType   = ActiveSync_Command_FolderSync::FOLDERTYPE_CONTACT;
+    protected $_defaultFolderType   = Syncope_Command_FolderSync::FOLDERTYPE_CONTACT;
     
     /**
      * default container for new entries
@@ -113,7 +113,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      *
      * @var int
      */
-    protected $_folderType          = ActiveSync_Command_FolderSync::FOLDERTYPE_CONTACT_USER_CREATED;
+    protected $_folderType          = Syncope_Command_FolderSync::FOLDERTYPE_CONTACT_USER_CREATED;
 
     /**
      * name of property which defines the filterid for different content classes
@@ -132,49 +132,42 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
     /**
      * append contact data to xml element
      *
-     * @param DOMElement  $_xmlNode   the parrent xml node
+     * @param DOMElement  $_domParrent   the parrent xml node
      * @param string      $_folderId  the local folder id
      * @param string      $_serverId  the local entry id
      * @param boolean     $_withBody  retrieve body of entry
      */
-    public function appendXML(DOMElement $_xmlNode, $_folderId, $_serverId, array $_options, $_neverTruncate = false)
+    public function appendXML(DOMElement $_domParrent, $_collectionData, $_serverId)
     {
+        $_domParrent->ownerDocument->documentElement->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:Contacts', 'uri:Contacts');
+        
         $data = $_serverId instanceof Tinebase_Record_Abstract ? $_serverId : $this->_contentController->get($_serverId);
         
-        foreach($this->_mapping as $key => $value) {
-        	$nodeContent = null;
-            if(!empty($data->$value)) {
+        foreach ($this->_mapping as $key => $value) {
+            if(!empty($data->$value) || $data->$value == '0') {
+                $nodeContent = null;
+                
                 switch($value) {
                     case 'bday':
-                        
-                        if ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_PALM) {
-                            $userTimezone = Tinebase_Core::get(Tinebase_Core::USERTIMEZONE);
-                            $data->bday->setTimezone($userTimezone);
-                            $data->bday->addHour(12);
-                            $data->bday = new Tinebase_DateTime($data->bday->format(Tinebase_Record_Abstract::ISO8601LONG), 'UTC');
+                        if($data->$value instanceof DateTime) {
+                            $nodeContent = $data->bday->format("Y-m-d\TH:i:s") . '.000Z';
                         }
-                        
-                        $nodeContent = $data->bday->format("Y-m-d\TH:i:s") . '.000Z';
                         break;
                         
                     case 'jpegphoto':
-                        if(! empty($data->$value)) {
-                            try {
-                                $image = Tinebase_Controller::getInstance()->getImage('Addressbook', $data->getId());
-                                $jpegData = $image->getBlob('image/jpeg', 36000);
-                                $nodeContent = base64_encode($jpegData);
-                            } catch (Exception $e) {
-                                Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " Image for contact {$data->getId()} not found or invalid");
-                            }
-
-                            
+                        try {
+                            $image = Tinebase_Controller::getInstance()->getImage('Addressbook', $data->getId());
+                            $jpegData = $image->getBlob('image/jpeg', 36000);
+                            $nodeContent = base64_encode($jpegData);
+                        } catch (Exception $e) {
+                            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " Image for contact {$data->getId()} not found or invalid");
                         }
                         break;
                         
                     case 'adr_one_countryname':
                     case 'adr_two_countryname':
-                    	$nodeContent = Tinebase_Translation::getCountryNameByRegionCode($data->$value);
-                    	break;
+                        $nodeContent = Tinebase_Translation::getCountryNameByRegionCode($data->$value);
+                        break;
                         
                     default:
                         $nodeContent = $data->$value;
@@ -187,106 +180,51 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                     continue;
                 }
                 
+                // strip off any non printable control characters
+                if (!ctype_print($nodeContent)) {
+                    $nodeContent = $this->removeControlChars($nodeContent);
+                }
+                
+                $node = $_domParrent->ownerDocument->createElementNS('uri:Contacts', $key);
+                $node->appendChild($_domParrent->ownerDocument->createTextNode($nodeContent));
+                
+                $_domParrent->appendChild($node);
+            }
+        }
+        
+        if(!empty($data->note)) {
+            if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+                $body = $_domParrent->appendChild(new DOMElement('Body', null, 'uri:AirSyncBase'));
+                
+                $body->appendChild(new DOMElement('Type', 1, 'uri:AirSyncBase'));
+                
                 // create a new DOMElement ...
-                $node = new DOMElement($key, null, 'uri:Contacts');
+                $dataTag = new DOMElement('Data', null, 'uri:AirSyncBase');
 
                 // ... append it to parent node aka append it to the document ...
-                $_xmlNode->appendChild($node);
+                $body->appendChild($dataTag);
                 
                 // ... and now add the content (DomText takes care of special chars)
-                $node->appendChild(new DOMText($nodeContent));
+                $dataTag->appendChild(new DOMText($data->note));
+            } else {
+                // create a new DOMElement ...
+                $node = new DOMElement('Body', null, 'uri:Contacts');
+
+                // ... append it to parent node aka append it to the document ...
+                $_domParrent->appendChild($node);
                 
+                // ... and now add the content (DomText takes care of special chars)
+                $node->appendChild(new DOMText($data->note));
                 
             }
         }
-          
+        
         if(isset($data->tags) && count($data->tags) > 0) {
-            $categories = $_xmlNode->appendChild(new DOMElement('Categories', null, 'uri:Contacts'));
+            $categories = $_domParrent->appendChild(new DOMElement('Categories', null, 'uri:Contacts'));
             foreach($data->tags as $tag) {
                 $categories->appendChild(new DOMElement('Category', $tag, 'uri:Contacts'));
             }
         }
-    }
-    
-    protected function _getSyncableFolders()
-    {
-        $folders = array();
-    	
-        $containers = Tinebase_Container::getInstance()->getPersonalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Core::getUser(), Tinebase_Model_Grants::GRANT_SYNC);
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => (count($folders) == 0) ? $this->_defaultFolderType : $this->_folderType
-           );
-        }
-	            
-        $containers = Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC);
-        foreach ($containers as $container) {
-            $folders[$container->id] = array(
-                'folderId'      => $container->id,
-                'parentId'      => 0,
-                'displayName'   => $container->name,
-                'type'          => $this->_folderType
-            );
-        }
-	    
-        #try {
-        #    $accountsFolder = Tinebase_Container::getInstance()->getInternalContainer(Tinebase_Core::getUser(), $this->_applicationName, Tinebase_Model_Grants::GRANT_SYNC);
-        #    $folders[$accountsFolder->id] = array(
-        #        'folderId'      => $accountsFolder->id,
-        #        'parentId'      => 0,
-        #        'displayName'   => $accountsFolder->name,
-        #        'type'          => $this->_folderType
-        #    );
-        #} catch (Exception $e) {
-        #    Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " leaving out internal container as user has no GRANT_SYNC for it");
-        #}
-        
-        // we ignore the folders of others users for now
-	            
-        return $folders;
-    }
-    
-    /**
-     * return list of supported folders for this backend
-     *
-     * @return array
-     */
-    public function getSupportedFolders()
-    {
-        // device supports multiple folders ?
-        if(in_array(strtolower($this->_device->devicetype), array('iphone', 'ipad', 'thundertine'))) {
-        
-            // get the folders the user has access to
-            $allowedFolders = $this->_getSyncableFolders();
-            
-            $wantedFolders = null;
-            // maybe the user has defined a filter to limit the search results
-            if(!empty($this->_device->contactsfilter_id)) {
-                $persistentFilter = Tinebase_PersistentFilter::getFilterById($this->_device->contactsfilter_id);
-                
-                foreach($persistentFilter as $filter) {
-                    if($filter instanceof Tinebase_Model_Filter_Container) {
-                        $wantedFolders = array_flip($filter->getContainerIds());
-                    }
-                }
-            }
-            
-            $folders = $wantedFolders === null ? $allowedFolders : array_intersect_key($allowedFolders, $wantedFolders);
-        } else {
-            
-            $folders[$this->_specialFolderName] = array(
-                'folderId'      => $this->_specialFolderName,
-                'parentId'      => 0,
-                'displayName'   => $this->_applicationName,
-                'type'          => $this->_defaultFolderType
-            );
-            
-        }
-        
-        return $folders;
     }
     
     /**
@@ -297,7 +235,7 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
      */
     public function toTineModel(SimpleXMLElement $_data, $_entry = null)
     {
-        if($_entry instanceof Addressbook_Model_Contact) {
+        if ($_entry instanceof Addressbook_Model_Contact) {
             $contact = $_entry;
         } else {
             $contact = new Addressbook_Model_Contact(null, true);
@@ -305,9 +243,10 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         unset($contact->jpegphoto);
         
         $xmlData = $_data->children('uri:Contacts');
-
+        $airSyncBase = $_data->children('uri:AirSyncBase');
+        
         foreach($this->_mapping as $fieldName => $value) {
-            switch($value) {
+            switch ($value) {
                 case 'jpegphoto':
                     // do not change if not set
                     if(isset($xmlData->$fieldName)) {
@@ -321,12 +260,13 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                             if (isset($currentPhoto) && $currentPhoto == $devicePhoto) {
                                 if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " photo did not change on device -> preserving server photo");
                             } else {
-                                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " takeing new contact photo from device (" . strlen($devicePhoto) . "KB)");
+                                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " using new contact photo from device (" . strlen($devicePhoto) . "KB)");
                                 $contact->jpegphoto = $devicePhoto;
                             }
-                        } else {
+                        } else if ($_entry && ! empty($_entry->jpegphoto)) {
                             $contact->jpegphoto = '';
-                            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " deleting contact photo on device request");
+                            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ 
+                                . ' Deleting contact photo on device request (contact id: ' . $contact->getId() . ')');
                         }
                     }
                     break;
@@ -337,11 +277,11 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                         $contact->bday = new Tinebase_DateTime($isoDate);
                         
                         if (
-                            ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_PALM) ||
-                            ($this->_device->devicetype == ActiveSync_Backend_Device::TYPE_IPHONE && $this->_device->getMajorVersion() < 800) ||
+                            // ($this->_device->devicetype == Syncope_Model_Device::TYPE_WEBOS) || // only valid versions < 2.1
+                            ($this->_device->devicetype == Syncope_Model_Device::TYPE_IPHONE && $this->_device->getMajorVersion() < 800) ||
                             preg_match("/^\d{4}-\d{2}-\d{2}$/", $isoDate)
                         ) {
-                            // iOS < 4 & palm send birthdays to the entered date, but the time the birthday got entered on the device
+                            // iOS < 4 & webow < 2.1 send birthdays to the entered date, but the time the birthday got entered on the device
                             // acutally iOS < 4 somtimes sends the bday at noon but the timezone is not clear
                             // -> we don't trust the time part and set the birthdays timezone to the timezone the user has set in tine
                             $userTimezone = Tinebase_Core::get(Tinebase_Core::USERTIMEZONE);
@@ -393,6 +333,14 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
                     break;
             }
         }
+        
+        // get body
+        if (version_compare($this->_device->acsversion, '12.0', '>=') === true) {
+                $contact->note = isset($airSyncBase->Body) ? (string)$airSyncBase->Body->Data : null;
+        } else {
+            $contact->note = isset($xmlData->Body) ? (string)$xmlData->Body : null;
+        }
+        
         // force update of n_fileas and n_fn
         $contact->setFromArray(array(
             'n_given'   => $contact->n_given,
@@ -403,7 +351,8 @@ class ActiveSync_Controller_Contacts extends ActiveSync_Controller_Abstract
         // contact should be valid now
         $contact->isValid();
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " contactData " . print_r($contact->toArray(), true));
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) 
+            Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " contactData " . print_r($contact->toArray(), true));
         
         return $contact;
     }

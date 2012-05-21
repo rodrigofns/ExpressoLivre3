@@ -28,9 +28,10 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
         
         var a = [];
         attendeeStore.each(function(attender) {
-            var name = Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderName.call(Tine.Calendar.AttendeeGridPanel.prototype, attender.get('user_id'), false, attender);
-            var status = Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderStatus.call(Tine.Calendar.AttendeeGridPanel.prototype, attender.get('status'), {}, attender);
-            a.push(name + ' (' + status + ')');
+            var name = Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderName.call(Tine.Calendar.AttendeeGridPanel.prototype, attender.get('user_id'), false, attender),
+                status = Tine.Tinebase.widgets.keyfield.Renderer.render('Calendar', 'attendeeStatus', attender.get('status')),
+                role = Tine.Tinebase.widgets.keyfield.Renderer.render('Calendar', 'attendeeRoles', attender.get('role'));
+            a.push(name + ' (' + role + ', ' + status + ')');
         });
         
         return a.join("\n");
@@ -43,11 +44,12 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
      * @return {String} html
      */
     containerRenderer: function(container) {
-        var displayContainer = this.record.getDisplayContainer();
-        return this.containerTpl.apply({
-            color: Tine.Calendar.colorMgr.getColor(displayContainer).color,
-            name: Ext.util.Format.htmlEncode(displayContainer && displayContainer.name ? displayContainer.name : this.app.i18n._('Unknown calendar'))
-        });
+        if(this.record) {   // no record after delete
+            var displayContainer = this.record.getDisplayContainer();
+            return Tine.Tinebase.common.containerRenderer(displayContainer);
+        } else {
+            return null;
+        }
     },
     
     /**
@@ -56,12 +58,31 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
      * @param {Date} dt
      * @return {String}
      */
-    datetimeRenderer: function(dt) {
+    datetimeRenderer: function(dt) {                                                                                                                        
         return String.format(this.app.i18n._("{0} {1} o'clock"), Tine.Tinebase.common.dateRenderer(dt), dt.format('H:i'));
     },
     
     transpRenderer: function(transp) {
         return Tine.Tinebase.common.booleanRenderer(transp == 'OPAQUE');
+    },
+    
+    summaryRenderer: function(summary) {
+        
+        var myAttenderRecord = this.record.getMyAttenderRecord(),
+            ret = '';
+        if(myAttenderRecord) {
+            var status = Tine.Tinebase.widgets.keyfield.Renderer.render('Calendar', 'attendeeStatus', myAttenderRecord.get('status'));
+            if(status) ret += status;
+        }
+            
+        if(this.record.isRecurBase() || this.record.isRecurInstance()) {   
+            ret += '<img class="cal-recurring" unselectable="on" src="' + Ext.BLANK_IMAGE_URL + '">' + this.app.i18n._('recurring event');
+        } else if (this.record.isRecurException()) {
+            ret += '<img class="cal-recurring exception" unselectable="on" src="' + Ext.BLANK_IMAGE_URL + '">' + this.app.i18n._('recurring event exception');
+        }   
+        
+        return Ext.util.Format.htmlEncode(summary) + '&nbsp;&nbsp;&nbsp;(' + ret + ')';
+                   
     },
     
     /**
@@ -98,7 +119,7 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
             '</div>'
         ).compile();
         
-        this.supr().initComponent.call(this);
+        Tine.Calendar.EventDetailsPanel.superclass.initComponent.call(this);
     },
     
     /**
@@ -169,12 +190,12 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
                             align:'stretch'
                         },
                         items: [{
-                            flex: 1,
                             xtype: 'ux.displayfield',
                             name: 'summary',
                             style: 'padding-top: 2px',
-                            cls: 'x-ux-display-header'
-                            //fieldLabel: this.app.i18n._('Summary')
+                            cls: 'x-ux-display-header',
+                            htmlEncode: false,
+                            renderer: this.summaryRenderer.createDelegate(this)
                         }, {
                             flex: 1,
                             xtype: 'ux.displayfield',
@@ -235,7 +256,7 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
                                 }
                             }]
                         }, {
-                            flex: 2,
+                            flex: 3,
                             layout: 'ux.display',
                             labelAlign: 'top',
                             autoScroll: true,
@@ -246,6 +267,7 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
                                 xtype: 'ux.displayfield',
                                 name: 'attendee',
                                 nl2br: true,
+                                htmlEncode: false,
                                 fieldLabel: this.app.i18n._('Attendee'),
                                 renderer: this.attendeeRenderer
                             }]
@@ -278,6 +300,7 @@ Tine.Calendar.EventDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel, {
         //this.cardPanel.layout.setActiveItem(this.cardPanel.items.getKey(this.eventDetailsPanel));
         
         this.getSingleRecordPanel().loadRecord.defer(100, this.getSingleRecordPanel(), [record]);
+
         //return this.supr().updateDetails.apply(this, arguments);
     }
     

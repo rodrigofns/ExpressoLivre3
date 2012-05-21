@@ -126,7 +126,7 @@ class Tinebase_Scheduler_Task extends Zend_Scheduler_Task
      */
     public static function addCacheCleanupTask(Zend_Scheduler $_scheduler)
     {
-        $task = self::getPreparedTask(self::TASK_TYPE_HOURLY, array(
+        $task = self::getPreparedTask(self::TASK_TYPE_DAILY, array(
             'controller'    => 'Tinebase_Controller',
             'action'        => 'cleanupCache',
         ));
@@ -177,20 +177,43 @@ class Tinebase_Scheduler_Task extends Zend_Scheduler_Task
     }
     
     /**
+     * add deleted file cleanup task to scheduler
+     * 
+     * @param Zend_Scheduler $_scheduler
+     */
+    public static function addDeletedFileCleanupTask(Zend_Scheduler $_scheduler)
+    {
+        $task = Tinebase_Scheduler_Task::getPreparedTask(Tinebase_Scheduler_Task::TASK_TYPE_DAILY, array(
+            'controller'    => 'Tinebase_FileSystem',
+            'action'        => 'clearDeletedFiles',
+        ));
+        
+        $_scheduler->addTask('Tinebase_DeletedFileCleanup', $task);
+        $_scheduler->saveTask();
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+            . ' Saved task Tinebase_FileSystem::clearDeletedFiles in scheduler.');
+    }
+    
+    /**
      * run requests
      * 
      * @see tine20/Zend/Scheduler/Zend_Scheduler_Task::run()
+     * 
+     * @todo remove the loop? can there be multiple requests?)
      */
     public function run()
     {
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+                . ' Fetching requests .... ');
+        
         foreach ($this->getRequests() as $request) {
             if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
                 . ' Running request: ' . $request->getControllerName() . '::' . $request->getActionName());
             
             $controller = Tinebase_Controller_Abstract::getController($request->getControllerName());
             
-            // strange: only the first request is process because of this return 
-            // @todo remove the loop? can there be multiple requests?)
+            // only the first request is processed because of this return 
             return call_user_func_array(array($controller, $request->getActionName()), $request->getUserParams());
         }
     }

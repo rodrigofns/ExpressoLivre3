@@ -1,17 +1,20 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - ActiveSync\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2010-12-08 14:05+0100\n"
-"Last-Translator: Philipp Schuele <p.schuele@metaways.de>\n"
+"PO-Revision-Date: 2012-02-10 12:00+0000\n"
+"Last-Translator: ph_il <p.schuele@metaways.de>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
+"X-Generator: Launchpad (build 14886)\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: js/Application.js:30
 msgid "Active Sync"
@@ -55,14 +58,6 @@ msgstr[1] "Geräte"
 msgid "Devices"
 msgstr "Geräte"
 
-#: Setup/setup.xml:473
-msgid "Default Policy"
-msgstr "Standard Policy"
-
-#: Setup/setup.xml:478
-msgid "Default Policy installed during setup"
-msgstr "Standard Policy aus dem Setup Prozess"
-
 #: Preference.php:74
 msgid "Default Addressbook"
 msgstr "Standard-Adressbuch"
@@ -86,3 +81,11 @@ msgstr "Standard-Aufgabenliste"
 #: Preference.php:83
 msgid "The default task list to create new tasks in."
 msgstr "Die Standard-Aufgabenliste, in der neue Aufgaben angelegt werden."
+
+#: Setup/setup.xml:527
+msgid "Default Policy"
+msgstr "Standard Policy"
+
+#: Setup/setup.xml:532
+msgid "Default Policy installed during setup"
+msgstr "Standard Policy aus dem Setup Prozess"

@@ -46,6 +46,8 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     },
     copyEditAction: true,
     felamimail: false,
+    multipleEdit: true,
+    duplicateResolvable: true,
     
     /**
      * @cfg {Bool} hasDetailsPanel 
@@ -102,6 +104,7 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         return [
             { id: 'tid', header: this.app.i18n._('Type'), dataIndex: 'tid', width: 30, renderer: this.contactTidRenderer.createDelegate(this), hidden: false },
             { id: 'tags', header: this.app.i18n._('Tags'), dataIndex: 'tags', width: 50, renderer: Tine.Tinebase.common.tagsRenderer, sortable: false, hidden: false  },
+            { id: 'salutation', header: this.app.i18n._('Salutation'), dataIndex: 'salutation', renderer: Tine.Tinebase.widgets.keyfield.Renderer.get('Addressbook', 'contactSalutation') },
             { id: 'n_family', header: this.app.i18n._('Last Name'), dataIndex: 'n_family' },
             { id: 'n_given', header: this.app.i18n._('First Name'), dataIndex: 'n_given', width: 80 },
             { id: 'n_fn', header: this.app.i18n._('Full Name'), dataIndex: 'n_fn' },
@@ -146,7 +149,10 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     initActions: function() {
         this.actions_exportContact = new Ext.Action({
             requiredGrant: 'exportGrant',
-            text: this.app.i18n._('Export Contact'),
+            text: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 50), this.i18nRecordsName),
+            singularText: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.i18nRecordName),
+            pluralText:  String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.i18nRecordsName),
+            translationObject: this.app.i18n,
             iconCls: 'action_export',
             scope: this,
             disabled: true,
@@ -255,10 +261,13 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     onImport: function(btn) {
         var popupWindow = Tine.widgets.dialog.ImportDialog.openWindow({
             appName: 'Addressbook',
+            modelName: 'Contact',
+            defaultImportContainer: this.app.getMainScreen().getWestPanel().getContainerTreePanel().getDefaultContainer('defaultAddressbook'),
+            
             // update grid after import
             listeners: {
                 scope: this,
-                'update': function(record) {
+                'finish': function() {
                     this.loadGridData({
                         preserveCursor:     false, 
                         preserveSelection:  false, 
@@ -266,13 +275,7 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                         removeStrategy:     'default'
                     });
                 }
-            },
-            record: new Tine.Tinebase.Model.ImportJob({
-                // TODO get selected container -> if no container is selected use default container
-                container_id: Tine.Addressbook.registry.get('defaultAddressbook'),
-                model: this.recordClass,
-                import_definition_id:  Tine.Addressbook.registry.get('defaultImportDefinition').id
-            }, 0)
+            }
         });
     },
         

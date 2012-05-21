@@ -5,7 +5,7 @@
  * @package     Tinebase
  * @subpackage  Record
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  */
 
@@ -102,16 +102,17 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
      * add Tinebase_Record_Interface like object to internal list
      *
      * @param Tinebase_Record_Interface $_record
+     * @param integer $_index
      * @return int index in set of inserted record
      */
-    public function addRecord(Tinebase_Record_Interface $_record)
+    public function addRecord(Tinebase_Record_Interface $_record, $_index = NULL)
     {
         if (! $_record instanceof $this->_recordClass) {
             throw new Tinebase_Exception_Record_NotAllowed('Attempt to add/set record of wrong record class. Should be ' . $this->_recordClass);
         }
         $this->_listOfRecords[] = $_record;
         end($this->_listOfRecords);
-        $index = key($this->_listOfRecords);
+        $index = ($_index !== NULL) ? $_index : key($this->_listOfRecords);
         
         // maintain indices
         $recordId = $_record->getId();
@@ -144,7 +145,7 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
      */
     public function removeRecord(Tinebase_Record_Interface $_record)
     {
-        $idx = array_search($_record, $this->_listOfRecords);
+        $idx = $this->indexOf($_record);
         if ($idx !== false) {
             $this->offsetUnset($idx);
         }
@@ -160,6 +161,17 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
         foreach ($_records as $record) {
             $this->removeRecord($record);
         }
+    }
+    
+    /**
+     * get index of given record
+     * 
+     * @param Tinebase_Record_Interface $_record
+     * @return (int) index of record of false if not found
+     */
+    public function indexOf(Tinebase_Record_Interface $_record)
+    {
+        return array_search($_record, $this->_listOfRecords);
     }
     
     /**
@@ -215,12 +227,39 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
     }
     
     /**
+     * returns record identified by its id
+     * 
+     * @param  string $_id id of record
+     * @return Tinebase_Record_Abstract::|bool    record or false if not in set
+     */
+    public function getById($_id)
+    {
+        $idx = $this->getIndexById($_id);
+        
+        return $idx !== false ? $this[$idx] : false;
+    }
+    
+    /**
      * returns array of ids
      */
     public function getArrayOfIds()
     {
         return array_keys($this->_idMap);
     }
+    
+    /**
+     * returns array of ids
+     */
+    public function getArrayOfIdsAsString()
+    {
+    	$ids = array_keys($this->_idMap);
+    	foreach($ids as $key => $id)
+    	{
+    		$ids[$key] = (string) $id;
+    	}
+    	return $ids;
+    } 
+   
     
     /**
      * returns array with idless (new) records in this set
@@ -548,12 +587,53 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
     }
     
     /**
-     * @todo implement this!
+     * compares two recordsets / only compares the ids / returns all records that are different in an array:
+     *  - removed  -> all records that are in $this but not in $_recordSet
+     *  - added    -> all records that are in $_recordSet but not in $this
+     *  - modified -> array of diffs  for all different records that are in both record sets
+     * 
+     * @param Tinebase_Record_RecordSet $_recordSet
+     * @return array
+     */
     public function diff($_recordSet)
     {
-        return array();
+        if (! $_recordSet instanceof Tinebase_Record_RecordSet) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' 
+                . ' Did not get Tinebase_Record_RecordSet, skipping diff()');
+            return array();
+        }
+        
+        if ($this->getRecordClassName() !== $_recordSet->getRecordClassName()) {
+            throw new Tinebase_Exception_InvalidArgument('can only compare recordsets with the same type of records');
+        }
+        $removed = new Tinebase_Record_RecordSet($this->getRecordClassName());
+        $added = new Tinebase_Record_RecordSet($this->getRecordClassName());
+        $modified = array();
+        
+        $result = array();
+        
+        $migration = $this->getMigration($_recordSet->getArrayOfIds());
+        foreach ($migration['toDeleteIds'] as $id) {
+            $added->addRecord($this->getById($id));
+        }
+        foreach ($migration['toCreateIds'] as $id) {
+            $removed->addRecord($_recordSet->getById($id));
+        }
+        foreach ($migration['toUpdateIds'] as $id) {
+            $diff = $this->getById($id)->diff($_recordSet->getById($id));
+            if (! empty($diff)) {
+                $modified[$id] = $diff;
+            }
+        }
+        
+        foreach (array('removed', 'added', 'modified') as $subresult) {
+            if (count($$subresult) > 0) {
+                $result[$subresult] = $$subresult;
+            }
+        }
+        
+        return $result;
     }
-    */
     
     /**
      * merges records from given record set
@@ -618,7 +698,23 @@ class Tinebase_Record_RecordSet implements IteratorAggregate, Countable, ArrayAc
         
         return $this;
     }
+
+    /**
+    * sorts this recordset by pagination sort info
+    *
+    * @param Tinebase_Model_Pagination $_pagination
+    * @return $this
+    */
+    public function sortByPagination($_pagination)
+    {
+        if ($_pagination !== NULL && $_pagination->sort) {
+            $sortField = is_array($_pagination->sort) ? $_pagination->sort[0] : $_pagination->sort; 
+            $this->sort($sortField, ($_pagination->dir) ? $_pagination->dir : 'ASC');
+        }
         
+        return $this;
+    }
+    
     /**
      * translate all member records of this set
      * 

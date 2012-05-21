@@ -1,0 +1,65 @@
+<?php
+// NOTE: You can either:
+//  - copy this file to config.inc.php and add change config values
+//  - create an empty config.inc.php, make it writeable to the webserver and edit config via the setup.php interface
+//  - make this directory temporary writeable to the webserver and edit config via the setup.php interface
+
+// minimal configuration
+return array(
+	'database' => array(
+		'host'          => 'ENTER DATABASE HOSTNAME',
+		'dbname'            => 'ENTER DATABASE NAME',
+		'username'      => 'ENTER DATABASE USERNAME',
+		'password'      => 'ENTER DATABASE PASSWORD',
+		'adapter'       => 'pdo_mysql',
+		'tableprefix'   => 'tine20_',
+	), 
+  'setupuser' => 
+  array (
+    'username' => 'admin',
+    'password' => 'e8d95a51f3af4a3b134bf6bb680a213a',
+  ),
+  'logger' => 
+  array (
+    'active' => true,
+    'priority' => 7,
+    'filename' => '/tmp/tine.log',
+  ),
+  'caching' => 
+  array (
+    'active' => false,
+    'lifetime' => '',
+    'path' => '',
+  ),
+  'tmpdir' => '/tmp',
+  'session' => 
+  array (
+    'lifetime' => 86400,
+    'backend' => 'File',
+    'path' => '',
+    'host' => 'localhost',
+    'port' => 6379,
+  ),
+  'filesdir' => '',
+  'mapPanel' => '',
+  'themes' =>
+    array (
+        'default'     => 0,
+        'cookieTheme' => '',
+        'themelist'   =>
+    array (
+        0 =>
+            array (
+                'name' => 'Tine 2.0 Default Skin',
+                'path' => 'tine20',
+                'useBlueAsBase' => 1,
+            ),
+        1 =>
+            array (
+                'name' => 'Expresso 3.0',
+                'path' => 'expresso30',
+                'useBlueAsBase' => 1,
+            ),
+        ),
+    ),
+);

@@ -113,13 +113,29 @@ class Tinebase_Core
      *
      */
     const PDO_MYSQL = 'Pdo_Mysql';
+    
+    /**
+     * minimal version of MySQL supported
+     */
+    const MYSQL_MINIMAL_VERSION = '5.0.0';
+
+    /**
+     * const PDO_PGSQL
+     *
+     */
+    const PDO_PGSQL = 'Pdo_Pgsql';
+    
+    /**
+     * minimal version of PostgreSQL supported
+     */
+    const PGSQL_MINIMAL_VERSION = '8.4.8';
 
     /**
      * const PDO_OCI
      *
      */
     const PDO_OCI = 'Pdo_Oci';
-
+    
     /**
      * const ORACLE
      * Zend_Db adapter name for the oci8 driver.
@@ -157,7 +173,7 @@ class Tinebase_Core
         ) {
             $server = new Tinebase_Server_Json();
 
-            /**************************** SNOM API *****************************/
+        /**************************** SNOM API *****************************/
         } elseif(
             isset($_SERVER['HTTP_USER_AGENT']) &&
             preg_match('/^Mozilla\/4\.0 \(compatible; (snom...)\-SIP (\d+\.\d+\.\d+)/i', $_SERVER['HTTP_USER_AGENT'])
@@ -165,42 +181,38 @@ class Tinebase_Core
             $server = new Voipmanager_Server_Snom();
 
 
-            /**************************** ASTERISK API *****************************/
+        /**************************** ASTERISK API *****************************/
         } elseif(isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] == 'asterisk-libcurl-agent/1.0') {
             $server = new Voipmanager_Server_Asterisk();
 
 
-            /**************************** ActiveSync API ****************************
-             * RewriteRule ^/Microsoft-Server-ActiveSync(.*) /index.php?frontend=activesync [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
-             */
+        /**************************** ActiveSync API ****************************
+         * RewriteRule ^/Microsoft-Server-ActiveSync /index.php?frontend=activesync [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         */
         } elseif((isset($_SERVER['REDIRECT_ACTIVESYNC']) && $_SERVER['REDIRECT_ACTIVESYNC'] == 'true') ||
-                 (isset($_REQUEST['frontend']) && $_REQUEST['frontend'] == 'activesync')) {
+                 (isset($_GET['frontend']) && $_GET['frontend'] == 'activesync')) {
             $server = new ActiveSync_Server_Http();
 
 
-            /**************************** WEBDAV API **********************************
-             * RewriteCond %{REQUEST_METHOD} !^(GET|POST)$
-             * RewriteRule ^/$      /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
-             *
-             * RewriteRule ^/webdav /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
-             */
-        } elseif(isset($_SERVER['REDIRECT_WEBDAV']) && $_SERVER['REDIRECT_WEBDAV'] == 'true') {
-            $server = new Tinebase_Server_WebDav();
+        /**************************** WebDAV / CardDAV / CalDAV API **********************************
+         * RewriteCond %{REQUEST_METHOD} !^(GET|POST)$
+         * RewriteRule ^/$            /index.php?frontend=webdav [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         *
+         * RewriteRule ^/addressbooks /index.php?frontend=webdav [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         * RewriteRule ^/calendars    /index.php?frontend=webdav [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         * RewriteRule ^/principals   /index.php?frontend=webdav [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         * RewriteRule ^/webdav       /index.php?frontend=webdav [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+         */
+        } elseif(isset($_GET['frontend']) && $_GET['frontend'] == 'webdav') {
+            $server = new Tinebase_Server_WebDAV();
 
-
-            /**************************** CALDAV API **********************************
-             * RewriteRule ^/caldav /index.php [E=CALDAV:true,E=REDIRECT_CALDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
-             */
-        } elseif(isset($_SERVER['REDIRECT_CALDAV']) && $_SERVER['REDIRECT_CALDAV'] == 'true') {
-            $server = new Tinebase_Server_CalDav();
-
-
-            /**************************** CLI API *****************************/
+            
+        /**************************** CLI API *****************************/
         } elseif (php_sapi_name() == 'cli') {
             $server = new Tinebase_Server_Cli();
 
 
-            /**************************** HTTP API ****************************/
+        /**************************** HTTP API ****************************/
         } else {
 
             /**************************** OpenID ****************************
@@ -229,20 +241,28 @@ class Tinebase_Core
     /**
      * returns an instance of the controller of an application
      *
-     * @param   string $_applicationName
+     * @param   string $_applicationName appname / modelname
      * @param   string $_modelName
      * @return  Tinebase_Controller_Abstract|Tinebase_Controller_Record_Abstract the controller of the application
      * @throws  Tinebase_Exception_NotFound
-     *
-     * @todo    we should use model name here consistent to other params/vars with the same name (i.e. it should have the format App_Model_Record)
+     * 
+     * @todo    make getApplicationInstance work for Tinebase records (Tinebase_Model_User for example)
      */
-    public static function getApplicationInstance($_applicationName, $_modelName = '')
+    public static function getApplicationInstance($_applicationName, $_modelName = '', $_ignoreACL = FALSE)
     {
-        $controllerName = ucfirst((string) $_applicationName) . '_Controller';
+        if (strpos($_applicationName, '_')) {
+            // got (complete) model name name as first param
+            list($appName, $i, $modelName) = explode('_', $_applicationName, 3);
+        } else {
+            $appName = $_applicationName;
+            $modelName = $_modelName;
+        }
+        
+        $controllerName = ucfirst((string) $appName) . '_Controller';
 
         // check for model controller
-        if (!empty($_modelName)) {
-            $modelName = preg_replace('/^' . $_applicationName . '_' . 'Model_/', '', $_modelName);
+        if (!empty($modelName)) {
+            $modelName = preg_replace('/^' . $appName . '_' . 'Model_/', '', $modelName);
 
             $controllerNameModel = $controllerName . '_' . $modelName;
             if (! class_exists($controllerNameModel)) {
@@ -254,12 +274,14 @@ class Tinebase_Core
             } else {
                 $controllerName = $controllerNameModel;
             }
-        } else {
-            if (!@class_exists($controllerName)) {
-                throw new Tinebase_Exception_NotFound('No Application Controller found (checked class ' . $controllerName . ')!');
-            }
+        } else if (!@class_exists($controllerName)) {
+            throw new Tinebase_Exception_NotFound('No Application Controller found (checked class ' . $controllerName . ')!');
         }
 
+        if (! $_ignoreACL && is_object(Tinebase_Core::getUser()) && ! Tinebase_Core::getUser()->hasRight($appName, Tinebase_Acl_Rights_Abstract::RUN)) {
+            throw new Tinebase_Exception_AccessDenied('No right to access application ' . $appName);
+        }
+        
         $controller = call_user_func(array($controllerName, 'getInstance'));
 
         return $controller;
@@ -274,8 +296,6 @@ class Tinebase_Core
     {
         Tinebase_Core::setupConfig();
         
-        Tinebase_Core::setupTempDir();
-        
         // Server Timezone must be setup before logger, as logger has timehandling!
         Tinebase_Core::setupServerTimezone();
         
@@ -283,6 +303,8 @@ class Tinebase_Core
         
         // Database Connection must be setup before cache because setupCache uses constant "SQL_TABLE_PREFIX" 
         Tinebase_Core::setupDatabaseConnection();
+        
+        Tinebase_Core::setupTempDir();
         
         Tinebase_Core::setupStreamWrapper();
         
@@ -298,7 +320,7 @@ class Tinebase_Core
         Tinebase_Core::set('locale', new Zend_Locale('en_US'));
         Tinebase_Core::set('userTimeZone', 'UTC');
         
-        Tinebase_Core::setupMailer();
+//        Tinebase_Core::setupMailer();
         
         Tinebase_Core::setupUserCredentialCache();
         
@@ -367,14 +389,7 @@ class Tinebase_Core
      */
     public static function setupConfig()
     {
-        $configData = include('config.inc.php');
-        if($configData === false) {
-            die ('central configuration file config.inc.php not found in includepath: ' . get_include_path());
-        }
-
-        $config = new Zend_Config($configData);
-
-        self::set(self::CONFIG, $config);
+        self::set(self::CONFIG, Tinebase_Config::getInstance());
     }
 
     /**
@@ -397,8 +412,8 @@ class Tinebase_Core
     {
         $config = self::getConfig();
 
-        $tmpdir = $config->get('tmpdir', null);
-        if (empty($tmpdir) || !@is_writable($tmpdir)) {
+        $tmpdir = $config->tmpdir;
+        if ($tmpdir == Tinebase_Model_Config::NOTSET || !@is_writable($tmpdir)) {
             $tmpdir = sys_get_temp_dir();
             if (empty($tmpdir) || !@is_writable($tmpdir)) {
                 $tmpdir = session_save_path();
@@ -440,7 +455,6 @@ class Tinebase_Core
                 if (isset($loggerConfig->filter->user)) {
                     $logger->addFilter(new Tinebase_Log_Filter_User($loggerConfig->filter->user));
                 }
-
                 if (isset($loggerConfig->filter->message)) {
                     $logger->addFilter(new Zend_Log_Filter_Message($loggerConfig->filter->message));
                 }
@@ -451,13 +465,21 @@ class Tinebase_Core
                 $logger->addWriter($writer);
             }
         } else {
-            $writer = new Zend_Log_Writer_Syslog;
+            $writer = new Zend_Log_Writer_Syslog(array(
+                'application'   => 'Tine 2.0'
+            ));
+            
+            $filter = new Zend_Log_Filter_Priority(Zend_Log::WARN);
+            $writer->addFilter($filter);
+            
             $logger->addWriter($writer);
         }
-
+        
         self::set(self::LOGGER, $logger);
 
-        $logger->info(__METHOD__ . '::' . __LINE__ .' logger initialized');
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) $logger->info(__METHOD__ . '::' . __LINE__ .' Logger initialized');
+        if (isset($loggerConfig) && Tinebase_Core::isLogLevel(Zend_Log::TRACE)) $logger->trace(__METHOD__ . '::' . __LINE__ 
+            .' Logger settings: ' . print_r($loggerConfig->toArray(), TRUE));
     }
 
     /**
@@ -522,7 +544,15 @@ class Tinebase_Core
             }
 
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " cache of backend type '{$backendType}' enabled");
-            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptions, TRUE));
+            
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) {
+                // logger is an object, that makes ugly traces :)
+                $backendOptionsWithoutLogger = $backendOptions;
+                if (isset($backendOptionsWithoutLogger['logger'])) {
+                    unset($backendOptionsWithoutLogger['logger']);
+                }
+                Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptionsWithoutLogger, TRUE));
+            }
 
         } else {
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . ' cache disabled');
@@ -566,7 +596,12 @@ class Tinebase_Core
      */
     public static function setupUserCredentialCache()
     {
-        $cache = Tinebase_Auth_CredentialCache::getInstance()->getCacheAdapter()->getCache();
+        try {
+            $cache = Tinebase_Auth_CredentialCache::getInstance()->getCacheAdapter()->getCache();
+        } catch (Zend_Db_Statement_Exception $zdse) {
+            // could not get credential cache adapter, perhaps Tine 2.0 is not installed yet
+            $cache = NULL;
+        }
         if ($cache !== NULL) {
             self::set(self::USERCREDENTIALCACHE, $cache);
         }
@@ -612,6 +647,7 @@ class Tinebase_Core
      * 
      * @param array $_options
      * @param string $_namespace
+     * @throws Exception
      */
     public static function startSession($_options = array(), $_namespace = 'tinebase')
     {
@@ -620,11 +656,11 @@ class Tinebase_Core
         
         try {
             Zend_Session::start();
-        } catch (Zend_Session_Exception $zse) {
+        } catch (Exception $e) {
             Zend_Session::destroy();
-            self::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Session error: ' . $zse->getMessage());
-            self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $zse->getTraceAsString());
-            throw $zse;
+            self::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Session error: ' . $e->getMessage());
+            self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
+            throw $e;
         }
         
         $session = new Zend_Session_Namespace($_namespace);
@@ -694,7 +730,7 @@ class Tinebase_Core
                     $maxLifeTime = $config->get('gc_maxlifetime', 86400);
                 }
                 Zend_Session::setOptions(array(
-                	'gc_maxlifetime'     => $maxLifeTime
+                    'gc_maxlifetime'     => $maxLifeTime
                 ));
                 
                 $sessionSavepath = self::getSessionDir();
@@ -711,7 +747,7 @@ class Tinebase_Core
                 $prefix = Tinebase_Application::getInstance()->getApplicationByName('Tinebase')->getId() . '_SESSION_';
                 
                 Zend_Session::setOptions(array(
-                	'gc_maxlifetime' => $maxLifeTime,
+                    'gc_maxlifetime' => $maxLifeTime,
                     'save_handler'   => 'redis',
                     'save_path'      => "tcp://$host:$port?prefix=$prefix"
                 ));
@@ -728,6 +764,7 @@ class Tinebase_Core
      * initializes the database connection
      *
      * @throws  Tinebase_Exception_UnexpectedValue
+     * @throws  Tinebase_Exception_Backend_Database
      */
     public static function setupDatabaseConnection()
     {
@@ -752,6 +789,10 @@ class Tinebase_Core
 
             switch($dbBackend) {
                 case self::PDO_MYSQL:
+                    if (! defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY')) {
+                        throw new Tinebase_Exception_Backend_Database('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is not defined. Please check PDO extension.');
+                    }
+                    
                     // force some driver options
                     $dbConfigArray['driver_options'] = array(
                         PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => FALSE,
@@ -763,19 +804,35 @@ class Tinebase_Core
                         // set mysql timezone to utc and activate strict mode
                         $db->query("SET time_zone ='+0:00';");
                         $db->query("SET SQL_MODE = 'STRICT_ALL_TABLES'");
+                        $db->query("SET SESSION group_concat_max_len = 81920");
                     } catch (Exception $e) {
                         self::getLogger()->warn('Failed to set "SET SQL_MODE to STRICT_ALL_TABLES or timezone: ' . $e->getMessage());
                     }
                     break;
+                    
                 case self::PDO_OCI:
                     $db = Zend_Db::factory('Pdo_Oci', $dbConfigArray);
                     break;
+                    
                 case self::ORACLE:
                     $db = Zend_Db::factory(self::ORACLE, $dbConfigArray);
                     $db->supportPositionalParameters(true);
                     $db->setLobAsString(true);
                     break;
-
+                    
+                case self::PDO_PGSQL:
+                    unset($dbConfigArray['adapter']);
+                    unset($dbConfigArray['tableprefix']);
+                    $db = Zend_Db::factory('Pdo_Pgsql', $dbConfigArray);
+                    try {
+                        // set mysql timezone to utc and activate strict mode
+                        $db->query("SET timezone ='+0:00';");
+                        // PostgreSQL has always been strict about making sure data is valid before allowing it into the database
+                    } catch (Exception $e) {
+                        self::getLogger()->warn('Failed to set "SET timezone: ' . $e->getMessage());
+                    }
+                    break;
+                    
                 default:
                     throw new Tinebase_Exception_UnexpectedValue('Invalid database adapter defined. Please set adapter to ' . self::PDO_MYSQL . ' or ' . self::PDO_OCI . ' in config.inc.php.');
                     break;
@@ -799,14 +856,24 @@ class Tinebase_Core
      */
     public static function getDbProfiling()
     {
+        if (! self::getConfig() || ! self::getConfig()->database) {
+            return;
+        }
+        
         $config = self::getConfig()->database;
 
         if ((bool) $config->profiler) {
             $profiler = Zend_Db_Table::getDefaultAdapter()->getProfiler();
 
+            if (! empty($config->profilerFilterElapsedSecs)) {
+                $profiler->setFilterElapsedSecs($config->profilerFilterElapsedSecs);    
+            }
+
             $data = array(
                 'totalNumQueries' => $profiler->getTotalNumQueries(),
-                'totalElapsedSec' => $profiler->getTotalElapsedSecs()
+                'totalElapsedSec' => $profiler->getTotalElapsedSecs(),
+                'longestTime'        => 0,
+                'longestQuery'       => ''
             );
 
             if ((bool) $config->queryProfiles) {
@@ -816,6 +883,11 @@ class Tinebase_Core
                         'query'       => $profile->getQuery(),
                         'elapsedSecs' => $profile->getElapsedSecs(),
                     );
+                    
+                    if ($profile->getElapsedSecs() > $data['longestTime']) {
+                        $data['longestTime']  = $profile->getElapsedSecs();
+                        $data['longestQuery'] = $profile->getQuery();
+                    }
                 }
             }
 
@@ -826,31 +898,37 @@ class Tinebase_Core
     /**
      * sets the user locale
      *
-     * @param  string $_localeString
-     * @param  bool   $_saveaspreference
+     * @param  string $localeString
+     * @param  bool   $saveaspreference
      */
-    public static function setupUserLocale($_localeString = 'auto', $_saveaspreference = FALSE)
+    public static function setupUserLocale($localeString = 'auto', $saveaspreference = FALSE)
     {
         $session = self::get(self::SESSION);
 
-        self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " given localeString '$_localeString'");
+        if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " given localeString '$localeString'");
 
         // get locale object from session or ...
-        if ($session !== NULL && isset($session->userLocale) && is_object($session->userLocale) && ($session->userLocale->toString() === $_localeString || $_localeString == 'auto')) {
+        if (   $session !== NULL 
+            && isset($session->userLocale) 
+            && is_object($session->userLocale) 
+            && ($session->userLocale->toString() === $localeString || $localeString === 'auto')
+        ) {
             $locale = $session->userLocale;
-            self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " session value: " . (string)$locale);
+            if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " session value: " . (string)$locale);
             
         // ... create new locale object
         } else {
-            $localeString = $_localeString;
-            
-            if ($_localeString == 'auto') {
-                // check if cookie with language is available
+            if ($localeString === 'auto') {
+                // check if cookie or pref with language is available
                 if (isset($_COOKIE['TINE20LOCALE'])) {
                     $localeString = $_COOKIE['TINE20LOCALE'];
+                    if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__
+                        . " Got locale from cookie: '$localeString'");
+                    
                 } elseif (isset($session->currentAccount)) {
-                    $localeString = self::getPreference()->{Tinebase_Preference::LOCALE};
-                    self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " preference '$localeString'");
+                    $localeString = self::getPreference()->getValue(Tinebase_Preference::LOCALE, 'auto');
+                    if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+                        . " Got locale from preference: '$localeString'");
                 }
             }
             
@@ -867,7 +945,7 @@ class Tinebase_Core
         self::set('locale', $locale);
         
         // save locale as preference
-        if ($_saveaspreference && Tinebase_Core::isRegistered(self::USER)) {
+        if (is_object(Tinebase_Core::getUser()) && ($saveaspreference || self::getPreference()->{Tinebase_Preference::LOCALE} === 'auto')) {
             self::getPreference()->{Tinebase_Preference::LOCALE} = (string)$locale;
         }
     }
@@ -918,27 +996,6 @@ class Tinebase_Core
     }
 
     /**
-     * function to initialize the smtp connection
-     *
-     */
-    public static function setupMailer()
-    {
-        $config = self::getConfig();
-
-        if (isset($config->smtp)) {
-            $mailConfig = $config->smtp;
-        } else {
-            $mailConfig = new Zend_Config(array(
-                'hostname' => 'localhost', 
-                'port' => 25
-            ));
-        }
-
-        $transport = new Zend_Mail_Transport_Smtp($mailConfig->hostname,  $mailConfig->toArray());
-        Zend_Mail::setDefaultTransport($transport);
-    }
-
-    /**
      * set php execution life (max) time
      *
      * @param int $_seconds
@@ -950,13 +1007,15 @@ class Tinebase_Core
         
         if ($oldMaxExcecutionTime > 0) {
             if ((bool)ini_get('safe_mode') === true) {
-                if (Tinebase_Core::isRegistered(self::LOGGER)) {
-                    Tinebase_Core::getLogger()->crit(__METHOD__ . '::' . __LINE__ . ' max_execution_time(' . $oldMaxExcecutionTime . ') is too low. Can\'t set limit to ' . $_seconds . ' because of safe mode restrictions.');    
+                if (Tinebase_Core::isRegistered(self::LOGGER) && Tinebase_Core::isLogLevel(Zend_Log::WARN)) {
+                    Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ 
+                        . ' max_execution_time(' . $oldMaxExcecutionTime . ') is too low. Can\'t set limit to ' 
+                        . $_seconds . ' because of safe mode restrictions.');
                 }
             } else {
-            	if (Tinebase_Core::isRegistered(self::LOGGER)) {
-            	    Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' setting execution life time to: ' . $_seconds);    
-            	}
+                if (Tinebase_Core::isRegistered(self::LOGGER) && Tinebase_Core::isLogLevel(Zend_Log::INFO)) {
+                    Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' setting execution life time to: ' . $_seconds);
+                }
                 set_time_limit($_seconds);
             }
         }

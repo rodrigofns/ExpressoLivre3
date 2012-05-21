@@ -17,7 +17,7 @@
  */
 class Tinebase_Group_Sql extends Tinebase_Group_Abstract
 {
-	/**
+    /**
      * @var Zend_Db_Adapter_Abstract
      */
     protected $_db;
@@ -53,15 +53,20 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     /**
      * the constructor
      */
-    public function __construct() {
-    	$this->_db = Tinebase_Core::getDb();
-    	
+    public function __construct() 
+    {
+        $this->_db = Tinebase_Core::getDb();
+        
         $this->groupsTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . $this->_tableName));
         $this->groupMembersTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'group_members'));
         
         try {
-            $this->_db->describeTable(SQL_TABLE_PREFIX . 'addressbook');
-            $this->_addressBookInstalled = true;
+            // MySQL throws an exception         if the table does not exist
+            // PostgreSQL returns an empty array if the table does not exist
+            $tableDescription = $this->_db->describeTable(SQL_TABLE_PREFIX . 'addressbook');
+            if (!empty($tableDescription)) {
+                $this->_addressBookInstalled = true;
+            }
         } catch (Zend_Db_Statement_Exception $zdse) {
             // nothing to do
         }
@@ -77,23 +82,22 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     {
         $accountId = Tinebase_Model_User::convertUserIdToInt($_accountId);
         
-        $cache = Tinebase_Core::get('cache');
-        $cacheId = convertCacheId('getGroupMemberships' . $accountId);
-        $memberships = $cache->load($cacheId);
+        $cacheId = convertCacheId('groupMemberships' . $accountId);
+        $memberships = Tinebase_Core::getCache()->load($cacheId);
 
         if (! $memberships) {
             $memberships = array();
             $colName = $this->groupsTable->getAdapter()->quoteIdentifier('account_id');
             $select = $this->groupMembersTable->select();
             $select->where($colName . ' = ?', $accountId);
-
+            
             $rows = $this->groupMembersTable->fetchAll($select);
-
+            
             foreach($rows as $membership) {
                 $memberships[] = $membership->group_id;
             }
 
-            $cache->save($memberships, $cacheId, array('group'));
+            Tinebase_Core::getCache()->save($memberships, $cacheId);
         }
 
         return $memberships;
@@ -109,15 +113,14 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     {
         $groupId = Tinebase_Model_Group::convertGroupIdToInt($_groupId);
         
-        $cache = Tinebase_Core::get('cache');
-        $cacheId = convertCacheId('getGroupMembers' . $groupId);
-        $members = $cache->load($cacheId);
+        $cacheId = convertCacheId('groupMembers' . $groupId);
+        $members = Tinebase_Core::getCache()->load($cacheId);
 
         if (! $members) {
             $members = array();
 
             $select = $this->groupMembersTable->select();
-            $select->where('group_id = ?', $groupId);
+            $select->where($this->_db->quoteIdentifier('group_id') . ' = ?', $groupId);
 
             $rows = $this->groupMembersTable->fetchAll($select);
             
@@ -125,7 +128,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
                 $members[] = $member->account_id;
             }
 
-            $cache->save($members, $cacheId, array('group'));
+            Tinebase_Core::getCache()->save($members, $cacheId);
         }
 
         return $members;
@@ -161,21 +164,23 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $this->groupMembersTable->delete($where);
         
         if(count($_groupMembers) > 0) {
-            $db = Tinebase_Core::getDb();
-            $stmt = $db->prepare('INSERT INTO ' . SQL_TABLE_PREFIX . 'group_members (group_id, account_id) VALUES (?,?)');
-            
             // add new members
             foreach ($_groupMembers as $accountId) {
                 $accountId = Tinebase_Model_User::convertUserIdToInt($accountId);        
-                $stmt->execute(array(
-                    $groupId, 
-                    $accountId
+                $this->_db->insert(SQL_TABLE_PREFIX . 'group_members', array(
+                    'group_id'    => $groupId,
+                    'account_id'  => $accountId
                 ));
+                
+                // invalidate membership cache
+                $cacheId = convertCacheId('groupMemberships' . $accountId);
+                Tinebase_Core::getCache()->remove($cacheId);
             }
         }
         
-        // invalidate cache
-        Tinebase_Core::get(Tinebase_Core::CACHE)->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array('group'));
+        // invalidate group cache
+        $cacheId = convertCacheId('groupMembers' . $groupId);
+        Tinebase_Core::getCache()->remove($cacheId);
     }
     
     /**
@@ -237,7 +242,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         }
         
         $event = new Tinebase_Group_Event_SetGroupMemberships(array(
-        	'user'               => $_userId,
+            'user'               => $_userId,
             'addedMemberships'   => $addGroupMemberships,
             'removedMemberships' => $removeGroupMemberships
         ));
@@ -281,8 +286,12 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $this->groupMembersTable->insert($data);
             
             // invalidate cache
-            Tinebase_Core::get(Tinebase_Core::CACHE)->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array('group'));     
-                   
+            $cacheId = convertCacheId('groupMembers' . $groupId);
+            Tinebase_Core::getCache()->remove($cacheId);
+            
+            $cacheId = convertCacheId('groupMemberships' . $accountId);
+            Tinebase_Core::getCache()->remove($cacheId);
+            
         } catch (Zend_Db_Statement_Exception $e) {
             // account is already member of this group
         }
@@ -322,7 +331,11 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $this->groupMembersTable->delete($where);
         
         // invalidate cache
-        Tinebase_Core::get(Tinebase_Core::CACHE)->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array('group'));
+        $cacheId = convertCacheId('groupMembers' . $groupId);
+        Tinebase_Core::getCache()->remove($cacheId);
+        
+        $cacheId = convertCacheId('groupMemberships' . $accountId);
+        Tinebase_Core::getCache()->remove($cacheId);
     }
     
     /**
@@ -390,7 +403,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      */
     public function updateGroup(Tinebase_Model_Group $_group)
     {
-        if($this instanceof Tinebase_Group_Interface_SyncAble) {
+        if ($this instanceof Tinebase_Group_Interface_SyncAble) {
             $this->updateGroupInSyncBackend($_group);
         }
         
@@ -399,6 +412,8 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
     
     /**
      * create a new group in sync backend
+     * 
+     * NOTE: sets visibility to HIDDEN if list_id is empty
      *
      * @param  Tinebase_Model_Group  $_group
      * @return Tinebase_Model_Group
@@ -408,16 +423,16 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $groupId = Tinebase_Model_Group::convertGroupIdToInt($_group);
         
         if (empty($_group->list_id)) {
-            $_group->visibility = 'hidden';
+            $_group->visibility = Tinebase_Model_Group::VISIBILITY_HIDDEN;
             $_group->list_id    = null;
         }
         
         $data = array(
             'name'          => $_group->name,
             'description'   => $_group->description,
-            'visibility'	=> $_group->visibility,
-            'email'			=> $_group->email,
-            'list_id'		=> $_group->list_id
+            'visibility'    => $_group->visibility,
+            'email'         => $_group->email,
+            'list_id'       => $_group->list_id
         );
         
         $where = $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $groupId);
@@ -499,7 +514,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
             $select->where($this->_db->quoteIdentifier($this->_tableName. '.name') . ' LIKE ?', '%' . $_filter . '%');
         }
         if($_sort !== NULL) {
-            $select->order("$_sort $_dir");
+            $select->order($this->_tableName . '.' . $_sort . ' ' . $_dir);
         }
         if($_start !== NULL) {
             $select->limit($_limit, $_start);
@@ -552,7 +567,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         $groupdId = Tinebase_Model_Group::convertGroupIdToInt($_groupId);     
         
         $select = $this->_getSelect();
-                
+        
         $select->where($this->_db->quoteIdentifier($this->_tableName . '.id') . ' = ?', $groupdId);
         
         $stmt = $this->_db->query($select);
@@ -562,7 +577,7 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
         if (!$queryResult) {
             throw new Tinebase_Exception_Record_NotDefined('Group not found.');
         }
-
+        
         $result = new Tinebase_Model_Group($queryResult, TRUE);
         
         return $result;
@@ -573,34 +588,37 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      *
      * @param string|array $_ids Ids
      * @return Tinebase_Record_RecordSet
+     * 
+     * @todo this should return the container_id, too
      */
     public function getMultiple($_ids)
     {
-    	$result = new Tinebase_Record_RecordSet('Tinebase_Model_Group');
-    	
-    	if (! empty($_ids)) {
-	        $select = $this->groupsTable->select();
-	        $select->where($this->_db->quoteIdentifier('id') . ' IN (?)', array_unique((array) $_ids));
-	        
-	        $rows = $this->groupsTable->fetchAll($select);
-	        foreach ($rows as $row) {
-	        	$result->addRecord(new Tinebase_Model_Group($row->toArray(), TRUE));
-	        }
-    	}
-    	
-    	return $result;
+        $result = new Tinebase_Record_RecordSet('Tinebase_Model_Group');
+        
+        if (! empty($_ids)) {
+            $select = $this->groupsTable->select();
+            $select->where($this->_db->quoteIdentifier('id') . ' IN (?)', array_unique((array) $_ids));
+            
+            $rows = $this->groupsTable->fetchAll($select);
+            foreach ($rows as $row) {
+                $result->addRecord(new Tinebase_Model_Group($row->toArray(), TRUE));
+            }
+        }
+        
+        return $result;
     }
     
     /**
      * get the basic select object to fetch records from the database
+     * 
+     * NOTE: container_id is joined from addressbook lists table
      *  
      * @param array|string|Zend_Db_Expr $_cols columns to get, * per default
      * @param boolean $_getDeleted get deleted records (if modlog is active)
      * @return Zend_Db_Select
-     * 
      */
     protected function _getSelect($_cols = '*', $_getDeleted = FALSE)
-    {        
+    {
         $select = $this->_db->select();
 
         $select->from(array($this->_tableName => SQL_TABLE_PREFIX . $this->_tableName), $_cols);
@@ -612,7 +630,6 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
                 array('container_id')
             );
         }
-        
         
         return $select;
     }

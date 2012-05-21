@@ -72,6 +72,13 @@ class Tinebase_Model_User extends Tinebase_Record_Abstract
     const ACCOUNT_STATUS_EXPIRED = 'expired';
     
     /**
+     * account is blocked
+     * 
+     * @var string
+     */
+    const ACCOUNT_STATUS_BLOCKED  = 'blocked';
+    
+    /**
      * list of zend inputfilter
      * 
      * this filter get used when validating user generated content with Zend_Input_Filter
@@ -107,18 +114,24 @@ class Tinebase_Model_User extends Tinebase_Record_Abstract
     /**
      * (non-PHPdoc)
      * @see Tinebase/Record/Tinebase_Record_Abstract#setFromArray($_data)
+     * 
+     * @todo need to discuss if this is the right place to do this. perhaps the client should send the fullname (and displayname), too.
      */
     public function setFromArray(array $_data)
     {
         // always update accountDisplayName and accountFullName
-        $_data['accountDisplayName'] = $_data['accountLastName'];
-        if (!empty($_data['accountFirstName'])) {
-            $_data['accountDisplayName'] .= ', ' . $_data['accountFirstName'];
-        }
+        if (isset($_data['accountLastName'])) {
+            $_data['accountDisplayName'] = $_data['accountLastName'];
+            if (!empty($_data['accountFirstName'])) {
+                $_data['accountDisplayName'] .= ', ' . $_data['accountFirstName'];
+            }
             
-        $_data['accountFullName'] = $_data['accountLastName'];
-        if (!empty($_data['accountFirstName'])) {
-            $_data['accountFullName'] = $_data['accountFirstName'] . ' ' . $_data['accountLastName'];
+            if (! array_key_exists('accountFullName', $_data)) {
+                $_data['accountFullName'] = $_data['accountLastName'];
+                if (!empty($_data['accountFirstName'])) {
+                    $_data['accountFullName'] = $_data['accountFirstName'] . ' ' . $_data['accountLastName'];
+                }
+            }
         }
         
         parent::setFromArray($_data);
@@ -135,7 +148,7 @@ class Tinebase_Model_User extends Tinebase_Record_Abstract
     /**
      * check if current user has a given right for a given application
      *
-     * @param string $_application the name of the application
+     * @param string|Tinebase_Model_Application $_application the application (one of: app name, id or record)
      * @param int $_right the right to check for
      * @return bool
      */

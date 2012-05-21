@@ -105,8 +105,8 @@ class Felamimail_Controller_Message_Flags extends Felamimail_Controller_Message
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $_mode. ' flags: ' . print_r($_flags, TRUE));
         
-        // only get the first 100 messages if we got a filtergroup
-        $pagination = ($_messages instanceof Tinebase_Model_Filter_FilterGroup) ? new Tinebase_Model_Pagination(array('sort' => 'folder_id', 'start' => 0, 'limit' => 100)) : NULL;
+        // only get the first 100 messages if we got a filtergroup   
+        $pagination = ($_messages instanceof Tinebase_Model_Filter_FilterGroup) ? new Tinebase_Model_Pagination(array('sort' => $this->_backend->getTableName() . '.folder_id', 'start' => 0, 'limit' => 100)) : NULL;
         $messagesToUpdate = $this->_convertToRecordSet($_messages, TRUE, $pagination);
         
         $lastFolderId       = null;
@@ -319,5 +319,21 @@ class Felamimail_Controller_Message_Flags extends Felamimail_Controller_Message
         Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
         
         return $folderCounts;
+    }
+    
+    /**
+     * set seen flag of message
+     * 
+     * @param Felamimail_Model_Message $_message
+     */
+    public function setSeenFlag(Felamimail_Model_Message $_message)
+    {
+        if (! in_array(Zend_Mail_Storage::FLAG_SEEN, $_message->flags)) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .
+                ' Add \Seen flag to msg uid ' . $_message->messageuid);
+            
+            $this->addFlags($_message, Zend_Mail_Storage::FLAG_SEEN);
+            $_message->flags[] = Zend_Mail_Storage::FLAG_SEEN;
+        }        
     }
 }

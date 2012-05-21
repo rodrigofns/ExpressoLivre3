@@ -114,7 +114,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Record_Interface $_pagination = NULL, $_getRelations = FALSE, $_onlyIds = FALSE)
     {
-        $filterValues = $this->_extractFilter($_filter);
+        $filterValues = $this->_extractFilter($_filter);        
         
         if (empty($filterValues['account_id'])) {
             throw new Felamimail_Exception('No account id set in search filter. Check default account preference!');
@@ -128,8 +128,10 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         $result = $this->_backend->search($filter);
         if (count($result) == 0) {
             // try to get folders from imap server
-            $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);
-        }             
+            $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);            
+        }
+
+        Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder search result count: ' . count($result) );        
         
         $this->_lastSearchCount[$this->_currentAccount->getId()][$filterValues['account_id']] = count($result);
         
@@ -292,6 +294,7 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
      */
     public function updateFolderCounter($_folderId, array $_counters)
     {
+    	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  " starting update of folder counter with id {$_folderId}");
         return $this->_backend->updateFolderCounter($_folderId, $_counters);
     }
     
@@ -312,16 +315,31 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             $folder = NULL;
         }            
         
-        // check if folder has subfolders and throw exception if that is the case
+        // check if folder has subfolders and throw exception if that is the case / OR: delete subfolders if recursive param is TRUE
         // @todo this should not be a Tinebase_Exception_AccessDenied -> we have to create a new exception and call the fmail exception handler when deleting/adding/renaming folders
         $subfolders = $this->getSubfolders($_accountId, $_folderName);
-        if (count($subfolders) > 0) {
-            if ($_recursive && $folder) {
+        if (count($subfolders) > 0 && $folder) {
+            if ($_recursive) {
                 $this->deleteSubfolders($folder, $subfolders);
+            } else {
+                throw new Tinebase_Exception_AccessDenied('Could not delete folder ' . $_folderName . ' because it has subfolders.');
             }
-            throw new Tinebase_Exception_AccessDenied('Could not delete folder ' . $_folderName . ' because it has subfolders.');
         }
         
+        $this->_deleteFolderOnIMAP($_accountId, $_folderName);
+        $this->_deleteFolderInCache($_accountId, $folder);
+    }
+
+    /**
+     * rename folder on imap server
+     * 
+     * @param string|Felamimail_Model_Account $_account
+     * @param string $_folderName
+     * @throws Felamimail_Exception_IMAPFolderNotFound
+     * @throws Felamimail_Exception_IMAP
+     */
+    protected function _deleteFolderOnIMAP($_accountId, $_folderName)
+    {
         try {
             $imap = Felamimail_Backend_ImapFactory::factory($_accountId);
             $imap->removeFolder(Felamimail_Model_Folder::encodeFolderName($_folderName));
@@ -334,13 +352,25 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             
             throw new Felamimail_Exception_IMAP('Could not delete folder ' . $_folderName . '. IMAP Error: ' . $zmse->getMessage());
         }
-        
-        if ($folder) {
-            Felamimail_Controller_Message::getInstance()->deleteByFolder($folder);
-            $this->_backend->delete($folder->getId());
-            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Deleted folder ' . $_folderName);
-            $this->_updateHasChildren($_accountId, $folder->parent);
+    }
+    
+    /**
+     * rename folder in cache
+     * 
+     * @param string|Felamimail_Model_Account $_account
+     * @param Felamimail_Model_Folder $_folder
+     */
+    protected function _deleteFolderInCache($_accountId, $_folder)
+    {
+        if ($_folder === NULL) {
+            return;
         }
+
+        Felamimail_Controller_Message::getInstance()->deleteByFolder($_folder);
+        $this->_backend->delete($_folder->getId());
+        
+        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Deleted folder ' . $_folder->globalname);
+        $this->_updateHasChildren($_accountId, $_folder->parent);
     }
     
     /**
@@ -366,6 +396,53 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
         $this->_updateSubfoldersAfterRename($account, $newGlobalName, $_oldGlobalName);
         
         return $folder;
+    }
+    
+        /**
+     * Get Acls for a folder
+     *
+     * @param string $_accountId
+     * @param string $_globalName
+     * @return 
+     */
+    public function getAcls($_accountId, $_globalName)
+    {
+        $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $_account->delimiter;
+        
+        //$foldername = $this->_prepareFolderName($_globalName);
+        $foldername = $_globalName;
+       
+       // if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Renaming ... ' . $_oldGlobalName . ' -> ' . $newGlobalName);
+        
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        $return = $imap->getFolderAcls(Felamimail_Model_Folder::encodeFolderName($foldername));
+        
+        return $return;
+    }
+    
+    
+    /** Set Acls for a folder
+     *
+     * @param string $_accountId
+     * @param string $_globalName
+     * @param Array  $_acls
+     * @return 
+     */
+    public function setAcls($_accountId, $_globalName, $_acls)
+    {
+        $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $_account->delimiter;   
+        
+        //$foldername = $this->_prepareFolderName($_globalName);
+        $foldername = $_globalName;
+       
+       // if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Renaming ... ' . $_oldGlobalName . ' -> ' . $newGlobalName);
+        
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        $return = $imap->setFolderAcls(Felamimail_Model_Folder::encodeFolderName($foldername),$_acls);
+        
+        return $return;
     }
     
     /**
@@ -541,7 +618,8 @@ class Felamimail_Controller_Folder extends Tinebase_Controller_Abstract implemen
             'globalname' => ''
         );
         
-        $filters = $_filter->getFilterObjects();
+        $filters = $_filter->getFilterObjects();     
+        
         foreach($filters as $filter) {
             switch($filter->getField()) {
                 case 'account_id':

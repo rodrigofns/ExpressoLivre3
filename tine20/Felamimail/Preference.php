@@ -52,6 +52,12 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
      * @todo add this to more apps?
      */
     const CONFIRM_DELETE = 'confirmDelete';
+
+    /**
+     * show Use Trash option
+     *
+     */
+    const MOVEDELETED_TOTRASH = 'confirmUseTrash';
     
     /**
      * default filter name
@@ -87,6 +93,7 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
             self::USEINADB,
             self::AUTOATTACHNOTE,
             self::CONFIRM_DELETE,
+            self::MOVEDELETED_TOTRASH,
         );
             
         return $allPrefs;
@@ -121,6 +128,10 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
             self::CONFIRM_DELETE  => array(
                 'label'         => $translate->_('Confirm Delete'),
                 'description'   => $translate->_('Show confirmation dialog when deleting mails.'),
+            ),
+            self::MOVEDELETED_TOTRASH  => array(
+                'label'         => $translate->_('Move Deleted Messages to Trash'),
+                'description'   => $translate->_('Choose yes, to Move Deleted Messages to Trash.'),
             ),
         );
         
@@ -168,6 +179,13 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
                     </options>';
                 break;
             case self::CONFIRM_DELETE:
+                $preference->value      = 1;
+                $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
+                    <options>
+                        <special>' . Tinebase_Preference_Abstract::YES_NO_OPTIONS . '</special>
+                    </options>';
+                break;
+            case self::MOVEDELETED_TOTRASH:
                 $preference->value      = 1;
                 $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
                     <options>

@@ -7,11 +7,8 @@
  * @author      Philipp Schüle <p.schuele@metaways.de>
  * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
- * @todo        add generic mechanism for value pre/postfixes? (see accountLoginNamePrefix in Admin_User_Import)
- * @todo        add more conversions e.g. date/accounts
  * @todo        add tests for notes
  * @todo        add more documentation
- * @todo        make it possible to import custom fields
  */
 
 /**
@@ -38,27 +35,11 @@
 abstract class Tinebase_Import_Csv_Abstract extends Tinebase_Import_Abstract
 {
     /**
+     * csv headline
+     * 
      * @var array
      */
-    protected $_options = array(
-        'maxLineLength'     => 8000,
-        'delimiter'         => ',',
-        'enclosure'         => '"',
-        'escape'            => '\\',
-        'encoding'          => 'UTF-8',
-        'encodingTo'        => 'UTF-8',
-        'dryrun'            => FALSE,
-        'dryrunCount'       => 20,
-        'dryrunLimit'       => 0,       
-        'duplicateCount'    => 0,
-        'createMethod'      => 'create',
-        'model'             => '',
-        'mapping'           => '',
-        'duplicates'        => 0,
-        'headline'          => 0,
-        'use_headline'      => 1,
-        'shared_tags'       => 'onlyexisting',
-    );
+    protected $_headline = array();
     
     /**
      * special delimiters
@@ -76,6 +57,18 @@ abstract class Tinebase_Import_Csv_Abstract extends Tinebase_Import_Abstract
      */
     public function __construct(array $_options = array())
     {
+        $this->_options = array_merge($this->_options, array(
+            'maxLineLength'     => 8000,
+            'delimiter'         => ',',
+            'enclosure'         => '"',
+            'escape'            => '\\',
+            'encoding'          => 'UTF-8',
+            'encodingTo'        => 'UTF-8',
+            'mapping'           => '',
+            'headline'          => 0,
+            'use_headline'      => 1,
+        ));
+        
         parent::__construct($_options);
         
         if (empty($this->_options['model'])) {
@@ -83,76 +76,6 @@ abstract class Tinebase_Import_Csv_Abstract extends Tinebase_Import_Abstract
         }
         
         $this->_setController();
-    }
-    
-    /**
-     * import the data
-     *
-     * @param  resource $_resource (if $_filename is a stream)
-     * @return array with Tinebase_Record_RecordSet the imported records (if dryrun) and totalcount 
-     */
-    public function import($_resource = NULL)
-    {
-        // get headline
-        if (isset($this->_options['headline']) && $this->_options['headline']) {
-            $headline = $this->_getRawData($_resource);
-            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Got headline: ' . implode(', ', $headline));
-            if (! $this->_options['use_headline']) {
-                // just read headline but do not use it
-                $headline = array();
-            }
-        } else {
-            $headline = array();
-        }
-
-        $result = array(
-            'results'           => new Tinebase_Record_RecordSet($this->_options['model']),
-            'totalcount'        => 0,
-            'failcount'         => 0,
-            'duplicatecount'    => 0,
-        );
-
-        while (
-            ($recordData = $this->_getRawData($_resource)) !== FALSE && 
-            (! $this->_options['dryrun'] 
-                || ! ($this->_options['dryrunLimit'] && $result['totalcount'] >= $this->_options['dryrunCount'])
-            )
-        ) {
-            if (is_array($recordData)) {
-                try {
-                    $mappedData = $this->_doMapping($recordData, $headline);
-                    
-                    if (! empty($mappedData)) {
-                        $convertedData = $this->_doConversions($mappedData);
-
-                        // merge additional values (like group id, container id ...)
-                        $mergedData = array_merge($convertedData, $this->_addData($convertedData));
-                        
-                        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Merged data: ' . print_r($mergedData, true));
-                        
-                        // import record into tine!
-                        $importedRecord = $this->_importRecord($mergedData, $result);
-                    } else {
-                        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Got empty record from mapping! Was: ' . print_r($recordData, TRUE));
-                        $result['failcount']++;
-                    }
-                    
-                } catch (Exception $e) {
-                    // don't add incorrect record (name missing for example)
-                    Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' . $e->getMessage());
-                    if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
-                    $result['failcount']++;
-                }
-            } else {
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No array: ' . $recordData);
-            }
-        }
-        
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
-            . ' Import finished. (total: ' . $result['totalcount'] 
-            . ' fail: ' . $result['failcount'] . ' duplicates: ' . $result['duplicatecount']. ')');
-        
-        return $result;
     }
     
     /**
@@ -179,81 +102,65 @@ abstract class Tinebase_Import_Csv_Abstract extends Tinebase_Import_Abstract
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Only got 1 field in line. Wrong delimiter?');
         }
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__
+            . ' Raw data: ' . print_r($lineData, true));
+        
         return $lineData;
     }
     
     /**
-     * do the mapping and replacements
+     * do something before the import
+     * 
+     * @param resource $_resource
+     */
+    protected function _beforeImport($_resource = NULL)
+    {
+        // get headline
+        if (isset($this->_options['headline']) && $this->_options['headline']) {
+            $this->_headline = $this->_getRawData($_resource);
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+                . ' Got headline: ' . implode(', ', $this->_headline));
+            if (! $this->_options['use_headline']) {
+                // just read headline but do not use it
+                $this->_headline = array();
+            }
+        }        
+    }
+    
+    /**
+     * do the mapping
      *
      * @param array $_data
-     * @param array $_headline [optional]
      * @return array
      */
-    protected function _doMapping($_data, $_headline = array())
+    protected function _doMapping($_data)
     {
         $data = array();
         $_data_indexed = array();
 
-        if (! empty($_headline) && sizeof($_headline) == sizeof($_data)) {
-            $_data_indexed = array_combine($_headline, $_data);
+        if (! empty($this->_headline) && sizeof($this->_headline) == sizeof($_data)) {
+            $_data_indexed = array_combine($this->_headline, $_data);
         }
         
         foreach ($this->_options['mapping']['field'] as $index => $field) {
             if (empty($_data_indexed)) {
                 // use import definition order
-                
-                if (! array_key_exists('destination', $field) || $field['destination'] == '' || !isset($_data[$index])) {
+                if (! array_key_exists('destination', $field) || $field['destination'] == '' || ! isset($_data[$index])) {
                     continue;
                 }
-            
-                if (isset($field['replace'])) {
-                    if ($field['replace'] === '\n') {
-                        $_data[$index] = str_replace("\\n", "\r\n", $_data[$index]);
-                    }
-                }
-            
-                if (isset($field['separator'])) {
-                    $data[$field['destination']] = explode($field['separator'], $_data[$index]);
-                } else if (isset($field['fixed'])) {
-                    $data[$field['destination']] = $field['fixed'];
-                } else {
-                    $data[$field['destination']] = $_data[$index];
-                }
+                $data[$field['destination']] = $_data[$index];
             } else {
                 // use order defined by headline
-                
-                if ($field['destination'] == '' || !isset($field['source']) || !isset($_data_indexed[$field['source']])) {
+                if ($field['destination'] == '' || ! isset($field['source']) || ! isset($_data_indexed[$field['source']])) {
                     continue;
                 }
-            
-                if (isset($field['replace'])) {
-                    if ($field['replace'] === '\n') {
-                        $_data_indexed[$field['source']] = str_replace("\\n", "\r\n", $_data_indexed[$field['source']]);
-                    }
-                }
-            
-                if (isset($field['separator'])) {
-                    $data[$field['destination']] = preg_split('/\s*' . $field['separator'] . '\s*/', $_data_indexed[$field['source']]);
-                } else if (isset($field['fixed'])) {
-                    $data[$field['destination']] = $field['fixed'];
-                } else if (isset($field['append'])) {
-                    $data[$field['destination']] .= $field['append'] . $_data_indexed[$field['source']];
-                } else {
-                    $data[$field['destination']] = $_data_indexed[$field['source']];
-                }
+                $data[$field['destination']] = $_data_indexed[$field['source']];
             }
         }
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__
+            . ' Mapped data: ' . print_r($data, true));
+        
         return $data;
-    }
-    
-    /**
-     * add some more values (overwrite that if you need some special/dynamic fields)
-     *
-     * @param  array recordData
-     */
-    protected function _addData()
-    {
-        return array();
     }
 }

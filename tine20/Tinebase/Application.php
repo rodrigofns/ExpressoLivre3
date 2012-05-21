@@ -184,6 +184,8 @@ class Tinebase_Application
         $select = $this->_db->select();
         $select->from($this->_tableName)
                ->where($this->_db->quoteIdentifier('name') . ' = ?', $_applicationName);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' getting application by name: ' . $select->assemble());
 
         $stmt = $this->_db->query($select);
         $queryResult = $stmt->fetch();
@@ -362,20 +364,21 @@ class Tinebase_Application
      * @param   string  right
      * @return  array   right description
      */
-    public function getRightDescription($_applicationId, $_right)
+    public function getAllRightDescriptions($_applicationId)
     {
         $application = Tinebase_Application::getInstance()->getApplicationById($_applicationId);
         
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .
+            ' Getting right descriptions for ' . $application->name );
+        
         // call getAllApplicationRights for application (if it has specific rights)
         $appAclClassName = $application->name . '_Acl_Rights';
-        if ( @class_exists($appAclClassName) ) {
-            $appAclObj = call_user_func(array($appAclClassName, 'getInstance'));
-            $description = $appAclObj->getRightDescription($_right);
-        } else {
-            $description = Tinebase_Acl_Rights::getInstance()->getRightDescription($_right);   
+        if (! @class_exists($appAclClassName)) {
+            $appAclClassName = 'Tinebase_Acl_Rights';
         }
         
-        return $description;
+        $descriptions = call_user_func(array($appAclClassName, 'getTranslatedRightDescriptions'));
+        return $descriptions;
     }
     
     /**
@@ -499,6 +502,7 @@ class Tinebase_Application
         $dataToDelete = array(
             'container'     => array('tablename' => ''),
             'config'        => array('tablename' => ''),
+            'customfield'	=> array('tablename' => ''),
             'rights'        => array('tablename' => 'role_rights'),
             'definitions'   => array('tablename' => 'importexport_definition'),
             'filter'        => array('tablename' => 'filter'),
@@ -516,6 +520,9 @@ class Tinebase_Application
                 case 'config':
                     $count = Tinebase_Config::getInstance()->deleteConfigByApplicationId($_application->getId());
                     break;
+              	case 'customfield':
+              		$count = Tinebase_CustomField::getInstance()->deleteCustomFieldsForApplication($_application->getId());
+              		break;
                 default:
                     if (array_key_exists('tablename', $info) && ! empty($info['tablename'])) {
                         $count = $this->_db->delete(SQL_TABLE_PREFIX . $info['tablename'], $where);

@@ -22,19 +22,28 @@ Ext.ns('Tine.Addressbook');
  */
 Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
     
+    /**
+     * parse address button
+     * @type Ext.Button 
+     */
+    parseAddressButton: null,
+    
     windowNamePrefix: 'ContactEditWindow_',
     appName: 'Addressbook',
     recordClass: Tine.Addressbook.Model.Contact,
     showContainerSelector: true,
+    multipleEdit: true,
     
     getFormItems: function () {
-        
         if (Tine.Tinebase.registry.get('mapPanel') && Tine.widgets.MapPanel) {
-            this.mapPanel = new Tine.widgets.MapPanel({
+            this.mapPanel = new Tine.Addressbook.MapPanel({
+                listeners: {
+                    'add': this.addToDisableOnEditMultiple,
+                    scope: this
+                },
                 layout: 'fit',
                 title: this.app.i18n._('Map'),
-                disabled: (! this.record.get('lon') || this.record.get('lon') === null) && (! this.record.get('lat') || this.record.get('lat') === null),
-                zoom: 15        
+                disabled: (Ext.isEmpty(this.record.get('adr_one_lon')) || Ext.isEmpty(this.record.get('adr_one_lat'))) && (Ext.isEmpty(this.record.get('adr_two_lon')) || Ext.isEmpty(this.record.get('adr_two_lat')))
             });
         } else {
             this.mapPanel = new Ext.Panel({
@@ -50,6 +59,9 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
             border: false,
             plain: true,
             activeTab: 0,
+            plugins: [{
+                ptype : 'ux.tabpanelkeyplugin'
+            }],
             items: [{
                 title: this.app.i18n.n_('Contact', 'Contacts', 1),
                 border: false,
@@ -81,29 +93,25 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                             })]
                         }, {
                             xtype: 'columnform',
-                            items: [[{
-                                columnWidth: 0.35,
+                            items: [[
+                                new Tine.Tinebase.widgets.keyfield.ComboBox({
                                 fieldLabel: this.app.i18n._('Salutation'),
-                                xtype: 'combo',
-                                store: Tine.Addressbook.getSalutationStore(),
-                                name: 'salutation_id',
-                                mode: 'local',
-                                displayField: 'name',
-                                valueField: 'id',
-                                triggerAction: 'all',
-                                forceSelection: true,
+                                name: 'salutation',
+                                app: 'Addressbook',
+                                keyFieldName: 'contactSalutation',
+                                value: '',
+                                columnWidth: 0.35,
                                 listeners: {
-                                	scope: this,
-                                	'select': function (combo, record, index) {
-                                		var jpegphoto = this.getForm().findField('jpegphoto');
-                                		
-                                		// set new empty photo depending on chosen salutation only if user doesn't have own image
-                                		if (Ext.isEmpty(jpegphoto.getValue()) && ! Ext.isEmpty(record.get('image_path'))) {
-                                			jpegphoto.setDefaultImage(record.get('image_path'));
-                                		}
-                                	}
+                                    scope: this,
+                                    'select': function (combo, record, index) {
+                                        var jpegphoto = this.getForm().findField('jpegphoto');
+                                        // set new empty photo depending on chosen salutation only if user doesn't have own image
+                                        if (Ext.isEmpty(jpegphoto.getValue()) && ! Ext.isEmpty(record.json.image)) {
+                                            jpegphoto.setDefaultImage(record.json.image);
+                                        }
+                                    }
                                 }
-                            }, {
+                            }), {
                                 columnWidth: 0.65,
                                 fieldLabel: this.app.i18n._('Title'), 
                                 name: 'n_prefix',
@@ -125,7 +133,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                                 columnWidth: 0.35,
                                 fieldLabel: this.app.i18n._('Last Name'), 
                                 name: 'n_family',
-                                maxLength: 64
+                                maxLength: 255
                             }, {
                                 width: 100,
                                 hidden: true
@@ -134,7 +142,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                                 xtype: 'mirrortextfield',
                                 fieldLabel: this.app.i18n._('Company'), 
                                 name: 'org_name',
-                                maxLength: 64
+                                maxLength: 255
                             }, {
                                 columnWidth: 0.35,
                                 fieldLabel: this.app.i18n._('Unit'), 
@@ -367,11 +375,6 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                 app: this.appName,
                 record_id: (this.record && ! this.copyRecord) ? this.record.id : '',
                 record_model: this.appName + '_Model_' + this.recordClass.getMeta('modelName')
-            }),
-            new Tine.Tinebase.widgets.customfields.CustomfieldsPanel({
-                recordClass: Tine.Addressbook.Model.Contact,
-                disabled: (Tine.Addressbook.registry.get('customfields').length === 0),
-                quickHack: {record: this.record}
             }), this.linkPanel
             ]
         };
@@ -391,7 +394,15 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
             } : {}
         });
         
-        // export lead handler for edit contact dialog
+        this.initToolbar();
+        
+        this.supr().initComponent.apply(this, arguments);    
+    },
+    
+    /**
+     * initToolbar
+     */
+    initToolbar: function() {
         var exportContactButton = new Ext.Action({
             id: 'exportButton',
             text: Tine.Tinebase.appMgr.get('Addressbook').i18n._('Export as pdf'),
@@ -400,10 +411,17 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
             disabled: false,
             scope: this
         });
-        var addNoteButton = new Tine.widgets.activities.ActivitiesAddButton({});  
-        this.tbarItems = [exportContactButton, addNoteButton];
+        var addNoteButton = new Tine.widgets.activities.ActivitiesAddButton({});
+        this.parseAddressButton = new Ext.Action({
+            text: Tine.Tinebase.appMgr.get('Addressbook').i18n._('Parse address'),
+            handler: this.onParseAddress,
+            iconCls: 'action_parseAddress',
+            disabled: false,
+            scope: this,
+            enableToggle: true
+        });
         
-        this.supr().initComponent.apply(this, arguments);    
+        this.tbarItems = [exportContactButton, addNoteButton, this.parseAddressButton];
     },
     
     /**
@@ -431,13 +449,30 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
     },
     
     /**
+     * overwrites the isValid method on multipleEdit
+     */
+    isMultipleValid: function() {
+        var isValid = true;
+        if (((this.getForm().findField('n_family').getValue() === '') && (this.getForm().findField('n_family').edited)) 
+            && ((this.getForm().findField('org_name').getValue() === '') && (this.getForm().findField('org_name').edited))) {
+            var invalidString = String.format(this.app.i18n._('Either {0} or {1} must be given'), this.app.i18n._('Last Name'), this.app.i18n._('Company'));
+            this.getForm().findField('n_family').markInvalid(invalidString);
+            this.getForm().findField('org_name').markInvalid(invalidString);
+            
+            isValid = false;
+        }
+        
+        return isValid;
+    },
+    
+    /**
      * export pdf handler
      */
     onExportContact: function () {
         var downloader = new Ext.ux.file.Download({
             params: {
                 method: 'Addressbook.exportContacts',
-                filter: this.record.id,
+                filter: Ext.encode([{field: 'id', operator: 'in', value: this.record.id}]),
                 options: Ext.util.JSON.encode({
                     format: 'pdf'
                 })
@@ -446,11 +481,62 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
         downloader.start();
     },
     
+    /**
+     * parse address handler
+     * 
+     * opens message box where user can paste address
+     * 
+     * @param {Ext.Button} button
+     */
+    onParseAddress: function (button) {
+        if (button.pressed) {
+            Ext.Msg.prompt(this.app.i18n._('Paste address'), this.app.i18n._('Please paste an address that should be parsed:'), function(btn, text) {
+                if (btn == 'ok'){
+                    this.parseAddress(text);
+                } else if (btn == 'cancel') {
+                    button.toggle();
+                }
+            }, this, 100);
+        } else {
+            button.setText(this.app.i18n._('Parse address'));
+            this.tokenModePlugin.endTokenMode();
+        }
+    },
+    
+    /**
+     * send address to server + fills record/form with parsed data + adds unrecognizedTokens to description box
+     * 
+     * @param {String} address
+     */
+    parseAddress: function(address) {
+        Tine.log.debug('parsing address ... ');
+        
+        Tine.Addressbook.parseAddressData(address, function(result, response) {
+            Tine.log.debug('parsed address:');
+            Tine.log.debug(result);
+            
+            // only set the fields that could be detected
+            Ext.iterate(result.contact, function(key, value) {
+                this.record.set(key, value);
+            }, this);
+            
+            var oldNote = (this.record.get('note')) ? this.record.get('note') : '';
+            this.record.set('note', result.unrecognizedTokens.join(' ') + oldNote);
+            this.onRecordLoad();
+            
+            this.parseAddressButton.setText(this.app.i18n._('End token mode'));
+            this.tokenModePlugin.startTokenMode();
+        }, this);
+    },
+    
+    /**
+     * onRecordLoad
+     */
     onRecordLoad: function () {
         // NOTE: it comes again and again till 
         if (this.rendered) {
             var container;
-        	        	
+                        
             // handle default container
             if (! this.record.id) {
                 if (this.forceContainer) {
@@ -465,8 +551,8 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                 this.record.set('container_id', container);
             }
             
-            if (Tine.Tinebase.registry.get('mapPanel') && Tine.widgets.MapPanel && this.record.get('lon') && this.record.get('lon') !== null && this.record.get('lat') && this.record.get('lat') !== null) {
-                this.mapPanel.setCenter(this.record.get('lon'), this.record.get('lat'));
+            if (this.mapPanel instanceof Tine.Addressbook.MapPanel) {
+                this.mapPanel.onRecordLoad(this.record);
             }
         }
         
@@ -482,6 +568,7 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
  * @return {Ext.ux.Window}
  */
 Tine.Addressbook.ContactEditDialog.openWindow = function (config) {
+    
     // if a container is selected in the tree, take this as default container
     var treeNode = Ext.getCmp('Addressbook_Tree') ? Ext.getCmp('Addressbook_Tree').getSelectionModel().getSelectedNode() : null;
     if (treeNode && treeNode.attributes && treeNode.attributes.container.type) {

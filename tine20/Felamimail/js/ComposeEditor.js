@@ -57,6 +57,10 @@ Tine.Felamimail.ComposeEditor = Ext.extend(Ext.form.HtmlEditor, {
         return markup;
     },
     
+		getContainer: function() {
+			return this.iframe;
+		},
+
     /**
      * @private
      */
@@ -66,11 +70,22 @@ Tine.Felamimail.ComposeEditor = Ext.extend(Ext.form.HtmlEditor, {
             new Ext.ux.form.HtmlEditor.IndentOutdent(),  
             new Ext.ux.form.HtmlEditor.RemoveFormat(),
             new Ext.ux.form.HtmlEditor.EndBlockquote(),
+			new Ext.ux.form.HtmlEditor.SpellChecker(),
             new Ext.ux.form.HtmlEditor.SpecialKeys()
         ];
         
         Tine.Felamimail.ComposeEditor.superclass.initComponent.call(this);
-    }
+    },
+         
+    // *Fix* Overridding the onRender method, in order to
+	// unset the height and width property, so that the
+	// layout manager won't consider this field to be of
+	// fixed dimension, thus ignoring the flex option
+    onRender: function () {
+		Tine.Felamimail.ComposeEditor.superclass.onRender.apply(this, arguments);
+		delete this.height;
+		delete this.width;
+	}
 });
 
 Ext.namespace('Ext.ux.form.HtmlEditor');

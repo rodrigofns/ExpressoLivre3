@@ -354,7 +354,7 @@ class Addressbook_Setup_Update_Release3 extends Setup_Update_Abstract
             ->joinLeft(
                 /* table  */ array('accounts' => SQL_TABLE_PREFIX . 'accounts'), 
                 /* on     */ $this->_db->quoteIdentifier('group_members' . '.account_id') . ' = ' . $this->_db->quoteIdentifier('accounts' . '.' . 'id'),
-                /* select */ array('members' => 'GROUP_CONCAT(' . $this->_db->quoteIdentifier('accounts' . '.' . 'contact_id') . ')')
+		        /* select */ array('members' => Tinebase_Backend_Sql_Command::getAggregateFunction($this->_db, $this->_db->quoteIdentifier('accounts' . '.' . 'contact_id')))
             )
             ->where("groups.visibility='displayed' and list_id IS NULL");
             

@@ -244,7 +244,7 @@ Tine.widgets.activities.ActivitiesPanel = Ext.extend(Ext.Panel, {
         }
         
         Tine.widgets.activities.ActivitiesPanel.superclass.initComponent.call(this);
-    }      
+    }
 });
 Ext.reg('tineactivitiespanel', Tine.widgets.activities.ActivitiesPanel);
 
@@ -635,6 +635,9 @@ Tine.widgets.activities.ActivitiesTabPanel = Ext.extend(Ext.Panel, {
         this.on('activate', function (panel) {
             panel.store.load({});
         });
+        
+        // no support for multiple edit
+        this.on('added', Tine.widgets.dialog.EditDialog.prototype.addToDisableOnEditMultiple, this);
         
         Tine.widgets.activities.ActivitiesTabPanel.superclass.initComponent.call(this);
     }
