@@ -120,14 +120,14 @@ Tine.Tinebase.container = {
      */
     path2name: function(path, containerName, containersName) {
         switch (path) {
-            case '/':           return String.format(_('All {0}'), containersName);
-            case '/shared':     return String.format(_('Shared {0}'), containersName);
-            case '/personal':   return String.format(_('Other Users {0}'), containersName);
+            case '/':           return String.format(_('All {0}'), _(containersName));
+            case '/shared':     return String.format(_('Shared {0}'), '');
+            case '/personal':   return String.format(_('Other Users {0}'), '');
         }
         
         if (path === Tine.Tinebase.container.getMyNodePath()
                 || path === Tine.Tinebase.container.getMyFileNodePath()) {
-            return String.format(_('My {0}'), containersName);
+            return String.format(_('My {0}'),_(containersName));
         }
         
         return path;
