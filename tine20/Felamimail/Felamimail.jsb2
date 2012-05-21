@@ -64,6 +64,10 @@
           "path": "js/"
         },
         {
+          "text": "MimeDisplayManager.js",
+          "path": "js/"
+        },
+        {
           "text": "GridDetailsPanel.js",
           "path": "js/"
         },
@@ -77,6 +81,18 @@
         },
         {
           "text": "MessageEditDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "ImportEmlDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "AclsEditDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "AclsGrid.js",
           "path": "js/"
         },
         {

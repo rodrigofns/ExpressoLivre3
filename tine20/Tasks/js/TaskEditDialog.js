@@ -105,22 +105,24 @@ Ext.namespace('Tine.Tasks');
      * @private
      */
     handleCompletedDate: function() {
-        if (this.getForm().findField('status_id') === null) {
-            return;
-        }
         
-        var status = Tine.Tasks.status.getStatus(this.getForm().findField('status_id').getValue());
-        var completed = this.getForm().findField('completed');
+        var statusStore = Tine.Tinebase.widgets.keyfield.StoreMgr.get('Tasks', 'taskStatus'),
+            status = this.getForm().findField('status').getValue(),
+            statusRecord = statusStore.getById(status),
+            completedField = this.getForm().findField('completed');
         
-        if (status.get('status_is_open')) {
-            completed.setValue(null);
-            completed.setDisabled(true);
-        } else {
-            if (! Ext.isDate(completed.getValue())){
-                completed.setValue(new Date());
+        if (statusRecord) {
+            if (statusRecord.get('is_open') !== 0) {
+                completedField.setValue(null);
+                completedField.setDisabled(true);
+            } else {
+                if (! Ext.isDate(completedField.getValue())){
+                    completedField.setValue(new Date());
+                }
+                completedField.setDisabled(false);
             }
-            completed.setDisabled(false);
         }
+        
     },
     
     /**
@@ -129,7 +131,7 @@ Ext.namespace('Tine.Tasks');
      * @return {Boolean}
      */
     isValid: function() {
-        isValid = true;
+        var isValid = true;
         
         var dueField = this.getForm().findField('due'),
             dueDate = dueField.getValue(),
@@ -179,37 +181,54 @@ Ext.namespace('Tine.Tasks');
                         name: 'summary',
                         listeners: {render: function(field){field.focus(false, 250);}},
                         allowBlank: false
-                    }], [ new Ext.ux.form.ClearableDateField({
-                        fieldLabel: this.app.i18n._('Due date'),
-                        name: 'due'
-                    }), new Tine.widgets.Priority.Combo({
-                        fieldLabel: this.app.i18n._('Priority'),
-                        name: 'priority'
-                    }), new Tine.Addressbook.SearchCombo({
-                            emptyText: _('Add Responsible ...'),
+                    }], [new Ext.ux.form.DateTimeField({
+                            allowBlank: true,
+                            defaultTime: '12:00',
+                            fieldLabel: this.app.i18n._('Due date'),
+                            name: 'due'
+                        }), 
+                        new Tine.Tinebase.widgets.keyfield.ComboBox({
+                            fieldLabel: this.app.i18n._('Priority'),
+                            name: 'priority',
+                            app: 'Tasks',
+                            keyFieldName: 'taskPriority',
+                            value: 'NORMAL'
+                        }),
+                        Tine.widgets.form.RecordPickerManager.get('Addressbook', 'Contact', {
                             userOnly: true,
+                            fieldLabel: this.app.i18n._('Organizer'),
+                            emptyText: _('Add Responsible ...'),
+                            useAccountRecord: true,
                             name: 'organizer',
-                            nameField: 'n_fileas',
-                            useAccountRecord: true
-                    })], [{
+                            allowEmpty: true
+                        })
+                    ], [{
                         columnWidth: 1,
                         fieldLabel: this.app.i18n._('Notes'),
                         emptyText: this.app.i18n._('Enter description...'),
                         name: 'description',
                         xtype: 'textarea',
                         height: 200
-                    }], [new Ext.ux.PercentCombo({
-                        fieldLabel: this.app.i18n._('Percentage'),
-                        editable: false,
-                        name: 'percent'
-                    }), new Tine.Tasks.status.ComboBox({
-                        fieldLabel: this.app.i18n._('Status'),
-                        name: 'status_id',
-                        listeners: {scope: this, 'change': this.handleCompletedDate}
-                    }), new Ext.form.DateField({
-                        fieldLabel: this.app.i18n._('Completed'),
-                        name: 'completed'
-                    })]]
+                    }], [
+                        new Ext.ux.PercentCombo({
+                            fieldLabel: this.app.i18n._('Percentage'),
+                            editable: false,
+                            name: 'percent'
+                        }), 
+                        new Tine.Tinebase.widgets.keyfield.ComboBox({
+                            app: 'Tasks',
+                            keyFieldName: 'taskStatus',
+                            fieldLabel: this.app.i18n._('Status'),
+                            name: 'status',
+                            listeners: {scope: this, 'change': this.handleCompletedDate}
+                        }), 
+                        new Ext.ux.form.DateTimeField({
+                            allowBlank: true,
+                            defaultTime: '12:00',
+                            fieldLabel: this.app.i18n._('Completed'),
+                            name: 'completed'
+                        })
+                    ]]
                 }, {
                     // activities and tags
                     layout: 'accordion',
@@ -256,7 +275,7 @@ Ext.namespace('Tine.Tasks');
 Tine.Tasks.TaskEditDialog.openWindow = function (config) {
     var id = (config.record && config.record.id) ? config.record.id : 0;
     var window = Tine.WindowFactory.getWindow({
-        width: 800,
+        width: 900,
         height: 490,
         name: Tine.Tasks.TaskEditDialog.prototype.windowNamePrefix + id,
         contentPanelConstructor: 'Tine.Tasks.TaskEditDialog',

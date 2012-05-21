@@ -96,7 +96,7 @@ Ext.namespace('Tine.Felamimail');
      * validation error message
      * @type String
      */
-     validationErrorMessage: '',
+    validationErrorMessage: '',
     
     /**
      * @private
@@ -174,6 +174,18 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s).')
         });
 
+        this.action_toggleReadingConfirmation = new Ext.Action({
+            text: this.app.i18n._('Reading Confirmation'),
+            handler: this.onToggleReadingConfirmation,
+            iconCls: 'notes_noteIcon',
+            disabled: false,
+            scope: this,
+            enableToggle: true
+        });
+        this.button_toggleReadingConfirmation = Ext.apply(new Ext.Button(this.action_toggleReadingConfirmation), {
+            tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
+        });
+
         this.tbar = new Ext.Toolbar({
             defaults: {height: 55},
             items: [{
@@ -193,7 +205,8 @@ Ext.namespace('Tine.Felamimail');
                     }),
                     this.action_saveAsDraft,
                     this.button_saveEmailNote,
-                    this.action_saveAsTemplate
+                    this.action_saveAsTemplate,
+                    this.button_toggleReadingConfirmation,
                 ]
             }]
         });
@@ -248,6 +261,8 @@ Ext.namespace('Tine.Felamimail');
      */
     initContent: function() {
         if (! this.record.get('body')) {
+            var account = Tine.Tinebase.appMgr.get('Felamimail').getAccountStore().getById(this.record.get('account_id'));
+            
             if (! this.msgBody) {
                 var message = this.getMessageFromConfig();
                           
@@ -257,41 +272,90 @@ Ext.namespace('Tine.Felamimail');
                         return this.recordProxy.fetchBody(message, this.initContent.createDelegate(this));
                     }
                     
-                    this.msgBody = message.get('body');
+                    this.setMessageBody(message, account);
                     
-                    var account = Tine.Tinebase.appMgr.get('Felamimail').getAccountStore().getById(this.record.get('account_id'));
-            
-                    if (account.get('display_format') == 'plain' || (account.get('display_format') == 'content_type' && message.get('body_content_type') == 'text/plain')) {
-                        this.msgBody = Ext.util.Format.nl2br(this.msgBody);
-                    }
-                    
-                    if (this.replyTo) {
-                        var date = (this.replyTo.get('received')) ? this.replyTo.get('received') : new Date();
-                        this.msgBody = String.format(this.app.i18n._('On {0}, {1} wrote'), 
-                            Tine.Tinebase.common.dateTimeRenderer(date), 
-                            Ext.util.Format.htmlEncode(this.replyTo.get('from_name'))
-                        ) + ':<br/>'
-                          + '<blockquote class="felamimail-body-blockquote">' + this.msgBody + '</blockquote><br/>';
-                    } else if (this.forwardMsgs && this.forwardMsgs.length === 1) {
-                        this.msgBody = '<br/>-----' + this.app.i18n._('Original message') + '-----<br/>'
-                            + Tine.Felamimail.GridPanel.prototype.formatHeaders(this.forwardMsgs[0].get('headers'), false, true) + '<br/><br/>'
-                            + this.msgBody + '<br/>';
-                        this.initAttachements(message);
-                    } else if (this.draftOrTemplate) {
+                    if (this.isForwardedMessage() || this.draftOrTemplate) {
                         this.initAttachements(message);
                     }
                 }
-            }
+            } 
+            this.addSignature(account);
             
-            if (! this.draftOrTemplate) {
-                this.msgBody += Tine.Felamimail.getSignature(this.record.get('account_id'))
-            }
-        
             this.record.set('body', this.msgBody);
         }
         
         delete this.msgBody;
         this.onRecordLoad();
+    },
+    
+    /**
+     * set message body: converts newlines, adds quotes
+     * 
+     * @param {Tine.Felamimail.Model.Message} message
+     * @param {Tine.Felamimail.Model.Account} account
+     */
+    setMessageBody: function(message, account) {
+        this.msgBody = message.get('body');
+        
+        if (account.get('display_format') == 'plain' || (account.get('display_format') == 'content_type' && message.get('body_content_type') == 'text/plain')) {
+            this.msgBody = Ext.util.Format.nl2br(this.msgBody);
+        }
+        
+        if (this.replyTo) {
+            this.setMessageBodyReply();
+        } else if (this.isForwardedMessage()) {
+            this.setMessageBodyForward();
+        }
+    },
+    
+    /**
+     * set message body for reply message
+     */
+    setMessageBodyReply: function() {
+        var date = (this.replyTo.get('received')) ? this.replyTo.get('received') : new Date();
+        
+        this.msgBody = String.format(this.app.i18n._('On {0}, {1} wrote'), 
+            Tine.Tinebase.common.dateTimeRenderer(date), 
+            Ext.util.Format.htmlEncode(this.replyTo.get('from_name'))
+        ) + ':<br/>'
+          + '<blockquote class="felamimail-body-blockquote">' + this.msgBody + '</blockquote><br/>';
+    },
+    
+    /**
+     * returns true if message is forwarded
+     * 
+     * @return {Boolean}
+     */
+    isForwardedMessage: function() {
+        return (this.forwardMsgs && this.forwardMsgs.length === 1);
+    },
+    
+    /**
+     * set message body for forwarded message
+     */
+    setMessageBodyForward: function() {
+        this.msgBody = '<br/>-----' + this.app.i18n._('Original message') + '-----<br/>'
+            + Tine.Felamimail.GridPanel.prototype.formatHeaders(this.forwardMsgs[0].get('headers'), false, true) + '<br/><br/>'
+            + this.msgBody + '<br/>';
+    },
+    
+    /**
+     * add signature to message
+     * 
+     * @param {Tine.Felamimail.Model.Account} account
+     */
+    addSignature: function(account) {
+        if (this.draftOrTemplate) {
+            return;
+        }
+
+        var signaturePosition = (account.get('signature_position')) ? account.get('signature_position') : 'below',
+            signature = Tine.Felamimail.getSignature(this.record.get('account_id'));
+        if (signaturePosition == 'below') {
+            this.msgBody += signature;
+        } else {
+            this.msgBody = signature + '<br/><br/>' + this.msgBody;
+        }
     },
     
     /**
@@ -472,21 +536,9 @@ Ext.namespace('Tine.Felamimail');
         if (! this.record.get('subject')) {
             if (! this.subject) {
                 if (this.replyTo) {
-                    // check if there is already a 'Re:' prefix
-                    var replyPrefix = this.app.i18n._('Re:'),
-                        replyPrefixRegexp = new RegExp('^' + replyPrefix, 'i'),
-                        replySubject = (this.replyTo.get('subject')) ? this.replyTo.get('subject') : '';
-                        
-                    if (! replySubject.match(replyPrefixRegexp)) {
-                        this.subject = replyPrefix + ' ' +  replySubject;
-                    } else {
-                        this.subject = replySubject;
-                    }
+                    this.setReplySubject();
                 } else if (this.forwardMsgs) {
-                    this.subject =  this.app.i18n._('Fwd:') + ' ';
-                    this.subject += this.forwardMsgs.length === 1 ?
-                        this.forwardMsgs[0].get('subject') :
-                        String.format(this.app.i18n._('{0} Message', '{0} Messages', this.forwardMsgs.length));
+                    this.setForwardSubject();
                 } else if (this.draftOrTemplate) {
                     this.subject = this.draftOrTemplate.get('subject');
                 }
@@ -495,6 +547,29 @@ Ext.namespace('Tine.Felamimail');
         }
         
         delete this.subject;
+    },
+    
+    /**
+     * setReplySubject -> this.subject
+     * 
+     * removes existing prefixes + just adds 'Re: '
+     */
+    setReplySubject: function() {
+        var replyPrefix = 'Re: ',
+            replySubject = (this.replyTo.get('subject')) ? this.replyTo.get('subject') : '',
+            replySubject = replySubject.replace(/^((re|aw|antw|fwd|odp|sv|wg|tr):\s*)*/i, replyPrefix);
+            
+        this.subject = replySubject;
+    },
+    
+    /**
+     * setForwardSubject -> this.subject
+     */
+    setForwardSubject: function() {
+        this.subject =  this.app.i18n._('Fwd:') + ' ';
+        this.subject += this.forwardMsgs.length === 1 ?
+            this.forwardMsgs[0].get('subject') :
+            String.format(this.app.i18n._('{0} Message', '{0} Messages', this.forwardMsgs.length));
     },
     
     /**
@@ -577,6 +652,13 @@ Ext.namespace('Tine.Felamimail');
     },
     
     /**
+     * toggle Request Reading Confirmation
+     */
+    onToggleReadingConfirmation: function () {
+        this.record.set('reading_conf', (! this.record.get('reading_conf')));
+    },
+
+    /**
      * search for contacts as recipients
      */
     onSearchContacts: function() {
@@ -633,12 +715,13 @@ Ext.namespace('Tine.Felamimail');
         var attachmentData = null;
         
         this.attachmentGrid.store.each(function(attachment) {
-            this.record.data.attachments.push(Ext.ux.file.Uploader.file.getFileData(attachment));
+            this.record.data.attachments.push(Ext.ux.file.Upload.file.getFileData(attachment));
         }, this);
         
-        var accountId = this.accountCombo.getValue();
+        var accountId = this.accountCombo.getValue(),
             account = this.accountCombo.getStore().getById(accountId),
             emailFrom = account.get('email');
+            
         this.record.set('from_email', emailFrom);
         
         Tine.Felamimail.MessageEditDialog.superclass.onRecordUpdate.call(this);

@@ -6,7 +6,7 @@
  * @subpackage  Controller
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2007-2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -59,28 +59,6 @@ class ExampleApplication_Controller extends Tinebase_Controller_Event implements
     }
     
     /**
-     * temporaray function to get a default container]
-     * 
-     * @param string $_referingApplication
-     * @return Tinebase_Model_Container container
-     * 
-     * @todo replace this by Tinebase_Container::getDefaultContainer
-     */
-    public function getDefaultContainer($_referingApplication = 'tasks')
-    {
-        $taskConfig = Tinebase_Core::getConfig()->tasks;
-        $configString = 'defaultcontainer_' . ( empty($_referingApplication) ? 'tasks' : $_referingApplication );
-        
-        if (isset($taskConfig->$configString)) {
-            $defaultContainer = Tinebase_Container::getInstance()->getContainerById((int)$taskConfig->$configString);
-        } else {
-            $defaultContainer = Tinebase_Container::getInstance()->getDefaultContainer($this->_currentAccount->accountId, 'ExampleApplication');
-        }
-        
-        return $defaultContainer;
-    }
-        
-    /**
      * creates the initial folder for new accounts
      *
      * @param mixed[int|Tinebase_Model_User] $_account   the accountd object
@@ -90,16 +68,17 @@ class ExampleApplication_Controller extends Tinebase_Controller_Event implements
     {
         $translation = Tinebase_Translation::getTranslation('ExampleApplication');
         
-        $accountId = Tinebase_Model_User::convertUserIdToInt($_accountId);
-        $account = Tinebase_User::getInstance()->getUserById($accountId);
+        $account = Tinebase_User::getInstance()->getUserById($_accountId);
+        
         $newContainer = new Tinebase_Model_Container(array(
             'name'              => sprintf($translation->_("%s's personal example records"), $account->accountFullName),
             'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
+            'owner_id'          => $_accountId,
             'backend'           => 'Sql',
             'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('ExampleApplication')->getId() 
         ));
         
-        $personalContainer = Tinebase_Container::getInstance()->addContainer($newContainer, NULL, FALSE, $accountId);
+        $personalContainer = Tinebase_Container::getInstance()->addContainer($newContainer);
         $container = new Tinebase_Record_RecordSet('Tinebase_Model_Container', array($personalContainer));
         
         return $container;

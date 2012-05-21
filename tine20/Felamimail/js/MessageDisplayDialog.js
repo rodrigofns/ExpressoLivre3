@@ -58,8 +58,7 @@ Tine.Felamimail.MessageDisplayDialog = Ext.extend(Tine.Felamimail.GridDetailsPan
         this.action_forward = new Ext.Action({
             text: this.app.i18n._('Forward'),
             handler: this.onMessageForward.createDelegate(this),
-            iconCls: 'action_email_forward',
-            disabled: this.record.id.match(/_/)
+            iconCls: 'action_email_forward'
         });
 
         this.action_download = new Ext.Action({
@@ -185,7 +184,8 @@ Tine.Felamimail.MessageDisplayDialog = Ext.extend(Tine.Felamimail.GridDetailsPan
             params: {
                 method: 'Felamimail.downloadMessage',
                 requestType: 'HTTP',
-                messageId: this.record.id
+                messageId: this.record.id,
+                filter : ''
             }
         }).start();
     },

@@ -224,6 +224,123 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
         return $result;
     }
     
+     /**
+     * get acls for a folder
+     * 
+     * @param  string $box which folder to get the acls
+     * @return bool|array false if error, array with all users and the acls of this user for this folder.
+     * @throws Zend_Mail_Protocol_Exception
+     */
+    public function getFolderAcls($box = 'INBOX'){
+       
+        $this->sendRequest("GETACL", array($this->escapeString($box)), $tag);
+
+        $result = array();
+        while (!$this->readLine($tokens, $tag)) {
+            $result = $tokens;
+        }
+        
+        if ($tokens[0] != 'OK') {
+            return false;
+        }else{
+            $results = Array();
+            for($i = 2; $i < count($result); $i = $i+2){
+                $writeacl = false;
+                $readacl = false;
+                
+                if(stristr($result[$i+1],'w')){
+                    $writeacl = true;
+                }
+                if(stristr($result[$i+1],'r')){
+                    $readacl = true;
+                }   
+                try{    
+                $user =  Tinebase_User::getInstance()->getFullUserByLoginName($result[$i])->toArray();
+                $current = Tinebase_Core::getUser()->toArray();
+                
+                if($current['accountId'] == $user['accountId'])
+                    continue;
+                
+                $account_name = Array('accountId' => $user['accountId'],
+                                     'accountDisplayName' => $user['accountDisplayName'], 
+                                     'accountFullName' => $user['accountFullName'],
+                                     'accountFirstName' => $user['accountFirstName'],
+                                     'accountLastName' => $user['accountLastName'],
+                                     'contact_id' => $user['contact_id']);
+                                     
+               
+                $results[] = Array('account_name' => $account_name, 'account_id' => $user['accountLoginName'], 'readacl' => $readacl, 'writeacl' => $writeacl);
+                }catch(Exception $e){
+                    
+                }
+                
+            }
+        }
+        $return = Array('results' => $results, 'totalcount' => count($results));
+        
+       
+        return $return;
+    
+    }
+    
+        
+     /**
+     * set acls for a folder
+     * 
+     * @param  string $box which folder to get the acls
+     * @param  array $acls the acls
+     * @return bool|array false if error, array with all users and the acls of this user for this folder.
+     * @throws Zend_Mail_Protocol_Exception
+     */
+    public function setFolderAcls($box, $acls)
+    {
+       
+        $folderList = $this->listMailbox('INBOX');
+        $currentAcls = $this->getFolderAcls('INBOX');
+        $currentAcls = $currentAcls['results'];
+        
+        foreach($currentAcls as $index => $currentAcl){
+            $find = false;
+            foreach($acls as $acl){
+                if($currentAcl['account_id'] == $acl['account_id']){
+                    $find= true;
+                    break 1;
+                    }
+            }
+            if(!$find){
+               $currentAcls[$index]['writeacl'] = false;
+               $currentAcls[$index]['readacl'] = false;
+               $acls[]=$currentAcls[$index];
+            }
+        }
+        
+        foreach($acls as $user){
+            if($user['account_data']){
+                $tmpUser =  Tinebase_User::getInstance()->getFullUserById($user['account_id'])->toArray();
+                $login = $tmpUser['accountLoginName'];
+            }else{
+                $login = $user['account_id'];
+            }
+            foreach($folderList as $folder => $value){
+                $currentUser = Tinebase_Core::getUser()->toArray();
+                $this->setACL($folder, $currentUser['accountId'], 'lrswipcda');
+                if($user['writeacl']){
+                    $setACL = $this->setACL($folder, $login, 'lrswipcd');
+                    }
+                elseif($user['readacl']){
+                    $setACL = $this->setACL($folder, $login, 'lrs');
+                    }
+                else{
+                    $setACL = $this->setACL($folder, $login, '');
+                    
+                    }
+            }    
+        }
+        
+        return true;
+    
+    }
+    
     /**
      * Open connection to IMAP server
      * - overwritten to adjust connection timeout (static late binding/timeout is defined as constant) :(

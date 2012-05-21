@@ -1,151 +1,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Phone\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2011-05-13 21:13+0100\n"
-"Last-Translator: Philipp Schuele <p.schuele@metaways.de>\n"
+"PO-Revision-Date: 2012-02-28 18:35+0000\n"
+"Last-Translator: ph_il <p.schuele@metaways.de>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
+"X-Generator: Launchpad (build 14886)\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-
-#: js/Phone.js:29 js/Phone.js:479 js/Phone.js:480
-msgid "Edit phone settings"
-msgstr "Telefoneinstellungen bearbeiten"
-
-#: js/Phone.js:59 js/Phone.js:254 js/Models.js:69
-msgid "Phone"
-msgid_plural "Phones"
-msgstr[0] "Telefon"
-msgstr[1] "Telefone"
-
-#: js/Phone.js:70
-msgid "Phones"
-msgstr "Telefone"
-
-#: js/Phone.js:277
-msgid "Line"
-msgstr "Leitung"
-
-#: js/Phone.js:286
-msgid "Number"
-msgstr "Nummer"
-
-#: js/Phone.js:295
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: js/Phone.js:305
-msgid "Dial"
-msgstr "Wählen"
-
-#: js/Phone.js:325
-msgid "Error"
-msgstr "Fehler"
-
-#: js/Phone.js:326
-msgid "Not possible to dial."
-msgstr "Wählen nicht möglich."
-
-#: js/Phone.js:469
-msgid "Dial number"
-msgstr "Nummer wählen"
-
-#: js/Phone.js:470
-msgid "Initiate a new outgoing call"
-msgstr "Neuer ausgehender Anruf"
-
-#: js/Phone.js:531
-msgid "Incoming call"
-msgstr "Eingehender Anruf"
-
-#: js/Phone.js:535
-msgid "Outgoing call"
-msgstr "Ausgehender Anruf"
-
-#: js/Phone.js:543
-msgid "unknown number"
-msgstr "Unbekannte Rufnummer"
-
-#: js/Phone.js:580
-msgid "Search:"
-msgstr "Suche:"
-
-#: js/Phone.js:665
-msgid "Source or Destination"
-msgstr "Quelle oder Ziel"
-
-#: js/Phone.js:681
-msgid "Displaying calls {0} - {1} of {2}"
-msgstr "Anrufe  {0} - {1} of {2} anzeigen"
-
-#: js/Phone.js:682 js/Phone.js:725
-msgid "No calls to display"
-msgstr "Keine Anrufe"
-
-#: js/Phone.js:692
-msgid "Direction"
-msgstr "Richtung"
-
-#: js/Phone.js:693
-msgid "Source"
-msgstr "Quelle"
-
-#: js/Phone.js:694
-msgid "Caller Id"
-msgstr "Eigene Rufnummer"
-
-#: js/Phone.js:695
-msgid "Destination"
-msgstr "Gesprächspartner"
-
-#: js/Phone.js:696
-msgid "Start"
-msgstr "Start"
-
-#: js/Phone.js:697
-msgid "Connected"
-msgstr "Verbunden"
-
-#: js/Phone.js:698
-msgid "Disconnected"
-msgstr "Getrennt"
-
-#: js/Phone.js:699
-msgid "Duration"
-msgstr "Dauer"
-
-#: js/Phone.js:700
-msgid "Ringing"
-msgstr "Klingeln"
-
-#: js/Phone.js:701
-msgid "Call ID"
-msgstr "Anruf-ID"
 
 #: js/AddressbookGridPanelHook.js:35
 msgid "Call contact"
 msgstr "Kontakt anrufen"
 
-#: js/AddressbookGridPanelHook.js:172
+#: js/AddressbookGridPanelHook.js:171
 msgid "Work"
 msgstr "Geschäftlich"
 
-#: js/AddressbookGridPanelHook.js:181
+#: js/AddressbookGridPanelHook.js:180
 msgid "Home"
 msgstr "Privat"
 
-#: js/AddressbookGridPanelHook.js:190
+#: js/AddressbookGridPanelHook.js:189
 msgid "Cell"
 msgstr "Handy"
 
-#: js/AddressbookGridPanelHook.js:199
+#: js/AddressbookGridPanelHook.js:198
 msgid "Cell private"
 msgstr "Handy privat"
+
+#: js/Models.js:69 js/Phone.js:59 js/Phone.js:265
+msgid "Phone"
+msgid_plural "Phones"
+msgstr[0] "Telefon"
+msgstr[1] "Telefone"
 
 #: js/Models.js:73
 msgid "phones list"
@@ -153,161 +48,269 @@ msgid_plural "phones lists"
 msgstr[0] "Telefonliste"
 msgstr[1] "Telefonlisten"
 
-#~ msgid "Dial phone number"
-#~ msgstr "Telefonnummer wählen"
+#: js/Phone.js:29 js/Phone.js:490 js/Phone.js:491
+msgid "Edit phone settings"
+msgstr "Telefoneinstellungen bearbeiten"
 
-#~ msgid "Name"
-#~ msgstr "Name"
+#: js/Phone.js:70
+msgid "Phones"
+msgstr "Telefone"
 
-#~ msgid "Phone Model"
-#~ msgstr "Telefon"
+#: js/Phone.js:288
+msgid "Line"
+msgstr "Leitung"
 
-#~ msgid "MAC Address"
-#~ msgstr "MAC Adresse"
+#: js/Phone.js:297
+msgid "Number"
+msgstr "Nummer"
 
-#~ msgid "infos"
-#~ msgstr "Informationen"
+#: js/Phone.js:306
+msgid "Cancel"
+msgstr "Abbrechen"
 
-#~ msgid "Current IP Address"
-#~ msgstr "Derzeitige IP Adresse"
+#: js/Phone.js:316
+msgid "Dial"
+msgstr "Wählen"
 
-#~ msgid "Firmware last checked at"
-#~ msgstr "Letzter Firmware check"
+#: js/Phone.js:336
+msgid "Error"
+msgstr "Fehler"
 
-#~ msgid "Current Software Version"
-#~ msgstr "Derzeitige Software Version"
+#: js/Phone.js:337
+msgid "Not possible to dial."
+msgstr "Wählen nicht möglich."
 
-#~ msgid "Settings Loaded at"
-#~ msgstr "Laden der Einstellungen"
+#: js/Phone.js:480
+msgid "Dial number"
+msgstr "Nummer wählen"
 
-#~ msgid "redirection"
-#~ msgstr "Weiterleitung"
+#: js/Phone.js:481
+msgid "Initiate a new outgoing call"
+msgstr "Neuer ausgehender Anruf"
 
-#~ msgid "redirect_event"
-#~ msgstr "weiterleitungs anlass"
+#: js/Phone.js:542
+msgid "Incoming call"
+msgstr "Eingehender Anruf"
 
-#~ msgid "all"
-#~ msgstr "Alle"
+#: js/Phone.js:546
+msgid "Outgoing call"
+msgstr "Ausgehender Anruf"
 
-#~ msgid "busy"
-#~ msgstr "belegt"
+#: js/Phone.js:554
+msgid "unknown number"
+msgstr "Unbekannte Rufnummer"
 
-#~ msgid "none"
-#~ msgstr "Keine"
+#: js/Phone.js:591
+msgid "Search:"
+msgstr "Suche:"
 
-#~ msgid "time"
-#~ msgstr "Zeit"
+#: js/Phone.js:676
+msgid "Source or Destination"
+msgstr "Quelle oder Ziel"
 
-#~ msgid "redirect_number"
-#~ msgstr "Weiterleitungs  Nummer"
+#: js/Phone.js:692
+msgid "Displaying calls {0} - {1} of {2}"
+msgstr "Anrufe  {0} - {1} of {2} anzeigen"
 
-#~ msgid "redirect_time"
-#~ msgstr "Weiterleitungs Zeit"
+#: js/Phone.js:693 js/Phone.js:736
+msgid "No calls to display"
+msgstr "Keine Anrufe"
 
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
+#: js/Phone.js:703
+msgid "Direction"
+msgstr "Richtung"
 
-#~ msgid "web_language"
-#~ msgstr "Sprache des Web-Interfaces"
+#: js/Phone.js:704
+msgid "Source"
+msgstr "Quelle"
 
-#~ msgid "- factory default -"
-#~ msgstr "- Firmen Einstellungen -"
+#: js/Phone.js:705
+msgid "Caller Id"
+msgstr "Eigene Rufnummer"
 
-#~ msgid "language"
-#~ msgstr "Sprache"
+#: js/Phone.js:706
+msgid "Destination"
+msgstr "Gesprächspartner"
 
-#~ msgid "display_method"
-#~ msgstr "Anzeige Methode"
+#: js/Phone.js:707
+msgid "Start"
+msgstr "Start"
 
-#~ msgid "whole url"
-#~ msgstr "Vollständige URL"
+#: js/Phone.js:708
+msgid "Connected"
+msgstr "Verbunden"
 
-#~ msgid "name"
-#~ msgstr "Name"
+#: js/Phone.js:709
+msgid "Disconnected"
+msgstr "Getrennt"
 
-#~ msgid "number"
-#~ msgstr "Nummer"
+#: js/Phone.js:710
+msgid "Duration"
+msgstr "Dauer"
 
-#~ msgid "name + number"
-#~ msgstr "Name + Nummer"
+#: js/Phone.js:711
+msgid "Ringing"
+msgstr "Klingeln"
 
-#~ msgid "number + name"
-#~ msgstr "Nummer + Name"
+#: js/Phone.js:712
+msgid "Call ID"
+msgstr "Anruf-ID"
 
-#~ msgid "call_waiting"
-#~ msgstr "Anruf Wartet"
+msgid "Dial phone number"
+msgstr "Telefonnummer wählen"
 
-#~ msgid "on"
-#~ msgstr "An"
+msgid "Name"
+msgstr "Name"
 
-#~ msgid "visual"
-#~ msgstr "Wählen"
+msgid "Phone Model"
+msgstr "Telefon"
 
-#~ msgid "ringer"
-#~ msgstr "Leitung"
+msgid "MAC Address"
+msgstr "MAC Adresse"
 
-#~ msgid "off"
-#~ msgstr "Aus"
+msgid "infos"
+msgstr "Informationen"
 
-#~ msgid "mwi_notification"
-#~ msgstr "MWI Benachrichtigung"
+msgid "Current IP Address"
+msgstr "Derzeitige IP Adresse"
 
-#~ msgid "silent"
-#~ msgstr "Stumm"
+msgid "Firmware last checked at"
+msgstr "Letzter Firmware check"
 
-#~ msgid "beep"
-#~ msgstr "Signalton"
+msgid "Current Software Version"
+msgstr "Derzeitige Software Version"
 
-#~ msgid "reminder"
-#~ msgstr "Erinnerung"
+msgid "Settings Loaded at"
+msgstr "Laden der Einstellungen"
 
-#~ msgid "mwi_dialtone"
-#~ msgstr "MWI Klingelton"
+msgid "redirection"
+msgstr "Weiterleitung"
 
-#~ msgid "normal"
-#~ msgstr "Normal"
+msgid "redirect_event"
+msgstr "weiterleitungs anlass"
 
-#~ msgid "stutter"
-#~ msgstr "Stutter"
+msgid "all"
+msgstr "Alle"
 
-#~ msgid "headset_device"
-#~ msgstr "Headset Gerät"
+msgid "busy"
+msgstr "belegt"
 
-#~ msgid "headset_rj"
-#~ msgstr "Headset RJ"
+msgid "none"
+msgstr "Keine"
 
-#~ msgid "message_led_other"
-#~ msgstr "Andere LED"
+msgid "time"
+msgstr "Zeit"
 
-#~ msgid "global_missed_counter"
-#~ msgstr "Genereller verpasst Zähler"
+msgid "redirect_number"
+msgstr "Weiterleitungs  Nummer"
 
-#~ msgid "scroll_outgoing"
-#~ msgstr "Blättern"
+msgid "redirect_time"
+msgstr "Weiterleitungs Zeit"
 
-#~ msgid "show_local_line"
-#~ msgstr "Meine Nummer"
+msgid "Settings"
+msgstr "Einstellungen"
 
-#~ msgid "show_call_status"
-#~ msgstr "Anruf Status"
+msgid "web_language"
+msgstr "Sprache des Web-Interfaces"
 
-#~ msgid "lineactive"
-#~ msgstr "Aktive Leitung"
+msgid "- factory default -"
+msgstr "- Firmen Einstellungen -"
 
-#~ msgid "sipCombo"
-#~ msgstr "SIP Auswahl"
+msgid "language"
+msgstr "Sprache"
 
-#~ msgid "Idle Text"
-#~ msgstr "Ruhezustands Nachricht"
+msgid "display_method"
+msgstr "Anzeige Methode"
 
-#~ msgid "Lines"
-#~ msgstr "Leitung"
+msgid "whole url"
+msgstr "Vollständige URL"
 
-#~ msgid "Users"
-#~ msgstr "Benutzer"
+msgid "name"
+msgstr "Name"
 
-#~ msgid "Rights"
-#~ msgstr "Rechte"
+msgid "number"
+msgstr "Nummer"
 
-#~ msgid "enter searchfilter"
-#~ msgstr "Suchfilter eingeben"
+msgid "name + number"
+msgstr "Name + Nummer"
+
+msgid "number + name"
+msgstr "Nummer + Name"
+
+msgid "call_waiting"
+msgstr "Anruf Wartet"
+
+msgid "on"
+msgstr "An"
+
+msgid "visual"
+msgstr "Wählen"
+
+msgid "ringer"
+msgstr "Leitung"
+
+msgid "off"
+msgstr "Aus"
+
+msgid "mwi_notification"
+msgstr "MWI Benachrichtigung"
+
+msgid "silent"
+msgstr "Stumm"
+
+msgid "beep"
+msgstr "Signalton"
+
+msgid "reminder"
+msgstr "Erinnerung"
+
+msgid "mwi_dialtone"
+msgstr "MWI Klingelton"
+
+msgid "normal"
+msgstr "Normal"
+
+msgid "stutter"
+msgstr "Stutter"
+
+msgid "headset_device"
+msgstr "Headset Gerät"
+
+msgid "headset_rj"
+msgstr "Headset RJ"
+
+msgid "message_led_other"
+msgstr "Andere LED"
+
+msgid "global_missed_counter"
+msgstr "Genereller verpasst Zähler"
+
+msgid "scroll_outgoing"
+msgstr "Blättern"
+
+msgid "show_local_line"
+msgstr "Meine Nummer"
+
+msgid "show_call_status"
+msgstr "Anruf Status"
+
+msgid "lineactive"
+msgstr "Aktive Leitung"
+
+msgid "sipCombo"
+msgstr "SIP Auswahl"
+
+msgid "Idle Text"
+msgstr "Ruhezustands Nachricht"
+
+msgid "Lines"
+msgstr "Leitung"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Rights"
+msgstr "Rechte"
+
+msgid "enter searchfilter"
+msgstr "Suchfilter eingeben"

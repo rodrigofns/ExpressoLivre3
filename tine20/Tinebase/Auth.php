@@ -235,7 +235,7 @@ class Tinebase_Auth
     {
         if (!isset(self::$_backendType)) {
             if (Setup_Controller::getInstance()->isInstalled('Tinebase')) {
-                self::setBackendType(Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::AUTHENTICATIONBACKENDTYPE, null, self::SQL)->value);
+                self::setBackendType(Tinebase_Config::getInstance()->getConfig(Tinebase_Config::AUTHENTICATIONBACKENDTYPE, null, self::SQL)->value);
             } else {
                 self::setBackendType(self::SQL); 
             }
@@ -290,7 +290,9 @@ class Tinebase_Auth
             }
         } else {
             if ( ! array_key_exists($_key, $defaultValues)) {
-                throw new Tinebase_Exception_InvalidArgument("Cannot set backend configuration option '$_key' for authentication provider " . self::getConfiguredBackend());
+                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .
+                    "Cannot set backend configuration option '$_key' for accounts storage " . self::getConfiguredBackend());
+                return;
             }
             self::$_backendConfiguration[$_key] = $_value;
         }
@@ -321,8 +323,8 @@ class Tinebase_Auth
      */
     public static function saveBackendConfiguration()
     {
-        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::AUTHENTICATIONBACKEND, Zend_Json::encode(self::getBackendConfiguration()));
-        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::AUTHENTICATIONBACKENDTYPE, self::getConfiguredBackend());
+        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Config::AUTHENTICATIONBACKEND, Zend_Json::encode(self::getBackendConfiguration()));
+        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Config::AUTHENTICATIONBACKENDTYPE, self::getConfiguredBackend());
     }
     
     /**
@@ -336,7 +338,7 @@ class Tinebase_Auth
         //lazy loading for $_backendConfiguration
         if (!isset(self::$_backendConfiguration)) {
             if (Setup_Controller::getInstance()->isInstalled('Tinebase')) {
-                $rawBackendConfiguration = Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::AUTHENTICATIONBACKEND, null, array())->value;
+                $rawBackendConfiguration = Tinebase_Config::getInstance()->getConfig(Tinebase_Config::AUTHENTICATIONBACKEND, null, array())->value;
             } else {
                 $rawBackendConfiguration = array();
             }

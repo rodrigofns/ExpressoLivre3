@@ -4,10 +4,10 @@
  * @package     Tasks
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2007-2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
- 
+
 Ext.namespace('Tine.Tasks');
 
 /**
@@ -43,6 +43,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     gridConfig: {
         clicksToEdit: 'auto',
         quickaddMandatory: 'summary',
+        resetAllOnNew: false,
         autoExpandColumn: 'summary',
         // drag n drop
         enableDragDrop: true,
@@ -79,12 +80,12 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * @private
      */
     initFilterToolbar: function() {
-        this.filterToolbar = new Tine.widgets.grid.FilterToolbar({
+        this.filterToolbar = new Tine.widgets.grid.FilterPanel({
             recordClass: this.recordClass,
+            app: this.app,
             filterModels: Tine.Tasks.Task.getFilterModel(),
             defaultFilter: 'query',
             filters: [
-                {field: 'status_id', operator: 'notin', value: Tine.Tasks.status.getClosedStatus()},
                 {field: 'container_id', operator: 'equals', value: {path: Tine.Tinebase.container.getMyNodePath()}}
             ],
             plugins: [
@@ -92,6 +93,7 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             ]
         });
     },
+
     
     /**
      * returns cm
@@ -116,26 +118,34 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 emptyText: this.app.i18n._('Add a task...')
             })
         }, {
-            id: 'due',
+        	id: 'due',
             header: this.app.i18n._("Due Date"),
-            width: 60,
+			width: 145,
             dataIndex: 'due',
-            renderer: Tine.Tinebase.common.dateRenderer,
-            editor: new Ext.ux.form.ClearableDateField({}),
-            quickaddField: new Ext.ux.form.ClearableDateField({})
+            renderer: Tine.Tinebase.common.dateTimeRenderer,
+            editor: new Ext.ux.form.DateTimeField({
+                defaultTime: '12:00',
+            	allowBlank: true
+            }),
+            quickaddField: new Ext.ux.form.DateTimeField({
+                defaultTime: '12:00',
+            	allowBlank: true
+            })
         }, {
             id: 'priority',
             header: this.app.i18n._("Priority"),
-            width: 45,
+            width: 65,
             dataIndex: 'priority',
-            renderer: Tine.widgets.Priority.renderer,
-            editor: new Tine.widgets.Priority.Combo({
-                allowBlank: false,
-                autoExpand: true,
-                blurOnSelect: true
-            }),
-            quickaddField: new Tine.widgets.Priority.Combo({
-                autoExpand: true
+            renderer: Tine.Tinebase.widgets.keyfield.Renderer.get('Tasks', 'taskPriority'),
+            editor: {
+                xtype: 'widget-keyfieldcombo',
+                app: 'Tasks',
+                keyFieldName: 'taskPriority'
+            },
+            quickaddField: new Tine.Tinebase.widgets.keyfield.ComboBox({
+                app: 'Tasks',
+                keyFieldName: 'taskPriority',
+                value: 'NORMAL'
             })
         }, {
             id: 'percent',
@@ -151,18 +161,20 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 autoExpand: true
             })
         }, {
-            id: 'status_id',
+            id: 'status',
             header: this.app.i18n._("Status"),
-            width: 45,
-            dataIndex: 'status_id',
-            renderer: Tine.Tasks.status.getStatusIcon,
-            editor: new Tine.Tasks.status.ComboBox({
-                autoExpand: true,
-                blurOnSelect: true,
-                listClass: 'x-combo-list-small'
-            }),
-            quickaddField: new Tine.Tasks.status.ComboBox({
-                autoExpand: true
+            width: 85,
+            dataIndex: 'status',
+            renderer: Tine.Tinebase.widgets.keyfield.Renderer.get('Tasks', 'taskStatus'),
+            editor: {
+                xtype: 'widget-keyfieldcombo',
+                app: 'Tasks',
+                keyFieldName: 'taskStatus'
+            },
+            quickaddField: new Tine.Tinebase.widgets.keyfield.ComboBox({
+                app: 'Tasks',
+                keyFieldName: 'taskStatus',
+                value: 'NEEDS-ACTION'
             })
         }, {
             id: 'creation_time',
@@ -181,22 +193,16 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         }, {
             id: 'organizer',
             header: this.app.i18n._('Responsible'),
-            width: 150,
+            width: 200,
             dataIndex: 'organizer',
             renderer: Tine.Tinebase.common.accountRenderer,
-            quickaddField: new Tine.Addressbook.SearchCombo({
-                // at the moment we support accounts only
+            quickaddField: Tine.widgets.form.RecordPickerManager.get('Addressbook', 'Contact', {
                 userOnly: true,
-                nameField: 'n_fileas',
+                useAccountRecord: true,
                 blurOnSelect: true,
                 selectOnFocus: true,
-                value: Tine.Tinebase.registry.get('currentAccount').accountDisplayName,
-                selectedRecord: new Tine.Addressbook.Model.Contact(Tine.Tinebase.registry.get('userContact')),
-                getValue: function() {
-                    if (this.selectedRecord) {
-                        return this.selectedRecord.get('account_id');
-                    }
-                }
+                allowEmpty: true,
+                value: Tine.Tinebase.registry.get('currentAccount')
             })
         }]
         });
@@ -249,9 +255,12 @@ Tine.Tasks.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      */
     getViewRowClass: function(record, index) {
         var due = record.get('due');
-        
+         
         var className = '';
-        if (due) {
+        
+        if(record.get('status') == 'COMPLETED') {
+            className += 'tasks-grid-completed';
+        } else  if (due) {
             var dueDay = due.format('Y-m-d');
             var today = new Date().format('Y-m-d');
 

@@ -185,6 +185,12 @@
     width: 100%;
 }
 
+.preview-panel-felamimail-signature {
+    margin-top: 5px;
+    background-color: #e8e8e8;
+    width: 100%;
+}
+
 /* note: el tyle of html areas underling textarea are copied to iframe*/
 .felamimail-message-body-html, 
 .preview-panel-felamimail-body {

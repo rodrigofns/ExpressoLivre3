@@ -26,7 +26,8 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
 
     windowNamePrefix: 'AdminTagEditDialog_',
     id: 'tagDialog',
-    layout: 'hfit',
+    layout: 'fit',
+    border: false,
     labelWidth: 120,
     labelAlign: 'top',
     
@@ -190,6 +191,7 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
             hasAccountPrefix: true,
             selectType: 'both',
             selectTypeDefault: 'group',
+            showHidden: true,
             configColumns: [
                 new Ext.ux.grid.CheckColumn({
                     header: this.translation.gettext('View'),
@@ -205,11 +207,10 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
         });
 
         var editTagDialog = {
-            layout: 'hfit',
+            layout: 'border',
             border: false,
-            width: 600,
-            height: 350,
             items: [{
+            	region: 'north',
                 xtype: 'columnform',
                 border: false,
                 autoHeight: true,
@@ -224,7 +225,7 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
                     name: 'description',
                     fieldLabel: this.translation.gettext('Description'),
                     anchor: '100%',
-                    maxLength: 50
+                    maxLength: 256
                 }, {
                     xtype: 'colorfield',
                     columnWidth: 0.1,
@@ -232,8 +233,8 @@ Tine.Admin.Tags.EditDialog = Ext.extend(Tine.widgets.dialog.EditRecord, {
                     name: 'color'
                 }]]
             }, {
+            	region: 'center',
                 xtype: 'tabpanel',
-                height: 300,
                 activeTab: 0,
                 deferredRender: false,
                 defaults: { autoScroll: true },
@@ -314,7 +315,6 @@ Tine.Admin.Tags.EditDialog.openWindow = function (config) {
         width: 650,
         height: 400,
         name: Tine.Admin.Tags.EditDialog.prototype.windowNamePrefix + config.tag.id,
-        layout: Tine.Admin.Tags.EditDialog.prototype.windowLayout,
         contentPanelConstructor: 'Tine.Admin.Tags.EditDialog',
         contentPanelConstructorConfig: config
     });

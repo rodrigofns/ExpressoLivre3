@@ -5,7 +5,7 @@
  * @package     Tinebase
  * @subpackage  Mail
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2008-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -17,6 +17,11 @@
  */
 class Tinebase_Mail extends Zend_Mail
 {
+    /**
+    * email address regexp
+    */
+    const EMAIL_ADDRESS_REGEXP = '/([a-z0-9_\+-\.]+@[a-z0-9-\.]+\.[a-z]{2,5})/i';
+    
     /**
      * Sender: address
      * @var string
@@ -84,6 +89,9 @@ class Tinebase_Mail extends Zend_Mail
             foreach ((array)$values as $value) {
                 switch ($header) {
                     case 'content-transfer-encoding':
+                    // these are implicitly set by Zend_Mail_Transport_Abstract::_getHeaders()
+                    case 'content-type':
+                    case 'mime-version':
                         // do nothing
                         
                         break;
@@ -105,7 +113,15 @@ class Tinebase_Mail extends Zend_Mail
                         break;
                         
                     case 'date':
-                        $result->setDate($value);
+                        try {
+                            $result->setDate($value);
+                        } catch (Zend_Mail_Exception $zme) {
+                            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE))
+                                Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . " Could not set date: " . $value);
+                            if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE))
+                                Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . " " . $zme);
+                            $result->setDate();
+                        }
                         
                         break;
                         
@@ -149,6 +165,35 @@ class Tinebase_Mail extends Zend_Mail
         }
         
         return $result;
+    }
+    
+    /**
+     * Sets the HTML body for the message
+     *
+     * @param  string|Zend_Mime_Part    $html
+     * @param  string    $charset
+     *  @param  string    $encoding
+     * @return Zend_Mail Provides fluent interface
+     */
+    public function setBodyHtml($html, $charset = null, $encoding = Zend_Mime::ENCODING_QUOTEDPRINTABLE)
+    {
+        if ($html instanceof Zend_Mime_Part) {
+            $mp = $html;
+        } else {
+            if ($charset === null) {
+                $charset = $this->_charset;
+            }
+        
+            $mp = new Zend_Mime_Part($html);
+            $mp->encoding = $encoding;
+            $mp->type = Zend_Mime::TYPE_HTML;
+            $mp->disposition = Zend_Mime::DISPOSITION_INLINE;
+            $mp->charset = $charset;
+        }
+        
+        $this->_bodyHtml = $mp;
+    
+        return $this;
     }
     
     /**

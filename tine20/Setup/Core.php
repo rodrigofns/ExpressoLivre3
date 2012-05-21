@@ -174,52 +174,82 @@ class Setup_Core extends Tinebase_Core
     
     /**
      * initializes the database connection
-     *
-     * @throws  Tinebase_Exception_UnexpectedValue
+     * 
+     * @return boolean
      * 
      * @todo try to write to db, if it fails: self::set(Setup_Core::CHECKDB, FALSE);
      */
     public static function setupDatabaseConnection()
     {
-        self::set(Setup_Core::CHECKDB, FALSE);
+        $dbcheck = FALSE;
         
         // check database first
         if (self::configFileExists()) {
-            $dbConfig = Tinebase_Core::getConfig()->database;            
+            $dbConfig = Tinebase_Core::getConfig()->database;
+            
             if ($dbConfig->adapter === self::PDO_MYSQL && (! defined(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY) || ! defined(PDO::MYSQL_ATTR_INIT_COMMAND))) {
                 Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
-                    . ' PDO constants not defined.');
-                return;
+                    . ' MySQL PDO constants not defined.');
+                return FALSE;
             }
             
             try {
                 parent::setupDatabaseConnection();
                 
-                // check (mysql)db server version
-                $ext = new Setup_ExtCheck(dirname(__FILE__) . '/essentials.xml');
-                if ($dbConfig->adapter === self::PDO_MYSQL && ($mysqlRequired = $ext->getExtensionData('MySQL'))) {
-                    //Check if installed MySQL version is compatible with required version
-                    $hostnameWithPort = (isset($dbConfig->port)) ? $dbConfig->host . ':' . $dbConfig->port : $dbConfig->host;
-                    $link = @mysql_connect($hostnameWithPort, $dbConfig->username, $dbConfig->password);
-                    if ($link) {
-                        $serverVersion = @mysql_get_server_info();
-                        if (version_compare($mysqlRequired['VERSION'], $serverVersion, '<')) {
-                            self::set(Setup_Core::CHECKDB, TRUE);
+                $serverVersion = self::getDb()->getServerVersion();
+                
+                switch ($dbConfig->adapter) {
+                    case self::PDO_MYSQL:
+                        if (version_compare(self::MYSQL_MINIMAL_VERSION, $serverVersion, '<')) {
+                            $dbcheck = TRUE;
                         } else {
                             Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
                                 . ' MySQL server version incompatible! ' . $serverVersion
-                                . ' < ' . $mysqlRequired['VERSION']
+                                . ' < ' . self::MYSQL_MINIMAL_VERSION
                             );
                         }
-                    }
-                } else {
-                    //@todo check version requirements for other db adapters
-                    self::set(Setup_Core::CHECKDB, TRUE);
+                        break;
+                        
+                    case self::ORACLE:
+
+                        if (version_compare(self::ORACLE_MINIMAL_VERSION, $serverVersion, '<')) {
+                            self::set(Setup_Core::CHECKDB, TRUE);
+                        } else {
+                            Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                                . ' Oracle server version incompatible! ' . $serverVersion
+                                . ' < ' . self::ORACLE_MINIMAL_VERSION
+                            );
+                        }
+                        
+                        $dbcheck = TRUE;
+                        break;                        
+                        
+                    case self::PDO_PGSQL:
+                        if (version_compare(self::PGSQL_MINIMAL_VERSION, $serverVersion, '<')) {
+                            $dbcheck = TRUE;
+                        } else {
+                            Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                                . ' PostgreSQL server version incompatible! ' . $serverVersion
+                                . ' < ' . self::PGSQL_MINIMAL_VERSION
+                            );
+                        }
+                        break;
+                    
+                    default:
+                        // @todo check version requirements for other db adapters
+                        $dbcheck = TRUE;
+                        break;
                 }
+                
             } catch (Zend_Db_Adapter_Exception $zae) {
                 Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' ' . $zae->getMessage());
+            } catch (Zend_Db_Exception $zde) {
+                Setup_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' ' . $zde->getMessage());
             }
         }
+        
+        self::set(Setup_Core::CHECKDB, $dbcheck);
+        return $dbcheck;
     }
     
     /**

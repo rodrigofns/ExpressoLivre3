@@ -121,17 +121,16 @@ class Tinebase_Alarm extends Tinebase_Controller_Record_Abstract
                     $alarm->sent_time = Tinebase_DateTime::now();
                 
                     try {
-                        // NOTE: we set the staus here, so controller can adopt the status itself
+                        // NOTE: we set the status here, so controller can adopt the status itself
                         $alarm->sent_status = Tinebase_Model_Alarm::STATUS_SUCCESS;
                         $appController->sendAlarm($alarm);
                     
                     } catch (Exception $e) {
                         Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' ' . $e->getMessage());
-                        Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
+                        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
                     
                         $alarm->sent_message = $e->getMessage();
                         $alarm->sent_status = Tinebase_Model_Alarm::STATUS_FAILURE;
-                        //throw $e;
                     } 
                 
                     if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Updating alarm status: ' . $alarm->sent_status);
@@ -145,6 +144,8 @@ class Tinebase_Alarm extends Tinebase_Controller_Record_Abstract
         } catch (Exception $e) {
             // save new status 'failure'
             $job = Tinebase_AsyncJob::getInstance()->finishJob($job, Tinebase_Model_AsyncJob::STATUS_FAILURE, $e->getMessage());
+            if (Tinebase_Core::isLogLevel(Zend_Log::WARN)) Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Job failed: ' . $e->getMessage());
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
         }
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Job ' . $eventName . ' finished.');           
@@ -184,6 +185,11 @@ class Tinebase_Alarm extends Tinebase_Controller_Record_Abstract
         ));
         $result = $this->_backend->search($filter, NULL, $_onlyIds);
         
+        // NOTE: Adding indices to empty recordsets breaks empty tests
+        if (count($result) > 0 && $result instanceof Tinebase_Record_RecordSet) {
+            $result->addIndices(array('record_id'));
+        }
+        
         return $result;
     }
     
@@ -203,6 +209,9 @@ class Tinebase_Alarm extends Tinebase_Controller_Record_Abstract
         $diff = $currentAlarms->getMigration($alarms->getArrayOfIds());
         $this->_backend->delete($diff['toDeleteIds']);
         
+        if (count($alarms) > 1) {
+            Tinebase_Core::getLogger()->NOTICE(__METHOD__ . '::' . __LINE__ . "only the first alarm could is saved: " . print_r($alarms->toArray(), TRUE));
+        }
         // create / update alarms
         foreach ($alarms as $alarm) {
             $id = $alarm->getId();
@@ -217,6 +226,8 @@ class Tinebase_Alarm extends Tinebase_Controller_Record_Abstract
                 }
                 $alarm = $this->_backend->create($alarm);
             }
+            
+            break;
         }
     }
     

@@ -65,7 +65,7 @@ class Tinebase_DateTimeTest extends PHPUnit_Framework_TestCase
         $dt = new Tinebase_DateTime('2010-11-25 12:11:00');
         $instance = $dt->addDay(-1);
         
-        $this->assertType('Tinebase_DateTime', $instance);
+        $this->assertEquals('Tinebase_DateTime', get_class($instance), 'wrong type');
     }
     
     public function testSleepWakeup()
@@ -81,6 +81,40 @@ class Tinebase_DateTimeTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals('2010-11-29 15:14:00', $wdt->format(Tinebase_Record_Abstract::ISO8601LONG));
         $this->assertEquals('Indian/Mauritius', $wdt->getTimezone()->getName());
+    }
+    
+    public function testHasTime()
+    {
+        $date = new Tinebase_DateTime('2011-11-11 11:11:11', 'Europe/Berlin');
+        $this->assertTrue($date->hasTime(), 'date must have the hasTime flag');
+        
+        $date->hasTime(FALSE);
+        $this->assertFalse($date->hasTime(), 'date must not have the hasTime flag');
+        $this->assertEquals('00:00:00', $date->format('H:i:s'), 'time info has not been reset');
+        
+        $date->setTimezone('Asia/Tehran');
+        $this->assertEquals('2011-11-11', $date->format('Y-m-d'), 'date must not chage');
+        $this->assertEquals('00:00:00', $date->format('H:i:s'), 'time must not chage');
+    }
+    
+    /**
+     * test create from DateTime
+     * @see http://forge.tine20.org/mantisbt/view.php?id=5020
+     */
+    public function testFromDateTime()
+    {
+        $dt = new DateTime('2012-01-16 14:30:00', new DateTimeZone('UTC'));
+        
+        $tdt = new Tinebase_DateTime($dt);
+        
+        $this->assertTrue($tdt instanceof Tinebase_DateTime);
+        $this->assertEquals('2012-01-16 14:30:00', $tdt->toString());
+        
+        $dtz = new DateTimeZone('Europe/Berlin');
+        $tdt = new Tinebase_DateTime($dt, $dtz);
+        
+        $this->assertEquals('UTC', $dt->getTimezone()->getName(), 'original timzone changed');
+        $this->assertEquals('2012-01-16 15:30:00', $tdt->toString());
     }
 }
 

@@ -5,19 +5,19 @@
  * @package     Addressbook
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Lars Kneschke <l.kneschke@metaways.de>
- * @copyright   Copyright (c) 2010-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
  * class to hold addressbook list data
  * 
- * @property	id		
- * @property	container_id
- * @property	name			
- * @property	description		
- * @property	member
- * @property	email 			
- * @property	type			type of list
+ * @property    id        
+ * @property    container_id
+ * @property    name            
+ * @property    description        
+ * @property    member
+ * @property    email             
+ * @property    type            type of list
  * @package     Addressbook
  */
 class Addressbook_Model_List extends Tinebase_Record_Abstract
@@ -60,9 +60,9 @@ class Addressbook_Model_List extends Tinebase_Record_Abstract
      */
     protected $_validators = array (
         // tine 2.0 generic fields
-    	'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
+        'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
         'container_id'          => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-    	'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'creation_time'         => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'last_modified_by'      => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'last_modified_time'    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
@@ -74,11 +74,11 @@ class Addressbook_Model_List extends Tinebase_Record_Abstract
         'name'                  => array('presence' => 'required'),
         'description'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'members'               => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => array()),
-    	'email'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'email'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'type'                  => array(
             Zend_Filter_Input::ALLOW_EMPTY => true,
             Zend_Filter_Input::DEFAULT_VALUE => self::LISTTYPE_LIST,
-            'InArray' => array(self::LISTTYPE_LIST, self::LISTTYPE_GROUP)
+            array('InArray', array(self::LISTTYPE_LIST, self::LISTTYPE_GROUP)),
         ),
         'group_id'              => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'tags'                  => array(Zend_Filter_Input::ALLOW_EMPTY => true)

@@ -40,11 +40,11 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
         'accountEmailAddress'       => 'email',
         'accountHomeDirectory'      => 'home_dir',
         'accountLoginShell'         => 'login_shell',
-        'lastLoginFailure'			=> 'last_login_failure_at',
-        'loginFailures'				=> 'login_failures',
+        'lastLoginFailure'          => 'last_login_failure_at',
+        'loginFailures'             => 'login_failures',
         'openid'                    => 'openid',
         'visibility'                => 'visibility',
-        'contactId'					=> 'contact_id'
+        'contactId'                 => 'contact_id'
     );
     
     /**
@@ -143,8 +143,6 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      * @param   string  $_accountClass  type of model to return
      * 
      * @return  Tinebase_Model_User the user object
-     * @throws  Tinebase_Exception_NotFound
-     * @throws  Tinebase_Exception_Record_Validation
      */
     public function getUserByProperty($_property, $_value, $_accountClass = 'Tinebase_Model_User')
     {
@@ -152,10 +150,15 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
         
         // append data from plugins
         foreach ($this->_sqlPlugins as $plugin) {
-            $plugin->inspectGetUserByProperty($user);
+            try {
+                $plugin->inspectGetUserByProperty($user);
+            } catch (Exception $e) {
+                if (Tinebase_Core::isLogLevel(Zend_Log::CRIT)) Tinebase_Core::getLogger()->crit(__METHOD__ . '::' . __LINE__ . ' User sql plugin failure: ' . $e->getMessage());
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
+            }
         }
             
-        if($this instanceof Tinebase_User_Interface_SyncAble) {
+        if ($this instanceof Tinebase_User_Interface_SyncAble) {
             try {
                 $syncUser = $this->getUserByPropertyFromSyncBackend('accountId', $user, $_accountClass);
                 
@@ -214,7 +217,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
 
         $row = $stmt->fetch(Zend_Db::FETCH_ASSOC);
         if ($row === false) {
-            throw new Tinebase_Exception_NotFound('User with ' . $_property . ' =  ' . $value . ' not found.');           
+            throw new Tinebase_Exception_NotFound('User with ' . $_property . ' = ' . $value . ' not found.');           
         }
         
         try {
@@ -250,15 +253,16 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
     protected function _getUserSelectObject()
     {
         /*
-         * IF (`status` = 'enabled', (CASE WHEN NOW() > `expires_at` THEN 'expired' 
-         * WHEN (`login_failures` > 5 AND DATE_ADD(`last_login_failure_at`, INTERVAL 15 MINUTE) > NOW()) 
-         * THEN 'blocked' ELSE 'enabled' END), 'disabled')
+         * CASE WHEN `status` = 'enabled' THEN (CASE WHEN NOW() > `expires_at` THEN 'expired' 
+         * WHEN (`login_failures` > 5 AND `last_login_failure_at` + INTERVAL 15 MINUTE > NOW()) 
+         * THEN 'blocked' ELSE 'enabled' END) ELSE 'disabled' END
          */
-        $statusSQL = 'IF (' . $this->_db->quoteIdentifier($this->rowNameMapping['accountStatus']) . ' = ' . $this->_db->quote('enabled') . ', (CASE WHEN NOW() > ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
-            ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND DATE_ADD(" . 
-                $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure']) . ", INTERVAL {$this->_blockTime} MINUTE) > NOW()) THEN 'blocked'" . 
-            ' ELSE ' . $this->_db->quote('enabled') . ' END), ' . $this->_db->quote('disabled') . ')';
-        
+        $statusSQL = 'CASE WHEN ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountStatus']) . ' = ' . $this->_db->quote('enabled') . ' THEN (';
+        $statusSQL .= 'CASE WHEN '.Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .' > ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
+        ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND " . 
+        Tinebase_Backend_Sql_Command::setDate($this->_db, $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure'])) . " + INTERVAL '{$this->_blockTime}' MINUTE > ". Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .") THEN 'blocked'" . 
+        ' ELSE ' . $this->_db->quote('enabled') . ' END) ELSE ' . $this->_db->quote('disabled') . ' END ';
+
         $select = $this->_db->select()
             ->from(SQL_TABLE_PREFIX . 'accounts', 
                 array(
@@ -279,8 +283,8 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
                     'accountEmailAddress'   => $this->rowNameMapping['accountEmailAddress'],
                     'lastLoginFailure'      => $this->rowNameMapping['lastLoginFailure'],
                     'loginFailures'         => $this->rowNameMapping['loginFailures'],
-                	'contact_id',
-                	'openid',
+                    'contact_id',
+                    'openid',
                     'visibility'
                 )
             )
@@ -416,7 +420,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      */
     public function setLastLoginFailure($_loginName)
     {
-        Tinebase_Core::getLogger()->crit(__METHOD__ . '::' . __LINE__ . ' Login of user ' . $_loginName . ' failed.');
+        Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Login of user ' . $_loginName . ' failed.');
         
         try {
             $user = $this->getUserByLoginName($_loginName);
@@ -568,7 +572,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
             'login_shell'       => $_user->accountLoginShell,
             'openid'            => $_user->openid,
             'visibility'        => $_user->visibility,
-        	'contact_id'		=> $_user->contact_id,
+            'contact_id'        => $_user->contact_id,
             $this->rowNameMapping['accountDisplayName']  => $_user->accountDisplayName,
             $this->rowNameMapping['accountFullName']     => $_user->accountFullName,
             $this->rowNameMapping['accountFirstName']    => $_user->accountFirstName,
@@ -667,26 +671,18 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
             'login_shell'       => $_user->accountLoginShell,
             'openid'            => $_user->openid,
             'visibility'        => $_user->visibility, 
-            'contact_id'		=> $_user->contact_id,
+            'contact_id'        => $_user->contact_id,
             $this->rowNameMapping['accountDisplayName']  => $_user->accountDisplayName,
             $this->rowNameMapping['accountFullName']     => $_user->accountFullName,
             $this->rowNameMapping['accountFirstName']    => $_user->accountFirstName,
             $this->rowNameMapping['accountLastName']     => $_user->accountLastName,
             $this->rowNameMapping['accountEmailAddress'] => $_user->accountEmailAddress,
-        
         );
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Adding user to SQL backend: ' . $_user->accountLoginName);
         
-        try {
-            // add new user
-            $accountsTable->insert($accountData);
+        $accountsTable->insert($accountData);
             
-        } catch (Exception $e) {
-            Tinebase_TransactionManager::getInstance()->rollBack();
-            throw($e);
-        }
-        
         return $this->getUserById($_user->getId(), 'Tinebase_Model_FullUser');
     }
     
@@ -697,15 +693,15 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      */
     public function deleteUser($_userId)
     {
-        $this->deleteUserInSqlBackend($_userId);
+        $deletedUser = $this->deleteUserInSqlBackend($_userId);
         
         if($this instanceof Tinebase_User_Interface_SyncAble) {
-            $this->deleteUserInSyncBackend($_userId);
+            $this->deleteUserInSyncBackend($deletedUser);
         }
         
         // update data from plugins
         foreach ($this->_sqlPlugins as $plugin) {
-            $plugin->inspectDeleteUser($_userId);
+            $plugin->inspectDeleteUser($deletedUser);
         }
         
     }
@@ -714,43 +710,42 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      * delete a user
      *
      * @param  mixed  $_userId
+     * @return Tinebase_Model_FullUser  the delete user
      */
     public function deleteUserInSqlBackend($_userId)
     {   
         if ($_userId instanceof Tinebase_Model_FullUser) {
-            $accountId = $_userId->getId();
-            $account = $_userId;
+            $user = $_userId;
         } else {
-            $accountId = Tinebase_Model_User::convertUserIdToInt($_userId);
-            $account = $this->getFullUserById($accountId);
+            $user = $this->getFullUserById($_userId);
         }
         
-        $accountsTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'accounts'));
-        $groupMembersTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'group_members'));
-        $roleMembersTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'role_accounts'));
+        $accountsTable          = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'accounts'));
+        $groupMembersTable      = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'group_members'));
+        $roleMembersTable       = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'role_accounts'));
         $userRegistrationsTable = new Tinebase_Db_Table(array('name' => SQL_TABLE_PREFIX . 'registrations'));
         
         try {
             $transactionId = Tinebase_TransactionManager::getInstance()->startTransaction($this->_db);
             
             $where  = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier('account_id') . ' = ?', $accountId),
+                $this->_db->quoteInto($this->_db->quoteIdentifier('account_id') . ' = ?', $user->getId()),
             );
             $groupMembersTable->delete($where);
 
             $where  = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier('account_id') . ' = ?', $accountId),
+                $this->_db->quoteInto($this->_db->quoteIdentifier('account_id')   . ' = ?', $user->getId()),
                 $this->_db->quoteInto($this->_db->quoteIdentifier('account_type') . ' = ?', Tinebase_Acl_Rights::ACCOUNT_TYPE_USER),
-                );
+            );
             $roleMembersTable->delete($where);
             
             $where  = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $accountId),
+                $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $user->getId()),
             );
             $accountsTable->delete($where);
 
             $where  = array(
-                $this->_db->quoteInto($this->_db->quoteIdentifier('login_name') . ' = ?', $account->accountLoginName),
+                $this->_db->quoteInto($this->_db->quoteIdentifier('login_name') . ' = ?', $user->accountLoginName),
             );
             $userRegistrationsTable->delete($where);
             
@@ -761,6 +756,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
             throw($e);
         }
         
+        return $user;
     }
     
     /**

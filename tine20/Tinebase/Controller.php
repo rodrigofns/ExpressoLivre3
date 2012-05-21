@@ -189,11 +189,9 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
             $credentialCache = Tinebase_Auth_CredentialCache::getInstance()->cacheCredentials($_user->accountLoginName, $_password);
             Tinebase_Core::set(Tinebase_Core::USERCREDENTIALCACHE, $credentialCache);
             
-            // need to set locale again if user preference is available because locale might not be set correctly during loginFromPost
-            $userPrefLocaleString = Tinebase_Core::getPreference()->{Tinebase_Preference::LOCALE};
-            if ($userPrefLocaleString !== 'auto') {
-                Tinebase_Core::setupUserLocale($userPrefLocaleString);
-            }
+            // need to set locale again and because locale might not be set correctly during loginFromPost
+            // use 'auto' setting because it is fetched from cookie or preference then
+            Tinebase_Core::setupUserLocale('auto');
             
             // need to set userTimeZone again
             $userTimezone = Tinebase_Core::getPreference()->getValue(Tinebase_Preference::TIMEZONE);
@@ -214,13 +212,13 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
      */
     protected function _initUserSession(Tinebase_Model_FullUser $_user)
     {
-        if (Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::SESSIONUSERAGENTVALIDATION, NULL, TRUE)->value) {
+        if (Tinebase_Config::getInstance()->getConfig(Tinebase_Config::SESSIONUSERAGENTVALIDATION, NULL, TRUE)->value) {
             Zend_Session::registerValidator(new Zend_Session_Validator_HttpUserAgent());
         } else {
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' User agent validation disabled.');
         }
         
-        if (Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::SESSIONIPVALIDATION, NULL, TRUE)->value) {
+        if (Tinebase_Config::getInstance()->getConfig(Tinebase_Config::SESSIONIPVALIDATION, NULL, TRUE)->value) {
             Zend_Session::registerValidator(new Zend_Session_Validator_IpAddress());
         } else {
             Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Session ip validation disabled.');

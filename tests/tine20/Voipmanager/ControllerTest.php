@@ -15,10 +15,6 @@
  */
 require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'TestHelper.php';
 
-if (!defined('PHPUnit_MAIN_METHOD')) {
-    define('PHPUnit_MAIN_METHOD', 'Voipmanager_ControllerTest::main');
-}
-
 /**
  * Test class for Tinebase_Group
  */
@@ -80,11 +76,13 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {	
-        // delete all contexts
-        $search = $this->_backends['Asterisk_Context']->search(new Voipmanager_Model_Asterisk_ContextFilter());
-        foreach ($search as $result) {
-            $this->_backends['Asterisk_Context']->delete($result->getId());
-        }        
+        foreach (array('Asterisk_SipPeer', 'Asterisk_Context', 'Snom_Location') as $backend) {
+            $filterName = 'Voipmanager_Model_' . $backend . 'Filter';
+            $search = $this->_backends[$backend]->search(new $filterName());
+            foreach ($search as $result) {
+                $this->_backends[$backend]->delete($result->getId());
+            }
+        }
     }
 
     /**
@@ -250,7 +248,7 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
         $test = $this->_backends['Asterisk_SipPeer']->create($test);
         $returned = $this->_backends['Asterisk_SipPeer']->get($test);
 
-        $this->assertType('Voipmanager_Model_Asterisk_SipPeer', $returned);
+        $this->assertEquals('Voipmanager_Model_Asterisk_SipPeer', get_class($returned));
         $this->assertEquals($test->id, $returned->id);
         $this->assertEquals($test->name, $returned->name);
         $this->assertEquals($test->callerid, $returned->callerid);
@@ -271,8 +269,8 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
         $test->name = Tinebase_Record_Abstract::generateUID();
         
         $returned = $this->_backends['Asterisk_SipPeer']->update($test);
-        $this->assertEquals($test->name, $returned->name);
-        $this->assertEquals($test->qualify, $returned->qualify);
+        $this->assertEquals($test->qualify, $returned->qualify, 'qualify does not match');
+        $this->assertEquals($test->name, $returned->name, 'name does not match');
         $this->assertNotNull($returned->id);
         
        $this->_backends['Asterisk_SipPeer']->delete($returned->getId()); 
@@ -433,7 +431,7 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
         $test = $this->_backends['Snom_Software']->create($test);
         $returned = $this->_backends['Snom_Software']->get($test);
         
-        $this->assertType('Voipmanager_Model_Snom_Software', $returned);
+        $this->assertEquals('Voipmanager_Model_Snom_Software', get_class($returned));
         $this->assertEquals($test->id, $returned->id);
         $this->assertEquals($test->name, $returned->name);
         $this->assertEquals($test->description, $returned->description);
@@ -611,7 +609,7 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
         $test = $this->_backends['Snom_Location']->create($test);
         $returned = $this->_backends['Snom_Location']->get($test);
         
-        $this->assertType('Voipmanager_Model_Snom_Location', $returned);
+        $this->assertEquals('Voipmanager_Model_Snom_Location', get_class($returned));
         $this->assertEquals($test->id, $returned->id);
         $this->assertEquals($test->name, $returned->name);
         $this->assertEquals($test->description, $returned->description);
@@ -712,7 +710,7 @@ class Voipmanager_ControllerTest extends PHPUnit_Framework_TestCase
         $test = $this->_backends['Snom_Template']->create($test);
         $returned = $this->_backends['Snom_Template']->get($test);
         
-        $this->assertType('Voipmanager_Model_Snom_Template', $returned);
+        $this->assertEquals('Voipmanager_Model_Snom_Template', get_class($returned));
         $this->assertEquals($test->id, $returned->id);
         $this->assertEquals($test->name, $returned->name);
         $this->assertEquals($test->description, $returned->description);

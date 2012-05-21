@@ -24,48 +24,55 @@ class Tinebase_Model_Relation extends Tinebase_Record_Abstract
      * degree parent
      */
     const DEGREE_PARENT = 'parent';
+    
     /**
      * degree child
      */
     const DEGREE_CHILD = 'child';
+    
     /**
      * degree sibling
      */
     const DEGREE_SIBLING = 'sibling';
+    
     /**
      * manually created relation
      */
     const TYPE_MANUAL = 'manual';
+    
     /**
      * default record backend
      */
     const DEFAULT_RECORD_BACKEND = 'Sql';
+    
     /**
      * key to find identifier
      */
-	protected $_identifier = 'id';
-	/**
+    protected $_identifier = 'id';
+    
+    /**
      * application the record belongs to
      *
      * @var string
      */
     protected $_application = 'Tinebase';
-	/**
-	 * all valid fields
-	 */
+    
+    /**
+     * all valid fields
+     */
     protected $_validators = array(
         'id'                     => array('allowEmpty' => true,  'Alnum'),
-	    'own_model'              => array('presence' => 'required', 'allowEmpty' => false),
-	    'own_backend'            => array('presence' => 'required', 'allowEmpty' => false),
-	    'own_id'                 => array('presence' => 'required', 'allowEmpty' => true, 'Alnum'),
-	    'own_degree'             => array('presence' => 'required', 'allowEmpty' => false, 'InArray' => array(
+        'own_model'              => array('presence' => 'required', 'allowEmpty' => false),
+        'own_backend'            => array('presence' => 'required', 'allowEmpty' => false),
+        'own_id'                 => array('presence' => 'required', 'allowEmpty' => true, 'Alnum'),
+        'own_degree'             => array('presence' => 'required', 'allowEmpty' => false, array('InArray', array(
             self::DEGREE_PARENT, 
             self::DEGREE_CHILD, 
             self::DEGREE_SIBLING
-        )),
-	    'related_model'          => array('presence' => 'required', 'allowEmpty' => false),
-	    'related_backend'        => array('presence' => 'required', 'allowEmpty' => false),
-	    'related_id'             => array('presence' => 'required', 'allowEmpty' => false, 'Alnum'),
+        ))),
+        'related_model'          => array('presence' => 'required', 'allowEmpty' => false),
+        'related_backend'        => array('presence' => 'required', 'allowEmpty' => false),
+        'related_id'             => array('presence' => 'required', 'allowEmpty' => false, 'Alnum'),
         'type'                   => array('presence' => 'required', 'allowEmpty' => false),
         'remark'                 => array('allowEmpty' => true          ), // freeform field for manual relations
         'related_record'         => array('allowEmpty' => true          ), // property to store 'resolved' relation record
@@ -76,16 +83,16 @@ class Tinebase_Model_Relation extends Tinebase_Record_Abstract
         'is_deleted'             => array('allowEmpty' => true          ),
         'deleted_time'           => array('allowEmpty' => true          ),
         'deleted_by'             => array('allowEmpty' => true,         ),
-	);
-	/**
-	 * fields containing datetime data
-	 */
+    );
+    
+    /**
+     * fields containing datetime data
+     */
     protected $_datetimeFields = array(
         'creation_time',
         'last_modified_time',
         'deleted_time'
     );
-    
     
     /**
      * convert remark to array if json encoded
@@ -104,5 +111,4 @@ class Tinebase_Model_Relation extends Tinebase_Record_Abstract
             $this->remark = Zend_Json::decode($this->remark);
         }
     }
-} // end of Tinebase_Model_Relation
-?>
+}

@@ -5,7 +5,7 @@
  * @package     Tinebase
  * @subpackage  User
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Lars Kneschke <l.kneschke@metaways.de>
  */
 
@@ -17,12 +17,22 @@
  */
 class Tinebase_User
 {
+    /**
+     * backend constants
+     * 
+     * @var string
+     */
     const SQL = 'Sql';
-    
     const LDAP = 'Ldap';
-    
     const TYPO3 = 'Typo3';
     
+    /**
+     * user status constants
+     * 
+     * @var string
+     * 
+     * @todo use constants from model
+     */
     const STATUS_BLOCKED  = 'blocked';
     const STATUS_DISABLED = 'disabled';
     const STATUS_ENABLED  = 'enabled';
@@ -86,15 +96,15 @@ class Tinebase_User
     private static $_backendConfigurationDefaults = array(
         self::SQL => array(
             'changepw' => true,
-            self::DEFAULT_USER_GROUP_NAME_KEY => 'Users',
-            self::DEFAULT_ADMIN_GROUP_NAME_KEY => 'Administrators',
+            self::DEFAULT_USER_GROUP_NAME_KEY  => Tinebase_Group::DEFAULT_USER_GROUP,
+            self::DEFAULT_ADMIN_GROUP_NAME_KEY => Tinebase_Group::DEFAULT_ADMIN_GROUP,
         ),
         self::LDAP => array(
             'host' => '',
             'username' => '',
             'password' => '',
             'bindRequiresDn' => true,
-            'useRfc2307bis' => true,
+            'useRfc2307bis' => false,
             'userDn' => '',
             'userFilter' => 'objectclass=posixaccount',
             'userSearchScope' => Zend_Ldap::SEARCH_SCOPE_SUB,
@@ -108,9 +118,10 @@ class Tinebase_User
             'maxGroupId' => '11099',
             'groupUUIDAttribute' => 'entryUUID',
             'userUUIDAttribute' => 'entryUUID',
-            self::DEFAULT_USER_GROUP_NAME_KEY => 'Users',
-            self::DEFAULT_ADMIN_GROUP_NAME_KEY => 'Administrators',
-            'changepw' => true
+            self::DEFAULT_USER_GROUP_NAME_KEY  => Tinebase_Group::DEFAULT_USER_GROUP,
+            self::DEFAULT_ADMIN_GROUP_NAME_KEY => Tinebase_Group::DEFAULT_ADMIN_GROUP,
+            'changepw' => true,
+            'readonly' => false,
          )
     );
     
@@ -122,7 +133,7 @@ class Tinebase_User
     public static function getInstance() 
     {
         $backendType = self::getConfiguredBackend();
-		
+        
         if (self::$_instance === NULL) {
             $backendType = self::getConfiguredBackend();
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' accounts backend: ' . $backendType);
@@ -134,33 +145,36 @@ class Tinebase_User
     }
         
     /**
-     * return an instance of the current rs backend
+     * return an instance of the current user backend
      *
-     * @param   string $_backendType name of the rs backend
+     * @param   string $backendType name of the user backend
      * @return  Tinebase_User_Abstract
      * @throws  Tinebase_Exception_InvalidArgument
      */
-    public static function factory($_backendType) 
+    public static function factory($backendType) 
     {
         $options = self::getBackendConfiguration();
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' 
+            . print_r($options, TRUE));
         
         $options['plugins'] = array();
         
         // manage email user settings
-        if (Tinebase_EmailUser::manages(Tinebase_Model_Config::IMAP)) {
-            $options['plugins'][] = Tinebase_EmailUser::getInstance(Tinebase_Model_Config::IMAP);
+        if (Tinebase_EmailUser::manages(Tinebase_Config::IMAP)) {
+            $options['plugins'][] = Tinebase_EmailUser::getInstance(Tinebase_Config::IMAP);
         }
-        if (Tinebase_EmailUser::manages(Tinebase_Model_Config::SMTP)) {
-            $options['plugins'][] = Tinebase_EmailUser::getInstance(Tinebase_Model_Config::SMTP);
+        if (Tinebase_EmailUser::manages(Tinebase_Config::SMTP)) {
+            $options['plugins'][] = Tinebase_EmailUser::getInstance(Tinebase_Config::SMTP);
         }
         
-        switch ($_backendType) {
+        switch ($backendType) {
             case self::LDAP:
                 
-		        // manage samba sam?
-		        if (isset(Tinebase_Core::getConfig()->samba) && Tinebase_Core::getConfig()->samba->get('manageSAM', FALSE) == true) {
-		            $options['plugins'][] = new Tinebase_User_Plugin_Samba(Tinebase_Core::getConfig()->samba->toArray());
-		        }
+                // manage samba sam?
+                if (isset(Tinebase_Core::getConfig()->samba) && Tinebase_Core::getConfig()->samba->get('manageSAM', FALSE) == true) {
+                    $options['plugins'][] = new Tinebase_User_Plugin_Samba(Tinebase_Core::getConfig()->samba->toArray());
+                }
                 
                 $result  = new Tinebase_User_Ldap($options);
                 
@@ -177,8 +191,11 @@ class Tinebase_User
                 break;
                 
             default:
-                throw new Tinebase_Exception_InvalidArgument("User backend type $_backendType not implemented.");
+                throw new Tinebase_Exception_InvalidArgument("User backend type $backendType not implemented.");
         }
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+            . ' Created user backend of type ' . $backendType);
         
         return $result;
     }
@@ -192,7 +209,7 @@ class Tinebase_User
     {
         if (!isset(self::$_backendType)) {
             if (Setup_Controller::getInstance()->isInstalled('Tinebase')) {
-                self::setBackendType(Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::USERBACKENDTYPE, null, self::SQL)->value);
+                self::setBackendType(Tinebase_Config::getInstance()->get(Tinebase_Config::USERBACKENDTYPE, self::SQL));
             } else {
                 self::setBackendType(self::SQL); 
             }
@@ -206,12 +223,20 @@ class Tinebase_User
      * 
      * @todo persist in db
      * 
-     * @param string $_backendType
+     * @param string $backendType
      * @return void
      */
-    public static function setBackendType($_backendType)
+    public static function setBackendType($backendType)
     {
-        self::$_backendType = ucfirst($_backendType);
+        if (empty($backendType)) {
+            throw new Tinebase_Exception_InvalidArgument('Backend type can not be empty!');
+        }
+        
+        $newBackendType = ucfirst($backendType);
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .
+            ' Setting backend type to ' . $newBackendType);
+        
+        self::$_backendType = $newBackendType;
     }
     
     /**
@@ -237,8 +262,12 @@ class Tinebase_User
             }
         } else {
             if ( ! array_key_exists($_key, $defaultValues)) {
-                throw new Tinebase_Exception_InvalidArgument("Cannot set backend configuration option '$_key' for accounts storage " . self::getConfiguredBackend());
+                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ .
+                    " Cannot set backend configuration option '$_key' for accounts storage " . self::getConfiguredBackend());
+                return;
             }
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .
+                ' Setting backend key ' . $_key . ' to ' . $_value);
             self::$_backendConfiguration[$_key] = $_value;
         }
     }
@@ -268,8 +297,8 @@ class Tinebase_User
      */
     public static function saveBackendConfiguration()
     {
-        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::USERBACKEND, Zend_Json::encode(self::getBackendConfiguration()));
-        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Model_Config::USERBACKENDTYPE, self::getConfiguredBackend());
+        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Config::USERBACKEND, Zend_Json::encode(self::getBackendConfiguration()));
+        Tinebase_Config::getInstance()->setConfigForApplication(Tinebase_Config::USERBACKENDTYPE, self::getConfiguredBackend());
     }
     
     /**
@@ -283,7 +312,7 @@ class Tinebase_User
         //lazy loading for $_backendConfiguration
         if (!isset(self::$_backendConfiguration)) {
             if (Setup_Controller::getInstance()->isInstalled('Tinebase')) {
-                $rawBackendConfiguration = Tinebase_Config::getInstance()->getConfig(Tinebase_Model_Config::USERBACKEND, null, array())->value;
+                $rawBackendConfiguration = Tinebase_Config::getInstance()->getConfig(Tinebase_Config::USERBACKEND, null, array())->value;
             } else {
                 $rawBackendConfiguration = array();
             }
@@ -366,13 +395,19 @@ class Tinebase_User
             $group = $groupBackend->getGroupById($user->accountPrimaryGroup);
         } catch (Tinebase_Exception_Record_NotDefined $tern) {
             $group = $groupBackend->getGroupByIdFromSyncBackend($user->accountPrimaryGroup);
-            $group = $groupBackend->addGroupInSqlBackend($group);
+            try {
+                $sqlGgroup = $groupBackend->getGroupByName($group->name);
+                throw new Tinebase_Exception('Group already exists but it has a different ID: ' . $group->name);
+                
+            } catch (Tinebase_Exception_Record_NotDefined $tern) {
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Adding group " . $group->name);
+                $group = $groupBackend->addGroupInSqlBackend($group);
+            }
         }
         
-        // update or create user in local sql backend
         try {
             $currentUser = $userBackend->getUserByProperty('accountId', $user, 'Tinebase_Model_FullUser');
-            
+        
             $currentUser->accountLoginName          = $user->accountLoginName;
             $currentUser->accountLastPasswordChange = $user->accountLastPasswordChange;
             $currentUser->accountExpires            = $user->accountExpires;
@@ -384,7 +419,7 @@ class Tinebase_User
             $currentUser->accountEmailAddress       = $user->accountEmailAddress;
             $currentUser->accountHomeDirectory      = $user->accountHomeDirectory;
             $currentUser->accountLoginShell         = $user->accountLoginShell;
-            
+        
             $user = $userBackend->updateUserInSqlBackend($currentUser);
         } catch (Tinebase_Exception_NotFound $ten) {
             try {
@@ -394,32 +429,10 @@ class Tinebase_User
             } catch (Tinebase_Exception_NotFound $ten) {
                 // do nothing
             }
-            
-            if (Tinebase_Application::getInstance()->isInstalled('Addressbook') === true) {
-                $addressbook = Addressbook_Backend_Factory::factory(Addressbook_Backend_Factory::SQL);
-                $internalAddressbook = Tinebase_Container::getInstance()->getContainerByName('Addressbook', 'Internal Contacts', Tinebase_Model_Container::TYPE_SHARED);
-                
-                $contact = new Addressbook_Model_Contact(array(
-                    'n_family'      => $user->accountLastName,
-                    'n_given'       => $user->accountFirstName,
-                    'n_fn'          => $user->accountFullName,
-                    'n_fileas'      => $user->accountDisplayName,
-                    'email'         => $user->accountEmailAddress,
-                    'type'          => Addressbook_Model_Contact::CONTACTTYPE_USER,
-                    'container_id'  => $internalAddressbook->getId()
-                ));
-                
-                // add modlog info
-                Tinebase_Timemachine_ModificationLog::setRecordMetaData($contact, 'create');
         
-                $contact = $addressbook->create($contact);        
-
-                $user->contact_id = $contact->getId();
-            }
+            self::syncContact($user);
             $user = $userBackend->addUserInSqlBackend($user);
         }
-        
-        #if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . "  synced user object: " . print_r($user->toArray(), true));
         
         // import contactdata(phone, address, fax, birthday. photo)
         if($_syncContactData === true && Tinebase_Application::getInstance()->isInstalled('Addressbook') === true) {
@@ -439,6 +452,41 @@ class Tinebase_User
         Tinebase_Group::syncMemberships($user);
         
         return $user;
+    }
+    
+    /**
+     * create contact in addressbook
+     * 
+     * @param Tinebase_Model_FullUser $user
+     */
+    public static function syncContact($user)
+    {
+        if (! Tinebase_Application::getInstance()->isInstalled('Addressbook')) {
+            return;
+        }
+        
+        $addressbook = Addressbook_Backend_Factory::factory(Addressbook_Backend_Factory::SQL);
+        $internalAddressbook = Tinebase_Container::getInstance()->getContainerByName('Addressbook', 'Internal Contacts', Tinebase_Model_Container::TYPE_SHARED);
+    
+        $contact = new Addressbook_Model_Contact(array(
+            'n_family'      => $user->accountLastName,
+            'n_given'       => $user->accountFirstName,
+            'n_fn'          => $user->accountFullName,
+            'n_fileas'      => $user->accountDisplayName,
+            'email'         => $user->accountEmailAddress,
+            'type'          => Addressbook_Model_Contact::CONTACTTYPE_USER,
+            'container_id'  => $internalAddressbook->getId()
+        ));
+    
+        // add modlog info
+        Tinebase_Timemachine_ModificationLog::setRecordMetaData($contact, 'create');
+    
+        $contact = $addressbook->create($contact);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
+            . " Added contact " . $contact->n_given);
+    
+        $user->contact_id = $contact->getId();
     }
     
     /**
@@ -477,6 +525,7 @@ class Tinebase_User
      *  'adminFirstName'    => 'Tine 2.0',
      *  'adminLastName'     => 'Admin Account',
      *  'adminEmailAddress' => 'admin@tine20domain.org',
+     *  'expires'            => Tinebase_DateTime object
      * );
      * </code>
      *
@@ -511,7 +560,7 @@ class Tinebase_User
             'accountLastName'       => $adminLastName,
             'accountDisplayName'    => $adminLastName . ', ' . $adminFirstName,
             'accountFirstName'      => $adminFirstName,
-            'accountExpires'        => NULL,
+            'accountExpires'        => (isset($_options['expires'])) ? $_options['expires'] : NULL,
             'accountEmailAddress'   => $adminEmailAddress
         ));
         

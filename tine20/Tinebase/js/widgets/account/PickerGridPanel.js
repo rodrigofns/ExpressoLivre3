@@ -5,7 +5,7 @@
  * @subpackage  widgets
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -55,6 +55,12 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
      * add 'anyone' selection if selectType == 'both'
      */
     selectAnyone: true,
+
+    /**
+     * @cfg {bool}
+     * show hidden (user) contacts / (group) lists
+     */
+    showHidden: false,
 
     /**
      * get only users with defined status (enabled, disabled, expired)
@@ -161,6 +167,7 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
             text: _('Add Anyone'),
             scope: this,
             newRecordClass: this.recordClass,
+            newRecordDefaults: this.recordDefaults,
             iconCls: 'tinebase-accounttype-addanyone',
             handler: function () {
                 // add anyone
@@ -216,9 +223,11 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
             accountsStore: this.store,
             emptyText: _('Search for users ...'),
             newRecordClass: this.recordClass,
+            newRecordDefaults: this.recordDefaults,
             recordPrefix: this.recordPrefix,
             userOnly: true,
-            onSelect: this.onAddRecordFromCombo
+            onSelect: this.onAddRecordFromCombo,
+            additionalFilters: (this.showHidden) ? [{field: 'showDisabled', operator: 'equals', value: true}] : []
         });
     },
     
@@ -232,6 +241,7 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
             blurOnSelect: true,
             recordClass: this.groupRecordClass,
             newRecordClass: this.recordClass,
+            newRecordDefaults: this.recordDefaults,
             recordPrefix: this.recordPrefix,
             emptyText: _('Search for groups ...'),
             onSelect: this.onAddRecordFromCombo
@@ -270,9 +280,8 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
             recordData[this.recordPrefix + 'type'] = 'user';
             recordData[this.recordPrefix + 'name'] = recordToAdd.data.n_fileas;
             recordData[this.recordPrefix + 'data'] = recordToAdd.data;
-            recordData.readGrant = true;
-            
-            record = new this.newRecordClass(recordData, recordToAdd.data.account_id);
+
+            record = new this.newRecordClass(Ext.applyIf(recordData, this.newRecordDefaults), recordToAdd.data.account_id);
         } 
         // group or addressbook list record selected
         else if (recordToAdd.data.group_id || recordToAdd.data.id) {         	
@@ -280,9 +289,8 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
         	recordData[this.recordPrefix + 'type'] = 'group';
             recordData[this.recordPrefix + 'name'] = recordToAdd.data.name;
             recordData[this.recordPrefix + 'data'] = recordToAdd.data;
-            recordData.readGrant = true;
             
-            record = new this.newRecordClass(recordData, recordToAdd.id);
+            record = new this.newRecordClass(Ext.applyIf(recordData, this.newRecordDefaults), recordToAdd.id);
         }
         
         // check if already in
@@ -319,3 +327,4 @@ Tine.widgets.account.PickerGridPanel = Ext.extend(Tine.widgets.grid.PickerGridPa
         }
     }
 });
+Ext.reg('tinerecordpickergrid', Tine.widgets.account.PickerGridPanel);

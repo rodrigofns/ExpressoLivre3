@@ -92,6 +92,7 @@ abstract class Tinebase_Group_Abstract
      *
      * @param int $_groupId
      * @return Tinebase_Model_Group
+     * @throws  Tinebase_Exception_Record_NotDefined
      */
     abstract public function getGroupById($_groupId);
     
@@ -100,6 +101,7 @@ abstract class Tinebase_Group_Abstract
      *
      * @param string $_groupName
      * @return Tinebase_Model_Group
+     * @throws  Tinebase_Exception_Record_NotDefined
      */
     abstract public function getGroupByName($_groupName);
 
@@ -161,7 +163,34 @@ abstract class Tinebase_Group_Abstract
             Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' ' . $configKey . ' not found. Check your user backend configuration.');
             $defaultGroupName = $_name;
         }
-        return $this->getGroupByName($defaultGroupName);        
+        
+        try {
+            $result = $this->getGroupByName($defaultGroupName);
+        } catch (Tinebase_Exception_Record_NotDefined $tenf) {
+            // create group on the fly
+            $result = $this->addGroup(new Tinebase_Model_Group(array(
+                'name'    => $defaultGroupName,
+            )));
+        }
+        
+        return $result;
+    }
+    
+    /**
+    * get dummy group record
+    *
+    * @param integer $_id [optional]
+    * @return Tinebase_Model_Group
+    */
+    public function getNonExistentGroup($_id = NULL)
+    {
+        $translate = Tinebase_Translation::getTranslation('Tinebase');
+    
+        $result = new Tinebase_Model_Group(array(
+                'id'        => $_id,
+                'name'      => $translate->_('unknown'),
+        ), TRUE);
+    
+        return $result;
     }
 }
- 

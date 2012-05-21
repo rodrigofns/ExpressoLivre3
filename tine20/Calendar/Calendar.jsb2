@@ -20,6 +20,10 @@
           "path": "js/"
         },
         {
+          "text": "SearchCombo.js",
+          "path": "js/"
+        },
+        {
           "text": "Model.js",
           "path": "js/"
         },
@@ -48,6 +52,10 @@
           "path": "js/"
         },
         {
+          "text": "GridView.js",
+          "path": "js/"
+        },
+        {
           "text": "PagingToolbar.js",
           "path": "js/"
         },
@@ -60,7 +68,7 @@
           "path": "js/"
         },
         {
-          "text": "MainScreenWestPanel.js",
+          "text": "WestPanel.js",
           "path": "js/"
         },
         {
@@ -80,11 +88,7 @@
           "path": "js/"
         },
         {
-          "text": "AttendeeStatusFilterModel.js",
-          "path": "js/"
-        },
-        {
-          "text": "CalendarSelectTreePanel.js",
+          "text": "TreePanel.js",
           "path": "js/"
         },
         {
@@ -118,6 +122,22 @@
         {
           "text": "MonthView.js",
           "path": "js/Printer/"
+        },
+        {
+          "text": "ContactEventsGridPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "iMIPDetailsPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "CalDAVContainerPropertiesHookField.js",
+          "path": "js/"
+        },
+        {
+          "text": "AddToEventPanel.js",
+          "path": "js/"
         }
       ]
     },

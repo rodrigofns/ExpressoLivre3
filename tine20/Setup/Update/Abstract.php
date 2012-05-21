@@ -5,7 +5,7 @@
  * @package     Setup
  * @subpackage  Update
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Matthias Greiling <m.greiling@metaways.de>
  */
 
@@ -171,14 +171,14 @@ class Setup_Update_Abstract
      * @param Setup_Backend_Schema_Table_Abstract $_table
      * @param string $_application
      */
-    public function createTable($_tableName, Setup_Backend_Schema_Table_Abstract $_table, $_application = 'Tinebase')
+    public function createTable($_tableName, Setup_Backend_Schema_Table_Abstract $_table, $_application = 'Tinebase', $_version = 1)
     {
+        $app = Tinebase_Application::getInstance()->getApplicationByName($_application);
+        Tinebase_Application::getInstance()->removeApplicationTable($app, $_tableName);
+        
         $this->_backend->createTable($_table);
-        Tinebase_Application::getInstance()->addApplicationTable(
-            Tinebase_Application::getInstance()->getApplicationByName($_application), 
-            $_tableName, 
-            1
-        );
+        
+        Tinebase_Application::getInstance()->addApplicationTable($app, $_tableName, $_version);
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Created new table ' . $_tableName);
     }
@@ -204,10 +204,11 @@ class Setup_Update_Abstract
      * drop table
      *
      * @param string $_tableName
+     * @param string $_application
      */  
-    public function dropTable($_tableName)
+    public function dropTable($_tableName, $_application = 'Tinebase')
     {
+        Tinebase_Application::getInstance()->removeApplicationTable(Tinebase_Application::getInstance()->getApplicationByName($_application), $_tableName);
         $result = $this->_backend->dropTable($_tableName);
     }
-    
 }

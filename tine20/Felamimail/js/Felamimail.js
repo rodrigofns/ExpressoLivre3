@@ -68,6 +68,8 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
      */
     updateMessageCacheTransactionId: null,
     
+    getFolderStatusTransactionInProgress: false, 
+    
     /**
      * unreadcount in default account inbox
      * @type Number
@@ -104,7 +106,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             }
             
             this.showActiveVacation();
-            new Tine.Felamimail.AddressbookGridPanelHook({app: this});
+            var hook = new Tine.Felamimail.AddressbookGridPanelHook({app: this});
         }
     },
     
@@ -166,7 +168,8 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
                 }
             }
             
-            Tine.log.debug('updating message cache for folder "' + folder.get('localname') + '" with ' + executionTime + ' seconds max execution time');
+            Tine.log.debug('Updating message cache for folder "' + folder.get('localname') + '" of account ' + folder.get('account_id'));
+            Tine.log.debug('Max execution time: ' + executionTime + ' seconds');
             
             this.updateMessageCacheTransactionExpectedResponse = new Date().add(Date.SECOND, executionTime);
             folder.set('cache_status', 'pending');
@@ -307,13 +310,30 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
         
         // check for incompletes
         var incompletes = this.folderStore.queryBy(function(folder) {
-            return (folder.get('cache_status') !== 'complete' && folder.get('is_selectable'));
+            return (['complete', 'updating', 'disconnect'].indexOf(folder.get('cache_status')) === -1 && folder.get('is_selectable'));
         }, this);
         if (incompletes.getCount() > 0) {
-            return incompletes.first();
+            Tine.log.debug('Got ' + incompletes.getCount() + ' incomplete folders.');
+            var firstIncomplete = incompletes.first();
+            Tine.log.debug('First ' + firstIncomplete.get('cache_status') + ' folder to check: ' + firstIncomplete.get('globalname'));
+            return firstIncomplete;
         }
         
         // check for outdated
+        if (! this.getFolderStatusTransactionInProgress) {
+            this.getStatusOfOutdatedFolders();
+        } else {
+            Tine.log.debug('getFolderStatus() already running ... wait a little more.');
+        }
+        
+        // nothing to update
+        return null;
+    },
+    
+    /**
+     * collects outdated folders and calls getFolderStatus on server to fetch all folders that need to be updated
+     */
+    getStatusOfOutdatedFolders: function() {
         var outdated = this.folderStore.queryBy(function(folder) {
             if (! folder.get('is_selectable')) {
                 return false;
@@ -331,13 +351,49 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             }
             return false;
         }, this);
-        if (outdated.getCount() > 0) {
-            Tine.log.debug('still got ' + outdated.getCount() + ' outdated folders to update ...');
-            return outdated.first();
-        }
         
-        // nothing to update
-        return null;
+        if (outdated.getCount() > 0) {
+            Tine.log.debug('Still got ' + outdated.getCount() + ' outdated folders to update');
+            
+            // call Felamimail.getFolderStatus() with ids of outdated folders -> update folder store on success
+            // get only max 50 folders at once
+            var rangeOfFolders = (outdated.getCount() > 50) ? outdated.getRange(0, 49) : outdated.getRange(),
+                ids = [],
+                now = new Date();
+            Ext.each(rangeOfFolders, function(folder) {
+                folder.set('client_access_time', now);
+                ids.push(folder.id);
+            });
+            
+            var filter = [{field: 'id', operator: 'in', value: ids}];
+            Tine.log.debug('Requesting folder status of ' + rangeOfFolders.length + ' folders ...');
+            Tine.Felamimail.getFolderStatus(filter, this.onGetFolderStatusSuccess.createDelegate(this));
+            this.getFolderStatusTransactionInProgress = true;
+        }
+    },
+    
+    /**
+     * get folder status returned -> set folders that need an update to pending status
+     * 
+     * @param {Array} response
+     */
+    onGetFolderStatusSuccess: function(response) {
+        this.getFolderStatusTransactionInProgress = false;
+        Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> Folder status update successful.');
+        Tine.log.debug(response);
+        
+        if (response && response.length > 0) {
+            Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> Got ' + response.length + ' folders that need an update.');
+            
+            Ext.each(response, function(folder) {
+                var folderToUpdate = this.folderStore.getById(folder.id);
+                folderToUpdate.set('cache_status', 'pending');
+            }, this);
+            
+            this.checkMailsDelayedTask.delay(1000);
+        } else {
+            Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> No folders for update found.');
+        }
     },
     
     /**
@@ -353,7 +409,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             account     = accountId ? this.getAccountStore().getById(accountId): null,
             imapStatus  = account ? account.get('imap_status') : null;
             
-        if (exception.code == 404) {
+        if (exception.code == 913) {
             // folder not found -> remove folder from store and tree panel
             var treePanel = this.getMainScreen().getTreePanel(),
                 node = treePanel.getNodeById(currentRequestFolder.id);
@@ -401,7 +457,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
     onUpdateFolder: function(store, record, operation) {
         if (operation === Ext.data.Record.EDIT) {
             if (record.isModified('cache_status')) {
-                Tine.log.info('Folder "' + record.get('localname') + '" updated with cache_status: ' + record.get('cache_status'));
+                Tine.log.info('Tine.Felamimail.Application::onUpdateFolder(): Folder "' + record.get('localname') + '" updated with cache_status: ' + record.get('cache_status'));
                 
                 // as soon as we get a folder with status != complete we need to trigger checkmail soon!
                 if (['complete', 'pending'].indexOf(record.get('cache_status')) === -1) {
@@ -498,7 +554,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.log.info('Folder "' + record.get('localname') + '" updated with quota values: ' 
                 + record.get('quota_usage') + ' / ' + record.get('quota_limit'));
 
-            this.getMainScreen().getCenterPanel().updateQuotaBar(null, record);
+            this.getMainScreen().getCenterPanel().updateQuotaBar(record);
         }
     },
     
@@ -544,7 +600,18 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
                 root: 'results',
                 totalProperty: 'totalcount',
                 proxy: Tine.Felamimail.accountBackend,
-                reader: Tine.Felamimail.accountBackend.getReader()
+                reader: Tine.Felamimail.accountBackend.getReader(),
+                listeners: {
+                	scope: this,
+                	'add': function (store, records) {
+                		Tine.log.info('Account added: ' + records[0].get(Tine.Felamimail.Model.Account.getMeta('titleProperty')));
+                		this.getMainScreen().getCenterPanel().action_write.setDisabled(! this.getActiveAccount());
+                	},
+                	'remove': function (store, record) {
+                		Tine.log.info('Account removed: ' + record.get(Tine.Felamimail.Model.Account.getMeta('titleProperty')));
+                		this.getMainScreen().getCenterPanel().action_write.setDisabled(! this.getActiveAccount());
+                	}
+                }
             });
         } 
     
@@ -665,7 +732,7 @@ Tine.Felamimail.getSignature = function(id) {
     var defaultAccount = app.getAccountStore().getById(id);
     var signature = (defaultAccount) ? defaultAccount.get('signature') : '';
     if (signature && signature != '') {
-        signature = Ext.util.Format.nl2br(signature);
+        // NOTE: signature is always in html, nl2br here would cause duplicate linebreaks!
         result = '<br><br><span id="felamimail-body-signature">--<br>' + signature + '</span>';
     }
     

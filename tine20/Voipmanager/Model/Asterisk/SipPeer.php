@@ -5,7 +5,7 @@
  * @package     Voipmanager
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Thomas Wadewitz <t.wadewitz@metaways.de>
- * @copyright   Copyright (c) 2007-2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
@@ -48,17 +48,6 @@ class Voipmanager_Model_Asterisk_SipPeer extends Tinebase_Record_Abstract
      * @var string
      */
     protected $_application = 'Voipmanager';
-    
-    /**
-     * list of zend inputfilter
-     * 
-     * this filter get used when validating user generated content with Zend_Input_Filter
-     *
-     * @var array
-     */
-    #protected $_filters = array(
-    #    '*'                     => 'StringTrim'
-    #);
     
     /**
      * list of zend validator
@@ -116,11 +105,14 @@ class Voipmanager_Model_Asterisk_SipPeer extends Tinebase_Record_Abstract
         'regserver'             => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'useragent'             => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'lastms'                => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => -1),
-        'cfi_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true, 'InArray' => array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL), 'default' => self::CFMODE_OFF),
+        'cfi_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true,
+            array('InArray', array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL)), 'default' => self::CFMODE_OFF),
         'cfi_number'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'cfb_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true, 'InArray' => array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL), 'default' => self::CFMODE_OFF),
+        'cfb_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true,
+            array('InArray', array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL)), 'default' => self::CFMODE_OFF),
         'cfb_number'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-        'cfd_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true, 'InArray' => array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL), 'default' => self::CFMODE_OFF),
+        'cfd_mode'              => array(Zend_Filter_Input::ALLOW_EMPTY => true,
+            array('InArray', array(self::CFMODE_OFF, self::CFMODE_NUMBER, self::CFMODE_VOICEMAIL)), 'default' => self::CFMODE_OFF),
         'cfd_number'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'cfd_time'              => array(Zend_Filter_Input::ALLOW_EMPTY => true, 'Int', 'default' => 30)
     );
@@ -149,31 +141,6 @@ class Voipmanager_Model_Asterisk_SipPeer extends Tinebase_Record_Abstract
         $this->_filters['cfd_time'] = new Zend_Filter_Empty(0);
         
         parent::__construct($_data, $_bypassFilters, $_convertDates);
-    }
-    
-    /**
-     * converts a int, string or Voipmanager_Model_Asterisk_SipPeer to an line id
-     *
-     * @param int|string|Voipmanager_Model_Asterisk_SipPeer $_sipPeerId the sip peer id to convert
-     * @return int
-     * @throws  Voipmanager_Exception_InvalidArgument
-     */
-    static public function convertAsteriskSipPeerIdToInt($_sipPeerId)
-    {
-        if ($_sipPeerId instanceof Voipmanager_Model_Asterisk_SipPeer) {
-            if (empty($_sipPeerId->id)) {
-                throw new Voipmanager_Exception_InvalidArgument('no sip peer id set');
-            }
-            $id = (string) $_sipPeerId->id;
-        } else {
-            $id = (string) $_sipPeerId;
-        }
-        
-        if ($id == '') {
-            throw new Voipmanager_Exception_InvalidArgument('sip peer id can not be 0');
-        }
-        
-        return $id;
     }
 
     /**

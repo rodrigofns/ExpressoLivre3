@@ -45,10 +45,32 @@ class Addressbook_Setup_Initialize extends Setup_Initialize
         Tinebase_Core::set(Tinebase_Core::USER, $initialUser);
         
         parent::_initialize($_application, $_options);
-        
-        $this->_initializeUserContacts();
-        $this->_initializeGroupLists();
-        $this->_initializeConfig();
+    }
+    
+    /**
+    * init key fields
+    */
+    protected function _initializeKeyFields()
+    {
+        $cb = new Tinebase_Backend_Sql(array(
+            'modelName' => 'Tinebase_Model_Config', 
+            'tableName' => 'config',
+        ));
+    
+        $keyfieldConfig = array(
+            'name'    => Addressbook_Config::CONTACT_SALUTATION,
+            'records' => array(
+                array('id' => 'MR',      'value' => 'Mr', 	   'gender' => Addressbook_Model_Salutation::GENDER_MALE,   'image' => 'images/empty_photo_male.png',    'system' => true), //_('Mr')
+                array('id' => 'MS',      'value' => 'Ms',      'gender' => Addressbook_Model_Salutation::GENDER_FEMALE, 'image' => 'images/empty_photo_female.png',  'system' => true), //_('Ms')
+                array('id' => 'COMPANY', 'value' => 'Company', 'gender' => Addressbook_Model_Salutation::GENDER_OTHER,  'image' => 'images/empty_photo_company.png', 'system' => true), //_('Company')
+            ),
+        );
+    
+        $cb->create(new Tinebase_Model_Config(array(
+            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('Addressbook')->getId(),
+            'name'              => Addressbook_Config::CONTACT_SALUTATION,
+            'value'             => json_encode($keyfieldConfig),
+        )));
     }
     
     /**
@@ -203,8 +225,31 @@ class Addressbook_Setup_Initialize extends Setup_Initialize
      */
     protected function _initializeConfig()
     {
-        Admin_Controller::getInstance()->saveConfigSettings(array(
-            Admin_Model_Config::DEFAULTINTERNALADDRESSBOOK => $this->_getInternalAddressbook()->getId()
-        ));
+        self::setDefaultInternalAddressbook($this->_getInternalAddressbook());
+    }
+    
+    /**
+     * set default internal addressbook
+     * 
+     * @param Tinebase_Model_Container $internalAddressbook
+     * @return Tinebase_Model_Container
+     * 
+     * @todo create new internal adb on the fly if it does not exist?
+     */
+    public static function setDefaultInternalAddressbook($internalAddressbook = NULL)
+    {
+        if ($internalAddressbook === NULL) {
+            $internalAddressbook = Tinebase_Container::getInstance()->getContainerByName('Addressbook', 'Internal Contacts', Tinebase_Model_Container::TYPE_SHARED);
+        }
+        
+        Tinebase_Config::getInstance()->setConfigForApplication(
+            Tinebase_Config::APPDEFAULTS,
+            Zend_Json::encode(array(
+                Admin_Model_Config::DEFAULTINTERNALADDRESSBOOK => $internalAddressbook->getId()
+            )),
+            'Admin'
+        );
+        
+        return $internalAddressbook;
     }
 }

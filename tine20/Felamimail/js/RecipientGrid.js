@@ -4,7 +4,7 @@
  * @package     Felamimail
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Philipp Schüle <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2009-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
  
@@ -261,19 +261,24 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
             return;
         }
         
-        var value = combo.getValue();
+        var value = combo.getValue(),
+            rawValue = combo.getRawValue();
         
         if (e.getKey() == e.ENTER) {
             // cancel loading when ENTER is pressed
             combo.lastStoreTransactionId = null;
-            if (value != '' && this.activeEditor.record.get('address') == value) {
+            if (value !== '' || rawValue !== '') {
                 // add another row here as this is not detected by onAfterEdit
+                if (value !== rawValue) {
+                    this.activeEditor.record.set('address', rawValue);
+                    this.activeEditor.record.id = Ext.id();
+                }
                 this.addRowAndDoLayout(this.activeEditor.record);
                 return true;
             }
         } else if (e.getKey() == e.BACKSPACE) {
             // remove row on backspace if we have more than 1 rows in grid
-            if (value == '' && this.store.getCount() > 1 && this.activeEditor.row > 0) {
+            if (rawValue == '' && this.store.getCount() > 1 && this.activeEditor.row > 0) {
                 this.store.remove(this.activeEditor.record);
                 this.activeEditor.row -= 1;
                 this.setFixedHeight(false);
@@ -290,15 +295,15 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
             return true;
         }
 
-        // jump to subject if we are in the last row and it is empty
-        if (value == '' && this.store.getCount() == this.activeEditor.row + 1) {
+        // jump to subject if we are in the last row and it is empty OR TAB was pressed
+        if (e.getKey() == e.TAB || (value == '' && this.store.getCount() == this.activeEditor.row + 1)) {
             this.fireEvent('specialkey', combo, e);
             if (this.activeEditor.row == 0) {
                 return false;
             }
         }
     },
-                
+    
     /**
      * adds row and adjusts layout
      * 

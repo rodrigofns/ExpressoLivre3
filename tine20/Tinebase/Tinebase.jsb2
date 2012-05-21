@@ -1,10 +1,8 @@
 {
   "projectName": "Tine 2.0 - Tinebase",
   "deployDir": "Tinebase",
-  "licenseText": "Tine 2.0 - Tinebase \nCopyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)\nhttp://www.gnu.org/licenses/agpl.html AGPL Version 3",
-  "resources": [
-    
-  ],
+  "licenseText": "Tine 2.0 - Tinebase \nCopyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)\nhttp://www.gnu.org/licenses/agpl.html AGPL Version 3",
+  "resources": [],
   "pkgs": [
     {
       "name": "Tinebase FAT Client",
@@ -50,6 +48,14 @@
         {
           "text": "MapPanel.js",
           "path": "js/widgets/"
+        },
+        {
+          "text": "ContentTypeTreePanel.js",
+          "path": "js/widgets/"
+        },
+        {
+          "text": "RecordPickerManager.js",
+          "path": "js/widgets/form/"
         },
         {
           "text": "FieldLabeler.js",
@@ -136,7 +142,11 @@
           "path": "js/ux/grid/"
         },
         {
-          "text": "Uploader.js",
+          "text": "UploadManager.js",
+          "path": "js/ux/file/"
+        },
+        {
+          "text": "Upload.js",
           "path": "js/ux/file/"
         },
         {
@@ -324,6 +334,18 @@
           "path": "js/"
         },
         {
+          "text": "Store.js",
+          "path": "js/widgets/keyfield/"
+        },
+        {
+          "text": "ComboBox.js",
+          "path": "js/widgets/keyfield/"
+        },
+        {
+          "text": "Renderer.js",
+          "path": "js/widgets/keyfield/"
+        },
+        {
           "text": "LangChooser.js",
           "path": "js/widgets/"
         },
@@ -336,10 +358,6 @@
           "path": "js/widgets/"
         },
         {
-          "text": "Priority.js",
-          "path": "js/widgets/"
-        },
-        {
           "text": "VersionCheck.js",
           "path": "js/widgets/"
         },
@@ -349,6 +367,26 @@
         },
         {
           "text": "EditDialog.js",
+          "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "MultipleEditDialogPlugin.js",
+          "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "MultipleEditResultSummary.js",
+          "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "TabPanelKeyPlugin.js",
+          "path": "js/ux/"
+        },
+        {
+          "text": "TokenModeEditDialogPlugin.js",
+          "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "WizardPanel.js",
           "path": "js/widgets/dialog/"
         },
         {
@@ -388,16 +426,20 @@
           "path": "js/widgets/dialog/"
         },
         {
-          "text": "CustomfieldSearchCombo.js",
-          "path": "js/widgets/customfields/"
+          "text": "FileListDialog.js",
+          "path": "js/widgets/dialog/"
         },
         {
-          "text": "CustomfieldsPanel.js",
-          "path": "js/widgets/customfields/"
+          "text": "DuplicateMergeDialog.js",
+          "path": "js/widgets/dialog/"
         },
         {
-          "text": "CustomfieldsCombo.js",
-          "path": "js/widgets/customfields/"
+          "text": "DuplicateResolveGridPanel.js",
+          "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "RendererManager.js",
+          "path": "js/widgets/grid/"
         },
         {
           "text": "DetailsPanel.js",
@@ -424,7 +466,15 @@
           "path": "js/widgets/grid/"
         },
         {
-          "text": "FilterModelMultiSelect.js",
+          "text": "FilterStructureTreePanel.js",
+          "path": "js/widgets/grid/"
+        },
+        {
+          "text": "FilterPanel.js",
+          "path": "js/widgets/grid/"
+        },
+        {
+          "text": "PickerFilter.js",
           "path": "js/widgets/grid/"
         },
         {
@@ -440,6 +490,10 @@
           "path": "js/widgets/grid/"
         },
         {
+          "text": "OwnRecordFilter.js",
+          "path": "js/widgets/grid/"
+        },
+        {
           "text": "QuickaddGridPanel.js",
           "path": "js/widgets/grid/"
         },
@@ -452,8 +506,16 @@
           "path": "js/widgets/grid/"
         },
         {
+          "text": "LinkGridPanel.js",
+          "path": "js/widgets/grid/"
+        },
+        {
           "text": "GridPanel.js",
           "path": "js/widgets/grid/"
+        },
+        {
+          "text": "Filter.js",
+          "path": "js/widgets/keyfield/"
         },
         {
           "text": "Loader.js",
@@ -466,6 +528,38 @@
         {
           "text": "FilterPlugin.js",
           "path": "js/widgets/tree/"
+        },
+        {
+          "text": "ConfigManager.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "Field.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "FilterModel.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "Renderer.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "CustomfieldSearchCombo.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "EditDialogPlugin.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "CustomfieldsCombo.js",
+          "path": "js/widgets/customfields/"
+        },
+        {
+          "text": "FilterModel.js",
+          "path": "js/widgets/relation/"
         },
         {
           "text": "PickerGridPanel.js",
@@ -484,7 +578,11 @@
           "path": "js/widgets/container/"
         },
         {
-          "text": "ContainerTree.js",
+          "text": "TreePanel.js",
+          "path": "js/widgets/container/"
+        },
+        {
+          "text": "PropertiesDialog.js",
           "path": "js/widgets/container/"
         },
         {
@@ -500,11 +598,19 @@
           "path": "js/widgets/tags/"
         },
         {
+          "text": "TagToggleBox.js",
+          "path": "js/widgets/tags/"
+        },
+        {
           "text": "TagFilter.js",
           "path": "js/widgets/tags/"
         },
         {
           "text": "TagsMassAttachAction.js",
+          "path": "js/widgets/tags/"
+        },
+        {
+          "text": "TagsMassDetachAction.js",
           "path": "js/widgets/tags/"
         },
         {
@@ -532,6 +638,14 @@
           "path": "js/widgets/form/"
         },
         {
+          "text": "AutoCompleteField.js",
+          "path": "js/widgets/form/"
+        },
+        {
+          "text": "FileUploadButton.js",
+          "path": "js/widgets/form/"
+        },
+        {
           "text": "Model.js",
           "path": "js/widgets/persistentfilter/"
         },
@@ -541,6 +655,10 @@
         },
         {
           "text": "PickerPanel.js",
+          "path": "js/widgets/persistentfilter/"
+        },
+        {
+          "text": "EditPersistentFilterPanel.js",
           "path": "js/widgets/persistentfilter/"
         },
         {
@@ -607,11 +725,19 @@
           "path": "css/"
         },
         {
+          "text": "mimetypes.css",
+          "path": "css/"
+        },
+        {
           "text": "SmallForms.css",
           "path": "css/"
         },
         {
           "text": "ArrowCollapse.css",
+          "path": "css/ux/"
+        },
+        {
+          "text": "SubFormPanel.css",
           "path": "css/ux/"
         },
         {

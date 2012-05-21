@@ -32,6 +32,7 @@ class Addressbook_Controller extends Tinebase_Controller_Event implements Tineba
      */
     private function __construct() {
         $this->_currentAccount = Tinebase_Core::getUser();
+        $this->_applicationName = 'Addressbook';
     }
     
     /**
@@ -84,21 +85,24 @@ class Addressbook_Controller extends Tinebase_Controller_Event implements Tineba
      *
      * @param mixed[int|Tinebase_Model_User] $_account   the accountd object
      * @return Tinebase_Record_RecordSet of subtype Tinebase_Model_Container
+     * 
+     * @todo replace this with Tinebase_Container::getInstance()->getDefaultContainer
      */
     public function createPersonalFolder($_account)
     {
-        $translation = Tinebase_Translation::getTranslation('Addressbook');
+        $translation = Tinebase_Translation::getTranslation($this->_applicationName);
         
-        $accountId = Tinebase_Model_User::convertUserIdToInt($_account);
-        $account = Tinebase_User::getInstance()->getUserById($accountId);
+        $account = Tinebase_User::getInstance()->getUserById($_account);
+        
         $newContainer = new Tinebase_Model_Container(array(
             'name'              => sprintf($translation->_("%s's personal addressbook"), $account->accountFullName),
             'type'              => Tinebase_Model_Container::TYPE_PERSONAL,
+        	'owner_id'          => $_account,
             'backend'           => 'Sql',
-            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName('Addressbook')->getId() 
+            'application_id'    => Tinebase_Application::getInstance()->getApplicationByName($this->_applicationName)->getId() 
         ));
         
-        $personalContainer = Tinebase_Container::getInstance()->addContainer($newContainer, NULL, FALSE, $accountId);
+        $personalContainer = Tinebase_Container::getInstance()->addContainer($newContainer);
         $container = new Tinebase_Record_RecordSet('Tinebase_Model_Container', array($personalContainer));
         
         return $container;
@@ -134,7 +138,7 @@ class Addressbook_Controller extends Tinebase_Controller_Event implements Tineba
         
         return new Tinebase_Model_Image($imageInfo + array(
             'id'           => $_identifier,
-            'application'  => 'Addressbook',
+            'application'  => $this->_applicationName,
             'data'         => $image
         ));
     }

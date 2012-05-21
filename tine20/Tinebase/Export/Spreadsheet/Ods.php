@@ -5,8 +5,8 @@
  * @package     Tinebase
  * @subpackage	Export
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2009-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Philipp Schüle <p.schuele@metaways.de>
+ * @copyright   Copyright (c) 2009-2011 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  * @todo        add alternating row styles again?
  */
@@ -17,7 +17,7 @@
  * @package     Tinebase
  * @subpackage	Export
  */
-class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstract
+class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstract implements Tinebase_Record_IteratableInterface
 {
     /**
      * user styles
@@ -95,6 +95,13 @@ class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstra
     protected $_openDocumentObject = NULL;
     
     /**
+     * spreadsheet table
+     * 
+     * @var OpenDocument_SpreadSheet_Table
+     */
+    protected $_activeTable = NULL;
+    
+    /**
      * generate export
      * 
      * @return string filename
@@ -103,27 +110,25 @@ class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstra
     {
         $this->_createDocument();
         
-        $records = $this->_getRecords();
-        
         // build export table (use current table if using template)
         Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Creating export for ' . $this->_modelName . ' . ' . $this->_getDataTableName());
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($this->_config->toArray(), TRUE));
         
         $spreadSheet = $this->_openDocumentObject->getBody();
         
         // append / use existing table
         if($spreadSheet->tableExists($this->_getDataTableName()) === true) {
-            $table = $spreadSheet->getTable($this->_getDataTableName());
+            $this->_activeTable = $spreadSheet->getTable($this->_getDataTableName());
         } else {
-            $table = $spreadSheet->appendTable($this->_getDataTableName());
+            $this->_activeTable = $spreadSheet->appendTable($this->_getDataTableName());
         }
         
         // add header (disabled at the moment)
         if (isset($this->_config->header) && $this->_config->header) {
-            $this->_addHead($table);
+            $this->_addHead($this->_activeTable);
         }
-            
-        // body
-        $this->_addBody($table, $records);
+        
+        $this->_exportRecords();
         
         // create file
         $result = $this->_openDocumentObject->getDocument();        
@@ -165,13 +170,10 @@ class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstra
     
     /**
      * add ods head (headline, column styles)
-     *
-     * @param OpenDocument_SpreadSheet_Table $table
-     * 
      */
-    protected function _addHead($table)
+    protected function _addHead()
     {
-        $row = $table->appendRow();
+        $row = $this->_activeTable->appendRow();
         
         // add header (replace placeholders)
         if (isset($this->_config->headers)) {
@@ -193,10 +195,10 @@ class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstra
             }
         }
         
-        $row = $table->appendRow();
+        $row = $this->_activeTable->appendRow();
         
         // add table headline
-        $row = $table->appendRow();
+        $row = $this->_activeTable->appendRow();
         foreach($this->_config->columns->column as $field) {
             $headerValue = ($field->header) ? $field->header : $field->identifier;
             $cell = $row->appendCell($headerValue, OpenDocument_SpreadSheet_Cell::TYPE_STRING);
@@ -214,18 +216,17 @@ class Tinebase_Export_Spreadsheet_Ods extends Tinebase_Export_Spreadsheet_Abstra
     /**
      * add body rows
      *
-     * @param OpenDocument_SpreadSheet_Table $table
      * @param Tinebase_Record_RecordSet $records
-     * @param array 
-     * 
      */
-    protected function _addBody(OpenDocument_SpreadSheet_Table $table, $_records)
+    public function processIteration($_records)
     {
+        $this->_resolveRecords($_records);
+        
         // add record rows
         $i = 0;
         foreach ($_records as $record) {
             
-            $row = $table->appendRow();
+            $row = $this->_activeTable->appendRow();
 
             foreach ($this->_config->columns->column as $field) {
                 

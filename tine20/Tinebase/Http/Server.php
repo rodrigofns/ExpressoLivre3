@@ -128,7 +128,8 @@ class Tinebase_Http_Server extends Zend_Server_Abstract implements Zend_Server_I
 		                if ($this->_functions[$this->_method]->isStatic()) {
 		                    // for some reason, invokeArgs() does not work the same as 
 		                    // invoke(), and expects the first argument to be an object. 
-		                    // So, using a callback if the method is static.
+		                    // So, using a callback if the method is static.                   
+		                	
 		                    $result = call_user_func_array(array($class, $this->_functions[$this->_method]->getName()), $calling_args);
 		                }
 		
@@ -142,7 +143,7 @@ class Tinebase_Http_Server extends Zend_Server_Abstract implements Zend_Server_I
 		                } catch (Exception $e) {
 		                    throw new Zend_Json_Server_Exception('Error instantiating class ' . $class . ' to invoke method ' . $this->_functions[$this->_method]->getName(), 500);
 		                }
-		                
+
 		                // the called function generates the needed output
 		                $this->_functions[$this->_method]->invokeArgs($object, $calling_args);
 					} else {

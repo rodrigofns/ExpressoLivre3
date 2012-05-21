@@ -5,14 +5,12 @@
  * @package     Tinebase
  * @subpackage  Record
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @copyright   Copyright (c) 2007-2008 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * 
- * @todo        add toJson / setFromJson functions?
  */
 
 /**
- * Abstract implemetation of  Tinebase_Record_Interface
+ * Abstract implemetation of Tinebase_Record_Interface
  * 
  * @package     Tinebase
  * @subpackage  Record
@@ -29,14 +27,14 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
      *
      * @var bool
      */
-    public  $bypassFilters;
+    public $bypassFilters;
     
     /**
      * should datetimeFields be converted from iso8601 (or optionally others {@see $this->dateConversionFormat}) strings to DateTime objects and back 
      *
      * @var bool
      */
-    public  $convertDates;
+    public $convertDates;
     
     /**
      * differnet format than iso8601 to use for conversions 
@@ -46,7 +44,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
     public $dateConversionFormat = NULL;
     
     /**
-     * key in $_validators/$_properties array for the filed which 
+     * key in $_validators/$_properties array for the field which 
      * represents the identifier
      * NOTE: _Must_ be set by the derived classes!
      * 
@@ -120,6 +118,15 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
      * @var array list of modlog omit fields
      */
     protected $_modlogOmitFields = array();
+    
+    /**
+     * name of fields that should not be persisted during create/update in backend
+     *
+     * @var array
+     * 
+     * @todo think about checking the setting of readonly field and not allow it
+     */
+    protected $_readOnlyFields = array();
     
     /**
      * save state if data are validated
@@ -277,7 +284,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
             $customFields = Tinebase_CustomField::getInstance()->getCustomFieldsForApplication($application, get_class($this))->name;
             $recordCustomFields = array();
         } else {
-            $customFields = array();    
+            $customFields = array();
         }
         
         // make sure we run through the setters
@@ -287,7 +294,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
             if (array_key_exists ($key, $this->_validators)) {
                 $this->$key = $value;
             } else if (in_array($key, $customFields)) {
-                $recordCustomFields[$key] = $value;                
+                $recordCustomFields[$key] = $value;
             }
         }
         if (!empty($recordCustomFields)) {
@@ -297,7 +304,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
         $this->bypassFilters = $bypassFilter;
         if ($this->bypassFilters !== true) {
             $this->isValid(true);
-        }        
+        }
     }
     
     /**
@@ -404,7 +411,6 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
             } else {
                 $this->_convertDateTimeToString($recordArray, $this->dateConversionFormat);
             }
-            
         }
         
         if ($_recursive) {
@@ -413,7 +419,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
                         (in_array('Tinebase_Record_Interface', class_implements($value)) || 
                         $value instanceof Tinebase_Record_Recordset) ||
                         (is_object($value) && method_exists($value, 'toArray'))) {
-                    $recordArray[$property] = $value->toArray(FALSE);
+                    $recordArray[$property] = $value->toArray();
                 }
             }
         }
@@ -433,10 +439,7 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
         if($this->_isValidated === false) {
             
             $inputFilter = $this->_getFilter();
-            
             $inputFilter->setData($this->_properties);
-            
-          
             
             if ($inputFilter->isValid()) {
                 // set $this->_properties with the filtered values
@@ -769,9 +772,36 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
     }
     
     /**
+    * converts a int, string or Tinebase_Record_Interface to a id
+    *
+    * @param int|string|Tinebase_Record_Abstract $_id the id to convert
+    * @param string $_modelName
+    * @return int|string
+    */
+    public static function convertId($_id, $_modelName = 'Tinebase_Record_Abstract')
+    {
+        if ($_id instanceof $_modelName) {
+            if (! $_id->getId()) {
+                throw new Tinebase_Exception_InvalidArgument('No id set!');
+            }
+            $id = $_id->getId();
+        } elseif (is_array($_id)) {
+            throw new Tinebase_Exception_InvalidArgument('Id can not be an array!');
+        } else {
+            $id = $_id;
+        }
+    
+        if ($id === 0) {
+            throw new Tinebase_Exception_InvalidArgument($_modelName . '.id can not be 0!');
+        }
+    
+        return $id;
+    }
+    
+    /**
      * returns an array with differences to the given record
      * 
-     * @param  Tinebase_Record_Interface $_record record for comparism
+     * @param  Tinebase_Record_Interface $_record record for comparison
      * @return array with differences field => different value
      */
     public function diff($_record)
@@ -780,44 +810,41 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
             return $_record;
         }
         
-        //echo '---------------' ."n";
-        //print_r($_record->toArray());
         $diff = array();
         foreach (array_keys($this->_validators) as $fieldName) {
-            //echo $fieldName . "\n";
+            $ownField = $this->__get($fieldName);
+            $recordField = $_record->$fieldName;
+            
             if (in_array($fieldName, $this->_datetimeFields)) {
-                if ($this->__get($fieldName) instanceof DateTime
-                    && $_record->$fieldName instanceof DateTime) {
-                    if ($this->__get($fieldName)->compare($_record->$fieldName) === 0) {
+                if ($ownField instanceof DateTime
+                    && $recordField instanceof DateTime) {
+                    if ($ownField->compare($recordField) === 0) {
                         continue;
                     } else {
                         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 
                             ' datetime for field ' . $fieldName . ' is not equal: '
-                            . $this->__get($fieldName)->getIso() . ' != '
-                            . $_record->$fieldName->getIso()
+                            . $ownField->getIso() . ' != '
+                            . $recordField->getIso()
                         );
                     } 
-                } elseif (!$_record->$fieldName instanceof DateTime
-                          && $this->__get($fieldName) == $_record->$fieldName) {
+                } else if (! $recordField instanceof DateTime && $ownField == $recordField) {
                     continue;
                 } 
-            } elseif($fieldName == $this->_identifier
-                     && $this->getId() == $_record->getId()) {
-                    continue;
-            } /*elseif (is_array($_record->$fieldName)) {
-                throw new Exception('Arrays are not allowed as values in records. use recordSets instead!');
-            } */elseif ($_record->$fieldName instanceof Tinebase_Record_RecordSet 
-                      || $_record->$fieldName instanceof Tinebase_Record_Abstract) {
-                 $subdiv = $_record->$fieldName->diff($this->__get($fieldName));
-                 if (!empty($subdiv)) {
-                     $diff[$fieldName] = $subdiv;
-                 }
-                 continue;
-            } elseif($this->__get($fieldName) == $_record->$fieldName) {
+            } else if ($fieldName == $this->_identifier && $this->getId() == $_record->getId()) {
+                continue;
+            } else if ($recordField instanceof Tinebase_Record_Abstract || $recordField instanceof Tinebase_Record_RecordSet) {
+                $subdiv = $recordField->diff($ownField);
+                if (! empty($subdiv)) {
+                    $diff[$fieldName] = $subdiv;
+                }
+                continue;
+            } else if ($ownField == $recordField) {
+                continue;
+            } else if (empty($ownField) && empty($recordField)) {
                 continue;
             }
             
-            $diff[$fieldName] = $_record->$fieldName;
+            $diff[$fieldName] = $recordField;
         }
         return $diff;
     }
@@ -876,14 +903,27 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
     }   
 
     /**
+     * get fields
+     * 
+     * @return array
+     */
+    public function getFields()
+    {
+        return array_keys($this->_validators);
+    }
+    
+    /**
      * fills a record from json data
      *
      * @param string $_data json encoded data
      * @return void
+     * 
+     * @todo replace this (and setFromJsonInUsersTimezone) with Tinebase_Convert_Json::toTine20Model
+     * @todo move custom _setFromJson to (custom) converter
      */
     public function setFromJson($_data)
     {
-        if(is_array($_data)) {
+        if (is_array($_data)) {
             $recordData = $_data;
         } else {
             $recordData = Zend_Json::decode($_data);
@@ -918,4 +958,15 @@ abstract class Tinebase_Record_Abstract implements Tinebase_Record_Interface
         return $this->_modlogOmitFields;
     }
 
+    /**
+     * returns read only fields
+     *
+     * @return array
+     */
+    public function getReadOnlyFields()
+    {
+        return $this->_readOnlyFields;
+    }
+
 }
+

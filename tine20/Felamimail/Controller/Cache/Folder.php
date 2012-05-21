@@ -85,6 +85,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
      */
     public function update($_accountId, $_folderName = '', $_recursive = FALSE)
     {
+    	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' getting (sub) folder and creating folders in db backend cache');
+    	
         $account = ($_accountId instanceof Felamimail_Model_Account) ? $_accountId : Felamimail_Controller_Account::getInstance()->get($_accountId);
         $this->_delimiter = $account->delimiter;
         
@@ -101,6 +103,9 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
         } catch (Zend_Mail_Protocol_Exception $zmpe) {
             Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' IMAP Protocol Exception: ' . $zmpe->getMessage());
             $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder');
+        } catch (Exception $e) {
+       		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' unexpected Exception: ' . $e->getMessage());
+       		$result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder');
         }
         
         return $result;
@@ -253,7 +258,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
             
         // check validity
         $folder->cache_uidvalidity = $folder->imap_uidvalidity;
-        $folder->imap_uidvalidity  = $counter['uidvalidity'];
+        $folder->imap_uidvalidity  = $counter['uidvalidity']; 
+        $folder->cache_uidvalidity = empty($folder->cache_uidvalidity) ? $folder->imap_uidvalidity : $folder->cache_uidvalidity;          
         $folder->imap_totalcount   = $counter['exists'];
         $folder->imap_status       = Felamimail_Model_Folder::IMAP_STATUS_OK;
         $folder->imap_timestamp    = Tinebase_DateTime::now();
@@ -337,10 +343,12 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
                 $folderData['localName'] = Felamimail_Model_Folder::decodeFolderName($folderData['localName']);
                 $folderData['globalName'] = Felamimail_Model_Folder::decodeFolderName($folderData['globalName']);
                 $isSelectable = $this->_isSelectable($folderData, $_account);
-                                
+                
                 $folder = Felamimail_Controller_Folder::getInstance()->getByBackendAndGlobalName($_account->getId(), $folderData['globalName']);
+                
                 $folder->is_selectable = $isSelectable;
-                $folder->has_children = ($folderData['hasChildren'] == '1');
+                $folder->imap_status   = Felamimail_Model_Folder::IMAP_STATUS_OK;
+                $folder->has_children  = ($folderData['hasChildren'] == '1');
                 
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Update cached folder ' . $folderData['globalName']);
                 
@@ -362,6 +370,7 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
                         'has_children'      => ($folderData['hasChildren'] == '1'),
                         'account_id'        => $_account->getId(),
                         'imap_timestamp'    => Tinebase_DateTime::now(),
+                        'imap_status'       => Felamimail_Model_Folder::IMAP_STATUS_OK,
                         'user_id'           => $this->_currentAccount->getId(),
                         'parent'            => $parentFolder,
                         'system_folder'     => in_array(strtolower($folderData['localName']), $systemFolders),
@@ -445,11 +454,12 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
      * check if folder cache is updating atm
      * 
      * @param Felamimail_Model_Folder $_folder
+     * @param boolean $_lockFolder
      * @return boolean
      * 
      * @todo we should check the time of the last update to dynamically decide if process could have died
      */
-    public function updateAllowed(Felamimail_Model_Folder $_folder)
+    public function updateAllowed(Felamimail_Model_Folder $_folder, $_lockFolder = TRUE)
     {
         // if cache status is CACHE_STATUS_UPDATING and timestamp is less than 5 minutes ago, don't update
         if ($_folder->cache_status == Felamimail_Model_Folder::CACHE_STATUS_UPDATING &&
@@ -461,8 +471,8 @@ class Felamimail_Controller_Cache_Folder extends Tinebase_Controller_Abstract
         ) {
             return false;
         }
-                        
-        $result = $this->_backend->lockFolder($_folder);
+
+        $result = ($_lockFolder) ? $this->_backend->lockFolder($_folder) : TRUE;
         
         return $result;
     }

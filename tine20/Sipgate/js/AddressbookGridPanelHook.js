@@ -23,9 +23,10 @@ Ext.ns('Tine.Sipgate');
  * @constructor
  */
 Tine.Sipgate.AddressbookGridPanelHook = function(config) {
+
     Tine.log.info('initialising sipgate addressbook hooks');
-    Ext.apply(this, config);
     
+    Ext.apply(this, config);
 
     this.callMenu = new Ext.menu.Menu({
     });
@@ -54,7 +55,8 @@ Tine.Sipgate.AddressbookGridPanelHook = function(config) {
 
 
     Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ActionToolbar-leftbtngrp', this.callContactBtn, 30);
-    Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu', this.callContactAction, 80);
+//    Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu', '-', 120);
+    Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu', this.callContactAction, 130);
      
     this.composeSmsAction = new Ext.Action({
         text: this.app.i18n._('Compose SMS'),
@@ -77,7 +79,7 @@ Tine.Sipgate.AddressbookGridPanelHook = function(config) {
     
     // register in toolbar + contextmenu
     Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ActionToolbar-leftbtngrp', this.composeSmsBtn, 30);
-    Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu', this.composeSmsAction, 80);    
+    Ext.ux.ItemRegistry.registerItem('Addressbook-GridPanel-ContextMenu', this.composeSmsAction, 140);    
     
 };
 
@@ -205,7 +207,7 @@ Ext.apply(Tine.Sipgate.AddressbookGridPanelHook.prototype, {
         }
         
         var popUpWindow = Tine.Sipgate.SmsEditDialog.openWindow({
-        	number: number
+            number: number
         });
         
     },    
@@ -215,7 +217,7 @@ Ext.apply(Tine.Sipgate.AddressbookGridPanelHook.prototype, {
      */
     onRender: function() {
         var actionUpdater = this.getContactGridPanel().actionUpdater,
-        	registeredActions = actionUpdater.actions;
+            registeredActions = actionUpdater.actions;
             
         if (registeredActions.indexOf(this.callContactAction) < 0) {
             actionUpdater.addActions([this.callContactAction]);
@@ -234,8 +236,7 @@ Ext.apply(Tine.Sipgate.AddressbookGridPanelHook.prototype, {
      * @param {Object} records
      */
     updateCallAction: function(action, grants, records) {
-    	   	
-    	
+
         if (action.isHidden()) {
             return;
         }

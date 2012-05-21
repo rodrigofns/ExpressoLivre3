@@ -40,7 +40,7 @@ class Tinebase_Frontend_Json_Container
                 $containers = Tinebase_Container::getInstance()->getSharedContainer(Tinebase_Core::getUser(), $application, Tinebase_Model_Grants::GRANT_READ);
                 break;
                 
-            case 'otherUsers':
+            case Tinebase_Model_Container::TYPE_OTHERUSERS:
                 $containers = Tinebase_Container::getInstance()->getOtherUsers(Tinebase_Core::getUser(), $application, Tinebase_Model_Grants::GRANT_READ);
                 break;
                 
@@ -191,7 +191,12 @@ class Tinebase_Frontend_Json_Container
                     $value['account_name'] = $account->toArray();
                     break;
                 case Tinebase_Acl_Rights::ACCOUNT_TYPE_GROUP:
-                    $value['account_name'] = Tinebase_Group::getInstance()->getGroupById($value['account_id'])->toArray();
+                    try {
+                        $group = Tinebase_Group::getInstance()->getGroupById($value['account_id']);
+                    } catch (Tinebase_Exception_Record_NotDefined $e) {
+                        $group = Tinebase_Group::getInstance()->getNonExistentGroup();
+                    }
+                    $value['account_name'] = $group->toArray();
                     break;
                 case Tinebase_Acl_Rights::ACCOUNT_TYPE_ANYONE:
                     $value['account_name'] = array('accountDisplayName' => 'Anyone');
@@ -199,7 +204,7 @@ class Tinebase_Frontend_Json_Container
                 default:
                     throw new Tinebase_Exception_InvalidArgument('Unsupported accountType.');
                     break;    
-            }            
+            }
         }
         
         return $_grants;

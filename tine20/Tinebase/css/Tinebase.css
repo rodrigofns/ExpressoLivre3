@@ -1,10 +1,10 @@
 html, body {
-	font:normal 12px verdana;
-	margin:0;
-	padding:0;
-	border:0 none;
-	overflow:hidden;
-	height:100%;
+    font:normal 12px verdana;
+    margin:0;
+    padding:0;
+    border:0 none;
+    overflow:hidden;
+    height:100%;
 }
 
 /* ----- actions -------------------------------------------------------------*/
@@ -71,6 +71,10 @@ html, body {
     background-image:url(../../images/oxygen/32x32/actions/color-line.png) !important;
 }
 
+.action_toggleshared {
+    background-image:url(../../images/oxygen/16x16/actions/get-hot-new-stuff.png) !important;
+}
+
 .action_delete {
     background-image:url(../../images/oxygen/16x16/actions/edit-delete.png) !important;
 }
@@ -80,7 +84,6 @@ html, body {
 .x-btn-large .action_delete {
     background-image:url(../../images/oxygen/32x32/actions/edit-delete.png) !important;
 }
-
 
 .action_applyChanges {
     background-image:url(../../images/oxygen/16x16/actions/dialog-ok-apply.png) !important;
@@ -114,6 +117,25 @@ html, body {
     background-image:url(../../images/oxygen/32x32/actions/dialog-ok.png) !important;
 }
 
+.action_next {
+    background-image:url(../../images/oxygen/16x16/actions/go-next.png) !important;
+}
+.x-btn-medium .action_next {
+    background-image:url(../../images/oxygen/22x22/actions/go-next.png) !important;
+}
+.x-btn-large .action_next {
+    background-image:url(../../images/oxygen/32x32/actions/go-next.png) !important;
+}
+
+.action_previous {
+    background-image:url(../../images/oxygen/16x16/actions/go-previous.png) !important;
+}
+.x-btn-medium .action_previous {
+    background-image:url(../../images/oxygen/22x22/actions/go-previous.png) !important;
+}
+.x-btn-large .action_previous {
+    background-image:url(../../images/oxygen/32x32/actions/go-previous.png) !important;
+}
 
 .action_managePermissions {
     background-image:url(../../images/oxygen/16x16/actions/password.png) !important;
@@ -125,6 +147,15 @@ html, body {
     background-image:url(../../images/oxygen/32x32/actions/password.png) !important;
 }
 
+.action_manageProperties {
+    background-image:url(../../images/oxygen/16x16/actions/dialog-information.png) !important;
+}
+.x-btn-medium .action_manageProperties {
+    background-image:url(../../images/oxygen/22x22/actions/dialog-information.png) !important;
+}
+.x-btn-large .action_manageProperties {
+    background-image:url(../../images/oxygen/32x32/actions/dialog-information.png) !important;
+}
 
 .action_addContact {
     background-image:url(../../images/oxygen/16x16/actions/add-user.png) !important;
@@ -201,6 +232,9 @@ html, body {
     background-image:url(../../images/oxygen/32x32/actions/rss-tag.png) !important;
 }
 
+.action_tag_delete {
+    background-image:url(../../images/oxygen/16x16/actions/rss-tag-delete.png) !important;
+}
 
 .action_uploadImage {
     background-image:url(../../images/oxygen/16x16/actions/insert-image.png) !important;
@@ -214,7 +248,7 @@ html, body {
 
 
 .action_cropImage {
-	background-image:url(../../images/oxygen/16x16/actions/select-rectangular.png) !important;
+    background-image:url(../../images/oxygen/16x16/actions/select-rectangular.png) !important;
 }
 .x-btn-medium .action_cropImage {
     background-image:url(../../images/oxygen/22x22/actions/select-rectangular.png) !important;
@@ -309,6 +343,10 @@ html, body {
     background-image:url(../../images/oxygen/32x32/actions/document-print-preview.png) !important;
 }
 
+.action_resolveDuplicates {
+    background-image: url(../../images/oxygen/16x16/actions/file-revert.png) !important;
+}
+
 .tinebase-action-export-xls {
     background-image:url(../../images/oxygen/16x16/mimetypes/application-vnd.ms-excel.png) !important;
 }
@@ -359,13 +397,21 @@ html, body {
     background-image:url(../../images/oxygen/16x16/actions/knewstuff.png);
 }
 
+.tinebase-westpanel-node-favorite-shared img.x-tree-node-icon {
+    background-image:url(../../images/oxygen/16x16/actions/get-hot-new-stuff.png);
+}
+
+.action-tinebase-favorite {
+    background-image:url(../../images/oxygen/16x16/actions/knewstuff.png) !important;
+}
+
 /* ----- login dialog --------------------------------------------------------*/
 .tb-login-panel form {
     padding: 20px 10px 20px 20px;
 }
 
 .tb-login-lobobox {
-	text-align:right;
+    text-align:right;
     height: 60px;
 }
 
@@ -380,11 +426,11 @@ html, body {
  }
 
 .tb-login-button-spacer {
-	height: 30px;
+    height: 30px;
 }
 
 .tb-login-infosection {
-	padding-left: 20px;
+    padding-left: 20px;
 }
 
 .tb-login-infosection {
@@ -394,7 +440,7 @@ html, body {
 }
 
 .tb-login-infosection a {
-	text-decoration: none;
+    text-decoration: none;
     font-style: normal;
     color: #1E78AD;
 }
@@ -571,7 +617,7 @@ html, body {
 }
 
 .tine-favicon {
-	background-image:url(../../images/favicon.png) !important;
+    background-image:url(../../images/favicon.png) !important;
 }
 
 .tine-mainscreen-apptabs .x-tab-strip-wrap ul.x-tab-strip-top {
@@ -582,12 +628,12 @@ html, body {
 }
 
 .tine-mainscreen-apptabs .x-tab-panel-header {
-	border: none;
+    border: none;
 }
 
 /*
 .tine-mainscreen-apptabs .x-tab-strip-wrap {
-	padding-top: 2px;
+    padding-top: 2px;
 }
 */
 
@@ -639,8 +685,8 @@ html, body {
 
 /******* grid row classes *********/
 .grid_row_enabled td{
-	font-weight: bold;
-	/* background-color: '#b5efc8'; */
+    font-weight: bold;
+    /* background-color: '#b5efc8'; */
 }
 
 .grid_row_disabled td{
@@ -662,22 +708,34 @@ html, body {
 /******* grid cell classes *********/
 
 .tine-grid-cell-hint {
-	background-image:url("../../library/ExtJS/resources/images/default/button/arrow.gif");
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	width: 10px;
+    background-image:url("../../library/ExtJS/resources/images/default/button/arrow.gif");
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 10px;
 }
 
 .tine-grid-cell-no-dirty {
     background-image:url("../../library/ExtJS/resources/images/default/s.gif");
 }
 
+.tine-duplicateresolve-keepvalue {
+    color: #006600;
+}
+
+.tine-duplicateresolve-discardvalue {
+    color: #660000;
+}
+
+.tine-duplicateresolve-adoptedvalue {
+    color: #666666;
+}
+
 /******** downloads ***********/
 
 .tinebase-download-link{
-	cursor: pointer;
-	color: blue;
+    cursor: pointer;
+    color: blue;
 }
 
 span:hover.tinebase-download-link {
@@ -686,8 +744,30 @@ span:hover.tinebase-download-link {
 
 /********* uploads ************/
 
+.x-tinebase-uploading {
+    background-image:url(../../library/ExtJS/resources/images/default/grid/wait.gif) !important;
+}
+
 .x-tinebase-uploadrow .x-grid3-cell-inner {
     background-image:url(../../library/ExtJS/resources/images/default/grid/wait.gif);
+    background-repeat: no-repeat;
+    padding-left: 19px;
+}
+
+.x-tinebase-uploadpaused .x-grid3-cell-inner {
+    background-image:url(../../images/oxygen/16x16/actions/media-playback-pause.png);
+    background-repeat: no-repeat;
+    padding-left: 19px;
+}
+
+.x-tinebase-uploading .x-grid3-cell-inner {
+    background-image:url(../../images/oxygen/16x16/actions/media-playback-start.png);
+    background-repeat: no-repeat;
+    padding-left: 19px;
+}
+
+.x-tinebase-uploadcomplete .x-grid3-cell-inner {
+    background-image:url(../../images/oxygen/16x16/actions/dialog-ok-apply.png);
     background-repeat: no-repeat;
     padding-left: 19px;
 }
@@ -714,4 +794,116 @@ span:hover.tinebase-addtocontacts-link {
 
 span:hover.tinebase-showheaders-link {
     color: #4444ff;
+}
+
+.tine-keyfield-icon {
+    width: 12px;
+    height: 12px;
+    vertical-align: text-bottom;
+    padding-right: 4px;
+}
+
+.x-grid .tine-keyfield-icon {
+    vertical-align: text-top;
+}
+
+/*.x-combo-list-item .tine-keyfield-icon {
+    padding-right: 4px;
+}*/
+
+.search-item {border: 1px solid white}
+
+/* multiple edit dialog */
+    
+.tinebase-editmultipledialog-noneedit, 
+input.tinebase-editmultipledialog-noneedit, 
+textarea.tinebase-editmultipledialog-noneedit {
+    background-color: #f4f1d3;
+    background-image:none!important;
+    }
+    
+.tinebase-editmultipledialog-clearer {
+    background: transparent url(../../styles/images/tine20/form/clear-trigger.gif) -16px top no-repeat;
+    border-bottom:1px solid #7eadd9; 
+    height:18px;
+    width:18px;
+    display:block;
+    position:absolute;
+    z-index:9;
+    }
+    
+.tinebase-editmultipledialog-clearer.hidden {
+    border-bottom:none; 
+    height:18px; 
+    background-image: url(../../library/ExtJS/resources/images/default/s.gif);
+    }
+    
+.tinebase-editmultipledialog-clearer.undo {
+    background: transparent url(../../images/oxygen/16x16/actions/edit-undo-grey.png) 0 3px no-repeat;
+    border-bottom: none;   
+    }
+
+.tinebase-editmultipledialog-clearer.undo.over {
+    background: transparent url(../../images/oxygen/16x16/actions/edit-undo.png) 0 3px no-repeat;
+    }
+    
+.tinebase-editmultipledialog-dirty {
+    position:absolute;
+    left:0;
+    background-image: url(../../library/ExtJS/resources/images/default/grid/dirty.gif);
+    background-repeat: no-repeat;
+}    
+    
+.tinebase-editmultipledialog-clearer.click {background-position: -33px 0}
+
+.tinebase-editmultipledialog-clearer.over {background-position: -67px 0}
+
+.tinebase-editmultipledialog-dirtycheck {
+    background-color: #F4F1D3; /* #F9F9A3 */
+    border: 1px solid #B5B8C8;
+    padding: 0px 2px 3px 2px;
+    border-radius: 3px;
+}
+
+.tine-wordbox {
+    border: 1px solid gray;
+    margin-left: 3px;
+    border-radius: 50px;
+    padding: 0px 5px;
+    background-color: white;
+}
+
+/* token mode edit dialog */
+.tinebase-tokenedit-textfield {
+    color: white;
+}
+
+.tinebase-tokenedit-tokenbox {
+    position: absolute;
+    background-color: white;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.tinebase-tokenedit-token {
+    border: 1px solid gray;
+    margin-right: 3px;
+}
+
+.tinebase-tokenedit-tokenbox-area .tinebase-tokenedit-token {
+    display: inline-block;
+    line-height: 13px;
+}
+
+.tinebase-tokenedit-token-selected {
+    background-color: #FFFFAE;
+}
+
+.tinebase-tokenedit-position {
+    display: none;
+    width: 0px;
+    border: 1px solid gray;
+    margin-right: 3px;
+    line-height: 13px;
+    overflow: hidden;
 }

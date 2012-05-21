@@ -52,6 +52,13 @@ class Tinebase_DateTime extends DateTime
     private $__sDTZ;
     
     /**
+     * this datetime represents a date only
+     * 
+     * @var bool
+     */
+    protected $_hasTime = TRUE;
+    
+    /**
      * @see http://bugs.php.net/bug.php?id=46891
      */
     public function __sleep(){
@@ -65,7 +72,8 @@ class Tinebase_DateTime extends DateTime
      * @see http://bugs.php.net/bug.php?id=46891
      */
     public function __wakeup() {
-        $this->__construct($this->__sDT, new DateTimeZone($this->__sDTZ ? $this->__sDTZ : 'UTC'));
+    	$this->__sDTZ = $this->__sDTZ == '+00:00' ? 'UTC' : $this->__sDTZ; 
+        $this->__construct($this->__sDT, new DateTimeZone($this->__sDTZ ? $this->__sDTZ : 'UTC'));    	
         $this->__sDT = $this->__sDTZ = NULL;
     }
     
@@ -78,6 +86,19 @@ class Tinebase_DateTime extends DateTime
     public function __construct($_time = "now", $_timezone = NULL)
     {
         $time = (is_numeric($_time)) ? "@" . $_time : $_time;
+        
+        // allow to pass instanceof DateTime
+        if ($_time instanceof DateTime) {
+            if (! $_timezone) {
+                $_timezone = $_time->getTimezone();
+            } else {
+                $_time = clone $_time;
+                $_time->setTimezone($_timezone);
+            }
+            
+            $time = $_time->format("Y-m-d H:i:s");
+        }
+        
         if ($_timezone) {
             if (! $_timezone instanceof DateTimeZone) {
                 $_timezone = new DateTimeZone($_timezone);
@@ -89,14 +110,23 @@ class Tinebase_DateTime extends DateTime
         }
 
         // Normalize Timezonename, as sometimes +00:00 is taken
-        if (is_numeric($_time)) {
+        if (is_numeric($_time) || $_timezone == '+00:00') {
             $this->setTimezone('UTC');
         }
     }
     
+    /**
+     * call interceptor
+     * 
+     * @param string $name
+     * @param array $arguments
+     */
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array($this, "php52compat_$name"), $arguments);
+        if (strpos($name, 'php52compat_') === FALSE) {
+            return call_user_func_array(array($this, "php52compat_$name"), $arguments);
+        }
+        throw new Tinebase_Exception_InvalidArgument('unknown method: ' . str_replace('php52compat_', '', $name));
     }
     
     /**
@@ -305,6 +335,27 @@ class Tinebase_DateTime extends DateTime
     public function equals($_date, $_part = 'c')
     {
         return $this->compare($_date, $_part) == 0;
+    }
+    
+    /**
+     * set/get the hasTime flag 
+     * 
+     * @param bool optional
+     */
+    public function hasTime()
+    {
+        $currValue = $this->_hasTime;
+        if (func_num_args() === 1) {
+            $paramValue = (bool) func_get_arg(0);
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Resetting _hasTime to ' . (int) $paramValue);
+            $this->_hasTime = $paramValue;
+            
+            if ($this->_hasTime === FALSE) {
+                $this->setTime(0,0,0);
+            }
+        }
+        
+        return $currValue;
     }
     
     /**
@@ -582,8 +633,17 @@ class Tinebase_DateTime extends DateTime
      */
     public function setTimezone($_timezone)
     {
+        if ($this->_hasTime === FALSE) $date = $this->format('Y-m-d');
+        
         $timezone = $_timezone instanceof DateTimeZone ? $_timezone : new DateTimeZone($_timezone);
         parent::setTimezone($timezone);
+        
+        // if we contain no time info, we are timezone invariant
+        if ($this->_hasTime === FALSE) {
+            call_user_func_array(array($this, 'setDate'), explode('-', $date));
+            $this->setTime(0,0,0);
+        }
+        
         return $this;
     }
     

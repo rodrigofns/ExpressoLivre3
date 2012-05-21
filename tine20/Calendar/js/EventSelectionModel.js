@@ -18,7 +18,7 @@ Tine.Calendar.EventSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
     init: function(view) {
         view.getTreeEl = function() {
             return view.el;
-        }
+        };
         view.el.on("keydown", this.onKeyDown, this);
         view.on("click", this.onNodeClick, this);
         
@@ -50,6 +50,10 @@ Tine.Calendar.EventSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
     getSelectedEvents: function() {
         return this.getSelectedNodes();
     },
+    
+//    getSelections: function() {
+//        return this.getSelectedEvents();
+//    },
     
     /**
      * Select an event.

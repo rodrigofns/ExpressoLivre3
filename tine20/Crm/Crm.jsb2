@@ -16,6 +16,10 @@
           "path": "js/"
         },
         {
+          "text": "SearchCombo.js",
+          "path": "js/"
+        },        
+        {
           "text": "Model.js",
           "path": "js/"
         },
@@ -32,7 +36,7 @@
           "path": "js/"
         },
         {
-          "text": "LeadGridPanel.js",
+          "text": "GridPanel.js",
           "path": "js/"
         },
         {
@@ -41,6 +45,10 @@
         },
         {
           "text": "LeadEditDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "AddToLeadPanel.js",
           "path": "js/"
         },
         {
@@ -62,10 +70,6 @@
         {
           "text": "LeadType.js",
           "path": "js/"
-        },
-        {
-          "text": "SearchCombo.js",
-          "path": "../Addressbook/js/"
         },
         {
           "text": "Contact.js",

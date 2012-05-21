@@ -36,10 +36,10 @@ class Tasks_Model_TaskFilter extends Tinebase_Model_Filter_FilterGroup
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'id'                   => array('filter' => 'Tinebase_Model_Filter_Id'),
+        'id'                   => array('filter' => 'Tinebase_Model_Filter_Id', 'options' => array('modelName' => 'Tasks_Model_Task')),
         'query'                => array('filter' => 'Tinebase_Model_Filter_Query', 'options' => array('fields' => array('summary', 'description'))),
         'organizer'            => array('filter' => 'Tinebase_Model_Filter_User'),
-        'status_id'            => array('filter' => 'Tinebase_Model_Filter_Int'),
+        'status'               => array('filter' => 'Tinebase_Model_Filter_Text'),
         'due'                  => array('filter' => 'Tinebase_Model_Filter_DateTime'),
         'description'          => array('filter' => 'Tinebase_Model_Filter_Text'),
         'summary'              => array('filter' => 'Tinebase_Model_Filter_Text'),

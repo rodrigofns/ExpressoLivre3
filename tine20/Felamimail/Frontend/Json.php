@@ -37,6 +37,50 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         return $result;
     }
+      /**
+     * get ACLs for a folder
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @return array
+     */
+    public function getFolderAcls($accountId, $globalName)
+    {
+         $result = Felamimail_Controller_Folder::getInstance()->getAcls($accountId,$globalName);
+        
+        return $result;
+    }
+  
+    /**
+     * set ACLs for a folder
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @param array ACLs
+     * @return array
+     */ 
+    public function setFolderAcls($accountId, $globalName, $acls)
+    {
+        $result = Felamimail_Controller_Folder::getInstance()->setAcls($accountId,$globalName,$acls);
+        
+        return $result;
+    }
+
+     /**
+     * import message to folder from a file(eml)
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @param array $file
+     * @return array
+     */
+    public function importMessage($accountId,$folderId, $file)
+    {
+        $result = Felamimail_Controller_Message::getInstance()->importMessagefromfile($accountId,$folderId, $file);
+        return array(
+            'status'    =>  'success' );
+    }
+
 
     /**
      * add new folder
@@ -107,6 +151,9 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      */
     public function emptyFolder($folderId)
     {
+        // close session to allow other requests
+        Zend_Session::writeClose(true);
+        
         $result = Felamimail_Controller_Folder::getInstance()->emptyFolder($folderId, TRUE);
         return $this->_recordToJson($result);
     }
@@ -121,6 +168,22 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     public function updateFolderCache($accountId, $folderName)
     {
         $result = Felamimail_Controller_Cache_Folder::getInstance()->update($accountId, $folderName, TRUE);
+        return $this->_multipleRecordsToJson($result);
+    }
+    
+    /**
+     * get folder status
+     *
+     * @param array  $filterData
+     * @return array of folder status
+     */
+    public function getFolderStatus($filterData)
+    {
+        // close session to allow other requests
+        Zend_Session::writeClose(true);
+        
+        $filter = new Felamimail_Model_FolderFilter($filterData);
+        $result = Felamimail_Controller_Cache_Message::getInstance()->getFolderStatus($filter);
         return $this->_multipleRecordsToJson($result);
     }
     
@@ -153,7 +216,7 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         // close session to allow other requests
         Zend_Session::writeClose(true);
         
-        $folder = Felamimail_Controller_Cache_Message::getInstance()->updateCache($folderId, $time);
+        $folder = Felamimail_Controller_Cache_Message::getInstance()->updateCache($folderId, $time);        
         
         return $this->_recordToJson($folder);
     }
@@ -198,7 +261,7 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         $filter->setFromArrayInUsersTimezone($filterData);
         $updatedFolders = Felamimail_Controller_Message_Move::getInstance()->moveMessages($filter, $targetFolderId);
         
-        $result = $this->_multipleRecordsToJson($updatedFolders);
+        $result = ($updatedFolders !== NULL) ? $this->_multipleRecordsToJson($updatedFolders) : array();
         
         return $result;
     }
@@ -324,6 +387,21 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
                     }
                 }
             }
+            
+            if ($_record->preparedParts instanceof Tinebase_Record_RecordSet) {
+                foreach ($_record->preparedParts as $preparedPart) {
+                    if ($preparedPart->preparedData instanceof Calendar_Model_iMIP) {
+                        try {
+                            $iMIPFrontend = new Calendar_Frontend_iMIP();
+                            $iMIPFrontend->prepareComponent($preparedPart->preparedData);
+                        } catch (Exception $e) {
+                            Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Could not prepare calendar iMIP component: ' . $e->getMessage());
+                            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $e->getTraceAsString());
+                        }
+                    }
+                }
+            }
+            
         } else if ($_record instanceof Felamimail_Model_Account) {
             // add usernames (imap + smtp)
             $_record->resolveCredentials();
@@ -355,6 +433,7 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         return $this->_recordToJson($folder);
     }
+    
     /***************************** accounts funcs *******************************/
     
     /**
@@ -511,8 +590,8 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
             ),
         );
         
-        $defaults = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::IMAP);
-        $defaults['smtp'] = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Model_Config::SMTP);
+        $defaults = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::IMAP);
+        $defaults['smtp'] = Tinebase_Config::getInstance()->getConfigAsArray(Tinebase_Config::SMTP);
         
         // remove sensitive data
         unset($defaults['user']);

@@ -3,7 +3,7 @@
  * 
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 Ext.ns('Tine.Calendar', 'Tine.Calendar.Model');
@@ -166,7 +166,7 @@ Tine.Calendar.Model.Event.getDefaultData = function() {
         // if dtstart is out of current period, take start of current period
         mainPanel = app.getMainScreen().getCenterPanel(),
         period = mainPanel.getCalendarPanel(mainPanel.activeView).getView().getPeriod(),
-        container = app.getMainScreen().getWestPanel().getContainerTreePanel().getDefaultContainerForNewRecords(),
+        container = app.getMainScreen().getWestPanel().getContainerTreePanel().getDefaultContainer(),
         attender = Tine.Tinebase.registry.get('currentAccount');
         
     if (period.from.getTime() > dtstart.getTime() || period.until.getTime() < dtstart.getTime()) {
@@ -198,13 +198,50 @@ Tine.Calendar.Model.Event.getFilterModel = function() {
     
     return [
         {label: _('Quick search'), field: 'query', operators: ['contains']},
+        {label: app.i18n._('Summary'), field: 'summary'},
+        {label: app.i18n._('Location'), field: 'location'},
+        {label: app.i18n._('Description'), field: 'description'},
         {filtertype: 'tine.widget.container.filtermodel', app: app, recordClass: Tine.Calendar.Model.Event, /*defaultOperator: 'in',*/ defaultValue: {path: Tine.Tinebase.container.getMyNodePath()}},
         {filtertype: 'calendar.attendee'},
-        {filtertype: 'calendar.attendeestatus'},
+        {
+            label: app.i18n._('Attendee Status'),
+            field: 'attender_status',
+            filtertype: 'tine.widget.keyfield.filter', 
+            app: app, 
+            defaultValue: ['DECLINED'], 
+            keyfieldName: 'attendeeStatus', 
+            defaultOperator: 'notin'
+        },
         {filtertype: 'addressbook.contact', field: 'organizer', label: app.i18n._('Organizer')},
         {filtertype: 'tinebase.tag', app: app}
     ];
 };
+
+// register calendar filters in addressbook
+Tine.widgets.grid.ForeignRecordFilter.OperatorRegistry.register('Addressbook', 'Contact', {
+    foreignRecordClass: 'Calendar.Event',
+    linkType: 'foreignId', 
+    filterName: 'ContactAttendeeFilter',
+    // _('Event (as attendee)')
+    label: 'Event (as attendee)'
+});
+Tine.widgets.grid.ForeignRecordFilter.OperatorRegistry.register('Addressbook', 'Contact', {
+    foreignRecordClass: 'Calendar.Event',
+    linkType: 'foreignId', 
+    filterName: 'ContactOrganizerFilter',
+    // _('Event (as organizer)')
+    label: 'Event (as organizer)'
+});
+
+// example for explicit definition
+//Tine.widgets.grid.FilterRegistry.register('Addressbook', 'Contact', {
+//    filtertype: 'foreignrecord',
+//    foreignRecordClass: 'Calendar.Event',
+//    linkType: 'foreignId', 
+//    filterName: 'ContactAttendeeFilter',
+//    // _('Event attendee')
+//    label: 'Event attendee'
+//});
 
 /**
  * @namespace Tine.Calendar.Model
@@ -308,9 +345,9 @@ Tine.Calendar.Model.Attender = Tine.Tinebase.data.Record.create([
     {name: 'cal_event_id'},
     {name: 'user_id', sortType: Tine.Tinebase.common.accountSortType },
     {name: 'user_type'},
-    {name: 'role'},
+    {name: 'role', type: 'keyField', keyFieldConfigName: 'attendeeRoles'},
     {name: 'quantity'},
-    {name: 'status'},
+    {name: 'status', type: 'keyField', keyFieldConfigName: 'attendeeStatus'},
     {name: 'status_authkey'},
     {name: 'displaycontainer_id'}
 ], {
@@ -454,25 +491,6 @@ Tine.Calendar.Model.Attender.getAttendeeStore = function(attendeeData) {
     return attendeeStore;
 };
 
-Tine.Calendar.Model.Attender.getAttendeeStatusStore = function() {
-    if (! Tine.Calendar.Model.Attender.attendeeStatusStore) {
-        var app = Tine.Tinebase.appMgr.get('Calendar');
-        Tine.Calendar.Model.Attender.attendeeStatusStore = new Ext.data.ArrayStore({
-            storeId: 'calendar.attener.status',
-            idIndex: 0,  
-            fields: ['id', 'status_name'],
-            data: [
-                ['NEEDS-ACTION', app.i18n._('No response')],
-                ['ACCEPTED',     app.i18n._('Accepted')   ],
-                ['DECLINED',     app.i18n._('Declined')   ],
-                ['TENTATIVE',    app.i18n._('Tentative')  ]
-            ]
-        });
-    }
-    
-    return Tine.Calendar.Model.Attender.attendeeStatusStore;
-}
-
 /**
  * @namespace Tine.Calendar.Model
  * @class Tine.Calendar.Model.Resource
@@ -498,10 +516,23 @@ Tine.Calendar.Model.Resource = Tine.Tinebase.data.Record.create(Tine.Tinebase.Mo
     containerProperty: null
 });
 
-/* lets try it with Ext.Direct
-Tine.Calendar.backend = new Tine.Calendar.Model.EventJsonBackend({
+/**
+ * @namespace   Tine.Calendar.Model
+ * @class       Tine.Calendar.Model.iMIP
+ * @extends     Tine.Tinebase.data.Record
+ * iMIP Record Definition
+ */
+Tine.Calendar.Model.iMIP = Tine.Tinebase.data.Record.create([
+    {name: 'id'},
+    {name: 'ics'},
+    {name: 'method'},
+    {name: 'originator'},
+    {name: 'userAgent'},
+    {name: 'event'},
+    {name: 'existing_event'},
+    {name: 'preconditions'}
+], {
     appName: 'Calendar',
-    modelName: 'Resource',
-    recordClass: Tine.Calendar.Model.Resource
+    modelName: 'iMIP',
+    idProperty: 'id'
 });
-*/
