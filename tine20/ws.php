@@ -19,11 +19,13 @@ $server = $_SERVER['SERVER_NAME'].' ('.$_SERVER['SERVER_ADDR'].')';
 $remote = (isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '') . 
           ' ('.$_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT'].')';
 
-file_put_contents('/tmp/ws.log', "$session_id\n", FILE_APPEND);
-file_put_contents('/tmp/ws.log', "$login_name\n", FILE_APPEND);
-file_put_contents('/tmp/ws.log', "$sql_executed\n", FILE_APPEND);
-file_put_contents('/tmp/ws.log', "$remote => $server\n", FILE_APPEND);
-file_put_contents('/tmp/ws.log', "$user_access->ip / $user_access->login_name\n", FILE_APPEND);
+date_default_timezone_set('America/Bahia');
+file_put_contents('/tmp/ws.log', 'Data/Hora: ' . date('d/m/Y h:i:s') . "\n");
+file_put_contents('/tmp/ws.log', "Sessao: $session_id\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "Login: $login_name\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "SQL: $sql_executed\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "Comunicacao: $remote => $server\n", FILE_APPEND);
+file_put_contents('/tmp/ws.log', "IP/Login: $user_access->ip / $user_access->login_name\n", FILE_APPEND);
 file_put_contents('/tmp/ws.log', "============================================\n", FILE_APPEND);
 
 header('Content-type: application/json');
