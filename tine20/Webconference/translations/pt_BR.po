@@ -1,32 +1,57 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - ExampleApplication\n"
-"POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2008-07-29 21:14+0100\n"
-"Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2012-05-21 13:28-0300\n"
+"Last-Translator: Edgar De Lucca <edgar.lucca@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "X-Poedit-Language: en\n"
 "X-Poedit-Country: GB\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
+#: Controler/BigBlueButton.php:89
+msgid "ERROR (the big blue button server is unreachable)"
+msgstr "ERRO  (o servidor Big Blue Button está inacessível)"
+
+#: Controler/BigBlueButton.php:93
+msgid "ERROR (%s): %s"
+msgstr "ERRO (%s): %s"
+
+#: Controler/BigBlueButton.php:119
+msgid "Welcome to the Webconference by %s"
+msgstr "Bem-vindo a Webconferência criada por %s"
+
+#: Controler/BigBlueButton.php:247
+msgid "Invite User To Join Webconference"
+msgstr "Convite para entrar na Webconfência"
+
+#: Controler/BigBlueButton.php:250
+msgid "The user %s is inviting you to a Webconference"
+msgstr "O usuário %s está convidando você para uma webconferência."
+
+#: Controler/BigBlueButton.php:256
+msgid "Log in to Webconference"
+msgstr "Entrar na webconferência"
+
+#: Controler/BigBlueButton.php:264
+msgid "Inviting users successfully!"
+msgstr "Usuários convidados com sucesso!"
+
 #: js/ExampleApplication.js:25
 msgid "Webconference"
-msgstr "Web Conferência"
-
-#: js/..
-msgid "Add User"
-msgstr "Adicionar Usuário"
+msgstr "Webconferência"
 
 #: js/ExampleRecordGridPanel.js:74
 msgid "Quick search"
 msgstr "Quick search"
 
-#: js/ExampleRecordGridPanel.js:102 js/ExampleRecordEditDialog.js:104
+#: js/ExampleRecordGridPanel.js:102
+#: js/ExampleRecordEditDialog.js:104
 msgid "Name"
 msgstr "Name"
 
@@ -70,3 +95,13 @@ msgstr "ExampleApplication"
 #, python-format
 msgid "%s's personal example records"
 msgstr "%s's personal example records"
+
+#~ msgid "Welcome to the Webconference"
+#~ msgstr "Bem-vindo a Webconferência criada por"
+
+#, fuzzy
+#~ msgid "Example Application"
+#~ msgstr "ExampleApplication"
+#~ msgid "Add User"
+#~ msgstr "Adicionar Usuário"
+

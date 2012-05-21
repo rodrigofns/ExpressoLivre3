@@ -43,9 +43,6 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      */
     public function searchWebconferenceConfig($filter, $paging) {
         return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
-        // teste
-        // asdfasdf
-        // lerolero
     }
 
     /**
@@ -174,53 +171,18 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
 //        }
     }
 
-    public function inviteUsersToJoin($users, $moderator, $roomName) {
-
-
-        $translate = Tinebase_Translation::getTranslation('Webconference');
-        $messageSubject = $translate->_('Your container has been changed');
-
-
-
-        $fullUser = Tinebase_Core::getUser();
-        $recipients = array();
-        foreach ($users as $user) {
-            $userName = $user[n_fn];
-
-            $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
-            //$url = "texto";
-            $subject = "invite Users To Join";
-            $messagePlain = null;
-            $_messageHtml = "O usuário " . Tinebase_Core::getUser()->accountFullName . " está convidando você para uma webconferencia. <br/><br/> ";
-            $_messageHtml.= "<div>";
-            $_messageHtml .= "<span class=\"$url\" />";
-            $_messageHtml .= "<span class=\"tinebase-webconference-link\">Entrar na webconferencia</span>";
-            $_messageHtml.= "</div>";
-            
-            //throw new Tinebase_Exception($_messageHtml);
-            //$_messageHtml = Felamimail_Message::addHtmlMarkup($_messageHtml);
-            //throw new Tinebase_Exception($_messageHtml);
-
-//            $view = new Zend_View();
-//            $view->setScriptPath(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'views');
-//            $view->mailTextWelcome = "Welcome to Tine 2.0";
-//            $view->accountFullName = Tinebase_Core::getUser()->accountFullName;
-//            $view->url = $url;
-//            $_messageHtml = $view->render('inviteMailHtml.php');
-
-
-
-            $recipient = array(new Addressbook_Model_Contact($user));
-            //Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, $_messageHtml, null);
-            Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, null, $_messageHtml);
-            array_push($recipients, $user);
-        }
-        return array(
-            'message' => 'Usuários convidados com sucesso!'
-            
-        );
+    public function inviteUsersToJoin($users, $moderator, $roomName) 
+    {
+        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($users, $moderator, $roomName);
+    }
+    
+    
+    public function inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email)
+    {
+        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email);
     }
 
+    
     /**
      * Search for records matching given arguments
      *

@@ -1,5 +1,36 @@
+#: Controler/BigBlueButton.php:89
+msgid "ERROR (the big blue button server is unreachable)"
+msgstr ""
+
+#: Controler/BigBlueButton.php:93
+msgid "ERROR (%s): %s"
+msgstr ""
+
+#: Controler/BigBlueButton.php:119
+msgid "Welcome to the Webconference by %s"
+msgstr ""
+
+#: Controler/BigBlueButton.php:247
+msgid "Invite User To Join Webconference"
+msgstr ""
+
+#: Controler/BigBlueButton.php:250
+msgid "The user %s is inviting you to a Webconference"
+msgstr ""
+
+#: Controler/BigBlueButton.php:256
+msgid "Log in to Webconference"
+msgstr ""
+
+#: Controler/BigBlueButton.php:264
+msgid "Inviting users successfully!"
+msgstr ""
+
+
+
+
 #: js/ExampleApplication.js:25
-msgid "Example Application"
+msgid "Webconference"
 msgstr ""
 
 #: js/ExampleRecordGridPanel.js:74
