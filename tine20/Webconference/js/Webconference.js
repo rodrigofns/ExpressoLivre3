@@ -1,11 +1,11 @@
-/*
- * Tine 2.0
- * 
- * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Philipp Schuele <p.schuele@metaways.de>
- * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
- */
+
 Ext.ns('Tine.Webconference');
+
+
+const WebconferenceOrigin = {
+    MENU : 0,
+    EMAIL : 1
+}
 
 
 /**
@@ -13,7 +13,7 @@ Ext.ns('Tine.Webconference');
  * @class       Tine.Webconference.Application
  * @extends     Tine.Tinebase.Application
  * 
- * @author      Cornelius Weiss <c.weiss@metaways.de>
+ * @author      Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	
@@ -21,8 +21,10 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     roomCreated: false,
     roomName:'',
     loadMask: null,
+    origin:null,
+    
     /**
-     * Get translated application title of the calendar application
+     * Get translated application title of the webconference application
      * 
      * @return {String}
      */
@@ -35,9 +37,6 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     getBbbUrl: function(){
         return this.bbbUrl;
     },
-    getRoomName: function(){
-        return this.roomName;  
-    },
     getLoadMask: function(){
         return this.loadMask;
     },
@@ -45,17 +44,78 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         this.loadMask = mask;
     },
     init: function() {
-        //Tine.Webconference.Application.superclass.init.apply(this, arguments);
-        this.roomCreated = false;
+        //this.roomCreated = false;
+        
+        /*
+        var pollA = new Ext.direct.PollingProvider({
+            type:'polling',
+            url: 'index.php',
+            interval: 10000, // 10 seconds
+            baseParams: {
+                method: 'Webconference.getJoinInvites'
+            }
+            
+        });
+        Ext.Direct.addProvider(pollA);
+        //pollA.disconnect();
+        
+        Ext.Direct.on('joinInvite', this.onJoinInvite);
+        */
+        
+      
+        this.origin = WebconferenceOrigin.MENU;
+      
+      
+        // binds click event to join webconference invite inside email
+        Ext.getBody().on('click', function(event, target){
+
+            //target            => html node
+            //Ext.get(target)   => ext element
+            
+            var url = Ext.get(target.parentNode).first('span',true).className;
+            Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url);
+
+
+        }, null, {
+            delegate: 'span.tinebase-webconference-link'
+        });
+        
        
     },
+    //onJoinInvite: function(e){
+    //console.debug(String.format('<p><i>{0}</i></p>', e.data));
+    //},
+    
+    onJoinWebconferenceFromEmail: function(url){
+        
+        
+        if(Tine.Tinebase.appMgr.get('Webconference').roomCreated){
+            Ext.MessageBox.confirm('', this.i18n._('Cancel active webconference') + ' ?', function(btn) {
+                if(btn == 'yes') { 
+                    this.origin = WebconferenceOrigin.EMAIL;
+                    this.bbbUrl = url;
+                    Ext.get('iframe-bbb').dom.src = this.bbbUrl;
+                    Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );
+                }
+                
+            }, this);
+        }
+        else {
+            this.origin = WebconferenceOrigin.EMAIL;
+            this.bbbUrl = url;
+            Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );  
+        }
+    },
+    
+    
     onBeforeActivate: function(){
         
         
-        if(!this.roomCreated){
+        if(!this.roomCreated && this.origin == WebconferenceOrigin.MENU ){
             this.createRoom();
             
         }
+       
         
                
     	
@@ -73,6 +133,11 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             bbb.setHeight('100%');
         }
     	
+    },
+    onActivate: function(){
+        if (this.origin == WebconferenceOrigin.EMAIL && !this.roomCreated){
+            this.joinRoom();
+        }
     },
             
     onBeforeDeActivate: function(){
@@ -115,11 +180,8 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.log.debug(this.bbbUrl);
                 this.roomCreated = true;
                 
-                
                 Ext.get('iframe-bbb').dom.src = this.bbbUrl;
-                
                 this.loadMask.hide();
-                
             
             }
             ,
@@ -133,6 +195,44 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         
         
         
+    },
+    joinRoom: function(){
+        
+        Ext.get('iframe-bbb').dom.src = this.bbbUrl;
+        this.roomCreated = true;
+        this.loadMask.hide();
+    },
+    
+    onAddUser: function(btn) {
+        
+        //console.debug(Tine.Tinebase.appMgr.get('Webconference').roomName);
+        //Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Admin') );
+        //        
+        //        selectedContactStore = new Tine.Tinebase.data.RecordStore({
+        //             recordClass: Tine.Addressbook.Model.Contact
+        //        });
+        
+        
+        
+        
+        
+        Tine.Webconference.ContactPickerDialog.openWindow({
+            
+            //record: new Tine.Felamimail.Model.Message(Tine.Felamimail.Model.Message.getDefaultData(), 0),
+            listeners: {
+                scope: this,
+                'update': function(record) {
+                    console.debug('update called in webconference...');
+                    //console.debug(record);
+                   
+                   
+                }
+                
+                
+            }
+        });
+  
+    	
     }
 	
 });
@@ -187,7 +287,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                             iconAlign: 'top',
                             iconCls: 'action_add',
                             text: this.app.i18n._('Add User'),
-                            handler: this.onAddUser
+                            handler: this.app.onAddUser
                         })
                         ]
                     }]
@@ -267,39 +367,15 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
         }
         var loadMask = new Ext.LoadMask(this.getCenterPanel().getEl(), {
             msg: String.format(_('Please wait'))
-            });
+        });
         if(!this.app.isRoomCreated()){
             loadMask.show();
             this.app.setLoadMask(loadMask);
         }
         return this;
         
-    },
-    
-    
-    onAddUser: function(btn) {
-        
-        //console.debug(Tine.Tinebase.appMgr.get('Webconference').roomName);
-    	
-        Ext.Ajax.request({
-            params: {
-                method: 'Webconference.getTest',
-                param1: 'abc'
-            },
-            scope: this,
-            success: function(_result, _request){
-                console.debug(_result.responseText);
-            }
-        });
-    	
- 
-    	
     }
-    
-       
    
 	   
 });
-
-
 

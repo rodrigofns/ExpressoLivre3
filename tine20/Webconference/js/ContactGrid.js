@@ -1,0 +1,275 @@
+ 
+Ext.ns('Tine.Webconference');
+
+
+Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPanel, {
+
+    hasDetailsPanel: false,
+    hasFavoritesPanel: false,
+    hasQuickSearchFilterToolbarPlugin: false,
+    stateId: 'WebconferenceContactGrid',
+    
+    gridConfig: {
+        autoExpandColumn: 'n_fileas',
+        enableDragDrop: false
+    },
+    
+    
+    messageRecord: null,
+    
+    /**
+     * inits this cmp
+     * @private
+     */
+    initComponent: function() {
+        this.addEvents(
+            /**
+             * @event addcontacts
+             * Fired when contacts are added
+             */
+            'addcontacts'
+            );
+        
+        this.app = Tine.Tinebase.appMgr.get('Addressbook');
+        this.initFilterToolbar();
+        
+        Tine.Webconference.ContactGridPanel.superclass.initComponent.call(this);
+        
+        this.grid.on('rowdblclick', this.onRowDblClick, this);
+        this.grid.on('cellclick', this.onCellClick, this);
+        this.store.on('load', this.onContactStoreLoad, this);
+    },
+    
+    /**
+     * init filter toolbar
+     */
+    initFilterToolbar: function() {
+        this.defaultFilters = [
+        {
+            field: 'email_query', 
+            operator: 'contains', 
+            value: '@'
+        }
+        ];
+        this.filterToolbar = this.getFilterToolbar({
+            filterFieldWidth: 100,
+            filterValueWidth: 100
+        });
+    },
+    
+    /**
+     * returns array with columns
+     * 
+     * @return {Array}
+     */
+    getColumns: function() {
+        var columns = Tine.Webconference.ContactGridPanel.superclass.getColumns.call(this);
+        
+        // hide all columns except name/company/email/email_home (?)
+        Ext.each(columns, function(column) {
+            if (['n_fileas', 'org_name', 'email'].indexOf(column.dataIndex) === -1) {
+                column.hidden = true;
+            }
+        });
+    
+        return columns;
+    },
+    
+  
+ 
+    /**
+     * cell click handler -> update recipients in record
+     * 
+     * @param {Grid} grid
+     * @param {Number} row
+     * @param {Number} col
+     * @param {Event} e
+     */
+    onCellClick: function(grid, row, col, e) {
+        
+    //        var contact = this.store.getAt(row),
+    //        typeToSet = this.grid.getColumnModel().getDataIndex(col)
+    //
+    //        console.debug('onCellClick....');
+    //        console.debug(typeToSet);
+    //
+    //        if (! contact.hasEmail() && typeToSet !== 'none') {
+    //            this.setTypeRadio(contact, 'none');
+    //        } else {
+    //            this.updateRecipients(contact, typeToSet);
+    //        }
+    },
+    
+    /**
+     * update recipient
+     * 
+     * @param {Tine.Addressbook.Model.Contact} contact
+     * @param {String} typeToSet
+     */
+    updateRecipients: function(contact, typeToSet) {
+        var email = Tine.Felamimail.getEmailStringFromContact(contact),
+        found = false;
+            
+            
+        console.debug('updateRecipients...');
+        Ext.each(['Invite', 'Moderator'], function(type) {
+            //if (this.messageRecord.data[type].indexOf(email) !== -1) {
+            if (type !== typeToSet) {
+                
+            //this.messageRecord.data[type].remove(email);
+            } else {
+                found = true;
+            }
+        //}
+        }, this);
+        
+        if (! found && typeToSet !== 'none') {
+            //this.messageRecord.data['emails'].push(email);
+            console.debug('pushing contact...');
+            console.debug(contact);
+        }
+    },
+    
+    
+    /**
+     * Return CSS class to apply to rows depending upon email set or not
+     * 
+     * @param {Tine.Addressbook.Model.Contact} record
+     * @param {Integer} index
+     * @return {String}
+     */
+    getViewRowClass: function(record, index) {
+        var className = '';
+        
+        if (! record.hasEmail()) {
+            className = 'felamimail-no-email';
+        }
+        
+        return className;
+    },
+    
+    /**
+     * @private
+     */
+    initActions: function() {
+        this.actions_addAsTo = new Ext.Action({
+            requiredGrant: 'readGrant',
+            text: this.app.i18n._('Add as "Attendee"'),
+            disabled: true,
+            iconCls: 'action_add',
+            actionUpdater: this.updateRecipientActions,
+            handler: this.onAddContact.createDelegate(this, [false]),
+            allowMultiple: true,
+            scope: this
+        });
+
+        this.actions_addAsCc = new Ext.Action({
+            requiredGrant: 'readGrant',
+            text: this.app.i18n._('Add as "Moderator"'),
+            disabled: true,
+            iconCls: 'action_add',
+            actionUpdater: this.updateRecipientActions,
+            handler: this.onAddContact.createDelegate(this, [true]),
+            allowMultiple: true,
+            scope: this
+        });
+
+       
+        
+        //register actions in updater
+        this.actionUpdater.addActions([
+            this.actions_addAsTo,
+            this.actions_addAsCc,
+            
+            ]);
+            
+            Tine.Webconference.ContactGridPanel.superclass.initActions.call(this,arguments);
+    },
+    
+    /**
+     * updates context menu
+     * 
+     * @param {Ext.Action} action
+     * @param {Object} grants grants sum of grants
+     * @param {Object} records
+     */
+    updateRecipientActions: function(action, grants, records) {
+        console.debug('updateRecipientActions....');
+        if (records.length > 0) {
+            var emptyEmails = true;
+            for (var i=0; i < records.length; i++) {
+                if (records[i].hasEmail()) {
+                    emptyEmails = false;
+                    break;
+                }
+            }
+            
+            action.setDisabled(emptyEmails);
+        } else {
+            action.setDisabled(true);
+        }
+        action.setDisabled(false);
+    },
+    
+    /**
+     * on add contact -> fires addcontacts event and passes rows + type
+     * 
+     * @param {String} type
+     */
+    onAddContact: function(type) {
+        console.debug('onAddContact....');
+        
+        var sm = this.grid.getSelectionModel(),
+        selectedRows = sm.getSelections();
+        
+        var contacts = this.grid.getSelectionModel().getSelectionsCollection().items;
+        
+        //var s = sm.getSelection();
+        // And then you can iterate over the selected items, e.g.: 
+        selected = [];
+        Ext.each(contacts, function (item) {
+            selected.push(item.data);
+        });        
+        
+        Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomName,  function(response) {
+            
+            //alert(response.message);
+            Ext.Msg.alert(response.message);
+        });
+            
+      
+    },
+    
+    /**
+     * row doubleclick handler
+     * 
+     * @param {} grid
+     * @param {} row
+     * @param {} e
+     */
+    onRowDblClick: function(grid, row, e) {
+    //this.onAddContact('Invite');
+    }, 
+    
+    /**
+     * returns rows context menu
+     * 
+     * @return {Ext.menu.Menu}
+     */
+    getContextMenu: function() {
+        console.debug('getContextMenu....');
+        if (! this.contextMenu) {
+            var items = [
+            this.actions_addAsTo,
+            this.actions_addAsCc,
+            
+            ];
+            this.contextMenu = new Ext.menu.Menu({
+                items: items
+            });
+        }
+        return this.contextMenu;
+    }
+});
+
+Ext.reg('webconferencecontactgrid', Tine.Webconference.ContactGridPanel);

@@ -49,10 +49,10 @@ Tine.Webconference.Model.ExampleRecord = Tine.Tinebase.data.Record.create(Tine.T
  */ 
 Tine.Webconference.Model.ExampleRecord.getDefaultData = function() { 
     var app = Tine.Tinebase.appMgr.get('Webconference');
-    var defaultsContainer = Tine.Webconference.registry.get('defaultContainer');
+    //var defaultsContainer = Tine.Webconference.registry.get('defaultContainer');
     
     return {
-        container_id: app.getMainScreen().getWestPanel().getContainerTreePanel().getSelectedContainer('addGrant', defaultsContainer)
+        container_id: app.getMainScreen().getWestPanel().getContainerTreePanel().getSelectedContainer('addGrant')
         // TODO add more defaults
     };
 };

@@ -18,3 +18,12 @@
 .x-btn-large .WebconferenceIconCls {
     background-image:url(../../images/oxygen/32x32/actions/document-open-recent.png) !important;
 }
+
+.tinebase-webconference-link{
+    cursor: pointer;
+    color: blue;
+}
+
+span:hover.tinebase-webconference-link {
+    color: #4444ff;
+}
