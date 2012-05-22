@@ -24,7 +24,11 @@
           "path": "js/"
         },
         {
-          "text": "ConfigEditDialog.js",
+          "text": "ContactPickerDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "ContactGrid.js",
           "path": "js/"
         }
       ]

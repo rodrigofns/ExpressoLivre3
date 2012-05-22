@@ -81,3 +81,9 @@ msgstr ""
 #, python-format
 msgid "%s's personal example records"
 msgstr ""
+
+msgid "Welcome to the Webconference"
+msgstr ""
+
+msgid "Add User"
+msgstr ""

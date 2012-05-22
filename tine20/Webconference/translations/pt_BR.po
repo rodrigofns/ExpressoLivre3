@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - ExampleApplication\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-05-21 13:28-0300\n"
-"Last-Translator: Edgar De Lucca <edgar.lucca@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-05-21 16:49-0300\n"
+"Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -96,12 +96,13 @@ msgstr "ExampleApplication"
 msgid "%s's personal example records"
 msgstr "%s's personal example records"
 
-#~ msgid "Welcome to the Webconference"
-#~ msgstr "Bem-vindo a Webconferência criada por"
+msgid "Welcome to the Webconference"
+msgstr "Bem-vindo a Webconferência criada por"
+
+msgid "Add User"
+msgstr "Adicionar Usuário"
 
 #, fuzzy
 #~ msgid "Example Application"
 #~ msgstr "ExampleApplication"
-#~ msgid "Add User"
-#~ msgstr "Adicionar Usuário"
 
