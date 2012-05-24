@@ -173,7 +173,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
 
     public function inviteUsersToJoin($users, $moderator, $roomName) 
     {
-        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($users, $moderator, $roomName);
+        return Webconference_Controller_EventNotifications::getInstance()->sendNotificationToAttender($users, $moderator, $roomName);
+        //return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($users, $moderator, $roomName);
     }
     
     
