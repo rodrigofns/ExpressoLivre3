@@ -15,7 +15,7 @@
  * @package     Felamimail
  * @subpackage  Controller
  */
-class Felamimail_Controller_Message_Move extends Felamimail_Controller_Message
+class Felamimail_Controller_Message_Move extends Felamimail_Controller_Message_Abstract
 {
     /**
      * holds the instance of the singleton
@@ -31,7 +31,7 @@ class Felamimail_Controller_Message_Move extends Felamimail_Controller_Message
      */
     private function __construct() 
     {
-        $this->_backend = new Felamimail_Backend_Cache_Sql_Message();
+        $this->_backend = Felamimail_Backend_Message::getInstance();
         $this->_currentAccount = Tinebase_Core::getUser();
     }
     

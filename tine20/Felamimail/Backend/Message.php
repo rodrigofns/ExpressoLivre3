@@ -12,11 +12,11 @@
  */
 
 /**
- * backend class for Felamimail folders
+ * backend class for Felamimail messages
  *
  * @package     Felamimail
  */
-class Felamimail_Backend_Folder
+class Felamimail_Backend_Message
 {
     /**
      * holds the instance of the singleton
@@ -24,11 +24,11 @@ class Felamimail_Backend_Folder
      * @var Felamimail_Controller_Cache_Folder
      */
     private static $_instance = NULL;
-    
+
     private function construct()
-    {        
+    {
     }
-    
+
     /**
      * don't clone. Use the singleton.
      *
@@ -40,7 +40,7 @@ class Felamimail_Backend_Folder
     /**
      * the singleton pattern
      *
-     * @return Felamimail_Backend_Cache_Imap_Folder or Felamimail_Backend_Cache_Sql_Folder
+     * @return Felamimail_Backend_Cache_Imap_Message or Felamimail_Backend_Cache_Sql_Message
      */
     public static function getInstance()
     {
@@ -48,7 +48,7 @@ class Felamimail_Backend_Folder
         {
             $adapter = Tinebase_Core::getConfig()->messagecache;
             $adapter = (empty($adapter))?'sql':$adapter;
-            $classname = 'Felamimail_Backend_Cache_' . ucfirst($adapter) . '_Folder';
+            $classname = 'Felamimail_Backend_Cache_' . ucfirst($adapter) . '_Message';
             self::$_instance = new $classname;
         }
         return self::$_instance;
