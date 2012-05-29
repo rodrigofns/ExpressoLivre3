@@ -47,7 +47,7 @@ class Felamimail_Controller_Cache_Imap_Folder extends Felamimail_Controller_Cach
     public static function getInstance() 
     {
         if (self::$_instance === NULL) {
-            self::$_instance = new Felamimail_Controller_Cache_Sql_Folder();
+            self::$_instance = new Felamimail_Controller_Cache_Imap_Folder();
         }
         
         return self::$_instance;

@@ -11,12 +11,7 @@
  *
  */
 
-/**
- * sql backend class for Felamimail folders
- *
- * @package     Felamimail
- */
-class Felamimail_Backend_Cache_Sql_Folder extends Tinebase_Backend_Sql_Abstract
+class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap_Abstract
                                             implements Felamimail_Backend_Cache_FolderInterface
 {
     /**
