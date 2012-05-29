@@ -11,7 +11,6 @@
  */
 
 abstract class Felamimail_Controller_Cache_Folder_Abstract extends Felamimail_Controller_Folder_Abstract
-                                                            implements Felamimail_Controller_Cache_Folder_Interface
 {
     /**
      * application name (is needed in checkRight())

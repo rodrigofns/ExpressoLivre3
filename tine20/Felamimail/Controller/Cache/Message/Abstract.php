@@ -11,7 +11,6 @@
  */
 
 abstract class Felamimail_Controller_Cache_Message_Abstract extends Felamimail_Controller_Message_Abstract
-                                                implements Felamimail_Controller_Cache_Message_Interface
 {
     /**
      * number of imported messages in one caching step

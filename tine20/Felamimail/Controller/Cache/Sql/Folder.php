@@ -10,7 +10,8 @@
  *
  */
 
-class Felamimail_Controller_Cache_Sql_Folder extends Felamimail_Controller_Cache_Folder_Abstract
+class Felamimail_Controller_Cache_Sql_Folder extends Felamimail_Controller_Cache_Folder_Abstract 
+                                                implements Felamimail_Controller_Cache_Folder_Interface
 {
     /**
      * holds the instance of the singleton

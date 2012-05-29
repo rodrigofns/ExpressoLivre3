@@ -16,7 +16,8 @@
  *
  * @package     Felamimail
  */
-class Felamimail_Backend_Cache_Imap_Message extends Tinebase_Backend_Sql_Abstract
+class Felamimail_Backend_Cache_Sql_Message extends Tinebase_Backend_Sql_Abstract
+                                            implements Felamimail_Backend_Cache_MessageInterface
 {
     /**
      * Table name without prefix

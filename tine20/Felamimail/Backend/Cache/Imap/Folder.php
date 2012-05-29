@@ -16,7 +16,8 @@
  *
  * @package     Felamimail
  */
-class Felamimail_Backend_Cache_Imap_Folder extends Tinebase_Backend_Sql_Abstract
+class Felamimail_Backend_Cache_Sql_Folder extends Tinebase_Backend_Sql_Abstract
+                                            implements Felamimail_Backend_Cache_FolderInterface
 {
     /**
      * Table name without prefix
@@ -31,10 +32,6 @@ class Felamimail_Backend_Cache_Imap_Folder extends Tinebase_Backend_Sql_Abstract
      * @var string
      */
     protected $_modelName = 'Felamimail_Model_Folder';
-
-
-
-    
 
     /**
      * get folder cache counter like total and unseen
