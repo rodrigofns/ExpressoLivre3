@@ -1,9 +1,10 @@
 <?php
 
+$pdo = new PDO('mysql:host=localhost;dbname=expresso', 'root', '12345');
+
 $session_id = $_POST['SID'];
 $login_name = $_POST['LGN'];
 
-$pdo = new PDO('mysql:host=localhost;dbname=expresso', 'root', '12345');
 $sql = 'SELECT al.ip, substring(email, 1, locate(\'@\', email)-1) as login_name
         FROM tine20_access_log al
         INNER JOIN tine20_accounts ac ON ac.login_name = al.login_name

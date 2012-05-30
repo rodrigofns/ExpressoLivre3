@@ -8,7 +8,8 @@ $auth->play(); // We simply start process !
 class JabberAuth
 {
 
-    const AUTH_URL = 'http://10.200.237.159:5678/ws.php';
+    const SERVER = "http://10.200.237.159:5678/",
+          AUTH_URL = 'ws.php';
 
     private $debug = true;                      /* Debug mode */
     private $debugfile = "/var/log/pipe-debug.log";  /* Debug output */
@@ -158,7 +159,12 @@ class JabberAuth
         $json = base64_decode($this->jabber_pass);
 	$this->logg('JSON => ' . $json);
 	$local_info = json_decode($json);
-
+        $this->logg('JSON DECODE');
+        $this->logg('---');
+        $this->logg(var_export($local_info, true));
+        $this->logg(var_export($local_info->pwd, true));
+        $this->logg(var_export($local_info->ip, true));
+        $this->logg('---');
         $server_info = $this->getServerInfo($local_info->pwd, $this->jabber_user);
 
         $this->logg('COMPARAÇÃO (local == remoto)...');
@@ -179,9 +185,9 @@ class JabberAuth
     private function getServerInfo($sid, $login)
     {
         $resource = curl_init();
-        $get_url = curl_setopt($resource, CURLOPT_URL, self::AUTH_URL);
+        $get_url = curl_setopt($resource, CURLOPT_URL, self::SERVER . self::AUTH_URL);
         if (!$get_url)
-            $this->logg('N&aacute;o capturou a URL: '.self::AUTH_URL);
+            $this->logg('N&aacute;o capturou a URL: ' . self::SERVER . self::AUTH_URL);
         curl_setopt($resource, CURLOPT_HEADER, false);
         curl_setopt($resource, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($resource, CURLOPT_POST, true);
@@ -195,7 +201,7 @@ class JabberAuth
 
     private function splitcomm() // simply split command and arugments into an array.
     {
-        return explode(":", $this->data);
+        return explode(":", $this->data, 4);
     }
 
     private function logg($message) // pretty simple, using syslog.
