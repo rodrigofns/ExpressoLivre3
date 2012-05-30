@@ -11,7 +11,7 @@ msgid "Welcome to the Webconference by %s"
 msgstr ""
 
 #: Controler/BigBlueButton.php:247
-msgid "Invite User To Join Webconference"
+msgid "Webconference Invite"
 msgstr ""
 
 #: Controler/BigBlueButton.php:250
@@ -26,7 +26,17 @@ msgstr ""
 msgid "Inviting users successfully!"
 msgstr ""
 
+msgid "You received an webconference invitation."
+msgstr ""
 
+msgid "Room name"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Enter"
+msgstr ""
 
 
 #: js/ExampleApplication.js:25

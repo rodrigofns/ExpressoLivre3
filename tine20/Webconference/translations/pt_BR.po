@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - ExampleApplication\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-05-21 16:49-0300\n"
+"PO-Revision-Date: 2012-05-29 13:49-0300\n"
 "Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
@@ -27,8 +27,8 @@ msgid "Welcome to the Webconference by %s"
 msgstr "Bem-vindo a Webconferência criada por %s"
 
 #: Controler/BigBlueButton.php:247
-msgid "Invite User To Join Webconference"
-msgstr "Convite para entrar na Webconfência"
+msgid "Webconference Invite"
+msgstr "Convite para Webconfência"
 
 #: Controler/BigBlueButton.php:250
 msgid "The user %s is inviting you to a Webconference"
@@ -41,6 +41,18 @@ msgstr "Entrar na webconferência"
 #: Controler/BigBlueButton.php:264
 msgid "Inviting users successfully!"
 msgstr "Usuários convidados com sucesso!"
+
+msgid "You received an webconference invitation."
+msgstr "Você recebeu um convite para Webconferência."
+
+msgid "Room name"
+msgstr "Nome da sala"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Enter"
+msgstr "Entrar"
 
 #: js/ExampleApplication.js:25
 msgid "Webconference"

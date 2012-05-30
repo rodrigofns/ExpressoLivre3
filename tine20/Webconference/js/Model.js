@@ -86,3 +86,17 @@ Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.T
     recordsName: 'Configurations',
     containerProperty: null
 });
+
+Tine.Webconference.Model.iMIP = Tine.Tinebase.data.Record.create([
+    {name: 'id'},
+    {name: 'url'},
+    {name: 'roomName'},
+    {name: 'moderator'},
+    {name: 'createdBy'},
+    {name: 'to'}
+    
+], {
+    appName: 'Webconference',
+    modelName: 'iMIP',
+    idProperty: 'id'
+});

@@ -5,65 +5,30 @@
  * and open the template in the editor.
  */
 
-class Webconference_Model_Invite {
-    
-    private $url;
-    private $roomName;
-    private $moderator;
-    private $createdBy;
-    private $to;
-    
-    function __construct($url, $roomName, $moderator, $createdBy, $to) {
-        $this->url = $url;
-        $this->roomName = $roomName;
-        $this->moderator = $moderator;
-        $this->createdBy = $createdBy;
-        $this->to = $to;
-    }
-    
-    public function getUrl() {
-        return $this->url;
-    }
-
-    public function setUrl($url) {
-        $this->url = $url;
-    }
-
-    public function getRoomName() {
-        return $this->roomName;
-    }
-
-    public function setRoomName($roomName) {
-        $this->roomName = $roomName;
-    }
-
-    public function getModerator() {
-        return $this->moderator;
-    }
-
-    public function setModerator($moderator) {
-        $this->moderator = $moderator;
-    }
-
-    public function getCreatedBy() {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy($createdBy) {
-        $this->createdBy = $createdBy;
-    }
-
-    public function getTo() {
-        return $this->to;
-    }
-
-    public function setTo($to) {
-        $this->to = $to;
-    }
-
+class Webconference_Model_Invite extends Tinebase_Record_Abstract{
 
     
+      /**
+     * (non-PHPdoc)
+     * @see Tinebase_Record_Abstract::_identifier
+     */
+    protected $_identifier = 'id';
+    
+    protected $_converter = NULL;
+    
+    /**
+     * (non-PHPdoc)
+     * @see Tinebase_Record_Abstract::_validators
+     */
+    protected $_validators = array(
+        'id'                   => array('allowEmpty' => true,         ), 
+        'url'                  => array('allowEmpty' => true          ),
+        'roomName'             => array('allowEmpty' => true,         ),
+        'moderator'            => array('allowEmpty' => true,         ), 
+        'createdBy'            => array('allowEmpty' => true,         ),
+        'to'                   => array('allowEmpty' => true,         )
+        
+    );
     
     
 }
-?>

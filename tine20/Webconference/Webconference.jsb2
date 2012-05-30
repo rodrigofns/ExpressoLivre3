@@ -30,6 +30,10 @@
         {
           "text": "ContactGrid.js",
           "path": "js/"
+        },
+        {
+          "text": "EmailDetailsPanel.js",
+          "path": "js/"
         }
       ]
     },

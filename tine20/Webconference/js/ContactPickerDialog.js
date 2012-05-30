@@ -106,6 +106,29 @@ Tine.Webconference.ContactPickerDialog = Ext.extend(Tine.widgets.dialog.EditDial
                 }]
             }, this.contactGrid]
         };
+    },
+    /**
+     * init buttons
+     */
+    initButtons: function() {
+        var genericButtons = [
+            this.action_delete
+        ];
+        
+        //this.tbarItems = genericButtons.concat(this.tbarItems);
+        
+        this.fbar = [
+            '->',
+            //this.action_applyChanges,
+            this.action_cancel
+            
+       ];
+       
+        if (this.tbarItems) {
+            this.tbar = new Ext.Toolbar({
+                items: this.tbarItems
+            });
+        }
     }
 });
 

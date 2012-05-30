@@ -15,11 +15,6 @@
  */
  class Webconference_Controller_EventNotifications
  {
-     const NOTIFICATION_LEVEL_NONE                      =  0;
-     const NOTIFICATION_LEVEL_INVITE_CANCEL             = 10;
-     const NOTIFICATION_LEVEL_EVENT_RESCHEDULE          = 20;
-     const NOTIFICATION_LEVEL_EVENT_UPDATE              = 30;
-     const NOTIFICATION_LEVEL_ATTENDEE_STATUS_UPDATE    = 40;
      
     /**
      * @var Calendar_Controller_EventNotifications
@@ -94,44 +89,60 @@
             
             $fullUser = Tinebase_Core::getUser();
             foreach ($users as $user) {
-
+                
                 $userName = $user[n_fn];
 
                 $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
 
-                $webconfMail = new Webconference_Model_Invite($url, $roomName, $moderator, $fullUser, $userName); 
-
-                $messageSubject = $translate->_("Invite User To Join Webconference");
+                //$webconfMail = new Webconference_Model_Invite($url, $roomName, $moderator, $fullUser, $userName); 
+                $webconfMail = new Webconference_Model_Invite(
+                        array(
+                                'url'=>$url, 
+                                'roomName'=>$roomName, 
+                                'moderator'=>$moderator, 
+                                'createdBy'=>$fullUser, 
+                                'to'=>$userName
+                            ),
+                        true
+                        ); 
+                
+                $messageSubject = $translate->_("Webconference Invite");
 
                 $view = new Zend_View();
                 $view->setScriptPath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views');
 
-                //$view->translate    = $translate;
+                $view->translate    = $translate;
                 //$view->timezone     = $timezone;
 
-                // $view->event        = $_event;
-                //$view->updater      = $_updater;
-                //$view->updates      = $_updates;
+                $view->url        = $url;
+                $view->fullUser   = $fullUser;
 
                 $method = 'Webconference';
-                
                 $messageBody = $view->render('eventNotification.php');
-
-                $mailPart           = new Zend_Mime_Part(Zend_Json::encode($webconfMail));
+                
+                
+                $mailPart           = new Zend_Mime_Part(serialize($webconfMail));
                 $mailPart->charset  = 'UTF-8';
                 $mailPart->type     = 'text/webconference; method=' . $method;
                 $mailPart->encoding = Zend_Mime::ENCODING_QUOTEDPRINTABLE;
+                
                
                 $attachments = null;
 
                 $contact = new Addressbook_Model_Contact($user);
                 $sender = $fullUser;
                 
-                return Tinebase_Notification::getInstance()->send($sender, array($contact), $messageSubject, $messageBody, $mailPart, $attachments);
+                $result = Tinebase_Notification::getInstance()->send($sender, array($contact), $messageSubject, $messageBody, $mailPart, $attachments);
+                
             }
         } catch (Exception $e) {
             Tinebase_Core::getLogger()->WARN(__METHOD__ . '::' . __LINE__ . " could not send notification :" . $e);
-            return;
+            return array(
+                'message' => $e->getMessage(),
+                'result' => $translate->_('An error has occured inviting users') 
+                );
         }
+        
+        return array('message' => $translate->_('Inviting users successfully!'));
     }
  }

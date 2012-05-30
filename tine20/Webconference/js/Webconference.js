@@ -18,10 +18,11 @@ const WebconferenceOrigin = {
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	
     bbbUrl : '',
-    roomCreated: false,
+    roomActive: false,
     roomName:'',
-    loadMask: null,
     origin:null,
+    
+    loadMask: null,
     
     /**
      * Get translated application title of the webconference application
@@ -31,22 +32,25 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     getTitle: function() {
         return this.i18n.gettext('Webconference');
     },
-    isRoomCreated: function(){
-        return this.roomCreated;
-    },
-    getBbbUrl: function(){
-        return this.bbbUrl;
-    },
-    getLoadMask: function(){
-        return this.loadMask;
+    isRoomActive: function(){
+        return this.roomActive;
     },
     setLoadMask: function(mask){
         this.loadMask = mask;
     },
     init: function() {
-        //this.roomCreated = false;
         
-        /*
+        this.origin = WebconferenceOrigin.MENU;
+         
+        if (Tine.Felamimail) {
+            Tine.Felamimail.MimeDisplayManager.register('text/webconference', Tine.Webconference.EmailDetailsPanel);
+        }
+       
+        
+        
+    //this.roomActive = false;
+        
+    /*
         var pollA = new Ext.direct.PollingProvider({
             type:'polling',
             url: 'index.php',
@@ -63,38 +67,33 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         */
         
       
-        this.origin = WebconferenceOrigin.MENU;
+       
       
       
+    /*
         // binds click event to join webconference invite inside email
         Ext.getBody().on('click', function(event, target){
-
             //target            => html node
             //Ext.get(target)   => ext element
             
             var url = Ext.get(target.parentNode).first('span',true).className;
             Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url);
-
-
         }, null, {
             delegate: 'span.tinebase-webconference-link'
         });
-        
+        */
        
     },
-    //onJoinInvite: function(e){
-    //console.debug(String.format('<p><i>{0}</i></p>', e.data));
-    //},
-    
+        
     onJoinWebconferenceFromEmail: function(url){
         
         
-        if(Tine.Tinebase.appMgr.get('Webconference').roomCreated){
+        if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
             Ext.MessageBox.confirm('', this.i18n._('Cancel active webconference') + ' ?', function(btn) {
                 if(btn == 'yes') { 
                     this.origin = WebconferenceOrigin.EMAIL;
                     this.bbbUrl = url;
-                    Ext.get('iframe-bbb').dom.src = this.bbbUrl;
+                    Ext.get('webconference-iframe').dom.src = this.bbbUrl;
                     Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );
                 }
                 
@@ -111,31 +110,33 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     onBeforeActivate: function(){
         
         
-        if(!this.roomCreated && this.origin == WebconferenceOrigin.MENU ){
+        if(!this.roomActive && this.origin == WebconferenceOrigin.MENU ){
             this.createRoom();
             
         }
        
+
         
-               
-    	
-        Ext.getCmp('west').collapse( Ext.Component.DIRECTION_LEFT );
         var west = Ext.get('west'); // this is west panel region
         west.hide();
-    	
-        var westx = Ext.getCmp('west'); // this is west panel region
-        westx.doLayout();
+        var westComponent = Ext.getCmp('west'); // this is west panel region component
+        westComponent.collapse( Ext.Component.DIRECTION_LEFT );
+        westComponent.doLayout();
+       
         
-        if(this.roomCreated)
+        
+        if(this.roomActive && Ext.fly('webconference-panel'))
         {
-            var bbb = Ext.fly('bbb-panel'); 
+            var bbb = Ext.fly('webconference-panel'); 
             bbb.setWidth('100%');
             bbb.setHeight('100%');
         }
     	
     },
     onActivate: function(){
-        if (this.origin == WebconferenceOrigin.EMAIL && !this.roomCreated){
+        
+    
+        if (this.origin == WebconferenceOrigin.EMAIL && !this.roomActive){
             this.joinRoom();
         }
     },
@@ -144,27 +145,20 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     	
         var west = Ext.get('west'); // this is west panel region
         west.show();
-        //Ext.getCmp('west').toggleCollapse();
-        //Ext.getCmp('west').showVerticalScroller();
+        var westComponent = Ext.getCmp('west'); // this is west panel region component
+        westComponent.expand();
+        westComponent.doLayout();
         
-        
-        //Ext.getCmp('west').expand();
-
-        var westx = Ext.getCmp('west'); // this is west panel region
-        westx.expand();
-        westx.doLayout();
-        
-        var bbb = Ext.fly('bbb-panel');
-        bbb.setWidth(0);
-        bbb.setHeight(0);
+        if(Ext.fly('webconference-panel')){
+            var bbb = Ext.fly('webconference-panel');
+            bbb.setWidth(0);
+            bbb.setHeight(0);
+        }
         
 
     },
 
     createRoom: function(){
-        console.debug('creating webconference room...');
-        // console.debug(this.getMainScreen().getCenterPanel());
-        
         
         Ext.Ajax.request({
             params: {
@@ -177,10 +171,9 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
                 this.bbbUrl = result.bbbUrl;
                 this.roomName = result.roomName;
                 
-                Tine.log.debug(this.bbbUrl);
-                this.roomCreated = true;
+                this.roomActive = true;
                 
-                Ext.get('iframe-bbb').dom.src = this.bbbUrl;
+                Ext.get('webconference-iframe').dom.src = this.bbbUrl;
                 this.loadMask.hide();
             
             }
@@ -198,8 +191,8 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     },
     joinRoom: function(){
         
-        Ext.get('iframe-bbb').dom.src = this.bbbUrl;
-        this.roomCreated = true;
+        Ext.get('webconference-iframe').dom.src = this.bbbUrl;
+        this.roomActive = true;
         this.loadMask.hide();
     },
     
@@ -212,28 +205,39 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         //             recordClass: Tine.Addressbook.Model.Contact
         //        });
         
-        
-        
-        
-        
         Tine.Webconference.ContactPickerDialog.openWindow({
-            
             //record: new Tine.Felamimail.Model.Message(Tine.Felamimail.Model.Message.getDefaultData(), 0),
             listeners: {
                 scope: this,
                 'update': function(record) {
-                    console.debug('update called in webconference...');
-                    //console.debug(record);
-                   
+                  
                    
                 }
-                
-                
             }
         });
-  
-    	
+    },
+    onExit: function(btn){
+        
+        
+        
+        var tabs = Ext.query('.tine-mainscreen-apptabs'); // as configured in Tinebase/js/MainScreen.js
+        var apptabs = Ext.getCmp(tabs[0].id); // apptabs component
+        var tabPanel = apptabs.items.items[0]; // TabPanel (Tine.Tinebase.AppTabsPanel)
+        var tabid = tabPanel.app2id('Webconference');
+       
+        var tab = Ext.getCmp(tabid);
+        tabPanel.remove(tab); // remove the webconference tab
+       
+       
+       //Ext.get('webconference-iframe').remove(); // remove the iframe element
+       Ext.getCmp('webconference-panel').destroy(); // destroy the webconference panel component
+       
+       Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
+       Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.MENU;
+    
+        
     }
+    
 	
 });
 
@@ -242,21 +246,13 @@ Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
     onRender : function(ct, position){
         this.el = ct.createChild({
             tag: 'iframe', 
-            id: 'iframe-bbb', 
+            id: 'webconference-iframe', 
             frameBorder: 0, 
             src: this.url
         });
     }
 });
 
-
-/**
- * @namespace   Tine.Webconference
- * @class       Tine.Webconference.MainScreen
- * @extends     Tine.widgets.MainScreen
- * 
- * @author      Cornelius Weiss <c.weiss@metaways.de>
- */
 
 Tine.Webconference.MainScreen = function(config) {
     Ext.apply(this, config);
@@ -273,7 +269,6 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
         
         if (! this[contentType + 'ActionToolbar']) {
             try {
-                //this[contentType + 'ActionToolbar'] = this[contentType + this.centerPanelClassNameSuffix].getActionToolbar();
                 
                 var actionToolbar = new Ext.Toolbar({
                     items: [{
@@ -289,6 +284,16 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                             text: this.app.i18n._('Add User'),
                             handler: this.app.onAddUser
                         })
+                        
+                        ,Ext.apply(new Ext.Button(), {
+                            scale: 'medium',
+                            rowspan: 2,
+                            iconAlign: 'top',
+                            iconCls: 'action_logOut',
+                            text: this.app.i18n._('Exit'),
+                            handler: this.app.onExit
+                        })
+                        
                         ]
                     }]
                 });
@@ -313,23 +318,20 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
     },
 	
     getCenterPanel: function() {
-        if (! this.contentPanel) {
+        if (! this.contentPanel || ! Ext.get('webconference-iframe')) {
             
-            //var uri = window.location;
-            if(this.app.isRoomCreated())
-                var uri = this.app.getBbbUrl();
+            if(this.app.isRoomActive())
+                var uri = this.app.bbbUrl;
             else
                 var uri = window.location;
         
         	
             this.contentPanel = new Ext.Panel({
-                id: 'bbb-panel',
+                id: 'webconference-panel',
                 title: 'bbb',
                 header: false,
                 closable:false,
-                hideMode:'visibility',
-                
-                // layout to fit child component
+                hideMode:'visibility', // to work with flash
                 layout:'fit', 
                 // add iframe as the child component
                 items: [ new Ext.ux.IFrameComponent({
@@ -365,10 +367,11 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
 
             this.fireEvent('show', this);
         }
+        
         var loadMask = new Ext.LoadMask(this.getCenterPanel().getEl(), {
             msg: String.format(_('Please wait'))
         });
-        if(!this.app.isRoomCreated()){
+        if(!this.app.isRoomActive()){
             loadMask.show();
             this.app.setLoadMask(loadMask);
         }

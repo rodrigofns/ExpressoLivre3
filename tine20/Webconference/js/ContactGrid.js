@@ -86,51 +86,11 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {Event} e
      */
     onCellClick: function(grid, row, col, e) {
+        //this.getContextMenu().showAt(e.getXY());
         
-    //        var contact = this.store.getAt(row),
-    //        typeToSet = this.grid.getColumnModel().getDataIndex(col)
-    //
-    //        console.debug('onCellClick....');
-    //        console.debug(typeToSet);
-    //
-    //        if (! contact.hasEmail() && typeToSet !== 'none') {
-    //            this.setTypeRadio(contact, 'none');
-    //        } else {
-    //            this.updateRecipients(contact, typeToSet);
-    //        }
     },
     
-    /**
-     * update recipient
-     * 
-     * @param {Tine.Addressbook.Model.Contact} contact
-     * @param {String} typeToSet
-     */
-    updateRecipients: function(contact, typeToSet) {
-        var email = Tine.Felamimail.getEmailStringFromContact(contact),
-        found = false;
-            
-            
-        console.debug('updateRecipients...');
-        Ext.each(['Invite', 'Moderator'], function(type) {
-            //if (this.messageRecord.data[type].indexOf(email) !== -1) {
-            if (type !== typeToSet) {
-                
-            //this.messageRecord.data[type].remove(email);
-            } else {
-                found = true;
-            }
-        //}
-        }, this);
-        
-        if (! found && typeToSet !== 'none') {
-            //this.messageRecord.data['emails'].push(email);
-            console.debug('pushing contact...');
-            console.debug(contact);
-        }
-    },
-    
-    
+      
     /**
      * Return CSS class to apply to rows depending upon email set or not
      * 
@@ -155,7 +115,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         this.actions_addAsTo = new Ext.Action({
             requiredGrant: 'readGrant',
             text: this.app.i18n._('Add as "Attendee"'),
-            disabled: true,
+            disabled: false,
             iconCls: 'action_add',
             actionUpdater: this.updateRecipientActions,
             handler: this.onAddContact.createDelegate(this, [false]),
@@ -166,7 +126,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         this.actions_addAsCc = new Ext.Action({
             requiredGrant: 'readGrant',
             text: this.app.i18n._('Add as "Moderator"'),
-            disabled: true,
+            disabled: false,
             iconCls: 'action_add',
             actionUpdater: this.updateRecipientActions,
             handler: this.onAddContact.createDelegate(this, [true]),
@@ -194,7 +154,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {Object} records
      */
     updateRecipientActions: function(action, grants, records) {
-        console.debug('updateRecipientActions....');
+        //console.debug('updateRecipientActions....');
         if (records.length > 0) {
             var emptyEmails = true;
             for (var i=0; i < records.length; i++) {
@@ -208,7 +168,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         } else {
             action.setDisabled(true);
         }
-        action.setDisabled(false);
+        //action.setDisabled(false);
     },
     
     /**
@@ -217,14 +177,10 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {String} type
      */
     onAddContact: function(type) {
-        console.debug('onAddContact....');
-        
-        var sm = this.grid.getSelectionModel(),
-        selectedRows = sm.getSelections();
+        //console.debug('onAddContact....');
         
         var contacts = this.grid.getSelectionModel().getSelectionsCollection().items;
         
-        //var s = sm.getSelection();
         // And then you can iterate over the selected items, e.g.: 
         selected = [];
         Ext.each(contacts, function (item) {
@@ -233,8 +189,13 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         
         Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomName,  function(response) {
             
-            //alert(response.message);
-            Ext.Msg.alert(response.message);
+            Ext.MessageBox.show({
+                    title: _('Webconference'), 
+                    msg: response.message,
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.INFO
+                });
+            
         });
             
       
@@ -257,8 +218,10 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @return {Ext.menu.Menu}
      */
     getContextMenu: function() {
-        console.debug('getContextMenu....');
+        //console.debug('getContextMenu....');
+        
         if (! this.contextMenu) {
+            
             var items = [
             this.actions_addAsTo,
             this.actions_addAsCc,
