@@ -1,0 +1,91 @@
+#: Config.php:31
+msgid "Status Available"
+msgstr ""
+
+#: Config.php:33
+msgid ""
+"Possible status. Please note that additional status might impact other "
+"ExampleApplication systems on export or syncronisation."
+msgstr ""
+
+#: Controller.php:74
+#, python-format
+msgid "%s's personal example records"
+msgstr ""
+
+#: js/ExampleApplication.js:24
+msgid "Example Application test"
+msgstr ""
+
+#: js/ExampleRecordEditDialog.js:87
+msgid "ExampleRecord"
+msgstr ""
+
+#: js/ExampleRecordEditDialog.js:104 js/ExampleRecordGridPanel.js:83
+msgid "Name"
+msgstr ""
+
+#: js/ExampleRecordEditDialog.js:110 js/ExampleRecordGridPanel.js:89
+#: js/Model.js:71
+msgid "Status"
+msgstr ""
+
+#: js/ExampleRecordGridPanel.js:96
+msgid "Title"
+msgstr ""
+
+#: js/ExampleRecordGridPanel.js:102
+msgid "Budget"
+msgstr ""
+
+#: js/ExampleRecordGridPanel.js:126
+msgid "Show closed"
+msgstr ""
+
+#: js/Model.js:31
+msgid "example record"
+msgid_plural "example records"
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/Model.js:35
+msgid "example record list"
+msgid_plural "example record lists"
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/Model.js:69
+msgid "Quick search"
+msgstr ""
+
+#: js/Model.js:79
+msgid "Last modified"
+msgstr ""
+
+#: js/Model.js:80
+msgid "Last modifier"
+msgstr ""
+
+#: js/Model.js:81
+msgid "Creation Time"
+msgstr ""
+
+#: js/Model.js:82
+msgid "Creator"
+msgstr ""
+
+#: Setup/Initialize.php:33
+msgid "Completed"
+msgstr ""
+
+#: Setup/Initialize.php:34
+msgid "Cancelled"
+msgstr ""
+
+#: Setup/Initialize.php:35
+msgid "In process"
+msgstr ""
+
+#: Setup/setup.xml:4
+msgid "ExampleApplication"
+msgstr ""
