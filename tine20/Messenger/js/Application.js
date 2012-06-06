@@ -58,7 +58,7 @@ const IMConst = {
 }
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
-    hasMainScreen: true,
+    hasMainScreen: false,
     
     // Delayed Tasks
     showMessengerDelayedTask: null,
