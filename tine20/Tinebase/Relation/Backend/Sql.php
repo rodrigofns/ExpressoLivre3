@@ -193,6 +193,9 @@ class Tinebase_Relation_Backend_Sql
     public function getAllRelations($_model, $_backend, $_id, $_degree = NULL, array $_type = array(), $_returnAll = false)
     {
         $_id = $_id ? (array)$_id : array('');
+        array_walk($_id, function(&$value,$index){
+        	$value = (string)$value;
+        });        
     	$where = array(
     	    $this->_db->quoteInto($this->_db->quoteIdentifier('own_model') .' = ?', $_model),
     	    $this->_db->quoteInto($this->_db->quoteIdentifier('own_backend') .' = ?',$_backend),
