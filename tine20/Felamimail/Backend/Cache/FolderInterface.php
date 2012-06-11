@@ -18,6 +18,17 @@
  */
 interface Felamimail_Backend_Cache_FolderInterface
 {  
+    
+    /**
+     * Search for records matching given filter
+     *
+     * @param  Tinebase_Model_Filter_FilterGroup    $_filter
+     * @param  Tinebase_Model_Pagination            $_pagination
+     * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
+     * @return Tinebase_Record_RecordSet|array
+     */
+    public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*');
+    
     /**
      * get folder cache counter like total and unseen
      *
