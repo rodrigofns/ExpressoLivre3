@@ -37,6 +37,26 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         return $retorno;
     }
+
+    /**
+     * Updates existing entry
+     *
+     * @param Tinebase_Record_Interface $_record
+     * @throws Tinebase_Exception_Record_Validation|Tinebase_Exception_InvalidArgument
+     * @return Tinebase_Record_Interface Record|NULL
+     */
+    public function update(Tinebase_Record_Interface $_record)
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message update = $_record ' . print_r($_record,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->update($_record);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message update = $retorno ' . print_r($retorno,true));
+        return $retorno;        
+    }
+    
     
     /**
      * Gets total count of search with $_filter

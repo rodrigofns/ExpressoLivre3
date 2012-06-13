@@ -24,6 +24,15 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract // extends Tinebase_Backen
     abstract public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*');
     
     /**
+     * Updates existing entry
+     *
+     * @param Tinebase_Record_Interface $_record
+     * @throws Tinebase_Exception_Record_Validation|Tinebase_Exception_InvalidArgument
+     * @return Tinebase_Record_Interface Record|NULL
+     */
+    abstract public function update(Tinebase_Record_Interface $_record);
+    
+    /**
      * Gets total count of search with $_filter
      * 
      * @param Tinebase_Model_Filter_FilterGroup $_filter
