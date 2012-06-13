@@ -7,66 +7,140 @@
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cassiano Dal Pizzol <cassiano.dalpizzol@serpro.gov.br>
  * @author      Bruno Costa Vieira <bruno.vieira-costa@serpro.gov.br>
+ * @author      Mario Cesar Kolling <mario.kolling@serpro.gov.br>
  * @copyright   Copyright (c) 2009-2013 Serpro (http://www.serpro.gov.br)
  *
  */
 
 class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Imap_Abstract
-                                            implements Felamimail_Backend_Cache_MessageInterface
+                                                implements Felamimail_Backend_Cache_MessageInterface
 {
     /**
-     * Table name without prefix
+     * Search for records matching given filter
      *
-     * @var string
+     * @param  Tinebase_Model_Filter_FilterGroup    $_filter
+     * @param  Tinebase_Model_Pagination            $_pagination
+     * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
+     * @return Tinebase_Record_RecordSet|array
      */
-    protected $_tableName = 'felamimail_cache_message';
+    public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_filter ' . print_r($_filter,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_filter,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_cols' . print_r($_cols,true));
+*/  
+        $aux = new Felamimail_Backend_Cache_Sql_Message();           
+        $retorno = $aux->search($_filter,$_pagination, $_cols);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $retorno' . print_r($retorno,true));        
+        
+        return $retorno;
+    }
     
     /**
-     * Model name
-     *
-     * @var string
+     * Gets total count of search with $_filter
+     * 
+     * @param Tinebase_Model_Filter_FilterGroup $_filter
+     * @return int
      */
-    protected $_modelName = 'Felamimail_Model_Message';
+    public function searchCount(Tinebase_Model_Filter_FilterGroup $_filter)
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message searchCount = $_filter ' . print_r($_filter,true));
+*/  
+        $aux = new Felamimail_Backend_Cache_Sql_Message();
+        $retorno = $aux->searchCount($_filter);
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message searchCount = $retorno ' . print_r($retorno,true));
+        return $retorno;
+    }
     
     /**
-    * default column(s) for count
-    *
-    * @var string
-    */
-    protected $_defaultCountCol = 'id';
+     * Gets one entry (by id)
+     *
+     * @param integer|Tinebase_Record_Interface $_id
+     * @param $_getDeleted get deleted records
+     * @return Tinebase_Record_Interface
+     * @throws Tinebase_Exception_NotFound
+     */
+    public function get($_id, $_getDeleted = FALSE) 
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message get = $_id ' . print_r($_id,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message get = $_getDeleted' . print_r($_getDeleted,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->get($_id, $_getDeleted);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message get = get ' . print_r($retorno,true));
+        return $retorno;
+    }
+    
+     /**
+      * Deletes entries
+      * 
+      * @param string|integer|Tinebase_Record_Interface|array $_id
+      * @return void
+      * @return int The number of affected rows.
+      */
+    public function delete($_id) 
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message delete = $_id ' . print_r($_id,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->delete($_id);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
+        return $retorno;
+    }
     
     /**
-     * foreign tables (key => tablename)
+     * Get multiple entries
      *
-     * @var array
+     * @param string|array $_id Ids
+     * @param array $_containerIds all allowed container ids that are added to getMultiple query
+     * @return Tinebase_Record_RecordSet
+     * 
+     * @todo get custom fields here as well
      */
-    protected $_foreignTables = array(
-        'to'    => array(
-            'table'     => 'felamimail_cache_message_to',
-            'joinOn'    => 'message_id',
-            'field'     => 'email',
-            'preserve'  => TRUE,
-        ),
-        'cc'    => array(
-            'table'  => 'felamimail_cache_message_cc',
-            'joinOn' => 'message_id',
-            'field'  => 'email',
-            'preserve'  => TRUE,
-        ),
-        'bcc'    => array(
-            'table'  => 'felamimail_cache_message_bcc',
-            'joinOn' => 'message_id',
-            'field'  => 'email',
-            'preserve'  => TRUE,
-        ),
-        'flags'    => array(
-            'table'         => 'felamimail_cache_message_flag',
-            'joinOn'        => 'message_id',
-            'field'         => 'flag',
-            'preserve'  => TRUE,
-        ),
-    );
+    public function getMultiple($_id, $_containerIds = NULL) 
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message getMultiple = $_id ' . print_r($_id,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message getMultiple = $_containerIds ' . print_r($_containerIds,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->getMultiple($_id, $_containerIds = NULL);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
+        return $retorno;
+    }
 
+    /**
+     * Creates new entry
+     *
+     * @param   Tinebase_Record_Interface $_record
+     * @return  Tinebase_Record_Interface
+     * @throws  Tinebase_Exception_InvalidArgument
+     * @throws  Tinebase_Exception_UnexpectedValue
+     * 
+     * @todo    remove autoincremental ids later
+     */
+    public function create(Tinebase_Record_Interface $_record)
+    {
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message create = $_record ' . print_r($_record,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->create($_record);
+        
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message create = $retorno ' . print_r($retorno,true));
+        return $retorno;        
+    }
+    
+    
+    
     /**
      * Search for records matching given filter
      *
@@ -76,7 +150,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      */
     public function searchMessageUids(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL)    
     {
-        return $this->search($_filter, $_pagination, array(self::IDCOL, 'messageuid'));
+        return $this->search($_filter, $_pagination, array(Tinebase_Backend_Sql_Abstract::IDCOL, 'messageuid'));
     }
     
     /**
@@ -95,7 +169,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             'limit' => $_limit,
         ), TRUE) : NULL;
         
-        return $this->search($filter, $pagination, array('messageuid' => 'messageuid', 'id' => self::IDCOL, 'flags' => 'felamimail_cache_message_flag.flag'));
+        return $this->search($filter, $pagination, array('messageuid' => 'messageuid', 'id' => Tinebase_Backend_Sql_Abstract::IDCOL, 'flags' => 'felamimail_cache_message_flag.flag'));
     }
         
     /**
