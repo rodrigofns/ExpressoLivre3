@@ -15,6 +15,7 @@
 class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap_Abstract
                                             implements Felamimail_Backend_Cache_FolderInterface
 {
+    /*************************** abstract functions ****************************/
     /**
      * Search for records matching given filter
      *
@@ -158,7 +159,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
         return $retorno;        
     }
-     
+    
+/*************************** interface functions ****************************/     
     /**
      * get folder cache counter like total and unseen
      *

@@ -15,6 +15,8 @@
 class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Imap_Abstract
                                                 implements Felamimail_Backend_Cache_MessageInterface
 {
+    
+    /*************************** abstract functions ****************************/
     /**
      * Search for records matching given filter
      *
@@ -160,7 +162,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
     }
     
     
-    
+    /*************************** interface functions ****************************/
     /**
      * Search for records matching given filter
      *
@@ -191,39 +193,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         return $this->search($filter, $pagination, array('messageuid' => 'messageuid', 'id' => Tinebase_Backend_Sql_Abstract::IDCOL, 'flags' => 'felamimail_cache_message_flag.flag'));
     }
-        
-    /**
-     * update foreign key values
-     * 
-     * @param string $_mode create|update
-     * @param Tinebase_Record_Abstract $_record
-     * 
-     * @todo support update mode
-     */
-    protected function _updateForeignKeys($_mode, Tinebase_Record_Abstract $_record)
-    {
-        if ($_mode == 'create') {
-            
-            foreach ($this->_foreignTables as $key => $foreign) {
-                if (!isset($_record->{$key}) || empty($_record->{$key})) {
-                    continue;
-                }
-                
-                //if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' ' . $_field . ': ' . print_r($_record->{$_field}, TRUE));
-                
-                foreach ($_record->{$key} as $data) {
-                    if ($key == 'flags') {
-                        $data = array(
-                            'flag'      => $data,
-                            'folder_id' => $_record->folder_id
-                        );
-                    }
-                    $data['message_id'] = $_record->getId();
-                    $this->_insertWithProfile($this->_tablePrefix . $foreign['table'], $data);                    
-                }
-            }
-        }
-    }
     
     /**
      * add flag to message
@@ -233,17 +202,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function addFlag($_message, $_flag)
     {
-        if (empty($_flag)) {
-            // nothing todo
-            return;
-        }
-        
-        $data = array(
-            'flag'          => $_flag,
-            'message_id'    => $_message->getId(),
-            'folder_id'     => $_message->folder_id
-        );
-        $this->_insertWithProfile($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message addFlag = $_message ' . print_r($_message,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message addFlag = $_flag ' . print_r($_flag,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $aux->addFlag($_message, $_flag);
     }
     
     /**
@@ -254,41 +218,13 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function setFlags($_messages, $_flags, $_folderId = NULL)
     {
-        if ($_messages instanceof Tinebase_Record_RecordSet) {
-            $messages = $_messages;
-        } elseif ($_messages instanceof Felamimail_Model_Message) {
-            $messages = new Tinebase_Record_RecordSet('Felamimail_Model_Message', array($_messages));
-        } else if (is_array($_messages) && $_folderId !== NULL) {
-            // array of ids
-            $messages = $_messages;
-        } else {
-            throw new Tinebase_Exception_UnexpectedValue('$_messages must be instance of Felamimail_Model_Message');
-        }
-        
-        $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('message_id') . ' IN (?)', ($messages instanceof Tinebase_Record_RecordSet) ? $messages->getArrayOfIds() : $messages)
-        );
-        $this->_db->delete($this->_tablePrefix . $this->_foreignTables['flags']['table'], $where);
-        
-        $flags = (array) $_flags;
-        $touchedMessages = array();
-
-        foreach ($flags as $flag) {
-            foreach ($messages as $message) {
-                $id = $touchedMessages[] = ($message instanceof Felamimail_Model_Message) ? $message->getId() : $message;
-                $folderId = ($message instanceof Felamimail_Model_Message) ? $message->folder_id : $_folderId;
-                
-                $data = array(
-                    'flag'          => $flag,
-                    'message_id'    => $id,
-                    'folder_id'     => $folderId,
-                );
-                $this->_insertWithProfile($this->_tablePrefix . $this->_foreignTables['flags']['table'], $data);
-            }
-        }
-        
-        // touch messages so sync can find the updates
-        $this->updateMultiple($touchedMessages, array('timestamp' => Tinebase_DateTime::now()));
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message setFlags = $_message ' . print_r($_message,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message setFlags = $_flags ' . print_r($_flags,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message setFlags = $_folderId ' . print_r($_folderId,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $aux->setFlags($_messages, $_flags, $_folderId);
     }
     
     /**
@@ -299,21 +235,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function clearFlag($_messages, $_flag)
     {
-        if ($_messages instanceof Tinebase_Record_RecordSet) {
-            $messageIds = $_messages->getArrayOfIds();
-        } elseif ($_messages instanceof Felamimail_Model_Message) {
-            $messageIds = $_messages->getId();
-        } else {
-            // single id or array of ids
-            $messageIds = $_messages;
-        }
-        
-        $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('message_id') . ' IN (?)', $messageIds),
-            $this->_db->quoteInto($this->_db->quoteIdentifier('flag') . ' IN (?)', $_flag)
-        );
-        
-        $this->_db->delete($this->_tablePrefix . $this->_foreignTables['flags']['table'], $where);
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message clearFlag = $_message ' . print_r($_message,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message clearFlag = $_flag ' . print_r($_flag,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $aux->clearFlag($_messages, $_flag);
     }
     
     /**
@@ -323,13 +250,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function deleteByFolderId($_folderId)
     {
-        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
-        
-        $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('folder_id') . ' = ?', $folderId)
-        );
-        
-        $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteByFolderId = $_folderId ' . print_r($_folderId,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $aux->deleteByFolderId($_folderId);
     }
 
     /**
@@ -340,26 +265,14 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function searchCountByFolderId($_folderId)
     {
-        $filter = $this->_getMessageFilterWithFolderId($_folderId);
-        $count = $this->searchCount($filter);
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message searchCountByFolderId = $_folderId ' . print_r($_folderId,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->searchCountByFolderId($_folderId);
         
-        return $count;
-    }
-    
-    /**
-     * get folder id message filter
-     * 
-     * @param mixed $_folderId
-     * @return Felamimail_Model_MessageFilter
-     */
-    protected function _getMessageFilterWithFolderId($_folderId)
-    {
-        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
-        $filter = new Felamimail_Model_MessageFilter(array(
-            array('field' => 'folder_id', 'operator' => 'equals', 'value' => $folderId)
-        ));
-        
-        return $filter;
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message searchCountByFolderId = $retorno ' . print_r($retorno,true));
+        return $retorno;      
     }
     
     /**
@@ -371,23 +284,14 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function seenCountByFolderId($_folderId)
     {
-        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message seenCountByFolderId = $_folderId ' . print_r($_folderId,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->seenCountByFolderId($_folderId);
         
-        $select = $this->_db->select();
-        $select->from(
-            array('flags' => $this->_tablePrefix . $this->_foreignTables['flags']['table']), 
-            array('count' => 'COUNT(DISTINCT message_id)')
-        )->where(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('folder_id') . ' = ?', $folderId)
-        )->where(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('flag') . ' = ?', '\Seen')
-        );
-        
-        $this->_traitGroup($select);
-
-        $seenCount = $this->_db->fetchOne($select);
-                
-        return $seenCount;
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message seenCountByFolderId = $retorno ' . print_r($retorno,true));
+        return $retorno;            
     }
     
     /**
@@ -399,37 +303,19 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function deleteMessageuidsByFolderId($_msguids, $_folderId)
     {
-        if (empty($_msguids) || !is_array($_msguids)) {
-            return FALSE;
-        }
+/*        
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteMessageuidsByFolderId = $_msguids ' . print_r($_msguids,true));
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteMessageuidsByFolderId = $_folderId ' . print_r($_folderId,true));
+*/ 
+        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+        $retorno = $aux->deleteMessageuidsByFolderId($_msguids, $_folderId);
         
-        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
-        
-        $where = array(
-            $this->_db->quoteInto($this->_db->quoteIdentifier('messageuid') . ' IN (?)', $_msguids),
-            $this->_db->quoteInto($this->_db->quoteIdentifier('folder_id') . ' = ?', $folderId)
-        );
-        
-        return $this->_db->delete($this->_tablePrefix . $this->_tableName, $where);
-    }
-
-    /**
-     * converts record into raw data for adapter
-     *
-     * @param  Tinebase_Record_Abstract $_record
-     * @return array
-     */
-    protected function _recordToRawData($_record)
-    {
-        $result = parent::_recordToRawData($_record);
-        
-        if(isset($result['structure'])) {
-            $result['structure'] = Zend_Json::encode($result['structure']);
-        }
-        
-        return $result;
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message seenCountByFolderId = $retorno ' . print_r($retorno,true));
+        return $retorno;
     }
     
+    /*************************** protected functions ****************************/
+
     /**
      * converts raw data from adapter into a single record
      *
@@ -463,5 +349,41 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $result = parent::_rawDataToRecordSet($_rawDatas);
         
         return $result;
+    }
+    
+    /**
+     * converts record into raw data for adapter
+     *
+     * @param  Tinebase_Record_Abstract $_record
+     * @return array
+     */
+    protected function _recordToRawData($_record)
+    {
+        $result = parent::_recordToRawData($_record);
+        
+        if(isset($result['structure'])) {
+            $result['structure'] = Zend_Json::encode($result['structure']);
+        }
+        
+        return $result;
+    }  
+    
+    
+    
+    
+    /**
+     * get folder id message filter
+     * 
+     * @param mixed $_folderId
+     * @return Felamimail_Model_MessageFilter
+     */
+    protected function _getMessageFilterWithFolderId($_folderId)
+    {
+        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
+        $filter = new Felamimail_Model_MessageFilter(array(
+            array('field' => 'folder_id', 'operator' => 'equals', 'value' => $folderId)
+        ));
+        
+        return $filter;
     }
 }
