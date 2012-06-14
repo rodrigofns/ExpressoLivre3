@@ -16,6 +16,149 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                                                 implements Felamimail_Backend_Cache_MessageInterface
 {
     
+    // Use imap search command or imap list?
+    protected function _isSearh($_filter)
+    {
+        
+        $return = false;
+        foreach ($_filter as $filter){
+            
+            switch ($filter['field'])
+            {
+            
+                // TODO: do search in case of flags???
+                // TODO: we'll have cases with id, account_id, folder_id and messageuid?
+                case 'query' :
+                case 'subject' :
+                case 'from_email' :
+                case 'from_name' :
+                case 'received' :
+                case 'to' :
+                case 'cc' :
+                case 'bcc' :
+                    if (!empty($filter['value']))
+                    {
+                        $return = true;
+                    }
+                    break;
+            }
+        }
+        
+        return $return;
+        
+    }
+    
+    // Should be a static function implemented in an utilitarian Class
+    protected function _searchNestedArray(array $array, $search, $mode = 'value') {
+
+        foreach (new RecursiveIteratorIterator(new RecursiveArrayIterator($array)) as $key => $value) {
+            if ($search === ${${"mode"}})
+                return true;
+        }
+        return false;
+    }
+
+    
+    protected function _processPathFilters($_filter)
+    {
+        $return = array();
+        $filters = $_filter[0]['filters'];
+        
+        if (!empty($filters) && $this->_searchNestedArray($filters, 'path'))
+        {
+            foreach ($filters as $filter)
+            {
+                if ($filter['field'] === 'path' && !empty($filter['value']))
+                {
+                    $return = array_merge($return, $filter['value']);
+                }
+            }
+        }
+        
+        $folder_controller = Felamimail_Controller_Folder::getInstance();
+        // TODO: Tentar recuperar o 'delimiter' do imap. Pois o delimiter pode 
+        // variar dependo da configuração do servidor imap.
+        $delimiter = '/';
+        
+        for ($i = 0; $i < count($return); $i++)
+        {
+            
+            $folder_id = end(explode($delimiter, $return[$i]));
+            $folder = $folder_controller->get($folder_id);
+
+            $folder_properties = $folder->toArray();
+            //$localname = $folder_properties['localname'];
+            $globalname = $folder_properties['globalname'];
+            
+            $return[$i] = $globalname;
+            //$parent = $folder_properties['parent'];
+            
+        }
+        
+        
+        return $return;
+    }
+    
+    // Process and generate the imap filter
+    protected function _generateImapFilter($filter_array)
+    {
+        
+    }
+    
+    protected function _parseFilterGroup($_filter)
+    {
+
+        $filter_array = $_filter->toArray();
+        $return = array(); // array de filtros imap.
+        
+        // Ignorando filtros 'OR'
+        if (!empty($filter_array) && !empty($filter_array[0]))
+        {
+            $filter_array = $filter_array[0];
+            if (strtolower($filter_array['condition']) === 'or')
+            {
+                if (!empty($filter_array['filters']))
+                {
+                    $filter_array = $filter_array['filters'];
+                }
+                else
+                {
+                    $filter_array = null;
+                }
+                
+            }
+            
+            $path_filters = $this->_processPathFilters($filter_array);
+            
+            if (empty($path_filters))
+            {
+                // TODO:
+                // $path_filters = $this->_getAllFolders();
+            }
+            
+            $return['paths'] = $path_filters; // array with folder globalnames
+            
+            // Descobrir se usaremos folder list ou search
+            if ($this->_isSearh($filter_array))
+            {
+                $return['command'] = 'search';
+                $return['filter'] = $this->_generateImapFilter($filter_array);
+            }
+            else
+            {
+                $return['command'] = 'list';
+            }
+            
+            // TODO: actually form de imap filter
+            
+            return $return;
+            
+        }
+        
+        return null;
+        
+    }
+    
     /*************************** abstract functions ****************************/
     /**
      * Search for records matching given filter
@@ -32,6 +175,10 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_filter,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_cols' . print_r($_cols,true));
 */  
+        
+        
+        $imap_filters = $this->_parseFilterGroup($_filter);
+        
         $aux = new Felamimail_Backend_Cache_Sql_Message();           
         $retorno = $aux->search($_filter,$_pagination, $_cols);
         
