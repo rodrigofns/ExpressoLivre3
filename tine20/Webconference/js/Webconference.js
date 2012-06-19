@@ -13,6 +13,8 @@ const WebconferenceOrigin = {
  * @class       Tine.Webconference.Application
  * @extends     Tine.Tinebase.Application
  * 
+ * Webconference Application Object <br>
+ * 
  * @author      Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
@@ -23,6 +25,12 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     origin:null,
     
     loadMask: null,
+    
+    
+    actions : {
+        addUser : null,
+        exit : null
+    },
     
     /**
      * Get translated application title of the webconference application
@@ -85,28 +93,6 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
        
     },
         
-    onJoinWebconferenceFromEmail: function(url){
-        
-        
-        if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
-            Ext.MessageBox.confirm('', this.i18n._('Cancel active webconference') + ' ?', function(btn) {
-                if(btn == 'yes') { 
-                    this.origin = WebconferenceOrigin.EMAIL;
-                    this.bbbUrl = url;
-                    Ext.get('webconference-iframe').dom.src = this.bbbUrl;
-                    Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );
-                }
-                
-            }, this);
-        }
-        else {
-            this.origin = WebconferenceOrigin.EMAIL;
-            this.bbbUrl = url;
-            Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );  
-        }
-    },
-    
-    
     onBeforeActivate: function(){
         
         
@@ -114,8 +100,6 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             this.createRoom();
             
         }
-       
-
         
         var west = Ext.get('west'); // this is west panel region
         west.hide();
@@ -123,15 +107,15 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         westComponent.collapse( Ext.Component.DIRECTION_LEFT );
         westComponent.doLayout();
        
-        
-        
+       
+       
         if(this.roomActive && Ext.fly('webconference-panel'))
         {
             var bbb = Ext.fly('webconference-panel'); 
             bbb.setWidth('100%');
             bbb.setHeight('100%');
         }
-    	
+        
     },
     onActivate: function(){
         
@@ -157,6 +141,50 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         
 
     },
+    
+    onJoinWebconferenceFromEmail: function(url, moderator){
+        
+        var loadMask = new Ext.LoadMask(Tine.Tinebase.appMgr.getActive().getMainScreen().getCenterPanel().getEl(), {
+            msg: String.format(_('Please wait'))
+        });
+        loadMask.show();
+        
+        Tine.Webconference.checkUrl(url,  function(response) {
+            if(response.online){
+                
+                if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
+                    Ext.MessageBox.confirm('', _('Cancel active webconference') + ' ?', function(btn) {
+                        if(btn == 'yes') { 
+                            Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.EMAIL;
+                            Tine.Tinebase.appMgr.get('Webconference').bbbUrl = url;
+                            Ext.get('webconference-iframe').dom.src = Tine.Tinebase.appMgr.get('Webconference').bbbUrl;
+                            Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );
+                        }
+                
+                    }, this);
+                }
+                else {
+                    Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.EMAIL;
+                    Tine.Tinebase.appMgr.get('Webconference').bbbUrl = url;
+                    Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Webconference') );  
+                }
+               
+                
+            }
+            else{
+                Ext.MessageBox.show({
+                    title: Tine.Tinebase.appMgr.get('Webconference').i18n._('Webconference'), 
+                    msg: Tine.Tinebase.appMgr.get('Webconference').i18n._('The Webconference server is offline'),
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.INFO
+                });
+            }
+            
+            loadMask.hide();
+        }); 
+        
+       
+    },
 
     createRoom: function(){
         
@@ -170,19 +198,29 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
                 var result = Ext.util.JSON.decode(_result.responseText);
                 this.bbbUrl = result.bbbUrl;
                 this.roomName = result.roomName;
-                
                 this.roomActive = true;
                 
                 Ext.get('webconference-iframe').dom.src = this.bbbUrl;
                 this.loadMask.hide();
+                this.getMainScreen().getNorthPanel().setDisabled(false);
+                
+            //this.fixFlash();
             
-            }
-            ,
+            },
+
             failure: function(response, options) {
                 var responseText = Ext.util.JSON.decode(response.responseText);
                 var exception = responseText.data ? responseText.data : responseText;
-                Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
-
+                
+                Ext.MessageBox.show({
+                    title: this.i18n._('Webconference'), 
+                    msg: exception.message,
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.INFO
+                });
+                
+                this.onExit();
+                
             }
         });
         
@@ -194,31 +232,32 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         Ext.get('webconference-iframe').dom.src = this.bbbUrl;
         this.roomActive = true;
         this.loadMask.hide();
+        this.getMainScreen().getNorthPanel().setDisabled(false);
     },
     
     onAddUser: function(btn) {
         
-        //console.debug(Tine.Tinebase.appMgr.get('Webconference').roomName);
-        //Tine.Tinebase.appMgr.activate( Tine.Tinebase.appMgr.get('Admin') );
-        //        
-        //        selectedContactStore = new Tine.Tinebase.data.RecordStore({
-        //             recordClass: Tine.Addressbook.Model.Contact
-        //        });
+        //Tine.Tinebase.appMgr.get('Webconference').fixFlash(); 
+        Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().hide();
         
         Tine.Webconference.ContactPickerDialog.openWindow({
             //record: new Tine.Felamimail.Model.Message(Tine.Felamimail.Model.Message.getDefaultData(), 0),
             listeners: {
                 scope: this,
-                'update': function(record) {
-                  
-                   
+//                'update': function(record) {
+//                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
+//                },
+                'cancel':function(win){
+                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
+                },
+                'destroy':function(win){
+                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
                 }
             }
         });
     },
+    
     onExit: function(btn){
-        
-        
         
         var tabs = Ext.query('.tine-mainscreen-apptabs'); // as configured in Tinebase/js/MainScreen.js
         var apptabs = Ext.getCmp(tabs[0].id); // apptabs component
@@ -228,15 +267,84 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         var tab = Ext.getCmp(tabid);
         tabPanel.remove(tab); // remove the webconference tab
        
-       
-       //Ext.get('webconference-iframe').remove(); // remove the iframe element
-       Ext.getCmp('webconference-panel').destroy(); // destroy the webconference panel component
-       
-       Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
-       Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.MENU;
+        Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
+        Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.MENU;
     
+        Ext.getCmp('webconference-panel').destroy(); // destroy the webconference panel component
         
+        Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getNorthPanel().hide();
+    },
+    
+    onTerminate: function(btn){
+        
+        Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().hide();
+        
+        
+        Ext.MessageBox.confirm('', _('This will kick all participants out of the meeting. Terminate webconference') + ' ?', function(btn) {
+            if(btn == 'yes') { 
+                //Tine.Tinebase.appMgr.get('Webconference').loadMask.show();
+                
+                Ext.Ajax.request({
+                    params: {
+                        method: 'Webconference.endMeeting',
+                        roomName: Tine.Tinebase.appMgr.get('Webconference').roomName
+                    },
+                    scope: this,
+                    success: function(_result, _request){
+                        //var result = Ext.util.JSON.decode(_result.responseText);
+                
+                        Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
+                        Tine.Tinebase.appMgr.get('Webconference').onExit();
+                
+            
+                    }
+                });
+            }
+            else {
+                Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
+            }
+                
+        }, this);
+        
+       
     }
+    
+//    ,fixFlash:function() {
+//        var embed = document.getElementsByTagName('embed');
+//        for(var i = 0; i < embed.length; i++){
+//            embed[i].setAttribute('wmode','transparent');
+//        }
+//        // FF does a "live" array when working directly with elements,
+//        // so "els" changes as we add/remove elements; to avoid problems
+//        // with indexing, copy to a temporary array
+//        var els = document.getElementsByTagName('object');
+//        var obj = [];
+//        for(var i = 0; i < els.length; i++){
+//            obj[i] = els[i];
+//        }
+//        for(var i = 0; i < obj.length; i++){
+//            var param = document.createElement('param');
+//            param.setAttribute('name','wmode');
+//            param.setAttribute('value','transparent');
+//            obj[i].appendChild(param);
+//
+//            var wrapper = document.createElement('div');
+//            obj[i].parentNode.appendChild(wrapper);
+//
+//            if(obj[i].outerHTML){
+//                // IE
+//                var html = obj[i].outerHTML;
+//                obj[i].parentNode.removeChild(obj[i]);
+//                wrapper.innerHTML = html;
+//            }else{
+//                // ff/chrome
+//                obj[i].parentNode.removeChild(obj[i]);
+//                wrapper.appendChild(obj[i]);
+//            }
+//        }
+//      
+//    }
+    
     
 	
 });
@@ -253,6 +361,16 @@ Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
     }
 });
 
+/**
+ * @namespace Tine.Webconference
+ * @class Tine.Webconference.MainScreen
+ * @extends Tine.widgets.MainScreen
+ * MainScreen of the Webconference Application <br>
+ * 
+
+ * @constructor
+ * Constructs mainscreen of the Webconference application
+ */
 
 Tine.Webconference.MainScreen = function(config) {
     Ext.apply(this, config);
@@ -273,17 +391,22 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                 var actionToolbar = new Ext.Toolbar({
                     items: [{
                         xtype: 'buttongroup',
-                        columns: 1,
+                        columns: 7,
                         items: [
                            
                         Ext.apply(new Ext.Button(), {
                             scale: 'medium',
                             rowspan: 2,
                             iconAlign: 'top',
-                            iconCls: 'action_add',
+                            iconCls: 'action_addContact',
                             text: this.app.i18n._('Add User'),
                             handler: this.app.onAddUser
                         })
+                        
+                        ,{
+                            xtype: 'tbspacer', 
+                            width: 10
+                        }
                         
                         ,Ext.apply(new Ext.Button(), {
                             scale: 'medium',
@@ -292,6 +415,28 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                             iconCls: 'action_logOut',
                             text: this.app.i18n._('Exit'),
                             handler: this.app.onExit
+                        })
+                        
+                        ,{
+                            xtype: 'tbspacer', 
+                            width: 10
+                        }
+                        ,{
+                            xtype: 'tbseparator'
+                        }
+                        ,{
+                            xtype: 'tbspacer', 
+                            width: 10
+                        }
+                        
+                        
+                        ,Ext.apply(new Ext.Button(), {
+                            scale: 'medium',
+                            rowspan: 2,
+                            iconAlign: 'top',
+                            iconCls: 'action_terminate',
+                            text: this.app.i18n._('Terminate'),
+                            handler: this.app.onTerminate
                         })
                         
                         ]
@@ -328,7 +473,6 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
         	
             this.contentPanel = new Ext.Panel({
                 id: 'webconference-panel',
-                title: 'bbb',
                 header: false,
                 closable:false,
                 hideMode:'visibility', // to work with flash
@@ -354,7 +498,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
                 html:''
             });
         }
-        
+
         return this.westPanel;
     },
     
@@ -374,6 +518,7 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
         if(!this.app.isRoomActive()){
             loadMask.show();
             this.app.setLoadMask(loadMask);
+            this.app.getMainScreen().getNorthPanel().setDisabled(true);
         }
         return this;
         

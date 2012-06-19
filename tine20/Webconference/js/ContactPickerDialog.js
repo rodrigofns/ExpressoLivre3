@@ -15,7 +15,10 @@ Tine.Webconference.ContactPickerDialog = Ext.extend(Tine.widgets.dialog.EditDial
     evalGrants: false,
     mode: 'local',
     
-    bodyStyle:'padding:0px',
+    bodyStyle: 'padding:0px',
+    cancelButtonText: 'Close',
+    
+          
     
     /**
      * overwrite update toolbars function (we don't have record grants)
@@ -73,14 +76,18 @@ Tine.Webconference.ContactPickerDialog = Ext.extend(Tine.widgets.dialog.EditDial
             ContactTreePanel: this.treePanel,
             
             ContactFilterPanel: new Tine.widgets.persistentfilter.PickerPanel({
-                filter: [{field: 'model', operator: 'equals', value: 'Addressbook_Model_ContactFilter'}],
+                filter: [{
+                    field: 'model', 
+                    operator: 'equals', 
+                    value: 'Addressbook_Model_ContactFilter'
+                }],
                 app: adbApp,
                 grid: this.contactGrid
             })
-//            additionalItems: [ new Tine.Felamimail.RecipientPickerFavoritePanel({
-//                app: this.app,
-//                grid: this.contactGrid
-//            })]
+        //            additionalItems: [ new Tine.Felamimail.RecipientPickerFavoritePanel({
+        //                app: this.app,
+        //                grid: this.contactGrid
+        //            })]
         });
         
         return {
@@ -112,23 +119,51 @@ Tine.Webconference.ContactPickerDialog = Ext.extend(Tine.widgets.dialog.EditDial
      */
     initButtons: function() {
         var genericButtons = [
-            this.action_delete
+        this.action_delete
         ];
         
-        //this.tbarItems = genericButtons.concat(this.tbarItems);
+        this.action_inviteUsers = new Ext.Button({
+            text: Tine.Tinebase.appMgr.get('Webconference').i18n._('Invite Users'),
+            menu: new Ext.menu.Menu({
+                items: [
+                
+                    new Ext.Action({ 
+                        requiredGrant: this.readGrant,
+                        text: Tine.Tinebase.appMgr.get('Webconference').i18n._('Add as Attendee'),
+                        minWidth: 70,
+                        scope: this,
+                        handler: this.onInviteUsers.createDelegate(this, [false]),
+                        iconCls: 'action_add'
+                    }),
+                    new Ext.Action({ 
+                        requiredGrant: this.readGrant,
+                        text: Tine.Tinebase.appMgr.get('Webconference').i18n._('Add as Moderator'),
+                        minWidth: 70,
+                        scope: this,
+                        handler: this.onInviteUsers.createDelegate(this, [true]),
+                        iconCls: 'action_add'
+                    })
+                ]
+            }),
+            iconCls: 'action_applyChanges'
+            
+        });
         
         this.fbar = [
-            '->',
-            //this.action_applyChanges,
-            this.action_cancel
-            
-       ];
+        '->',
+        this.action_inviteUsers,
+        this.action_cancel
+        ];
        
         if (this.tbarItems) {
             this.tbar = new Ext.Toolbar({
                 items: this.tbarItems
             });
         }
+    },
+    
+    onInviteUsers: function(moderator){
+        this.contactGrid.onAddContact(moderator);
     }
 });
 

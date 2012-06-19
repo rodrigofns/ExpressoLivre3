@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Tine 2.0 - ExampleApplication\n"
+"Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-05-29 13:49-0300\n"
+"PO-Revision-Date: 2012-06-12 10:57-0300\n"
 "Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
@@ -39,8 +39,8 @@ msgid "Log in to Webconference"
 msgstr "Entrar na webconferência"
 
 #: Controler/BigBlueButton.php:264
-msgid "Inviting users successfully!"
-msgstr "Usuários convidados com sucesso!"
+msgid "Users invited successfully"
+msgstr "Usuários convidados com sucesso"
 
 msgid "You received an webconference invitation."
 msgstr "Você recebeu um convite para Webconferência."
@@ -53,6 +53,9 @@ msgstr "Tipo"
 
 msgid "Enter"
 msgstr "Entrar"
+
+msgid "Exit"
+msgstr "Sair"
 
 #: js/ExampleApplication.js:25
 msgid "Webconference"
@@ -83,38 +86,27 @@ msgstr "Budget"
 msgid "Show closed"
 msgstr "Show closed"
 
-#: js/ExampleRecordEditDialog.js:87
-msgid "ExampleRecord"
-msgstr "ExampleRecord"
-
-#: js/Model.js:31
-msgid "example record"
-msgid_plural "example records"
-msgstr[0] "example record"
-msgstr[1] "example records"
-
-#: js/Model.js:35
-msgid "example record list"
-msgid_plural "example record lists"
-msgstr[0] "example record list"
-msgstr[1] "example record lists"
-
-#: Setup/setup.xml:10
-msgid "ExampleApplication"
-msgstr "ExampleApplication"
-
-#: Controller.php:96
-#, python-format
-msgid "%s's personal example records"
-msgstr "%s's personal example records"
-
 msgid "Welcome to the Webconference"
 msgstr "Bem-vindo a Webconferência criada por"
 
 msgid "Add User"
 msgstr "Adicionar Usuário"
 
-#, fuzzy
-#~ msgid "Example Application"
-#~ msgstr "ExampleApplication"
+msgid "Attendee"
+msgstr "Participante"
+
+msgid "Moderator"
+msgstr "Moderador"
+
+#: js/ContactGrid.js:117
+msgid "Add as Attendee"
+msgstr "Adicionar como Participante"
+
+#: js/ContactGrid.js:128
+msgid "Add as Moderator"
+msgstr "Adicionar como Moderador"
+
+#: js/ContactPickerDialog.js:124
+msgid "Invite Users"
+msgstr "Convidar usuários"
 

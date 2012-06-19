@@ -56,55 +56,10 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
     processEmail: function(status, range) {
         
         var url = this.iMIPrecord.get('url');
-        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url);
+        var moderator = this.iMIPrecord.get('moderator');
+        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url,moderator);
         
-        /*
-        if (this.iMIPrecord.get('event').isRecurBase() && status != 'ACCEPTED' && !range) {
-            Tine.widgets.dialog.MultiOptionsDialog.openWindow({
-                title: this.app.i18n._('Reply to Recurring Event'),
-                questionText: this.app.i18n._('You are responding to an recurring event. What would you like to do?'),
-                height: 170,
-                scope: this,
-                options: [
-                {
-                    text: this.app.i18n._('Respond to whole series'), 
-                    name: 'series'
-                },
-
-                {
-                    text: this.app.i18n._('Do not respond'), 
-                    name: 'cancel'
-                }
-                ],
-                
-                handler: function(option) {
-                    if (option != 'cancel') {
-                        this.processEmail(status, option);
-                    }
-                }
-            });
-            return;
-        }
-        */
         
-//        Tine.log.debug('Tine.Calendar.iMIPDetailsPanel::processIMIP status: ' + status);
-//        this.getLoadMask().show();
-        
-//        Tine.Calendar.iMIPProcess(this.iMIPrecord.data, status, function(result, response) {
-//            this.preparedPart.preparedData = result;
-//            if (response.error) {
-//                // precondition changed?  
-//                //return this.prepareIMIP();
-//            }
-//            
-//            // load result
-//            this.iMIPrecord = new Tine.Webconference.Model.iMIP(result);
-//            this.iMIPrecord.set('event', Tine.Calendar.backend.recordReader({
-//                responseText: Ext.util.JSON.encode(result.event)
-//            }));
-//            
-//            this.showIMIP();
-//        }, this);
     },
     
     /**

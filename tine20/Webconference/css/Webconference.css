@@ -10,13 +10,13 @@
  */
  
 .WebconferenceIconCls {
-    background-image:url(../../images/oxygen/16x16/actions/document-open-recent.png) !important;
+    background-image:url(../../images/oxygen/16x16/actions/datashow.png) !important;
 }
 .x-btn-medium .WebconferenceIconCls {
-    background-image:url(../../images/oxygen/22x22/actions/document-open-recent.png) !important;
+    background-image:url(../../images/oxygen/22x22/actions/datashow.png) !important;
 }
 .x-btn-large .WebconferenceIconCls {
-    background-image:url(../../images/oxygen/32x32/actions/document-open-recent.png) !important;
+    background-image:url(../../images/oxygen/32x32/actions/datashow.png) !important;
 }
 
 .tinebase-webconference-link{
@@ -26,4 +26,14 @@
 
 span:hover.tinebase-webconference-link {
     color: #4444ff;
+}
+
+.action_terminate {
+    background-image:url(../../images/oxygen/16x16/actions/application-exit.png) !important;
+}
+.x-btn-medium .action_terminate {
+    background-image:url(../../images/oxygen/22x22/actions/application-exit.png) !important;
+}
+.x-btn-large .action_terminate {
+    background-image:url(../../images/oxygen/32x32/actions/application-exit.png) !important;
 }

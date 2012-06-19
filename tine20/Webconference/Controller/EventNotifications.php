@@ -143,6 +143,9 @@
                 );
         }
         
-        return array('message' => $translate->_('Inviting users successfully!'));
+        return array(
+            'success'   => TRUE,
+            'message' => $translate->_('Users invited successfully').'!'
+            );
     }
  }

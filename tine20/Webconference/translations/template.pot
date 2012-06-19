@@ -23,7 +23,7 @@ msgid "Log in to Webconference"
 msgstr ""
 
 #: Controler/BigBlueButton.php:264
-msgid "Inviting users successfully!"
+msgid "Users invited successfully"
 msgstr ""
 
 msgid "You received an webconference invitation."
@@ -38,6 +38,8 @@ msgstr ""
 msgid "Enter"
 msgstr ""
 
+msgid "Exit"
+msgstr ""
 
 #: js/ExampleApplication.js:25
 msgid "Webconference"
@@ -67,33 +69,29 @@ msgstr ""
 msgid "Show closed"
 msgstr ""
 
-#: js/ExampleRecordEditDialog.js:87
-msgid "ExampleRecord"
-msgstr ""
 
-#: js/Model.js:31
-msgid "example record"
-msgid_plural "example records"
-msgstr[0] ""
-msgstr[1] ""
-
-#: js/Model.js:35
-msgid "example record list"
-msgid_plural "example record lists"
-msgstr[0] ""
-msgstr[1] ""
-
-#: Setup/setup.xml:10
-msgid "ExampleApplication"
-msgstr ""
-
-#: Controller.php:96
-#, python-format
-msgid "%s's personal example records"
-msgstr ""
 
 msgid "Welcome to the Webconference"
 msgstr ""
 
 msgid "Add User"
+msgstr ""
+
+msgid "Attendee"
+msgstr ""
+
+msgid "Moderator"
+msgstr ""
+
+
+#: js/ContactGrid.js:117
+msgid "Add as Attendee"
+msgstr ""
+
+#: js/ContactGrid.js:128
+msgid "Add as Moderator"
+msgstr ""
+
+#: js/ContactPickerDialog.js:124
+msgid "Invite Users"
 msgstr ""

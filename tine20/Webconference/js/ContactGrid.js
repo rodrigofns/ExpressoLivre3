@@ -30,7 +30,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
             'addcontacts'
             );
         
-        this.app = Tine.Tinebase.appMgr.get('Addressbook');
+        this.app = Tine.Tinebase.appMgr.get('Webconference');
         this.initFilterToolbar();
         
         Tine.Webconference.ContactGridPanel.superclass.initComponent.call(this);
@@ -86,7 +86,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {Event} e
      */
     onCellClick: function(grid, row, col, e) {
-        //this.getContextMenu().showAt(e.getXY());
+    //this.getContextMenu().showAt(e.getXY());
         
     },
     
@@ -112,9 +112,9 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @private
      */
     initActions: function() {
-        this.actions_addAsTo = new Ext.Action({
+        this.actions_addAsAttendee = new Ext.Action({
             requiredGrant: 'readGrant',
-            text: this.app.i18n._('Add as "Attendee"'),
+            text: this.app.i18n._('Add as Attendee'),
             disabled: false,
             iconCls: 'action_add',
             actionUpdater: this.updateRecipientActions,
@@ -123,9 +123,9 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
             scope: this
         });
 
-        this.actions_addAsCc = new Ext.Action({
+        this.actions_addAsModerator = new Ext.Action({
             requiredGrant: 'readGrant',
-            text: this.app.i18n._('Add as "Moderator"'),
+            text: this.app.i18n._('Add as Moderator'),
             disabled: false,
             iconCls: 'action_add',
             actionUpdater: this.updateRecipientActions,
@@ -138,12 +138,12 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         
         //register actions in updater
         this.actionUpdater.addActions([
-            this.actions_addAsTo,
-            this.actions_addAsCc,
+            this.actions_addAsAttendee,
+            this.actions_addAsModerator,
             
             ]);
             
-            Tine.Webconference.ContactGridPanel.superclass.initActions.call(this,arguments);
+        Tine.Webconference.ContactGridPanel.superclass.initActions.call(this,arguments);
     },
     
     /**
@@ -168,7 +168,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         } else {
             action.setDisabled(true);
         }
-        //action.setDisabled(false);
+    //action.setDisabled(false);
     },
     
     /**
@@ -177,27 +177,42 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {String} type
      */
     onAddContact: function(type) {
-        //console.debug('onAddContact....');
         
         var contacts = this.grid.getSelectionModel().getSelectionsCollection().items;
         
-        // And then you can iterate over the selected items, e.g.: 
-        selected = [];
-        Ext.each(contacts, function (item) {
-            selected.push(item.data);
-        });        
-        
-        Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomName,  function(response) {
+        if (contacts.length > 0){
             
-            Ext.MessageBox.show({
+            var loadMask = new Ext.LoadMask(this.container, {
+                msg: String.format(_('Please wait'))
+            });
+            loadMask.show();
+        
+            selected = [];
+            Ext.each(contacts, function (item) {
+                selected.push(item.data);
+            });        
+
+            Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomName,  function(response) {
+
+                loadMask.hide();
+
+                Ext.MessageBox.show({
                     title: _('Webconference'), 
                     msg: response.message,
                     buttons: Ext.Msg.OK,
                     icon: Ext.MessageBox.INFO
                 });
-            
-        });
-            
+
+            });
+        }
+        else{
+            Ext.MessageBox.show({
+                title: _('Webconference'), 
+                msg: _('No rows selected'),
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
       
     },
     
@@ -209,7 +224,8 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
      * @param {} e
      */
     onRowDblClick: function(grid, row, e) {
-    //this.onAddContact('Invite');
+        //this.onAddContact('Invite');
+        this.getContextMenu().showAt(e.getXY());
     }, 
     
     /**
@@ -223,8 +239,8 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         if (! this.contextMenu) {
             
             var items = [
-            this.actions_addAsTo,
-            this.actions_addAsCc,
+            this.actions_addAsAttendee,
+            this.actions_addAsModerator,
             
             ];
             this.contextMenu = new Ext.menu.Menu({

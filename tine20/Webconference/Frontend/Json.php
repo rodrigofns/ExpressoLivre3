@@ -182,6 +182,11 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
     {
         return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email);
     }
+    
+    
+    public function checkUrl($url){
+       return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
+    }
 
     
     /**
