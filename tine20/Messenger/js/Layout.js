@@ -140,13 +140,13 @@ Tine.Messenger.Config = {
                     cls: 'messenger-client-tbar',
                     items:[
                         {
-                            text:'Actions',
+                            text: _('Actions'),
                             menu: {
                                     id: "BuddysMenu",
                                     items:[{
                                             id: 'messenger-contact-add',
                                             icon: '/images/messenger/user_add.png',
-                                            text: 'Add Contact',
+                                            text: _('Add Contact'),
                                             disabled: true,
                                             handler: function(){
                                                 Tine.Messenger.Window.AddBuddyWindow();
@@ -154,7 +154,7 @@ Tine.Messenger.Config = {
                                     },
                                     {
                                             id: 'messenger-group-mngt-add',
-                                            text: 'Add Group',
+                                            text: _('Add Group'),
                                             icon: '/images/messenger/group_add.png',
                                             disabled: true,
                                             handler: function() {
@@ -165,7 +165,7 @@ Tine.Messenger.Config = {
                                      },
                                      {
                                          id: 'messenger-logout',
-                                         text: 'Logout',
+                                         text: _('Logout'),
                                          disabled: true,
                                          handler: function() {
                                              Tine.Messenger.ChatHandler.disconnect();
@@ -175,7 +175,7 @@ Tine.Messenger.Config = {
                                 }
                         },
                         {
-                            text: 'Preferences',
+                            text: _('Preferences'),
                             handler: function () {
                                 if (configWindow == null)
                                     configWindow = new Tine.Messenger.ConfigWindow();

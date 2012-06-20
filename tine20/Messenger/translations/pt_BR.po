@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-20 16:39-0300\n"
-"PO-Revision-Date: 2012-06-20 16:39-0300\n"
+"POT-Creation-Date: 2012-06-20 16:55-0300\n"
+"PO-Revision-Date: 2012-06-20 16:55-0300\n"
 "Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
 "Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
@@ -151,6 +151,7 @@ msgid "Group created successfully!"
 msgstr "Grupo criado com sucesso!"
 
 #: Messenger/js/Window.js:21
+#: Messenger/js/Layout.js:157
 msgid "Add Group"
 msgstr "Adicionar Grupo"
 
@@ -190,6 +191,23 @@ msgstr "Autenticação falhou"
 #: Messenger/js/Application.js:259
 msgid "You're logged in Messenger. If you leave the page, Messenger will disconnect!"
 msgstr "Você está conectado no Messenger. Se sair da página, o Messenger será desconectado!"
+
+#: Messenger/js/Layout.js:143
+msgid "Actions"
+msgstr "Ações"
+
+#: Messenger/js/Layout.js:149
+msgid "Add Contact"
+msgstr "Adicionar Contato"
+
+#: Messenger/js/Layout.js:168
+msgid "Logout"
+msgstr "Sair"
+
+#: Messenger/js/Layout.js:178
+#: Messenger/js/ConfigWindow.js:8
+msgid "Preferences"
+msgstr "Preferências"
 
 #: Messenger/js/RosterTree.js:17
 #: Messenger/js/RosterTree.js:126
@@ -250,10 +268,6 @@ msgstr "Excluir Grupo"
 #: Messenger/js/RosterTree.js:449
 msgid "Subscription"
 msgstr "Assinatura"
-
-#: Messenger/js/ConfigWindow.js:8
-msgid "Preferences"
-msgstr "Preferências"
 
 #: Messenger/js/ConfigWindow.js:22
 msgid "Notifications"
