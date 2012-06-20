@@ -183,10 +183,38 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
         return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email);
     }
     
-    
-    public function checkUrl($url){
-       return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
+    public function isMeetingActive($roomName, $url){
+        $translate = Tinebase_Translation::getTranslation('Webconference');
+        
+        $active = Webconference_Controller_BigBlueButton::getInstance()->isMeetingActive($roomName);
+        if($active){
+            return array(
+                'active' => true,
+                'message'=> ''
+            );
+        }
+        else{
+            $online = Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
+            if(!$online){
+                return array(
+                    'active' => false,
+                    'message'=> $translate->_('The Webconference server is offline')
+                );
+            }
+            else{
+                return array(
+                    'active' => false,
+                    'message'=> $translate->_('The Webconference you are trying to join no longer exists')
+                );
+            }
+        }
+        
+        return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
     }
+    
+//    public function checkUrl($url){
+//       return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
+//    }
 
     
     /**
