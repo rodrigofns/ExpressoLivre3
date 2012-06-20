@@ -50,7 +50,21 @@ class Webconference_Controller_BigBlueButton {
      * @return String room name 
      */
     private function _createRoomName() {
-        return Tinebase_Core::getUser()->accountLoginName;
+        $metings = $this->getMeetings();
+        $user = Tinebase_Core::getUser()->accountLoginName;
+        if ($metings) {
+            foreach ($metings as $meting){
+                $metingId = (String)$meting["meetingID"];
+                $hasBeenForciblyEnded = (String)$meting["hasBeenForciblyEnded"];
+                if ($hasBeenForciblyEnded == "true"){
+                    continue;
+                }
+                if (strstr($metingId, $user)){
+                    return $metingId;
+                }
+            }
+        }
+        return $user."_".time();
     }
 
     private function _joinUrl($roomName, $username, $mPW, $salt, $url) {
@@ -59,7 +73,7 @@ class Webconference_Controller_BigBlueButton {
                     roomName => $roomName
         );
     }
-
+ 
     /**
      * This method creates a meeting
      * 
@@ -109,7 +123,7 @@ class Webconference_Controller_BigBlueButton {
         $aPW = ATTENDEE_PW;
         $logoutUrl = $this->getLogoutUrl();
         $welcomeString = sprintf($translation->_("Welcome to the Webconference by %s"), Tinebase_Core::getUser()->accountFullName);
-        $username = Tinebase_Core::getUser()->accountFullName;
+        $username = Tinebase_Core::getUser()->accountFullName;       
         $roomName = $this->_createRoomName();
 
         return $this->_createRoom($username, $roomName, $welcomeString, $mPW, $aPW, $salt, $url, $logoutUrl);
