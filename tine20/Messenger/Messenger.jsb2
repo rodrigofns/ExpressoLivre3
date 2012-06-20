@@ -58,6 +58,10 @@
         {
           "text": "base64.js",
           "path": "js/"
+        },
+        {
+          "text": "ConfigWindow.js",
+          "path": "js/"
         }
       ]
     },

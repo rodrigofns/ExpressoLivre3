@@ -3,7 +3,7 @@ Ext.ns('Tine.Messenger');
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
     MESSENGER_DEBUG = false;
-    
+
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
         fields:["value","text"],
@@ -56,6 +56,7 @@ const IMConst = {
     SB_UNSUBSCRIBED : "unsubscribed"
     
 }
+
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
     hasMainScreen: false,
@@ -69,14 +70,18 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     xml_raw: null,
     
     getTitle: function () {
-        return "Expresso Messenger";
+        return this.i18n.ngettext('Messenger', 'Messengers', 1);
     },
     
     init: function () {
+        // Shows IM window and starts communication
         this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
         this.showMessengerDelayedTask.delay(500);
         this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
         this.startMessengerDelayedTask.delay(500);
+        
+        // Sets Messenger config panel
+        
     },
     
     debugFunction: function () {
@@ -184,7 +189,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-cmd').setText('Connecting...').disable();
+            Ext.getCmp('messenger-connect-cmd').setText(_('Connecting')+'...').disable();
             $('.messenger-connect-display img').css('display','block');
             
         } else if (status === Strophe.Status.CONNFAIL) {
@@ -193,8 +198,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Messenger.IM.disableOnDisconnect();
             Tine.Messenger.Log.error("Connection failed!");
             Ext.Msg.show({
-                title:'Error',
-                msg: 'Authentication failed!',
+                title: _('Error'),
+                msg: _('Authentication failed')+'!',
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.ERROR
             });
@@ -251,7 +256,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                return "You're logged in Messenger. If you leave the page, Messenger will disconnect!";
+                return _("You're logged in Messenger. If you leave the page, Messenger will disconnect!");
             }
 
             // Leaving the page cause disconnection
@@ -271,8 +276,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // Disable components
             Tine.Messenger.IM.disableOnDisconnect();
             Ext.Msg.show({
-                title:'Error',
-                msg: 'Authentication failed!',
+                title: _('Error'),
+                msg: _('Authentication failed') + '!',
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.ERROR
             });
@@ -338,6 +343,17 @@ Tine.Messenger.Util = {
             name = Tine.Messenger.Util.getJabberName(Tine.Tinebase.registry.get('messenger').messenger.format);
         
         return name + '@' + domain + '/' + resource;
+    },
+    
+    getJidFromConfigNoResource: function () {
+        var domain = Tine.Tinebase.registry.get('messenger').messenger.domain,
+            name = Tine.Messenger.Util.getJabberName(Tine.Tinebase.registry.get('messenger').messenger.format),
+            jid = '';
+            
+        if (name != null)
+            jid = name + '@' + domain;
+            
+        return jid;
     },
     
     getJabberName: function (format) {

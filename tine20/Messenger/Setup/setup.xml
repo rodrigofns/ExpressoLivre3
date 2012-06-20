@@ -9,13 +9,24 @@
             <version>1</version>
             <declaration>
                 <field>
-                    <name>domain</name>
+                    <name>contact_id</name>
                     <type>text</type>
-                    <length>255</length>
+                    <length>40</length>
                     <notnull>true</notnull>
                 </field>
                 <field>
-                    <name>resource</name>
+                    <name>notifications</name>
+                    <type>boolean</type>
+                    <default>true</default>
+                </field>
+                <field>
+                    <name>history</name>
+                    <type>text</type>
+                    <length>10</length>
+                    <notnull>true</notnull>
+                </field>
+                <field>
+                    <name>custom_name</name>
                     <type>text</type>
                     <length>255</length>
                     <notnull>true</notnull>

@@ -13,9 +13,9 @@ Tine.Messenger.ChatHandler = {
     
     formatChatTitle: function (jid, name, type) {
         if(type == 'groupchat')
-            return _('Group chat in room ') + name;
+            return _('Group chat in room') + ' ' + name;
         else
-            return _('Chat with ') + name + ' (' + jid + ')';
+            return _('Chat with') + ' ' + name + ' (' + jid + ')';
         return null;
     },
     
@@ -57,8 +57,8 @@ Tine.Messenger.ChatHandler = {
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
-            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' is unavailable', _("Info"), 'messenger-notify');
-            Tine.Messenger.ChatHandler.setChatMessage(jid, 'Your messages will be sent offline', _('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + _('is unavailable'), _("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, _('Your messages will be sent offline'), _('Info'), 'messenger-notify');
         }
     
         return chat;

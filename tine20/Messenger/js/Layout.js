@@ -110,6 +110,9 @@ Tine.Messenger.SimpleDialog = function(_config){
         }
     }
 }
+
+var configWindow = null;
+
 Tine.Messenger.Config = {
     
     ClientLayout : {
@@ -136,11 +139,6 @@ Tine.Messenger.Config = {
             tbar: {
                     cls: 'messenger-client-tbar',
                     items:[
-//                        {
-//                            id: 'BuddyCredencial',
-//                            html: Tine.Messenger.Credential.getHtml(),
-//                            width:145
-//                        },
                         {
                             text:'Actions',
                             menu: {
@@ -175,6 +173,15 @@ Tine.Messenger.Config = {
                                      }
                                     ]
                                 }
+                        },
+                        {
+                            text: 'Preferences',
+                            handler: function () {
+                                if (configWindow == null)
+                                    configWindow = new Tine.Messenger.ConfigWindow();
+                                
+                                configWindow.show();
+                            }
                         }]
             },
             items:[{
