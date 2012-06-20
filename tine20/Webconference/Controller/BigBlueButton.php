@@ -215,6 +215,22 @@ class Webconference_Controller_BigBlueButton {
         $url = $config->url;
         return $this->_backend->getUsersArray($roomName, $moderatorPassword, $url, $salt);
     }
+    
+    
+    /*This method check the BigBlueButton server to see if the meeting is running (i.e. there is someone in the meeting)
+    *
+    *@param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
+    *
+    *@return A boolean of true if the meeting is running and false if it is not running
+    */
+    public function isMeetingActive($_roomName)
+    {
+        $config = $this->_getBigBlueButtonConfig();
+        $config = (object) $config;
+        $salt = $config->salt;
+        $url = $config->url;
+        return $this->_backend->getMeetingIsActive($_roomName, MODERATOR_PW, $url, $salt);
+    }
 
     /**
      * generates a randomstrings of given length

@@ -576,6 +576,14 @@ class Webconference_Backend_BigBlueButtonApi {
 
 	}
 
+	public function getMeetingIsActive( $meetingID, $modPW, $URL, $SALT ) {
+		$xml = bbb_wrap_simplexml_load_file( Webconference_Backend_BigBlueButtonApi::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
+		if( $xml && $xml->returncode == 'SUCCESS' && !$xml->messageKey == null && $xml->hasBeenForciblyEnded == 'false'){//The meetings were returned
+                    return true;
+		} else {
+                    return false;
+                }
+	}
 
 
 	function getServerIP() {
