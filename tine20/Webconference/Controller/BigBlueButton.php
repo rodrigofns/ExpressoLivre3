@@ -264,9 +264,7 @@ class Webconference_Controller_BigBlueButton {
         if (strlen($r) > 1)
             $online = true;
 
-        return array(
-            'online' => $online
-        );
+        return $online;
     }
 
     public function inviteUsersToJoin($users, $moderator, $roomName) {

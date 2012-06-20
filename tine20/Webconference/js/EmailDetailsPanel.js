@@ -57,7 +57,8 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         
         var url = this.iMIPrecord.get('url');
         var moderator = this.iMIPrecord.get('moderator');
-        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url,moderator);
+        var roomName = this.iMIPrecord.get('roomName');
+        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url, moderator, roomName);
         
         
     },
