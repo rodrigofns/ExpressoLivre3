@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-06-12 10:57-0300\n"
+"PO-Revision-Date: 2012-06-21 14:03-0300\n"
 "Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
@@ -13,10 +13,6 @@ msgstr ""
 "X-Poedit-Country: GB\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-
-#: Controler/BigBlueButton.php:89
-msgid "ERROR (the big blue button server is unreachable)"
-msgstr "ERRO  (o servidor Big Blue Button está inacessível)"
 
 #: Controler/BigBlueButton.php:93
 msgid "ERROR (%s): %s"
@@ -57,40 +53,21 @@ msgstr "Entrar"
 msgid "Exit"
 msgstr "Sair"
 
-#: js/ExampleApplication.js:25
+msgid "Close"
+msgstr "Fechar"
+
+#: js/Webconference.js:25
 msgid "Webconference"
 msgstr "Webconferência"
-
-#: js/ExampleRecordGridPanel.js:74
-msgid "Quick search"
-msgstr "Quick search"
-
-#: js/ExampleRecordGridPanel.js:102
-#: js/ExampleRecordEditDialog.js:104
-msgid "Name"
-msgstr "Name"
-
-#: js/ExampleRecordGridPanel.js:108
-msgid "Title"
-msgstr "Title"
-
-#: js/ExampleRecordGridPanel.js:114
-msgid "Status"
-msgstr "Status"
-
-#: js/ExampleRecordGridPanel.js:121
-msgid "Budget"
-msgstr "Budget"
-
-#: js/ExampleRecordGridPanel.js:145
-msgid "Show closed"
-msgstr "Show closed"
 
 msgid "Welcome to the Webconference"
 msgstr "Bem-vindo a Webconferência criada por"
 
 msgid "Add User"
 msgstr "Adicionar Usuário"
+
+msgid "Terminate"
+msgstr "Encerrar"
 
 msgid "Attendee"
 msgstr "Participante"
@@ -106,7 +83,65 @@ msgstr "Adicionar como Participante"
 msgid "Add as Moderator"
 msgstr "Adicionar como Moderador"
 
+#: js/ContactGrid.js:211
+msgid "No records selected"
+msgstr "Nenhum registro selecionado"
+
 #: js/ContactPickerDialog.js:124
 msgid "Invite Users"
 msgstr "Convidar usuários"
+
+#: js/Webconference.js:157
+msgid "Cancel active webconference"
+msgstr "Cancelar webconferência ativa"
+
+#: js/Webconference.js:296
+msgid "This will kick all participants out of the meeting. Terminate webconference"
+msgstr "Isto vai expulsar todos os participantes da sala. Encerrar webconferência"
+
+#: js/Webconference.js:408
+msgid "Invite an User to the Webconference"
+msgstr "Convidar um usuário para a webconferência"
+
+#: js/Webconference.js:416
+msgid "Left Webconference"
+msgstr "Deixar webconferência"
+
+#: js/Webconference.js:425
+msgid "Terminate Webconference kicking all users out"
+msgstr "Encerrar webconferência expulsando todos os participantes"
+
+#: Frontend/Json.php:201
+msgid "The Webconference server is offline"
+msgstr "O servidor de webconferência está offline"
+
+#: Frontend/Json.php:207
+msgid "The Webconference you are trying to join no longer exists"
+msgstr "A webconferência que você está tentando acessar não existe mais"
+
+#: Controller/EventNotifications.php:
+#: 142
+msgid "An error has occured inviting users"
+msgstr "Ocorreu um erro ao convidar usuários"
+
+#: views/eventNotification.php:4
+msgid "Use the link below to access the webconference"
+msgstr "Use o link abaixo para acessar a webconferência"
+
+#: Controller/BigBlueButton.php:96
+msgid "ERROR (the webconference server is unreachable)"
+msgstr "ERRO  (o servidor de webconferência está inacessível)"
+
+#~ msgid "Quick search"
+#~ msgstr "Quick search"
+#~ msgid "Name"
+#~ msgstr "Name"
+#~ msgid "Title"
+#~ msgstr "Title"
+#~ msgid "Status"
+#~ msgstr "Status"
+#~ msgid "Budget"
+#~ msgstr "Budget"
+#~ msgid "Show closed"
+#~ msgstr "Show closed"
 

@@ -93,7 +93,7 @@ class Webconference_Controller_BigBlueButton {
         $ret = $this->_backend->createMeetingArray($username, $roomName, $welcomeString, $mPW, $aPW, $salt, $url, $logoutUrl);
 
         if (!$ret) {
-            throw new Tinebase_Exception_NotFound($translation->_('ERROR (the big blue button server is unreachable)'));
+            throw new Tinebase_Exception_NotFound($translation->_('ERROR (the webconference server is unreachable)'));
         }
         $ret = (object) $ret;
         if ($ret->returncode == 'FAILED') {

@@ -1,7 +1,3 @@
-#: Controler/BigBlueButton.php:89
-msgid "ERROR (the big blue button server is unreachable)"
-msgstr ""
-
 #: Controler/BigBlueButton.php:93
 msgid "ERROR (%s): %s"
 msgstr ""
@@ -41,40 +37,21 @@ msgstr ""
 msgid "Exit"
 msgstr ""
 
-#: js/ExampleApplication.js:25
+msgid "Close"
+msgstr ""
+
+#: js/Webconference.js:25
 msgid "Webconference"
 msgstr ""
-
-#: js/ExampleRecordGridPanel.js:74
-msgid "Quick search"
-msgstr ""
-
-#: js/ExampleRecordGridPanel.js:102 js/ExampleRecordEditDialog.js:104
-msgid "Name"
-msgstr ""
-
-#: js/ExampleRecordGridPanel.js:108
-msgid "Title"
-msgstr ""
-
-#: js/ExampleRecordGridPanel.js:114
-msgid "Status"
-msgstr ""
-
-#: js/ExampleRecordGridPanel.js:121
-msgid "Budget"
-msgstr ""
-
-#: js/ExampleRecordGridPanel.js:145
-msgid "Show closed"
-msgstr ""
-
 
 
 msgid "Welcome to the Webconference"
 msgstr ""
 
 msgid "Add User"
+msgstr ""
+
+msgid "Terminate"
 msgstr ""
 
 msgid "Attendee"
@@ -92,6 +69,51 @@ msgstr ""
 msgid "Add as Moderator"
 msgstr ""
 
+#: js/ContactGrid.js:211
+msgid "No records selected"
+msgstr ""
+
+
 #: js/ContactPickerDialog.js:124
 msgid "Invite Users"
+msgstr ""
+
+#: js/Webconference.js:157
+msgid "Cancel active webconference"
+msgstr ""
+
+#: js/Webconference.js:296
+msgid "This will kick all participants out of the meeting. Terminate webconference"
+msgstr ""
+
+#: js/Webconference.js:408
+msgid "Invite an User to the Webconference"
+msgstr ""
+
+#: js/Webconference.js:416
+msgid "Left Webconference"
+msgstr ""
+
+#: js/Webconference.js:425
+msgid "Terminate Webconference kicking all users out"
+msgstr ""
+
+#: Frontend/Json.php:201
+msgid "The Webconference server is offline"
+msgstr ""
+
+#: Frontend/Json.php:207
+msgid "The Webconference you are trying to join no longer exists"
+msgstr ""
+
+#: Controller/EventNotifications.php: 142
+msgid "An error has occured inviting users"
+msgstr ""
+
+#: views/eventNotification.php:4
+msgid "Use the link below to access the webconference"
+msgstr ""
+
+#: Controller/BigBlueButton.php:96
+msgid "ERROR (the webconference server is unreachable)"
 msgstr ""

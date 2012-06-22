@@ -208,7 +208,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
         else{
             Ext.MessageBox.show({
                 title: _('Webconference'), 
-                msg: _('No rows selected'),
+                msg: Tine.Tinebase.appMgr.get('Webconference').i18n._('No records selected'),
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.INFO
             });

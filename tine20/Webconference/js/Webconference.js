@@ -49,8 +49,8 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         if (Tine.Felamimail) {
             Tine.Felamimail.MimeDisplayManager.register('text/webconference', Tine.Webconference.EmailDetailsPanel);
         }
-       
         
+
     //this.roomActive = false;
         
     /*
@@ -91,7 +91,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     
         
     onBeforeActivate: function(){
-        
+
         
         if(!this.roomActive && this.origin == WebconferenceOrigin.MENU ){
             this.createRoom();
@@ -115,7 +115,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         
     },
     onActivate: function(){
-        
+
     
         if (this.origin == WebconferenceOrigin.EMAIL && !this.roomActive){
             this.joinRoom();
@@ -293,7 +293,11 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().hide();
         
         
-        Ext.MessageBox.confirm('', _('This will kick all participants out of the meeting. Terminate webconference') + ' ?', function(btn) {
+        Ext.MessageBox.confirm(
+            '', 
+            Tine.Tinebase.appMgr.get('Webconference').i18n._('This will kick all participants out of the meeting. Terminate webconference') + ' ?', 
+            function(btn) {
+            
             if(btn == 'yes') { 
                 
                 var roomName = Tine.Tinebase.appMgr.get('Webconference').roomName;
