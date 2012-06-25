@@ -17,7 +17,7 @@
  * @package     Felamimail
  */
 class Felamimail_Backend_Cache_Sql_Folder extends Tinebase_Backend_Sql_Abstract
-                                            implements Felamimail_Backend_Cache_FolderInterface
+                                          implements Felamimail_Backend_Cache_FolderInterface
 {
     /**
      * Table name without prefix

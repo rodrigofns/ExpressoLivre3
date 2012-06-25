@@ -13,7 +13,7 @@
  */
 
 class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap_Abstract
-                                            implements Felamimail_Backend_Cache_FolderInterface
+                                           implements Felamimail_Backend_Cache_FolderInterface
 {
     /*************************** abstract functions ****************************/
     /**
