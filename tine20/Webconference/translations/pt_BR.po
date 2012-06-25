@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-06-21 14:03-0300\n"
+"PO-Revision-Date: 2012-06-25 11:38-0300\n"
 "Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
@@ -55,6 +55,26 @@ msgstr "Sair"
 
 msgid "Close"
 msgstr "Fechar"
+
+#: js/AdminPanel.js:81
+msgid "Apply"
+msgstr "Aplicar"
+
+#: js/AdminPanel.js:77
+msgid "Webconference Configuration"
+msgstr "Configuração da Webconferência"
+
+#: js/AdminPanel.js:183
+msgid "BBB Url"
+msgstr "Url do BBB"
+
+#: js/AdminPanel.js:188
+msgid "Security Salt"
+msgstr "Security Salt"
+
+#: js/AdminPanel.js:194
+msgid "Description"
+msgstr "Descrição"
 
 #: js/Webconference.js:25
 msgid "Webconference"

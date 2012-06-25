@@ -40,6 +40,27 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+
+#: js/AdminPanel.js:81
+msgid "Apply"
+msgstr ""
+
+#: js/AdminPanel.js:77
+msgid "Webconference Configuration"
+msgstr ""
+
+#: js/AdminPanel.js:183
+msgid "BBB Url"
+msgstr ""
+
+#: js/AdminPanel.js:188
+msgid "Security Salt"
+msgstr ""
+
+#: js/AdminPanel.js:194
+msgid "Description"
+msgstr ""
+
 #: js/Webconference.js:25
 msgid "Webconference"
 msgstr ""

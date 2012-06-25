@@ -33,6 +33,7 @@ Ext.namespace('Tine.Webconference');
  */
 Tine.Webconference.AdminPanel = Ext.extend(Ext.TabPanel, {
     
+    app : null,
     activeItem: 0,
     border: false,
     
@@ -72,11 +73,12 @@ Tine.Webconference.ConfigPanel = Ext.extend(Ext.Panel, { // TODO: extend some ki
      * @private
      */
     initComponent: function () {
-        this.title = _('Webconference Configuration');
+        this.app = Tine.Tinebase.appMgr.get('Webconference');
+        this.title = this.app.i18n._('Webconference Configuration');
         this.items = [];
         
         this.applyAction = new Ext.Action({
-            text: _('Apply'),
+            text: this.app.i18n._('Apply'),
             disabled: true,
             iconCls: 'action_applyChanges',
             handler: this.applyConfig.createDelegate(this)
@@ -178,18 +180,18 @@ Tine.Webconference.ConfigPanel = Ext.extend(Ext.Panel, { // TODO: extend some ki
                 {
                     id:'url', 
                     name: 'url',
-                    fieldLabel: 'BBB Url',
+                    fieldLabel: this.app.i18n._('BBB Url'),
                     allowBlank:false
                 },{
                     id: 'salt',
                     name: 'salt',
-                    fieldLabel: 'Security Salt',
+                    fieldLabel: this.app.i18n._('Security Salt'),
                     allowBlank:false
                     
                 },{
                     id:'description',
                     name: 'description',
-                    fieldLabel: 'Description'
+                    fieldLabel: this.app.i18n._('Description')
                 }
             ]
         });
