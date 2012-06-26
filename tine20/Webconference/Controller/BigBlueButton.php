@@ -338,17 +338,21 @@ class Webconference_Controller_BigBlueButton {
     }
 
     public function getLogoutUrl() {
-        //return 'http://localhost';
-
-        //$conflen=strlen('SCRIPT');
-        $B = substr(__FILE__, 0, strrpos(__FILE__, '/'));
-        $A = substr($_SERVER['DOCUMENT_ROOT'], strrpos($_SERVER['DOCUMENT_ROOT'], $_SERVER['PHP_SELF']));
-        $C = substr($B, strlen($A));
-        $posconf = strlen($C) - $conflen - 1;
-        $D = substr($C, 1, $posconf);
-        $host = $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $D;
         
-        return 'http://'.$host . '/../views/logoutPage.html';
+//        $B = substr(__FILE__, 0, strrpos(__FILE__, '/'));
+//        $A = substr($_SERVER['DOCUMENT_ROOT'], strrpos($_SERVER['DOCUMENT_ROOT'], $_SERVER['PHP_SELF']));
+//        $C = substr($B, strlen($A));
+//        $posconf = strlen($C) - $conflen - 1;
+//        $D = substr($C, 1, $posconf);
+//        $host = $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $D;
+//        return 'http://'.$host . '/../views/logoutPage.html';
+        
+
+        $protocol =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+        $base = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
+        return $protocol.'://'.$host.$base.'/Webconference/views/logoutPage.html';
+        
     }
 
 }
