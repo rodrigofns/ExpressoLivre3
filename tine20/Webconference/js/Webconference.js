@@ -99,12 +99,12 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         }
         
         var west = Ext.get('west'); // this is west panel region
-        west.hide();
+        west.hide(); 
         var westComponent = Ext.getCmp('west'); // this is west panel region component
         westComponent.collapse( Ext.Component.DIRECTION_LEFT );
         westComponent.doLayout();
-       
-       
+
+
        
         if(this.roomActive && Ext.fly('webconference-panel'))
         {
