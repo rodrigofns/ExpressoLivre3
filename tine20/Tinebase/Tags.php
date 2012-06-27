@@ -900,6 +900,9 @@ class Tinebase_Tags
      */
     protected function _getSelect($_recordId, $_applicationId, $_cols = '*')
     {
+    	array_walk($_recordId, function(&$value,$index){
+    		$value = (string)$value;
+    	});
         $select = $this->_db->select()
             ->from(array('tagging' => SQL_TABLE_PREFIX . 'tagging'), $_cols)
             ->join(array('tags'    => SQL_TABLE_PREFIX . 'tags'), $this->_db->quoteIdentifier('tagging.tag_id') . ' = ' . $this->_db->quoteIdentifier('tags.id'))

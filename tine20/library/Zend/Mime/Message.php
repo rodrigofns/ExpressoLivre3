@@ -130,9 +130,10 @@ class Zend_Mime_Message
      * is generated and used.
      *
      * @param string $EOL EOL string; defaults to {@link Zend_Mime::LINEEND}
+     * @param boolean $showWarning Should a warning be shown for non-MIME clients: defaults to true
      * @return string
      */
-    public function generateMessage($EOL = Zend_Mime::LINEEND)
+    public function generateMessage($EOL = Zend_Mime::LINEEND, $showWarning = true)
     {
         if (! $this->isMultiPart()) {
             $body = array_shift($this->_parts);
@@ -141,9 +142,11 @@ class Zend_Mime_Message
             $mime = $this->getMime();
 
             $boundaryLine = $mime->boundaryLine($EOL);
+            $body = '';
+            if ($showWarning) {
             $body = 'This is a message in Mime Format.  If you see this, '
                   . "your mail reader does not support this format." . $EOL;
-
+            }
             foreach (array_keys($this->_parts) as $p) {
                 $body .= $boundaryLine
                        . $this->getPartHeaders($p, $EOL)

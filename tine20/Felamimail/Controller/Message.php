@@ -653,6 +653,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
             $body = $this->_getDecodedBodyContent($bodyPart, $partStructure);
             
             if ($partStructure['contentType'] != Zend_Mime::TYPE_TEXT) {
+                $body = $this->_getDecodedBodyImages($_message->getId(), $body);
                 $body = $this->_purifyBodyContent($body);
             }
             
@@ -825,6 +826,34 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         
         return $content;
     }
+    
+       /**
+     * convert image cids to download image links
+     *
+     * @param string $_content
+     * @return string
+     */
+    protected function _getDecodedBodyImages($_messageId, $_content)
+    {
+        $found = preg_match_all('/<img.[^>]*src=[\"|\']cid:(.[^>\"\']*).[^>]*>/',$_content,$matches,PREG_SET_ORDER);
+        if ($found) {
+            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Replacing cids from multipart messages with images');
+            foreach ($matches as $match) {
+                $pid = '';
+                foreach ($this->_attachments as $attachment) {
+                    if ($attachment['cid']==='<'.$match[1].'>') {
+                        $pid = $attachment['partId'];
+                        break;
+                    }
+                }
+                $src = "index.php?method=Felamimail.downloadAttachment&amp;messageId=".$_messageId."&amp;partId=".$pid;
+                $_content = preg_replace("/cid:$match[1]/",$src,$_content);
+            }
+        }
+
+        return $_content;
+    }
+
     
     /**
      * get message headers
