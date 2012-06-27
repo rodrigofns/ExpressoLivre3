@@ -1,0 +1,52 @@
+{
+  "projectName": "Tine 2.0 - Webconference",
+  "deployDir": "Webconference",
+  "licenseText": "Tine 2.0 - Webconference \nCopyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)\nhttp://www.gnu.org/licenses/agpl.html AGPL Version 3",
+  "resources": [
+    
+  ],
+  "pkgs": [
+    {
+      "name": "Webconference FAT Client",
+      "file": "js/Webconference-FAT.js",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Model.js",
+          "path": "js/"
+        },
+        {
+          "text": "Webconference.js",
+          "path": "js/"
+        },
+        {
+          "text": "AdminPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "ContactPickerDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "ContactGrid.js",
+          "path": "js/"
+        },
+        {
+          "text": "EmailDetailsPanel.js",
+          "path": "js/"
+        }
+      ]
+    },
+    {
+      "name": "Webconference FAT Client",
+      "file": "css/Webconference-FAT.css",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Webconference.css",
+          "path": "css/"
+        }
+      ]
+    }
+  ]
+}
