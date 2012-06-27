@@ -61,6 +61,11 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     const CONTENT_TYPE_CALENDAR = 'text/calendar';
     
     /**
+     * content type text/webconference
+     */
+    const CONTENT_TYPE_WEBCONFERENCE = 'text/webconference';
+    
+    /**
      * content type text/vcard
      */
     const CONTENT_TYPE_VCARD = 'text/vcard';
