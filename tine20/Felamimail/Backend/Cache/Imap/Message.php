@@ -14,13 +14,70 @@
 
 class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Imap_Abstract
                                                 implements Felamimail_Backend_Cache_MessageInterface
-{     
+{
+    
+       // Probably we'll never use this attribute
+//    /**
+//     * Table name without prefix
+//     *
+//     * @var string
+//     */
+//    protected $_tableName = 'felamimail_cache_message';
+    
+    /**
+     * Model name
+     *
+     * @var string
+     */
+    protected $_modelName = 'Felamimail_Model_Message';
+    
+    /**
+    * default column(s) for count
+    *
+    * @var string
+    */
+    protected $_defaultCountCol = 'id';
+    
+    /**
+     * foreign tables (key => tablename)
+     *
+     * @var array
+     */
+    protected $_foreignTables = array(
+        'to'    => array(
+            'table'     => 'felamimail_cache_message_to',
+            'joinOn'    => 'message_id',
+            'field'     => 'email',
+            'preserve'  => TRUE,
+        ),
+        'cc'    => array(
+            'table'  => 'felamimail_cache_message_cc',
+            'joinOn' => 'message_id',
+            'field'  => 'email',
+            'preserve'  => TRUE,
+        ),
+        'bcc'    => array(
+            'table'  => 'felamimail_cache_message_bcc',
+            'joinOn' => 'message_id',
+            'field'  => 'email',
+            'preserve'  => TRUE,
+        ),
+        'flags'    => array(
+            'table'         => 'felamimail_cache_message_flag',
+            'joinOn'        => 'message_id',
+            'field'         => 'flag',
+            'preserve'  => TRUE,
+        ),
+    );
+    
     // Use imap search command or imap list?
     protected function _isSearh($_filter)
     {
         
         $return = false;
-        foreach ($_filter as $filter){
+        $filters = $_filter[0]['filters'];
+        foreach ($filters as $filter)
+        {
             
             switch ($filter['field'])
             {
@@ -90,6 +147,17 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $return;
     }
     
+    protected function _generateImapFilter(array $_filterArray, Tinebase_Model_Pagination $_pagination = NULL){
+        
+        $paginationAttr = $_pagination->toArray();
+        $filters = $_filterArray['filters'];
+        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
+        
+        
+        
+        
+    }
+    
     protected function _parseFilterGroup(Tinebase_Model_Filter_FilterGroup $_filter = NULL,
                                             Tinebase_Model_Pagination $_pagination = NULL)
     {        
@@ -129,7 +197,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             if ($this->_isSearh($filterArray))
             {
                 $return['command'] = 'search';
-                $return['filter'] = $this->_generateImapFilter($filterArray);
+                $return['filter'] = $this->_generateImapFilter($filterArray, $_pagination);
             }
             else
             {
@@ -162,15 +230,63 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 */  
         
         
-        $imapFilters = $this->_parseFilterGroup($_filter);
-        $imapStream = $this->_getImapConnection($imapFilters['paths'][0][0], $imapFilters['paths'][0][1]);
+        $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         
-        if (!(empty($imapFilters['paths'][0][0])))
+        if (!(empty($imapFilters['paths'])))
         {
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $imapStream' . print_r($imapStream,true));        
-            $consulta = imap_sort($imapStream, SORTARRIVAL, 0);
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $consulta' . print_r($consulta,true));        
+            foreach ($imapFilters['paths'] as $path)
+            {
+                list($account, $mailbox) = $path;
+                $imapStream = $this->_getImapConnection($account, $mailbox);
+
+                $paginationAttr = $_pagination->toArray();
+                
+                // TODO: Probably we won't diferentiate from list and search
+                if ($imapFilters['command'] == 'list')
+                {
+
+                    $sorted = imap_sort($imapStream, SORTDATE, 1, SE_UID);
+                    
+                    Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
+                    
+                    $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
+                    $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
+
+                    $headers = array();
+                    foreach ($chunked[$chunkIndex] as $uid)
+                    {
+                        $msgno = imap_msgno($imapStream, $uid);
+                        $tmp = imap_header($imapStream, $msgno);
+                        $header = Felamimail_Backend_Cache_Imap_Abstract::
+                                objectToArray(imap_header($imapStream, $msgno));
+                        
+                        $header['structure'] = Felamimail_Backend_Cache_Imap_Abstract::
+                                objectToArray(imap_fetchstructure($imapStream, $uid, FT_UID));
+                        
+                        $headers[] = $header;
+                    }
+                    
+                    $error = imap_last_error();
+                    
+                    // Put headers into model
+                    $model =  $this->_rawDataToRecordSet($headers);
+                    
+                    //return $model;
+                    
+                }
+                else
+                {
+
+                }
+                
+                // TODO: For more than one path we will have to concat and reorder
+
+
+                Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $imapStream' . print_r($imapStream,true));    
+            }
         }
+        
+        
         
         $aux = new Felamimail_Backend_Cache_Sql_Message();           
         $retorno = $aux->search($_filter,$_pagination, $_cols);
@@ -480,11 +596,13 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     protected function _rawDataToRecordSet(array $_rawDatas)
     {
-        foreach($_rawDatas as &$_rawData) {
-            if(isset($_rawData['structure'])) {
-                $_rawData['structure'] = Zend_Json::decode($_rawData['structure']);
-            }
-        }
+        
+        // $_rawData['structure'] already an array
+//        foreach($_rawDatas as &$_rawData) {
+//            if(isset($_rawData['structure'])) {
+//                $_rawData['structure'] = Zend_Json::decode($_rawData['structure']);
+//            }
+//        }
         $result = parent::_rawDataToRecordSet($_rawDatas);
         
         return $result;
@@ -506,9 +624,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         return $result;
     }  
-    
-    
-    
     
     /**
      * get folder id message filter

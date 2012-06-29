@@ -30,7 +30,7 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
      * @var array 
      */
     static protected $_imap = array();
-    
+     
     /**
      * Search for records matching given filter
      *
@@ -100,7 +100,89 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
      */
     abstract public function create(Tinebase_Record_Interface $_record);
     
+    
+    /**
+     * Convert an object to Array, recursively
+     * @TODO: Put into an Helper Class (ex. Tinebase_Helper)
+     */
+    public static function objectToArray($var)
+    {
+        if (gettype($var) === 'object')
+        {
+            return self::objectToArray(get_object_vars($var));
+        }
+        else if (gettype($var) === 'array') {
+            $array = array();
+            foreach ($var as $idx => $value)
+            {
+                $array[$idx] = self::objectToArray($value);
+            }
+            return $array;
+        }
+        else {
+            return $var;
+        }
+//        
+//        $return = get_object_vars($obj);
+//        foreach ($return as $key => $value)
+//        {
+//            if (gettype($value) === 'array')
+//            {
+//                $array = array();
+//                foreach ($value as $idx => $content)
+//                {
+//                    if (gettype($content) === 'object')
+//                    {
+//                        
+//                    }
+//                }
+//                
+//            }
+//            else if (gettype($value) === 'object')
+//            {
+//                
+//            }
+//        }
+    }
+    
+    
 /********************************************** protected functions ***************************************************/
+    
+    /**
+     * converts raw data from adapter into a set of records
+     * got from Tinebase_Backend_Sql_Abstract
+     * 
+     * @param  array $_rawDatas of arrays
+     * @return Tinebase_Record_RecordSet
+     */
+    protected function _rawDataToRecordSet(array $_rawDatas)
+    {
+        $result = new Tinebase_Record_RecordSet($this->_modelName, $_rawDatas, true);
+        
+        if (! empty($this->_foreignTables)) {
+            foreach ($result as $record) {
+                $this->_explodeForeignValues($record);
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * explode foreign values
+     * got from Tinebase_Backend_Sql_Abstract
+     * 
+     * @param Tinebase_Record_Interface $_record
+     */
+    protected function _explodeForeignValues(Tinebase_Record_Interface $_record)
+    {
+        foreach (array_keys($this->_foreignTables) as $field) {
+            $isSingleValue = (array_key_exists('singleValue', $this->_foreignTables[$field]) && $this->_foreignTables[$field]['singleValue']);
+            if (! $isSingleValue) {
+                $_record->{$field} = (! empty($_record->{$field})) ? explode(',', $_record->{$field}) : array();
+            }
+        }
+    }
     
     /**
      * Create or return a connection with the IMAP using the PHP native functions
@@ -117,6 +199,7 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
         {
             $account = ($_accountId instanceof Felamimail_Model_Account) ? 
                             $_accountId : Felamimail_Controller_Account::getInstance()->get($_accountId);
+            
             $params = (object) $account->getImapConfig();
 
             if (is_array($params))
@@ -128,19 +211,25 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
             {
                 throw new Felamimail_Exception_IMAPInvalidCredentials('Need at least user in params.');
             }
-
-            $params->host     = isset($params->host)     ? $params->host     : 'localhost';
+            
+            
+            $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray('imap');
+            
+            $params->host     = isset($params->host)     ? $params->host     : 
+                isset($imapConfig['host']) ? $imapConfig['host'] : 'localhost';
             $params->password = isset($params->password) ? $params->password : '';
-            $params->port     = isset($params->port)     ? $params->port     : null;
-            $params->ssl      = isset($params->ssl)      ? $params->ssl      : false;
+            $params->port     = isset($params->port)     ? $params->port     : 
+                isset($imapConfig['port']) ? $imapConfig['port'] : '143';
+            $params->ssl      = isset($params->ssl)      ? '/tls'      : '/notls';
 
             Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Connecting to server ' . $params->host 
                 . ':' . $params->port . ' (' . (($params->ssl) ? $params->ssl : 'none') . ')' . ' with username ' 
                 . $params->user);
             
-            self::$_hostAddr[$accountId] = '{' . $params->host . ':' . $params->port . '}';
+            self::$_hostAddr[$accountId] = '{' . $params->host . ':' . $params->port . 
+                    $params->ssl . '}';
             $mailbox = mb_convert_encoding(self::$_hostAddr[$accountId] . $_mailbox, "UTF7-IMAP","ISO_8859-1");
-            $mbox = imap_open($mailbox, $params->user, $params->password);
+            $mbox = @imap_open($mailbox, $params->user, $params->password);
             if ($mbox === FALSE)
             {
                 /**
@@ -154,7 +243,7 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
             $mailbox = mb_convert_encoding(self::$_hostAddr . $_mailbox, "UTF7-IMAP","ISO_8859-1");
             Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'Reconnecting to server on ' 
                     . self::$_hostAddr . ' in mailbox '. $_mailbox);
-            if (imap_reopen(self::$_imap[$accountId] , $mailbox) === FALSE)
+            if (@imap_reopen(self::$_imap[$accountId] , $mailbox) === FALSE)
             {
                /**
                 * TODO: Throw an exeption on failure to reopen the connection
