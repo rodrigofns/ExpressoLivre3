@@ -499,15 +499,15 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
     }
     
     /**
-     * delete all cached messages for one folder
+     * Does nothing in this backend. It's necessary for the interface though.
      *
      * @param  mixed  $_folderId
      */
     public function deleteByFolderId($_folderId)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteByFolderId = $_folderId ' . print_r($_folderId,true));
-*/ 
+        /**
+         *TODO: remove the rest of the function  
+         */
         $aux = new Felamimail_Backend_Cache_Sql_Message();        
         $aux->deleteByFolderId($_folderId);
     }
