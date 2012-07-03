@@ -554,18 +554,23 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      *
      * @param  array  $_msguids
      * @param  mixed  $_folderId
-     * @return integer number of deleted rows
+     * @return integer number of deleted rows or false if no message are given
      */
     public function deleteMessageuidsByFolderId($_msguids, $_folderId)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteMessageuidsByFolderId = $_msguids ' . print_r($_msguids,true));
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message deleteMessageuidsByFolderId = $_folderId ' . print_r($_folderId,true));
-*/ 
+        $return = FALSE;        
+        if (!(empty($_msguids) || !is_array($_msguids)))
+        {
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Logicaly delete the messages ' 
+                                                                                            . print_r($_msguids, true));
+            $return = count($_msguids);
+        }
+        //return $return;
+        /**
+         * TODO: remove the code below and uncomment the code above
+         */
         $aux = new Felamimail_Backend_Cache_Sql_Message();        
         $retorno = $aux->deleteMessageuidsByFolderId($_msguids, $_folderId);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message seenCountByFolderId = $retorno ' . print_r($retorno,true));
         return $retorno;
     }
     
