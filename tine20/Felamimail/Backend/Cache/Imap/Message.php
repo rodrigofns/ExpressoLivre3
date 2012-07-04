@@ -117,7 +117,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     //processa os caminhos
     protected function _processPathFilters($_filter)
     {
-        $return = array();
+        $paths = array();
         $filters = $_filter[0]['filters'];
         //iterates till we only have the user and folder
         if (!empty($filters) && $this->_searchNestedArray($filters, 'path'))
@@ -126,21 +126,22 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             {
                 if ($filter['field'] === 'path' && !empty($filter['value']))
                 {
-                    $return = array_merge($return, $filter['value']);
+                    $paths = array_merge($paths, $filter['value']);
                 }
             }
         }
         
-        for ($i = 0; $i < count($return); $i++)
+        $return = array();
+        foreach ($paths as $tmp)
         {
-            $returnExplode = explode(self::IMAPDELIMITER, $return[$i]);
-            $userId   = $returnExplode[1];
-            $folderId = $returnExplode[2];
+            $path = explode(self::IMAPDELIMITER, $tmp);
+            array_shift($path);
+            list($userId, $folderId) = $path;
             
             $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
             $folderController = $folder->toArray();
             
-            $return[$i] = array($userId, $folderController['globalname']);
+            $return[$folderId] = array($userId, $folderController['globalname']);
         }
         
         
@@ -212,6 +213,47 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $return;
     }
     
+    /**
+     * create new message for the cache
+     * 
+     * @param array $_message
+     * @param Felamimail_Model_Folder $_folder
+     * @return Felamimail_Model_Message
+     */
+    protected function _createModelMessageArray(array $_messages, Felamimail_Model_Folder $_folder)
+    {
+        
+        $return = array();
+        foreach ($_messages as $uid => $msg)
+        {
+            
+            // TODO: use controller to generate the message
+            
+            $message = new Felamimail_Model_Message(array(
+                'account_id'    => $_folder->account_id,
+                'messageuid'    => $uid,
+                'folder_id'     => $_folder->getId(),
+                'timestamp'     => Tinebase_DateTime::now(),
+                'received'      => Felamimail_Message::convertDate($_message['received']),
+                'size'          => $msg['size'],
+                'flags'         => $msg['flags'],
+            ));
+
+            $message->parseStructure($msg['structure']);
+            $message->parseHeaders($msg['header']);
+            $message->parseBodyParts();
+            $message->parseSmime($msg['structure']);
+
+            $attachments = Felamimail_Controller_Message::getInstance()->getAttachments($message);
+            $message->has_attachment = (count($attachments) > 0) ? true : false;
+            
+            $return[$uid] = $message;
+
+        }
+        
+        return $return;
+    }
+    
     /*************************** abstract functions ****************************/
     /**
      * Search for records matching given filter
@@ -220,6 +262,11 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param  Tinebase_Model_Pagination            $_pagination
      * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
      * @return Tinebase_Record_RecordSet|array
+     * 
+     * @todo fix flags
+     * @todo fix date
+     * @todo implement sort for more than one path
+     * @todo implement other searches
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
@@ -229,49 +276,38 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_cols' . print_r($_cols,true));
 */  
         
-        
+        $return = null;
+        $messagesArray = array();
+        $messages = array();
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         
         if (!(empty($imapFilters['paths'])))
         {
-            foreach ($imapFilters['paths'] as $path)
+            foreach ($imapFilters['paths'] as $folderId => $path)
             {
                 list($account, $mailbox) = $path;
-                $imapStream = $this->_getImapConnection($account, $mailbox);
-
+                //$imapStream = $this->_getImapConnection($account, $mailbox);
+                
+                $imap = Felamimail_Backend_ImapFactory::factory($account);
+                $imap->selectFolder($mailbox);
                 $paginationAttr = $_pagination->toArray();
                 
                 // TODO: Probably we won't diferentiate from list and search
                 if ($imapFilters['command'] == 'list')
                 {
-
-                    $sorted = imap_sort($imapStream, SORTDATE, 1, SE_UID);
+                    
+                    // TODO: use $paginationAttr
+                    // TODO: if sort method not compatible with IMAP sort extension
+                    $sorted = $imap->sort(array('ARRIVAL'));
                     
                     Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
                     
                     $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
                     $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
+                    
+                    $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
 
-                    $headers = array();
-                    foreach ($chunked[$chunkIndex] as $uid)
-                    {
-                        $msgno = imap_msgno($imapStream, $uid);
-                        $tmp = imap_header($imapStream, $msgno);
-                        $header = Felamimail_Backend_Cache_Imap_Abstract::
-                                objectToArray(imap_header($imapStream, $msgno));
-                        
-                        $header['structure'] = Felamimail_Backend_Cache_Imap_Abstract::
-                                objectToArray(imap_fetchstructure($imapStream, $uid, FT_UID));
-                        
-                        $headers[] = $header;
-                    }
-                    
-                    $error = imap_last_error();
-                    
-                    // Put headers into model
-                    $model =  $this->_rawDataToRecordSet($headers);
-                    
-                    //return $model;
+                    $messagesArray[$mailbox] = $this->_createModelMessageArray($imap->getSummary($chunked[$chunkIndex]), $folder);
                     
                 }
                 else
@@ -281,18 +317,29 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 
                 // TODO: For more than one path we will have to concat and reorder
 
-
-                Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $imapStream' . print_r($imapStream,true));    
             }
+            
+            foreach ($messagesArray as $tmp)
+            {
+                $messages = array_merge($messages, $tmp);
+            }
+            
+            // Put headers into model
+            $return =  $this->_rawDataToRecordSet($messages);
+            
         }
         
+        if (!empty($return) && $return instanceof TineBase_Record_RecordSet)
+        {
+            return $return;
+        }
         
-        
+        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Could\'nt use Imap directly' . print_r($return,true));
         $aux = new Felamimail_Backend_Cache_Sql_Message();           
-        $retorno = $aux->search($_filter,$_pagination, $_cols);
+        $return = $aux->search($_filter,$_pagination, $_cols);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $retorno' . print_r($retorno,true));
-        return $retorno;
+        
     }
 
     /**

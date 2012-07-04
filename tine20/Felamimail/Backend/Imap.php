@@ -40,7 +40,7 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      *   - port port for IMAP server [optional, default = 110]
      *   - ssl 'SSL' or 'TLS' for secure sockets
      *   - folder select this folder [optional, default = 'INBOX']
-     *
+     * 
      * @param  object $params mail reader specific parameters
      */
     public function __construct($params)
@@ -266,6 +266,25 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
             require_once 'Zend/Mail/Storage/Exception.php';
             throw new Zend_Mail_Storage_Exception('cannot set flags, have you tried to set the recent flag or special chars?');
         }
+    }
+        
+    /**
+     * Get sorted messages through the Impa sort command
+     * 
+     * @param array $params
+     * @param boolean $uid
+     * @param boolean $descending
+     * @param mixed $search
+     * @param string $charset
+     * @return array
+     * 
+     * @todo verify capabilities and throw an exception if server don't implement sort extension
+     */
+    public function sort(array $params, $uid = false, $descending = false, $search=null, $charset='UTF-8')
+    {
+        $result = $this->_protocol->sort($params, $this->_useUid, $descending, $search, $charset);
+        
+        return $result;
     }
     
     /**
