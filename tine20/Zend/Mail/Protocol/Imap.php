@@ -645,7 +645,7 @@ class Zend_Mail_Protocol_Imap
      * @param string $charset
      * @return array
      */
-    public function sort(array $params, $uid = false, $descending = false, $search=null, $charset='UTF-8')
+    public function sort(array $params, $uid = false, $search=null, $charset='UTF-8')
     {
        
         $command = '(';

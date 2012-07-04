@@ -158,13 +158,7 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
     protected function _rawDataToRecordSet(array $_rawDatas)
     {
         $result = new Tinebase_Record_RecordSet($this->_modelName, $_rawDatas, true);
-        
-        if (! empty($this->_foreignTables)) {
-            foreach ($result as $record) {
-                $this->_explodeForeignValues($record);
-            }
-        }
-        
+                
         return $result;
     }
     

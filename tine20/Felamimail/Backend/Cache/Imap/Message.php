@@ -260,7 +260,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                 'messageuid'    => $uid,
                 'folder_id'     => $_folder->getId(),
                 'timestamp'     => Tinebase_DateTime::now(),
-                'received'      => Felamimail_Message::convertDate($_message['received']),
+                'received'      => Felamimail_Message::convertDate($msg['received']),
                 'size'          => $msg['size'],
                 'flags'         => $msg['flags'],
             ));
@@ -288,9 +288,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param  Tinebase_Model_Pagination            $_pagination
      * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
      * @return Tinebase_Record_RecordSet|array
-     * 
-     * @todo fix flags
-     * @todo fix date
+     *
      * @todo implement sort for more than one path
      * @todo implement other searches
      */
@@ -675,12 +673,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
     protected function _rawDataToRecordSet(array $_rawDatas)
     {
         
-        // $_rawData['structure'] already an array
-//        foreach($_rawDatas as &$_rawData) {
-//            if(isset($_rawData['structure'])) {
-//                $_rawData['structure'] = Zend_Json::decode($_rawData['structure']);
-//            }
-//        }
         $result = parent::_rawDataToRecordSet($_rawDatas);
         
         return $result;
