@@ -71,6 +71,11 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     );
     
     // Use imap search command or imap list?
+    /**
+     * get type of imap command to use
+     * @param type $_filter
+     * @return boolean 
+     */
     protected function _isSearh($_filter)
     {
         
@@ -104,7 +109,15 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         
     }
     
-    // Should be a static function implemented in an utilitarian Class
+    /**
+     * find existance of values recursivelly on array
+     * @param array $array
+     * @param type $search
+     * @param type $mode
+     * @return boolean
+     * 
+     * @todo implement it as a static method on a helper class (Tinebase_Helper)
+     */
     protected function _searchNestedArray(array $array, $search, $mode = 'value') {
 
         foreach (new RecursiveIteratorIterator(new RecursiveArrayIterator($array)) as $value) {
@@ -114,7 +127,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return false;
     }
 
-    //processa os caminhos
+    /**
+     * get all folders globalname and accountId
+     * 
+     * @param type $_filter
+     * @return array
+     */
     protected function _processPathFilters($_filter)
     {
         $paths = array();
@@ -148,17 +166,29 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $return;
     }
     
+    /**
+     * Generate all the necessary imap filters to be processed by the search method
+     * 
+     * @param array $_filterArray
+     * @param Tinebase_Model_Pagination $_pagination 
+     * 
+     * @todo implement all possible filters
+     */
     protected function _generateImapFilter(array $_filterArray, Tinebase_Model_Pagination $_pagination = NULL){
         
         $paginationAttr = $_pagination->toArray();
         $filters = $_filterArray['filters'];
         Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
         
-        
-        
-        
     }
     
+    /**
+     * Get filter model and pagination model and parse the rules
+     * 
+     * @param Tinebase_Model_Filter_FilterGroup $_filter
+     * @param Tinebase_Model_Pagination $_pagination
+     * @return string 
+     */
     protected function _parseFilterGroup(Tinebase_Model_Filter_FilterGroup $_filter = NULL,
                                             Tinebase_Model_Pagination $_pagination = NULL)
     {        
@@ -194,7 +224,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             
             $return['paths'] = $pathFilters; // array with folder globalnames
             
-            // Descobrir se usaremos folder list ou search
+            // find out if we're just listing folders or doing some search
             if ($this->_isSearh($filterArray))
             {
                 $return['command'] = 'search';
@@ -204,10 +234,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             {
                 $return['command'] = 'list';
             }
-            
-            // TODO: actually form de imap filter
-
-            
         }
         
         return $return;
@@ -219,6 +245,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param array $_message
      * @param Felamimail_Model_Folder $_folder
      * @return Felamimail_Model_Message
+     * 
+     * @todo use controller to generate the message
      */
     protected function _createModelMessageArray(array $_messages, Felamimail_Model_Folder $_folder)
     {
@@ -226,8 +254,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $return = array();
         foreach ($_messages as $uid => $msg)
         {
-            
-            // TODO: use controller to generate the message
             
             $message = new Felamimail_Model_Message(array(
                 'account_id'    => $_folder->account_id,
