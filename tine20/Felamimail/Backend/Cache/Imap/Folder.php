@@ -180,21 +180,19 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
     }
 
     /**
-     * try to lock a folder
+     * Sql cache specific function. In the IMAPAdapter always returns true
      *
      * @param  Felamimail_Model_Folder  $_folder  the folder to lock
-     * @return bool  true if locking was successful, false if locking was not possible
+     * @return bool true if locking was successful, false if locking was not possible
      */
     public function lockFolder(Felamimail_Model_Folder $_folder)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_folder ' . print_r($_folder,true));
-*/ 
+        //return true;
+        /**
+         *TODO: remove the comment above, delete the lines bellow
+         */
         $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->lockFolder($_folder);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
-        return $retorno;
+        return $aux->lockFolder($_folder);
     }
 
     /**
