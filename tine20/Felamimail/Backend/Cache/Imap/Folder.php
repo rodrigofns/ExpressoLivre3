@@ -26,18 +26,106 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder Search = $_filter ' . print_r($_filter,true));
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder Search = $_pagination' . print_r($_filter,true));
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder Search = $_cols' . print_r($_cols,true));
-*/  
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();           
-        $retorno = $aux->search($_filter,$_pagination, $_cols);
         
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder Search = $retorno' . print_r($retorno,true));        
+        $filters = $_filter->getFilterObjects();     
         
-        return $retorno;
+        foreach($filters as $filter) {
+            switch($filter->getField()) {
+                case 'account_id':
+                    $accountId = $filter->getValue();
+                    break;
+                case 'parent':
+                    $globalName = $filter->getValue();
+                    break;
+            }
+        }
+        
+        //$teste = $this->searchFoldersIMAP($filterValues['account_id'], $filterValues['globalname']);
+        $account = Felamimail_Controller_Account::getInstance()->get($accountId);
+        $resultArray = array();
+        $folders = $this->_getFoldersFromIMAP($account,$globalName);
+        //$imap = Felamimail_Backend_ImapFactory::factory($accountId);
+        foreach($folders as $folder){
+            $id = base64_encode($folder['globalName']);
+            $count = substr_count ($id, '=');
+            $id = str_replace('==','',$id);
+            $id = str_replace('=','',$id);
+            $id = $id.$count;   
+           $folderTmp = $this->get($id);
+           $resultArray[] = $folderTmp;
+        }
+        
+        $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder', $resultArray, true);
+        return $result;
     }
+    
+        /**
+     * get folders from imap
+     * 
+     * @param Felamimail_Model_Account $_account
+     * @param string $_folderName
+     * @return array
+     */
+    protected function _getFoldersFromIMAP(Felamimail_Model_Account $_account, $_folderName)
+    {
+        if (empty($_folderName)) {
+            $folders = $this->_getRootFolders($_account);
+        } else {
+            $folders = $this->_getSubfolders($_account, $_folderName);
+        }
+        
+        return $folders;
+    }
+    
+    /**
+     * get root folders and check account capabilities and system folders
+     * 
+     * @param Felamimail_Model_Account $_account
+     * @return array of folders
+     */
+    protected function _getRootFolders(Felamimail_Model_Account $_account)
+    {
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+            . ' Get subfolders of root for account ' . $_account->getId());
+        $result = $imap->getFolders('', '%');
+        
+        return $result;
+    }
+    
+    /**
+     * get subfolders
+     * 
+     * @param $_account
+     * @param $_folderName
+     * @return array of folders
+     */
+    protected function _getSubfolders(Felamimail_Model_Account $_account, $_folderName)
+    {
+        $result = array();
+        
+        try {
+            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                . ' trying to get subfolders of ' . $_folderName . $this->_delimiter);
+
+            $imap = Felamimail_Backend_ImapFactory::factory($_account);
+            $result = $imap->getFolders(Felamimail_Model_Folder::encodeFolderName($_folderName) . '/', '%');
+            
+            // remove folder if self
+            if (in_array($_folderName, array_keys($result))) {
+                unset($result[$_folderName]);
+            }        
+        } catch (Zend_Mail_Storage_Exception $zmse) {
+            if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                . ' No subfolders of ' . $_folderName . ' found.');
+        }
+        
+        return $result;
+    }
+    
+    
+    
     
     /**
      * Updates existing entry
@@ -76,26 +164,80 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
         return $retorno;
     }
     
-    /**
+
+    
+        /**
      * Gets one entry (by id)
      *
-     * @param integer|Tinebase_Record_Interface $_id
+     * @param string $_id
      * @param $_getDeleted get deleted records
      * @return Tinebase_Record_Interface
      * @throws Tinebase_Exception_NotFound
      */
     public function get($_id, $_getDeleted = FALSE) 
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder get = $_id ' . print_r($_id,true));
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder get = $_getDeleted' . print_r($_getDeleted,true));
-*/ 
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->get($_id, $_getDeleted);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder get = get ' . print_r($retorno,true));
-        return $retorno;
+            $globalName = base64_decode(str_pad(substr($_id,0,-1), substr($_id,-1), '='));
+            
+            $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
+
+            if($globalName == 'user'){
+                   return new Felamimail_Model_Folder(array(
+                    'id' => $_id,
+                    'account_id' => Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT},
+                    'localname' => $globalName,
+                    'globalname' => $globalName,
+                    'parent' => '',
+                    'delimiter' => $globalName,self::IMAPDELIMITER,
+                    'is_selectable' => 1,
+                    'has_children' => 1,
+                    'system_folder' => 1,
+                    'imap_status' => Felamimail_Model_Folder::IMAP_STATUS_OK,
+                    'imap_timestamp' => Tinebase_DateTime::now(),
+                    'cache_status' => 'complete',
+                    'cache_timestamp' => Tinebase_DateTime::now(),
+                    'cache_job_lowestuid' => 0,
+                    'cache_job_startuid' => 0,
+                    'cache_job_actions_est' => 0,
+                    'cache_job_actions_done' => 0
+                ));
+                
+            }else{
+                $folder = $imap->getFolders('',$globalName);
+                $counter = $imap->examineFolder($globalName);
+            }
+            if($globalName == 'INBOX' || $globalName == 'user')
+                $folder[$globalName]['parent'] = '';
+            else
+                $folder[$globalName]['parent'] = substr($globalName, strrpos($globalName,self::IMAPDELIMITER));
+            
+            return new Felamimail_Model_Folder(array(
+                    'id' => $_id,
+                    'account_id' => Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT},
+                    'localname' => Felamimail_Model_Folder::decodeFolderName($folder[$globalName]['localName']),
+                    'globalname' => $folder[$globalName]['globalName'],
+                    'parent' => '',
+                    'delimiter' => $folder[$globalName]['delimiter'],
+                    'is_selectable' => $folder[$globalName]['isSelectable'],
+                    'has_children' => $folder[$globalName]['hasChildren'],
+                    'system_folder' => 0,
+                    'imap_status' => Felamimail_Model_Folder::IMAP_STATUS_OK,
+                    'imap_uidvalidity' => $counter['uidvalidity'],
+                    'imap_totalcount' => $counter['exists'],
+                    'imap_timestamp' => Tinebase_DateTime::now(),
+                    'cache_status' => 'complete',
+                    'cache_totalcount' => $counter['exists'],
+                    'cache_recentcount' => $counter['recent'],
+                    'cache_unreadcount' => $counter['unseen'],
+                    'cache_timestamp' => Tinebase_DateTime::now(),
+                    'cache_job_lowestuid' => 0,
+                    'cache_job_startuid' => 0,
+                    'cache_job_actions_est' => 0,
+                    'cache_job_actions_done' => 0
+                ));
     }
+    
+    
+    
     
      /**
       * Deletes entries
