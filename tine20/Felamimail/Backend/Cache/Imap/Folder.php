@@ -26,11 +26,12 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
-        
         $filters = $_filter->getFilterObjects();     
         
-        foreach($filters as $filter) {
-            switch($filter->getField()) {
+        foreach($filters as $filter)
+        {
+            switch($filter->getField())
+            {
                 case 'account_id':
                     $accountId = $filter->getValue();
                     break;
@@ -47,23 +48,29 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         
         $account = Felamimail_Controller_Account::getInstance()->get($accountId);
         $resultArray = array();
-        $folders = $this->_getFoldersFromIMAP($account,$globalName);
+        $folders = $this->_getFoldersFromIMAP($account, $globalName);
         //$imap = Felamimail_Backend_ImapFactory::factory($accountId);
-        foreach($folders as $folder){
-            $id = base64_encode($folder['globalName']);
-            $count = substr_count ($id, '=');
-            $id = str_replace('==','',$id);
-            $id = str_replace('=','',$id);
-            $id = $id.$count;
-           $folderTmp = $this->get($id);
-           $resultArray[] = $folderTmp;
+///<<<<<<< HEAD
+//        foreach($folders as $folder){
+//            $id = base64_encode($folder['globalName']);
+//            $count = substr_count ($id, '=');
+//            $id = str_replace('==','',$id);
+//            $id = str_replace('=','',$id);
+//            $id = $id.$count;
+//           $folderTmp = $this->get($id);
+//           $resultArray[] = $folderTmp;
+//=======
+        foreach($folders as $folder)
+        {
+           $resultArray[] = $this->get(self::encodeFolderUid($folder['globalName']));;
+//>>>>>>> a2fef24d71d5ec58207aae85fef1e97561421365
         }
         
         $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder', $resultArray, true);
         return $result;
     }
     
-        /**
+    /**
      * get folders from imap
      * 
      * @param Felamimail_Model_Account $_account
@@ -72,8 +79,10 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      */
     protected function _getFoldersFromIMAP(Felamimail_Model_Account $_account, $_folderName)
     {
-        if (empty($_folderName)) {
+        if (empty($_folderName))
+        {
             $folders = $this->_getRootFolders($_account);
+//<<<<<<< HEAD
         } else {
             if (!is_array($_folderName))
             {
@@ -81,11 +90,18 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
             } 
             else
             {
+                $folders = array();
                 foreach ($_folderName as $folder)
                 {
-                    $folders[] = $this->_getFolder($_account, $folder);
+                    $folder = self::decodeFolderUid($folder);
+                    $folders = array_merge($folders, $this->_getFolder($_account, $folder));
                 }
             }  
+//=======
+//        } else
+//        {
+//            $folders = $this->_getSubfolders($_account, $_folderName);
+//>>>>>>> a2fef24d71d5ec58207aae85fef1e97561421365
         }
         
         return $folders;
@@ -114,7 +130,7 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      * @param Felamimail_Model_Account $_account
      * @return array of folders
      */
-    protected function _getFolder($_folderName)
+    protected function _getFolder(Felamimail_Model_Account $_account, $_folderName)
     {
         $imap = Felamimail_Backend_ImapFactory::factory($_account);
         
@@ -197,7 +213,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
     
 
     
-        /**
+    /**
      * Gets one entry (by id)
      *
      * @param string $_id
@@ -207,7 +223,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function get($_id, $_getDeleted = FALSE) 
     {
-            $globalName = base64_decode(str_pad(substr($_id,0,-1), substr($_id,-1), '='));
+            $globalName = self::decodeFolderUid($_id);
             
             $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
 
@@ -388,4 +404,27 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
         return $retorno;
     }
+    
+    /**
+     * Encode the folder name to be passed on the calls
+     * @param string $_folder
+     * @return string 
+     */
+    static public function encodeFolderUid($_folder)
+    {
+        $folder = base64_encode($_folder);
+        $count = substr_count($folder, '=');
+      return substr($folder,0, (strlen($folder) - $count)) . $count;
+    }
+    
+    /**
+     * Decode the folder previously encoded by encoderFolderUid
+     * @param type $_folder
+     * @return type 
+     */
+    static public function decodeFolderUid($_folder)
+    {
+        return base64_decode(str_pad(substr($_folder, 0, -1), substr($_folder, -1), '='));
+    }
+    
 }
