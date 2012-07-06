@@ -152,16 +152,23 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $return = array();
         foreach ($paths as $tmp)
         {
-            $path = explode(self::IMAPDELIMITER, $tmp);
-            array_shift($path);
-            list($userId, $folderId) = $path;
+            $tmp = explode(self::IMAPDELIMITER, $tmp);
             
+            if (empty($tmp[0]))
+            {
+                array_shift($tmp);
+            }
+            
+            $userId = array_shift($tmp);
+            
+            $folderId = array_pop($tmp);
             $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
-            $folderController = $folder->toArray();
+            $folderArray = $folder->toArray();
             
-            $return[$folderId] = array($userId, $folderController['globalname']);
+            //list($userId, $folderId) = $path;
+            
+            $return[$folderId] = array($userId, $folderArray['globalname']);
         }
-        
         
         return $return;
     }

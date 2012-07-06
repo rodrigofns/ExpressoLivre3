@@ -37,10 +37,14 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
                 case 'parent':
                     $globalName = $filter->getValue();
                     break;
+                case 'id':
+                    $felamimailAccount = Felamimail_Controller_Account::getInstance()->search()->toArray();
+                    $accountId = $felamimailAccount[0]['id'];
+                    $globalName = $filter->getValue();
+                    break;
             }
         }
         
-        //$teste = $this->searchFoldersIMAP($filterValues['account_id'], $filterValues['globalname']);
         $account = Felamimail_Controller_Account::getInstance()->get($accountId);
         $resultArray = array();
         $folders = $this->_getFoldersFromIMAP($account,$globalName);
@@ -50,7 +54,7 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
             $count = substr_count ($id, '=');
             $id = str_replace('==','',$id);
             $id = str_replace('=','',$id);
-            $id = $id.$count;   
+            $id = $id.$count;
            $folderTmp = $this->get($id);
            $resultArray[] = $folderTmp;
         }
@@ -63,7 +67,7 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      * get folders from imap
      * 
      * @param Felamimail_Model_Account $_account
-     * @param string $_folderName
+     * @param mixed $_folderName
      * @return array
      */
     protected function _getFoldersFromIMAP(Felamimail_Model_Account $_account, $_folderName)
@@ -71,7 +75,17 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         if (empty($_folderName)) {
             $folders = $this->_getRootFolders($_account);
         } else {
-            $folders = $this->_getSubfolders($_account, $_folderName);
+            if (!is_array($_folderName))
+            {
+                $folders = $this->_getSubfolders($_account, $_folderName);
+            } 
+            else
+            {
+                foreach ($_folderName as $folder)
+                {
+                    $folders[] = $this->_getFolder($_account, $folder);
+                }
+            }  
         }
         
         return $folders;
@@ -90,6 +104,23 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
             . ' Get subfolders of root for account ' . $_account->getId());
         $result = $imap->getFolders('', '%');
+        
+        return $result;
+    }
+    
+    /**
+     * get root folders and check account capabilities and system folders
+     * 
+     * @param Felamimail_Model_Account $_account
+     * @return array of folders
+     */
+    protected function _getFolder($_folderName)
+    {
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+            . ' Get folder ' . $_folderName);
+        $result = $imap->getFolders(Felamimail_Model_Folder::encodeFolderName($_folderName));
         
         return $result;
     }

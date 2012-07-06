@@ -124,30 +124,30 @@ class Felamimail_Controller_Cache_Imap_Message extends Felamimail_Controller_Cac
         // always read folder from database
         $folder = Felamimail_Controller_Folder::getInstance()->get($_folder);
         
-        if ($this->_doNotUpdateCache($folder)) {
-            return $folder;
-        }
-        
-        $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
-        
-        $this->_availableUpdateTime = $_time;
-        
-        $this->_expungeCacheFolder($folder, $imap);
-        $this->_initUpdate($folder);
-        $this->_updateMessageSequence($folder, $imap);
-        $this->_deleteMessagesInCache($folder, $imap);
-        $this->_addMessagesToCache($folder, $imap);
-        $this->_checkForMissingMessages($folder, $imap);
-        $this->_updateFolderStatus($folder);
-        
-        if (rand(1, $_updateFlagFactor) == 1) {
-            $folder = $this->updateFlags($folder);
-        }
-        
-        $this->_updateFolderQuota($folder, $imap);
-        
-        // reset max execution time to old value
-        Tinebase_Core::setExecutionLifeTime($oldMaxExcecutionTime);
+//        if ($this->_doNotUpdateCache($folder)) {
+//            return $folder;
+//        }
+//        
+//        $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
+//        
+//        $this->_availableUpdateTime = $_time;
+//        
+//        $this->_expungeCacheFolder($folder, $imap);
+//        $this->_initUpdate($folder);
+//        $this->_updateMessageSequence($folder, $imap);
+//        $this->_deleteMessagesInCache($folder, $imap);
+//        $this->_addMessagesToCache($folder, $imap);
+//        $this->_checkForMissingMessages($folder, $imap);
+//        $this->_updateFolderStatus($folder);
+//        
+//        if (rand(1, $_updateFlagFactor) == 1) {
+//            $folder = $this->updateFlags($folder);
+//        }
+//        
+//        $this->_updateFolderQuota($folder, $imap);
+//        
+//        // reset max execution time to old value
+//        Tinebase_Core::setExecutionLifeTime($oldMaxExcecutionTime);
         
         return $folder;
     }
