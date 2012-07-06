@@ -174,7 +174,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function get($_id, $_getDeleted = FALSE) 
     {
-            $globalName = decodeFolderUid($_id);
+            $globalName = $this->decodeFolderUid($_id);
             
             $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
 
@@ -365,7 +365,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
     {
         $folder = base64_encode($_folder);
         $count = substr_count($folder, '=');
-        return substr($folder,0, (strlen($folder) - $count)) . ($count>0?$count:'');
+      return substr($folder,0, (strlen($folder) - $count)) . $count;
     }
     
     /**
