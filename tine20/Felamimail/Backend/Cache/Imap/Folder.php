@@ -49,21 +49,9 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         $account = Felamimail_Controller_Account::getInstance()->get($accountId);
         $resultArray = array();
         $folders = $this->_getFoldersFromIMAP($account, $globalName);
-        //$imap = Felamimail_Backend_ImapFactory::factory($accountId);
-///<<<<<<< HEAD
-//        foreach($folders as $folder){
-//            $id = base64_encode($folder['globalName']);
-//            $count = substr_count ($id, '=');
-//            $id = str_replace('==','',$id);
-//            $id = str_replace('=','',$id);
-//            $id = $id.$count;
-//           $folderTmp = $this->get($id);
-//           $resultArray[] = $folderTmp;
-//=======
         foreach($folders as $folder)
         {
            $resultArray[] = $this->get(self::encodeFolderUid($folder['globalName']));;
-//>>>>>>> a2fef24d71d5ec58207aae85fef1e97561421365
         }
         
         $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder', $resultArray, true);
@@ -82,7 +70,6 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         if (empty($_folderName))
         {
             $folders = $this->_getRootFolders($_account);
-//<<<<<<< HEAD
         } else {
             if (!is_array($_folderName))
             {
@@ -97,11 +84,6 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
                     $folders = array_merge($folders, $this->_getFolder($_account, $folder));
                 }
             }  
-//=======
-//        } else
-//        {
-//            $folders = $this->_getSubfolders($_account, $_folderName);
-//>>>>>>> a2fef24d71d5ec58207aae85fef1e97561421365
         }
         
         return $folders;
@@ -186,11 +168,11 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder update = $_record ' . print_r($_record,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->update($_record);
+//        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
+//        $retorno = $aux->update($_record);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder update = $retorno ' . print_r($retorno,true));
-        return $retorno;        
+        return NULL;        
     }
     
     
@@ -358,14 +340,14 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function getFolderCounter($_folderId)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_folderId ' . print_r($_folderId,true));
-*/ 
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->getFolderCounter($_folderId);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
-        return $retorno;
+        $globalName = $self::decodeFolderUid($_folderId);
+        $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
+        $counter = $imap->examineFolder($globalName);
+      
+         return array(
+            'cache_totalcount'  => $counter['exists'],
+            'cache_unreadcount' => $counter['unseen']
+        );
     }
 
     /**
@@ -392,7 +374,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      * @return Felamimail_Model_Folder
      * @throws Tinebase_Exception_InvalidArgument
      */
-    public function updateFolderCounter($_folderId, array $_counters)
+     public function updateFolderCounter($_folderId, array $_counters)
     {
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_folderId ' . print_r($_folderId,true));

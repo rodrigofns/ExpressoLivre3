@@ -119,7 +119,7 @@ class Felamimail_Controller_Cache_Imap_Message extends Felamimail_Controller_Cac
      */
     public function updateCache($_folder, $_time = 10, $_updateFlagFactor = 10)
     {
-        $oldMaxExcecutionTime = Tinebase_Core::setExecutionLifeTime(300); // 5 minutes
+        //$oldMaxExcecutionTime = Tinebase_Core::setExecutionLifeTime(300); // 5 minutes
         
         // always read folder from database
         $folder = Felamimail_Controller_Folder::getInstance()->get($_folder);
