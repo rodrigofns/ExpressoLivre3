@@ -358,9 +358,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         {
             foreach ($imapFilters['paths'] as $folderId => $path)
             {
-                list($account, $mailbox) = $path;
-                //$imapStream = $this->_getImapConnection($account, $mailbox);
-                
+                list($account, $mailbox) = $path;               
                 $imap = Felamimail_Backend_ImapFactory::factory($account);
                 $imap->selectFolder($mailbox);
                 $paginationAttr = $_pagination->toArray();
