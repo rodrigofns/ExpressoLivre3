@@ -939,12 +939,16 @@ Ext.extend(Tine.Calendar.MonthView, Ext.util.Observable, {
         
         // update dates and bg colors
         var dayHeaders = Ext.DomQuery.select('div[class=cal-monthview-dayheader-date]', this.mainBody.dom);
+        prepara_feriados(this.startDate.getFullYear(),this.startDate.getMonth()+1);
         for(var i=0; i<this.dateMesh.length; i++) {
             this.dayCells[i].style.background = this.dateMesh[i].getMonth() == this.startDate.getMonth() ? '#FFFFFF' : '#F9F9F9';
+            if(this.dateMesh[i].getMonth() == this.startDate.getMonth() && feriados[this.dateMesh[i].format('j')]){
+                this.dayCells[i].style.background = '#FFA54F';
+                this.dayCells[i].title = feriados[this.dateMesh[i].format('j')];
+            }
             if (this.dateMesh[i].getTime() == this.toDay.getTime()) {
                 this.dayCells[i].style.background = '#EBF3FD';
             }
-                
             dayHeaders[i].innerHTML = this.dateMesh[i].format('j');
         }
         

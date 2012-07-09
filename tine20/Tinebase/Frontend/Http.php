@@ -33,6 +33,16 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
     }
     
     /**
+     * Request new image for captcha
+     * 
+     * @return void
+     */
+    public function RequestImage()
+    {
+        Tinebase_Controller::getInstance()->makecaptcha();
+    }
+
+    /**
      * return xrds file
      * used to autodiscover openId servers
      * 

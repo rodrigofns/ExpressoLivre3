@@ -14,6 +14,11 @@
     /*cursor: pointer; see ticket #1484*/
 }
 
+.cal-daysviewpanel-dayheader-holliday {
+    background:#FFA54F ;
+    /*cursor: pointer; see ticket #1484*/
+}
+
 .cal-daysviewpanel-header-offset {
     position: relative;
     margin-left:45px;
