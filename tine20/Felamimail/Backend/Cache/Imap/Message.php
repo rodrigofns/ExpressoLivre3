@@ -247,13 +247,72 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     }
     
     /**
+     * Create a messageId
+     * @param string $_messageId
+     * @return string 
+     */
+    static public function createMessageId($_accountId, $_folderId, $_messageUid)
+    {
+        $messageId = base64_encode($_accountId . ';' . $_folderId . ';' . $_messageUid);
+        $count = substr_count($messageId, '=');
+        return substr($messageId,0, (strlen($messageId) - $count)) . $count;
+    }
+    
+    /**
+     * Decode the messageId
+     * @param string $_messageId
+     * @return  array
+     */
+    static public function decodeMessageId($_messageId)
+    {
+        $decoded = base64_decode(str_pad(substr($_messageId, 0, -1), substr($_messageId, -1), '='));
+        list($accountId, $folderId, $messageUid) = explode(';', $decoded);
+        
+        return array(
+            'accountId'     => $accountId,
+            'folderId'      => $folderId,
+            'messageUid'    => $messageUid,
+        );
+    }
+    
+    /**
      * create new message for the cache
      * 
      * @param array $_message
      * @param Felamimail_Model_Folder $_folder
      * @return Felamimail_Model_Message
+     */
+    protected function _createModelMessage(array $_message, Felamimail_Model_Folder $_folder)
+    {
+        
+        $message = new Felamimail_Model_Message(array(
+            'id'            => self::createMessageId($_folder->account_id, $_folder->getId(), $_message['uid']),
+            'account_id'    => $_folder->account_id,
+            'messageuid'    => $_message['uid'],
+            'folder_id'     => $_folder->getId(),
+            'timestamp'     => Tinebase_DateTime::now(),
+            'received'      => Felamimail_Message::convertDate($_message['received']),
+            'size'          => $_message['size'],
+            'flags'         => $_message['flags'],
+        ));
+
+        $message->parseStructure($_message['structure']);
+        $message->parseHeaders($_message['header']);
+        $message->parseBodyParts();
+        $message->parseSmime($_message['structure']);
+
+        $attachments = Felamimail_Controller_Message::getInstance()->getAttachments($message);
+        $message->has_attachment = (count($attachments) > 0) ? true : false;
+        
+        return $message;
+    }
+    
+    /**
+     * create new message for the cache
      * 
-     * @todo use controller to generate the message
+     * @param array $_message
+     * @param Felamimail_Model_Folder $_folder
+     * @return Felamimail_Model_Message
      */
     protected function _createModelMessageArray(array $_messages, Felamimail_Model_Folder $_folder)
     {
@@ -262,24 +321,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         foreach ($_messages as $uid => $msg)
         {
             
-            $message = new Felamimail_Model_Message(array(
-                'account_id'    => $_folder->account_id,
-                'messageuid'    => $uid,
-                'folder_id'     => $_folder->getId(),
-                'timestamp'     => Tinebase_DateTime::now(),
-                'received'      => Felamimail_Message::convertDate($msg['received']),
-                'size'          => $msg['size'],
-                'flags'         => $msg['flags'],
-            ));
-
-            $message->parseStructure($msg['structure']);
-            $message->parseHeaders($msg['header']);
-            $message->parseBodyParts();
-            $message->parseSmime($msg['structure']);
-
-            $attachments = Felamimail_Controller_Message::getInstance()->getAttachments($message);
-            $message->has_attachment = (count($attachments) > 0) ? true : false;
-            
+            $message = $this->_createModelMessage($msg, $_folder);
             $return[$uid] = $message;
 
         }
@@ -424,10 +466,27 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message get = $_id ' . print_r($_id,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message get = $_getDeleted' . print_r($_getDeleted,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->get($_id, $_getDeleted);
+        $decodedIds = self::decodeMessageId($_id);
         
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message get = get ' . print_r($retorno,true));
+        $uid = $decodedIds['messageUid'];
+        $folder = Felamimail_Controller_Folder::getInstance()->get($decodedIds['folderId']);
+        $globalname = Felamimail_Backend_Cache_Imap_Folder::decodeFolderUid($decodedIds['folderId']);
+        $accountId = $decodedIds['accountId'];
+        
+        $imap = Felamimail_Backend_ImapFactory::factory($accountId);
+        $imap->selectFolder($globalname);
+        
+        // we're getting just one message
+        $messages = $imap->getSummary($uid, $uid, TRUE);
+        
+        if (count($messages) === 0)
+        {
+            throw new Tinebase_Exception_NotFound("Message number $uid not found!");
+        }
+        
+        $message = array_shift($messages);
+        $retorno = $this->_createModelMessage($message, $folder);
+
         return $retorno;
     }
     
