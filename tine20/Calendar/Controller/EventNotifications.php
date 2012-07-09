@@ -123,9 +123,10 @@
      * @param Tinebase_Model_FullAccount $_updater
      * @param Sting                      $_action
      * @param Calendar_Model_Event       $_oldEvent
+     * @param array                      $attachs
      * @return void
      */
-    public function doSendNotifications($_event, $_updater, $_action, $_oldEvent=NULL)
+    public function doSendNotifications($_event, $_updater, $_action, $_oldEvent=NULL, $attachs = FALSE)
     {
         if (! $_event->attendee instanceof Tinebase_Record_RecordSet) {
             return;
@@ -142,6 +143,10 @@
                 }
                 break;
             case 'created':
+                foreach($_event->attendee as $attender) {
+                    $this->sendNotificationToAttender($attender, $_event, $_updater, $_action, self::NOTIFICATION_LEVEL_INVITE_CANCEL, FALSE, $attachs);
+                }
+                break;                
             case 'deleted':
                 foreach($_event->attendee as $attender) {
                     $this->sendNotificationToAttender($attender, $_event, $_updater, $_action, self::NOTIFICATION_LEVEL_INVITE_CANCEL);
@@ -213,9 +218,10 @@
      * @param Sting                      $_action
      * @param String                     $_notificationLevel
      * @param array                      $_updates
+     * @param array                      $attachs
      * @return void
      */
-    public function sendNotificationToAttender($_attender, $_event, $_updater, $_action, $_notificationLevel, $_updates=NULL)
+    public function sendNotificationToAttender($_attender, $_event, $_updater, $_action, $_notificationLevel, $_updates=NULL, $attachs = FALSE)
     {
         try {
                 
@@ -356,6 +362,19 @@
                 $attachment->filename = 'event.ics';
                 
                 $attachments = array($attachment);
+                if($attachs)
+                    {
+                        foreach($attachs as $file) 
+                            {
+                                $stream = fopen($file['tempFile']['path'], 'r');
+                                $part = new Zend_Mime_Part($stream);
+                                $part->type = $file['tempFile']['type'];                                
+                                $part->encoding = Zend_Mime::ENCODING_BASE64;
+                                $part->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                                $part->filename = $file['tempFile']['name'];
+                                $attachments[] = $part;
+                            }
+                    }
             } else {
                 $calendarPart = null;
                 $attachments = null;
