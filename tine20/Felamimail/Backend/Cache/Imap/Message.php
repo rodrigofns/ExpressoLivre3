@@ -397,6 +397,13 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $folderArray = $folder->toArray();
                 
                 $imap = Felamimail_Backend_ImapFactory::factory($folderArray['account_id']);
+                $imap->selectFolder($folderArray['globalname']);
+//=======
+//                list($account, $mailbox) = $path;               
+//                $imap = Felamimail_Backend_ImapFactory::factory($account);
+//                $imap->selectFolder($mailbox);
+//                $paginationAttr = $_pagination->toArray();
+//>>>>>>> 0be093720b77d52312be10aab423e0477af77d2d
                 
                 // TODO: Debbugar getSummary();
                 $messages = array_merge($messages, $imap->getSummary($idsInFolder, $folder));

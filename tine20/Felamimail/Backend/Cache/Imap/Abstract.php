@@ -20,18 +20,6 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
     const IMAPDELIMITER = '/';
     
     /**
-     * List of the hosts of the connections indexed by the Id of the user
-     * @var array
-     */
-    static protected $_hostAddr = array();
-    
-    /**
-     * List of theo the connections indexed by the Id of the user
-     * @var array 
-     */
-    static protected $_imap = array();
-     
-    /**
      * Search for records matching given filter
      *
      * @param  Tinebase_Model_Filter_FilterGroup    $_filter
@@ -176,74 +164,5 @@ abstract class Felamimail_Backend_Cache_Imap_Abstract
                 $_record->{$field} = (! empty($_record->{$field})) ? explode(',', $_record->{$field}) : array();
             }
         }
-    }
-    
-    /**
-     * Create or return a connection with the IMAP using the PHP native functions
-     * 
-     * @param Felamimail_Model_Account | string $_accountId
-     * @param string $_mailbox Default is the INBOX
-     * @return Imap Connectin
-     * @throws Felamimail_Exception_IMAPInvalidCredentials 
-     */
-    protected function _getImapConnection($_accountId, $_mailbox = 'INBOX')
-    {
-        $accountId = ($_accountId instanceof Felamimail_Model_Account) ? $_accountId->getId() : $_accountId;
-        if (!(isset(Felamimail_Backend_Cache_Imap_Message::$_imap[$accountId])))
-        {
-            $account = ($_accountId instanceof Felamimail_Model_Account) ? 
-                            $_accountId : Felamimail_Controller_Account::getInstance()->get($_accountId);
-            
-            $params = (object) $account->getImapConfig();
-
-            if (is_array($params))
-            {
-                $params = (object) $params;
-            }
-
-            if (!isset($params->user)) 
-            {
-                throw new Felamimail_Exception_IMAPInvalidCredentials('Need at least user in params.');
-            }
-            
-            
-            $imapConfig = Tinebase_Config::getInstance()->getConfigAsArray('imap');
-            
-            $params->host     = isset($params->host)     ? $params->host     : 
-                isset($imapConfig['host']) ? $imapConfig['host'] : 'localhost';
-            $params->password = isset($params->password) ? $params->password : '';
-            $params->port     = isset($params->port)     ? $params->port     : 
-                isset($imapConfig['port']) ? $imapConfig['port'] : '143';
-            $params->ssl      = isset($params->ssl)      ? '/tls'      : '/notls';
-
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Connecting to server ' . $params->host 
-                . ':' . $params->port . ' (' . (($params->ssl) ? $params->ssl : 'none') . ')' . ' with username ' 
-                . $params->user);
-            
-            self::$_hostAddr[$accountId] = '{' . $params->host . ':' . $params->port . 
-                    $params->ssl . '}';
-            $mailbox = mb_convert_encoding(self::$_hostAddr[$accountId] . $_mailbox, "UTF7-IMAP","ISO_8859-1");
-            $mbox = @imap_open($mailbox, $params->user, $params->password);
-            if ($mbox === FALSE)
-            {
-                /**
-                 *TODO: Throw an exeption on failure to open the connection
-                 */
-            }
-            self::$_imap[$accountId] = $mbox;
-        }
-        else
-        {
-            $mailbox = mb_convert_encoding(self::$_hostAddr . $_mailbox, "UTF7-IMAP","ISO_8859-1");
-            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 'Reconnecting to server on ' 
-                    . self::$_hostAddr . ' in mailbox '. $_mailbox);
-            if (@imap_reopen(self::$_imap[$accountId] , $mailbox) === FALSE)
-            {
-               /**
-                * TODO: Throw an exeption on failure to reopen the connection
-                */ 
-            }
-        }
-        return self::$_imap[$accountId];
     }
 }
