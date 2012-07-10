@@ -329,6 +329,35 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $return;
     }
     
+    /**
+     * Get Ids for filter
+     * @param array $imapFilters
+     * @param string|array $_sort
+     * @return array
+     * 
+     * @todo try to derive 
+     */
+    protected function _getIds(array $_imapFilters, $_sort = array('ARRIVAL'))
+    {
+        
+        $messages = array();
+        // do a search for each path on $imapFilters
+        foreach ($_imapFilters['paths'] as $folderId => $path)
+        {
+            list($accountId, $mailbox) = $path;
+            
+            $imap = Felamimail_Backend_ImapFactory::factory($accountId);
+            $imap->selectFolder($mailbox);
+
+            // TODO: pass the search parameter too.
+            $messages[$folderId] = $imap->sort((array)$_sort);
+            
+        }
+        
+        return $messages;
+    }
+
+
     /*************************** abstract functions ****************************/
     /**
      * Search for records matching given filter
@@ -338,7 +367,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
      * @return Tinebase_Record_RecordSet|array
      *
-     * @todo implement sort for more than one path
+     * @todo implement sort
      * @todo implement other searches
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
@@ -350,57 +379,42 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 */  
         
         $return = null;
-        $messagesArray = array();
         $messages = array();
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
+        $paginationAttr = $_pagination->toArray();
         
         if (!(empty($imapFilters['paths'])))
         {
-            foreach ($imapFilters['paths'] as $folderId => $path)
+            $ids = $this->_getIds($imapFilters);
+        }
+        
+        if (!empty($ids))
+        {
+            // get Summarys and merge results
+            foreach ($ids as $folderId => $idsInFolder)
             {
-                list($account, $mailbox) = $path;
-                //$imapStream = $this->_getImapConnection($account, $mailbox);
+                $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
+                $folderArray = $folder->toArray();
                 
-                $imap = Felamimail_Backend_ImapFactory::factory($account);
-                $imap->selectFolder($mailbox);
-                $paginationAttr = $_pagination->toArray();
+                $imap = Felamimail_Backend_ImapFactory::factory($folderArray['account_id']);
                 
-                // TODO: Probably we won't diferentiate from list and search
-                if ($imapFilters['command'] == 'list')
-                {
-                    
-                    // TODO: use $paginationAttr
-                    // TODO: if sort method not compatible with IMAP sort extension
-                    $sorted = $imap->sort(array('ARRIVAL'));
-                    
-                    Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
-                    
-                    $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
-                    $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
-                    
-                    $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
-
-                    $messagesArray[$mailbox] = $this->_createModelMessageArray($imap->getSummary($chunked[$chunkIndex]), $folder);
-                    
-                }
-                else
-                {
-
-                }
-                
-                // TODO: For more than one path we will have to concat and reorder
-
+                // TODO: Debbugar getSummary();
+                $messages = array_merge($messages, $imap->getSummary($idsInFolder, $folder));
             }
-            
-            foreach ($messagesArray as $tmp)
-            {
-                $messages = array_merge($messages, $tmp);
-            }
+
+            // do array sort of $messagesArray with callback()
+            $sorted = $messages;
+
+            // Apply Pagination and get the resulting summary
+            $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
+            $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
             
             // Put headers into model
-            $return =  $this->_rawDataToRecordSet($messages);
-            
+            $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
+         
+            Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
         }
+        
         
         if (!empty($return) && $return instanceof TineBase_Record_RecordSet)
         {
@@ -410,6 +424,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Could\'nt use Imap directly' . print_r($return,true));
         $aux = new Felamimail_Backend_Cache_Sql_Message();           
         $return = $aux->search($_filter,$_pagination, $_cols);
+        
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $retorno' . print_r($retorno,true));
         

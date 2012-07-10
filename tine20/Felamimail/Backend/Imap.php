@@ -280,7 +280,7 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      * 
      * @todo verify capabilities and throw an exception if server don't implement sort extension
      */
-    public function sort(array $params, $uid = false, $search=null, $charset='UTF-8')
+    public function sort(array $params, $search = NULL, $charset = 'UTF-8')
     {
         $result = $this->_protocol->sort($params, $this->_useUid, $search, $charset);
         
