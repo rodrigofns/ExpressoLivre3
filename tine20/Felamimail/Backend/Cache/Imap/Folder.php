@@ -206,8 +206,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
     public function get($_id, $_getDeleted = FALSE) 
     {
             $globalName = self::decodeFolderUid($_id);
-            
-            $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
 
             if($globalName == 'user'){
                    return new Felamimail_Model_Folder(array(
@@ -231,6 +229,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                 ));
                 
             }else{
+                $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
                 $folder = $imap->getFolders('',$globalName);
                 $counter = $imap->examineFolder($globalName);
             }
