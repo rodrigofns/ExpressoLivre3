@@ -491,7 +491,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $accountId = $decodedIds['accountId'];
         
         $imap = Felamimail_Backend_ImapFactory::factory($accountId);
-        $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($globalname));
+        $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($globalname['globalName']));
         
         // we're getting just one message
         $messages = $imap->getSummary($uid, $uid, TRUE);
