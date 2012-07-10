@@ -388,41 +388,38 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             $ids = $this->_getIds($imapFilters);
         }
         
-        if (!empty($ids))
+        // get Summarys and merge results
+        foreach ($ids as $folderId => $idsInFolder)
         {
-            // get Summarys and merge results
-            foreach ($ids as $folderId => $idsInFolder)
-            {
-                $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
-                $folderArray = $folder->toArray();
-                
-                $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
-                $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
-                $messages = array_merge($messages, $imap->getSummary($idsInFolder, $folder));
-            }
+            $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
 
-            // do array sort of $messagesArray with callback()
-            $sorted = $messages;
-
-            // Apply Pagination and get the resulting summary
-            $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
-            $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
-            
-            // Put headers into model
-            $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
-         
-            Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
+            $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
+            $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
+            $messages = array_merge($messages, $imap->getSummary($idsInFolder, $folder));
         }
-        
-        
-        if (!empty($return) && $return instanceof TineBase_Record_RecordSet)
+
+        if (empty($messages))
         {
-            return $return;
+            return $this->_rawDataToRecordSet(array());
         }
+
+        // do array sort of $messagesArray with callback()
+        $sorted = $messages;
+
+        // Apply Pagination and get the resulting summary
+        $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
+        $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
+
+        // Put headers into model
+        $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
+
+        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
         
-        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Could\'nt use Imap directly' . print_r($return,true));
-        $aux = new Felamimail_Backend_Cache_Sql_Message();           
-        $return = $aux->search($_filter,$_pagination, $_cols);
+        return $return;
+//        
+//        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Could\'nt use Imap directly' . print_r($return,true));
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();           
+//        $return = $aux->search($_filter,$_pagination, $_cols);
         
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $retorno' . print_r($retorno,true));
