@@ -298,6 +298,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
 
         $message->parseStructure($_message['structure']);
         $message->parseHeaders($_message['header']);
+        $message->fixToListModel();
         $message->parseBodyParts();
         $message->parseSmime($_message['structure']);
 
