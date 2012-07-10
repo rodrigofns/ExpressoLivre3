@@ -340,7 +340,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function getFolderCounter($_folderId)
     {
-        $globalName = $self::decodeFolderUid($_folderId);
+        $globalName = self::decodeFolderUid($_folderId);
         $imap = Felamimail_Backend_ImapFactory::factory(Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT});
         $counter = $imap->examineFolder($globalName);
       
