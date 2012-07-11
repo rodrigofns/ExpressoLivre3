@@ -355,14 +355,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function create(Tinebase_Record_Interface $_record)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_record ' . print_r($_record,true));
-*/ 
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->create($_record);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
-        return $retorno;        
+        $folder = $_record->toArray();
+        $return = $this->get($this->encodeFolderUid($folder['globalname'], $folder['account_id']));
+        Return $return;
     }
     
 /*************************** interface functions ****************************/     
