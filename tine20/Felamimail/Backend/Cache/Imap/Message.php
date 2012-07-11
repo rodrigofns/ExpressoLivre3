@@ -126,27 +126,55 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         }
         return false;
     }
+    
+    /**
+    * get folder ids of all inboxes for accounts of current user
+    *
+    * @return array
+    */
+    protected function _getFolderIdsOfAllInboxes()
+    {
+            $accounts = Felamimail_Controller_Account::getInstance()->search();
+            $folderFilter = new Felamimail_Model_FolderFilter(array(
+                            array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
+                            array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
+            ));
+            $folderBackend = Felamimail_Backend_Folder::getInstance();
+            $folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
+
+            return $folderIds;
+    }
 
     /**
      * get all folders globalname and accountId
      * 
      * @param type $_filter
      * @return array
+     * 
+     * @todo implement not in
+     * @todo implement /allinboxes
      */
     protected function _processPathFilters($_filter)
     {
         $paths = array();
-        $filters = $_filter[0]['filters'];
+        $filters = !empty($_filter[0]['filters']) ? $_filter[0]['filters'] : $_filter;
         //iterates till we only have the user and folder
-        if (!empty($filters) && $this->_searchNestedArray($filters, 'path'))
+        if ($this->_searchNestedArray($filters, 'path'))
         {
             foreach ($filters as $filter)
             {
                 if ($filter['field'] === 'path' && !empty($filter['value']))
                 {
-                    $paths = array_merge($paths, $filter['value']);
+                    $paths = ($filter['value'] === Felamimail_Model_MessageFilter::PATH_ALLINBOXES) ?
+                        array_merge($this->_getFolderIdsOfAllInboxes()) : 
+                        array_merge($paths, $filter['value']);
                 }
             }
+        }
+        
+        if (empty($paths))
+        {
+            $paths = $this->_getFolderIdsOfAllInboxes();
         }
         
         $return = array();
@@ -160,12 +188,9 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             }
             
             $userId = array_shift($tmp);
-            
             $folderId = array_pop($tmp);
             $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
             $folderArray = $folder->toArray();
-            
-            //list($userId, $folderId) = $path;
             
             $return[$folderId] = array($userId, $folderArray['globalname']);
         }
@@ -181,7 +206,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * 
      * @todo implement all possible filters
      */
-    protected function _generateImapFilter(array $_filterArray, Tinebase_Model_Pagination $_pagination = NULL){
+    protected function _generateImapSearch(array $_filterArray, Tinebase_Model_Pagination $_pagination = NULL){
         
         $paginationAttr = $_pagination->toArray();
         $filters = $_filterArray['filters'];
@@ -204,7 +229,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         
         //get the filter array
         $filterArray = $_filter->toArray();
-        // Ignorando filtros 'OR'
+        // Ignoring 'OR' filters
         if (!empty($filterArray) && !empty($filterArray[0]))
         {
             $return = array();
@@ -223,19 +248,13 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             
             $pathFilters = $this->_processPathFilters($filterArray);
             
-            if (empty($pathFilters))
-            {
-                // TODO:
-                // $path_filters = $this->_getAllFolders();
-            }
-            
             $return['paths'] = $pathFilters; // array with folder globalnames
             
             // find out if we're just listing folders or doing some search
             if ($this->_isSearh($filterArray))
             {
                 $return['command'] = 'search';
-                $return['filter'] = $this->_generateImapFilter($filterArray, $_pagination);
+                $return['filter'] = $this->_generateImapSearch($filterArray, $_pagination);
             }
             else
             {
@@ -298,6 +317,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
 
         $message->parseStructure($_message['structure']);
         $message->parseHeaders($_message['header']);
+        $message->fixToListModel();
         $message->parseBodyParts();
         $message->parseSmime($_message['structure']);
 
