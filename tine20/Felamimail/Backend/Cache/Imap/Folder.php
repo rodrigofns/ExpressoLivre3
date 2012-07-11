@@ -28,6 +28,13 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
     {
         $filters = $_filter->getFilterObjects();     
         
+//        TODO: implement this folder filter
+//        $folderFilter = new Felamimail_Model_FolderFilter(array(
+//                        array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
+//                        array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
+//        ));
+        
+        
         foreach($filters as $filter)
         {
             switch($filter->getField())
