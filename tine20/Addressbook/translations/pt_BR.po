@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-06-11 15:30-0300\n"
+"PO-Revision-Date: 2012-07-11 16:10-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
@@ -465,10 +465,11 @@ msgstr "End token mode"
 #: js/Model.js:94
 #: js/Model.js:133
 msgid "Contact"
-msgid_plural "Contacts"
-msgstr[0] "Contato"
-msgstr[1] "Contatos"
+msgstr "Contato"
 
+#msgid_plural "Contacts"
+#msgstr[0] "Contato"
+#msgstr[1] "Contatos"
 #: js/ContactGrid.js:105
 #: js/Model.js:160
 msgid "Type"
