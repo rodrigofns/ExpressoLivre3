@@ -767,20 +767,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
     }
     
     /**
-     * converts raw data from adapter into a set of records
-     *
-     * @param  array $_rawDatas of arrays
-     * @return Tinebase_Record_RecordSet
-     */
-    protected function _rawDataToRecordSet(array $_rawDatas)
-    {
-        
-        $result = parent::_rawDataToRecordSet($_rawDatas);
-        
-        return $result;
-    }
-    
-    /**
      * converts record into raw data for adapter
      *
      * @param  Tinebase_Record_Abstract $_record
