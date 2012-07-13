@@ -253,6 +253,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                 $imap = Felamimail_Backend_ImapFactory::factory($folderDecoded['accountId']);
                 $folder = $imap->getFolders('',$folderDecoded['globalName']);
                 $counter = $imap->examineFolder($folderDecoded['globalName']);
+                $status = $imap->getFolderStatus($folderDecoded['globalName']);
             }
             if($folderDecoded['globalName'] == 'INBOX' || $folderDecoded['globalName'] == 'user')
                 $folder[$folderDecoded['globalName']]['parent'] = '';
@@ -271,12 +272,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                     'system_folder' => 0,
                     'imap_status' => Felamimail_Model_Folder::IMAP_STATUS_OK,
                     'imap_uidvalidity' => $counter['uidvalidity'],
-                    'imap_totalcount' => $counter['exists'],
+                    'imap_totalcount' => $status['exists'],
                     'imap_timestamp' => Tinebase_DateTime::now(),
                     'cache_status' => 'complete',
-                    'cache_totalcount' => $counter['exists'],
-                    'cache_recentcount' => $counter['recent'],
-                    'cache_unreadcount' => $counter['unseen'],
+                    'cache_totalcount' => $status['messages'],
+                    'cache_recentcount' => $status['recent'],
+                    'cache_unreadcount' => $status['unseen'],
                     'cache_timestamp' => Tinebase_DateTime::now(),
                     'cache_job_lowestuid' => 0,
                     'cache_job_startuid' => 0,
