@@ -136,8 +136,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     {
             $accounts = Felamimail_Controller_Account::getInstance()->search();
             $folderFilter = new Felamimail_Model_FolderFilter(array(
-                            array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
-                            array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
+                array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
+                array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
             ));
             $folderBackend = Felamimail_Backend_Folder::getInstance();
             $folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
@@ -148,33 +148,20 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     /**
      * get all folders globalname and accountId
      * 
-     * @param type $_filter
+     * @param array $_pathFilters
      * @return array
      * 
      * @todo implement not in
      * @todo implement /allinboxes
      */
-    protected function _processPathFilters($_filter)
+    protected function _processPathFilters($_pathFilters)
     {
         $paths = array();
-        $filters = !empty($_filter[0]['filters']) ? $_filter[0]['filters'] : $_filter;
-        //iterates till we only have the user and folder
-        if ($this->_searchNestedArray($filters, 'path'))
+        foreach ($_pathFilters as $pathFilter)
         {
-            foreach ($filters as $filter)
-            {
-                if ($filter['field'] === 'path' && !empty($filter['value']))
-                {
-                    $paths = ($filter['value'] === Felamimail_Model_MessageFilter::PATH_ALLINBOXES) ?
-                        array_merge($this->_getFolderIdsOfAllInboxes()) : 
-                        array_merge($paths, $filter['value']);
-                }
-            }
-        }
-        
-        if (empty($paths))
-        {
-            $paths = $this->_getFolderIdsOfAllInboxes();
+            $pathFilter['value'] = ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) ?
+                $this->_getFolderIdsOfAllInboxes() : $pathFilter['value'];
+            $paths = array_merge($paths,  $pathFilter['value']);
         }
         
         $return = array();
@@ -206,12 +193,30 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * 
      * @todo implement all possible filters
      */
-    protected function _generateImapSearch(array $_filterArray, Tinebase_Model_Pagination $_pagination = NULL){
+    protected function _generateImapSearch(Tinebase_Model_Filter_Abstract $_filter, Tinebase_Model_Pagination $_pagination = NULL){
         
-        $paginationAttr = $_pagination->toArray();
-        $filters = $_filterArray['filters'];
-        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
+        if (!empty($_pagination))
+        {
+            $paginationAttr = $_pagination->toArray();
+        }
+//        $filters = $_filterArray['filters'];
+//        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
         
+    }
+    
+    
+    protected function _hasFilter(Tinebase_Model_Filter_FilterGroup $_filter)
+    {
+        foreach ($_filter->getFilterModel() as $type => $value)
+        {
+            $filter = $_filter->getFilter($type);
+            if (is_array($filter) || is_object($filter))
+            {
+                $test = true;
+            }
+        }
+        
+        return $test;
     }
     
     /**
@@ -223,42 +228,27 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      */
     protected function _parseFilterGroup(Tinebase_Model_Filter_FilterGroup $_filter = NULL,
                                             Tinebase_Model_Pagination $_pagination = NULL)
-    {        
-        //setup the return
-        $return = null;
+    {
+        $return = array();
+        $return['filters'] = array();
+        $return['paths'] = array();
         
-        //get the filter array
-        $filterArray = $_filter->toArray();
-        // Ignoring 'OR' filters
-        if (!empty($filterArray) && !empty($filterArray[0]))
+        if ($_filter instanceof Tinebase_Model_Filter_FilterGroup && !$_filter->isEmpty())
         {
-            $return = array();
-            $filterArray = $filterArray[0];
-            if (strtolower($filterArray['condition']) === 'or')
+            foreach ($_filter->getFilterObjects() as $filter)
             {
-                if (!empty($filterArray['filters']))
+                if ($filter instanceof Tinebase_Model_Filter_FilterGroup)
                 {
-                    $filterArray = $filterArray['filters'];
+                    $return = $this->_parseFilterGroup($filter, $_pagination);
+                    $return['paths'] = array_merge($return['paths'], 
+                            (array)$this->_processPathFilters($filter->getFilter('path', true)));
                 }
-                else
+                else if ($filter instanceof Tinebase_Model_Filter_Abstract)
                 {
-                    $filterArray = null;
-                }                
-            }
-            
-            $pathFilters = $this->_processPathFilters($filterArray);
-            
-            $return['paths'] = $pathFilters; // array with folder globalnames
-            
-            // find out if we're just listing folders or doing some search
-            if ($this->_isSearh($filterArray))
-            {
-                $return['command'] = 'search';
-                $return['filter'] = $this->_generateImapSearch($filterArray, $_pagination);
-            }
-            else
-            {
-                $return['command'] = 'list';
+                    $return['filters'] = array_merge($return['filters'], 
+                            (array)$this->_generateImapSearch($filter, $_pagination));
+                }
+                
             }
         }
         
@@ -423,7 +413,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             return $this->_rawDataToRecordSet(array());
         }
 
-        // do array sort of $messagesArray with callback()
+        // TODO: do array sort of $messagesArray with callback()
         $sorted = $messages;
 
         // Apply Pagination and get the resulting summary
