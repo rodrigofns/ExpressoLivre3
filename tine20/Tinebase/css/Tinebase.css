@@ -9,13 +9,13 @@ html, body {
 
 /* ----- actions -------------------------------------------------------------*/
 .action_delegate {
-    background-image:url(../../images/oxygen/16x16/actions/list-delegate.png) !important;
+    background-image:url(../../images/list-delegate-16x16.png) !important;
 }
 .x-btn-medium .action_delegate {
-    background-image:url(../../images/oxygen/22x22/actions/list-delegate.png) !important;
+    background-image:url(../../images/list-delegate-22x22.png) !important;
 }
 .x-btn-large .action_delegate {
-    background-image:url(../../images/oxygen/32x32/actions/list-delegate.png) !important;
+    background-image:url(../../images/list-delegate-32x32.png) !important;
 }
 
 .action_add {

@@ -134,6 +134,9 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
      * delegate IMIP
      * 
      * @param {String} status
+     * oven event/delegate attendance
+     * 
+     * @param {Object} event
      */
     delegateAttendance: function(event, range) {
 		event = this.iMIPrecord.get('event');
@@ -404,6 +407,9 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
             text: this.app.i18n._('Delegate'),
             handler: this.delegateAttendance.createDelegate(this, [null]),
             icon: 'action_delegate'
+            text: this.app.i18n._('Open/Delegate'),
+            handler: this.delegateAttendance.createDelegate(this, [null]),
+            icon: 'images/list-delegate-16x16.png'
         }));
         
         this.actions = this.actions.concat(this.statusActions);
