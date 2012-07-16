@@ -131,6 +131,256 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
     },
     
     /**
+     * oven event/delegate attendance
+     * 
+     * @param {Object} event
+     */
+    delegateAttendance: function(event, range) {
+		event = this.iMIPrecord.get('event');
+
+        //this.getLoadMask().show();
+	event.set('id', this.iMIPrecord.get('existing_event').id);
+	event.set('organizer',this.iMIPrecord.get('existing_event').organizer);
+        Ext.each(event.data.attendee, function(attender) {
+            Ext.each(this.iMIPrecord.get('existing_event').attendee, function(att) {
+                if (att.user_id == attender.user_id.id) {
+                    attender.id = att.id;
+                }
+            }, this);
+        }, this);
+        event.dirty = false;
+        Tine.log.debug('Tine.Calendar.iMIPDetailsPanel::delegateAttendance event: ' + event.id);
+
+        Tine.Calendar.EventEditDialog.openWindow({
+            record: Ext.util.JSON.encode(event.data),
+            recordId: event.data.id,
+            listeners: {
+                scope: this,
+                update: function (eventJson) {
+                    var updatedEvent = Tine.Calendar.backend.recordReader({responseText: eventJson});
+                    updatedEvent.dirty = true;
+                    updatedEvent.modified = {};
+                    event.phantom = true;
+                    
+                    this.onUpdateEvent(updatedEvent, false);
+                }
+            }
+        });
+    },
+    
+    onUpdateEvent: function(event, pastChecked) {
+        
+        if(!pastChecked) {
+            this.checkPastEvent(event, null);
+            return;
+        }
+        
+        if (event.isRecurInstance() || (event.isRecurBase() && ! event.get('rrule').newrule)) {
+            Tine.widgets.dialog.MultiOptionsDialog.openWindow({
+                title: this.app.i18n._('Update Event'),
+                height: 170,
+                scope: this,
+                options: [
+                    {text: this.app.i18n._('Update this event only'), name: 'this'},
+                    {text: this.app.i18n._('Update this and all future events'), name: (event.isRecurBase() && ! event.get('rrule').newrule) ? 'series' : 'future'},
+                    {text: this.app.i18n._('Update whole series'), name: 'series'},
+                    {text: this.app.i18n._('Update nothing'), name: 'cancel'}
+                    
+                ],
+                handler: function(option) {
+
+                    switch (option) {
+                        case 'series':
+                            var options = {
+                                scope: this, 
+								success: this.prepareIMIP(),
+								failure: this.onProxyFail.createDelegate(this, [event], true)
+                            };
+                            
+                            Tine.Calendar.backend.updateRecurSeries(event, options);
+                            break;
+                            
+                        case 'this':
+                        case 'future':
+                            var options = {
+                                scope: this, 
+								success: this.prepareIMIP(),
+								failure: this.onProxyFail.createDelegate(this, [event], true)
+                            };
+                            
+                            Tine.Calendar.backend.createRecurException(event, false, option == 'future', options);
+                            break;
+                            
+                        default:
+                            break;
+                    }
+
+                } 
+            });
+        } else {
+            this.onUpdateEventAction(event);
+        }
+    },
+    
+    onUpdateEventAction: function(event) {
+            
+        Tine.Calendar.backend.saveRecord(event, {
+            scope: this, 
+			success: this.prepareIMIP(),
+			failure: this.onProxyFail.createDelegate(this, [event], true)
+        }, {
+            checkBusyConflicts: 1
+        });
+    },
+
+    checkPastEvent: function(event, checkBusyConflicts) {
+        
+        var start = event.get('dtstart').getTime();
+        var morning = new Date().clearTime().getTime();
+
+        var title = this.app.i18n._('Updating event in the past'),
+            optionYes = this.app.i18n._('Update this event'),
+            optionNo = this.app.i18n._('Do not update this event');
+        
+        if(start < morning) {
+            Tine.widgets.dialog.MultiOptionsDialog.openWindow({                
+                title: title,
+                height: 170,
+                scope: this,
+                options: [
+                    {text: optionYes, name: 'yes'},
+                    {text: optionNo, name: 'no'}                   
+                ],
+                
+                handler: function(option) {
+                    try {
+                        switch (option) {
+                            case 'yes':
+                                this.onUpdateEvent(event, true);
+                                break;
+                            case 'no':
+                            default:
+								break;                                
+                        }
+                    } catch (e) {
+                        Tine.log.error('Tine.Calendar.MainScreenCenterPanel::checkPastEvent::handler');
+                        Tine.log.error(e);
+                    }
+                }             
+            });
+        } else {
+            this.onUpdateEvent(event, true);
+        }
+    },
+    
+    onProxyFail: function(error, event) {
+        if(this.loadMask) this.loadMask.hide();
+        
+        if (error.code == 901) {
+           
+            // resort fbInfo to combine all events of a attender
+            var busyAttendee = [];
+            var conflictEvents = {};
+            var attendeeStore = Tine.Calendar.Model.Attender.getAttendeeStore(event.get('attendee'));
+             
+            Ext.each(error.freebusyinfo, function(fbinfo) {
+                attendeeStore.each(function(a) {
+                    if (a.get('user_type') == fbinfo.user_type && a.getUserId() == fbinfo.user_id) {
+                        if (busyAttendee.indexOf(a) < 0) {
+                            busyAttendee.push(a);
+                            conflictEvents[a.id] = [];
+                        }
+                        conflictEvents[a.id].push(fbinfo);
+                    }
+                });
+            }, this);
+            
+            // generate html for each busy attender
+            var busyAttendeeHTML = '';
+            Ext.each(busyAttendee, function(busyAttender) {
+                // TODO refactore name handling of attendee
+                //      -> attender model needs knowlege of how to get names!
+                //var attenderName = a.getName();
+                var attenderName = Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderName.call(Tine.Calendar.AttendeeGridPanel.prototype, busyAttender.get('user_id'), false, busyAttender);
+                busyAttendeeHTML += '<div class="cal-conflict-attendername">' + attenderName + '</div>';
+                
+                var eventInfos = [];
+                Ext.each(conflictEvents[busyAttender.id], function(fbInfo) {
+                    var format = 'H:i';
+                    var dateFormat = Ext.form.DateField.prototype.format;
+                    if (event.get('dtstart').format(dateFormat) != event.get('dtend').format(dateFormat) ||
+                        Date.parseDate(fbInfo.dtstart, Date.patterns.ISO8601Long).format(dateFormat) != Date.parseDate(fbInfo.dtend, Date.patterns.ISO8601Long).format(dateFormat))
+                    {
+                        format = dateFormat + ' ' + format;
+                    }
+                    
+                    var eventInfo = Date.parseDate(fbInfo.dtstart, Date.patterns.ISO8601Long).format(format) + ' - ' + Date.parseDate(fbInfo.dtend, Date.patterns.ISO8601Long).format(format);
+                    if (fbInfo.event && fbInfo.event.summary) {
+                        eventInfo += ' : ' + fbInfo.event.summary;
+                    }
+                    eventInfos.push(eventInfo);
+                }, this);
+                busyAttendeeHTML += '<div class="cal-conflict-eventinfos">' + eventInfos.join(', <br />') + '</div>';
+                
+            });
+            
+            this.conflictConfirmWin = Tine.widgets.dialog.MultiOptionsDialog.openWindow({
+                modal: true,
+                allowCancel: false,
+                height: 180 + 15*error.freebusyinfo.length,
+                title: this.app.i18n._('Scheduling Conflict'),
+                questionText: '<div class = "cal-conflict-heading">' +
+                                   this.app.i18n._('The following attendee are busy at the requested time:') + 
+                               '</div>' +
+                               busyAttendeeHTML,
+                options: [
+                    {text: this.app.i18n._('Ignore Conflict'), name: 'ignore'},
+                    {text: this.app.i18n._('Edit Event'), name: 'edit', checked: true},
+                    {text: this.app.i18n._('Cancel this action'), name: 'cancel'}
+                ],
+                scope: this,
+                handler: function(option) {
+
+                    switch (option) {
+                        case 'ignore':
+                            this.onAddEvent(event, false, true);
+                            this.conflictConfirmWin.close();
+                            break;
+                        
+                        case 'edit':
+                            
+/*                            var presentationMatch = this.activeView.match(this.presentationRe),
+                                presentation = Ext.isArray(presentationMatch) ? presentationMatch[0] : null;
+                            
+                            if (presentation != 'Grid') {
+                                var view = panel.getView();
+                                view.getSelectionModel().select(event);
+                                // mark event as not dirty to allow edit dlg
+                                event.dirty = false;
+                                view.fireEvent('dblclick', view, event);
+                            } else {
+                                // add or edit?
+                                this.onEditInNewWindow(null, null, event);
+                            }
+*/                            
+                            this.delegateAttendance(event, null);
+
+                            this.conflictConfirmWin.close();
+                            break;                            
+                        case 'cancel':
+                        default:
+                            this.conflictConfirmWin.close();
+                            break;
+                    }
+                }
+            });
+            
+        } else {
+            Tine.Tinebase.ExceptionHandler.handleRequestException(error);
+        }
+    },
+    
+    /**
      * iMIP action toolbar
      */
     initIMIPToolbar: function() {
@@ -149,6 +399,12 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
                 icon: status.get('icon')
             }));
         }, this);
+
+        this.statusActions.push(new Ext.Action({
+            text: this.app.i18n._('Open/Delegate'),
+            handler: this.delegateAttendance.createDelegate(this, [null]),
+            icon: 'images/list-delegate-16x16.png'
+        }));
         
         this.actions = this.actions.concat(this.statusActions);
         
