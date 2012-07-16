@@ -152,7 +152,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @return array
      * 
      * @todo implement not in
-     * @todo implement /allinboxes
+     * @todo what happens when path is empty???? is the same as /allinboxes???
      */
     protected function _processPathFilters($_pathFilters)
     {
@@ -160,7 +160,9 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         foreach ($_pathFilters as $pathFilter)
         {
             $pathFilter['value'] = ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) ?
-                $this->_getFolderIdsOfAllInboxes() : $pathFilter['value'];
+                $this->_getFolderIdsOfAllInboxes() : ($pathFilter['operator'] === 'notin') ?
+                array_diff($this->_getFolderIdsOfAllInboxes(), $pathFilter['value']) : $pathFilter['value'];
+            
             $paths = array_merge($paths,  $pathFilter['value']);
         }
         
@@ -188,17 +190,56 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     /**
      * Generate all the necessary imap filters to be processed by the search method
      * 
-     * @param array $_filterArray
+     * @param mixed $_filter
      * @param Tinebase_Model_Pagination $_pagination 
      * 
-     * @todo implement all possible filters
+     * @todo implement filters: flags, account_id, id, received, messageuid
+     * @todo verify results with empty value
      */
-    protected function _generateImapSearch(Tinebase_Model_Filter_Abstract $_filter, Tinebase_Model_Pagination $_pagination = NULL){
+    protected function _generateImapSearch($_filter, Tinebase_Model_Pagination $_pagination = NULL)
+    {
+        $return = array();
         
-        if (!empty($_pagination))
+        if ($_filter instanceof Tinebase_Model_Filter_Abstract)
         {
-            $paginationAttr = $_pagination->toArray();
+            $filters = array();
+            $filters[] = $_filter->toArray();
         }
+        else
+        {
+            $filters = $_filter;
+        }
+        
+        foreach ($filters as $filter)
+        {
+            if (!empty($filter['value']))
+            {
+                switch ($filter['field'])
+                {
+                    case 'query' :
+                        $return[] = "OR SUBJECT {$filter['value']} FROM {$filter['value']}";
+                        break;
+                    case 'subject' :
+                        $return[] = "SUBJECT {$filter['value']}";
+                        break;
+                    case 'from_name' : // we can'nt diferentiate with imap filters
+                    case 'from_email' :
+                        $return[] = "FROM {$filter['value']}";
+                        break;
+                    case 'to' :
+                        $return[] = "TO {$filter['value']}";
+                        break;
+                    case 'cc' :
+                        $return[] = "CC {$filter['value']}";
+                        break;
+                    case 'bcc' :
+                        $return[] = "BCC {$filter['value']}";
+                        break;
+                }
+            }
+        }
+        return $return;
+        
 //        $filters = $_filterArray['filters'];
 //        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
         
@@ -224,7 +265,9 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * 
      * @param Tinebase_Model_Filter_FilterGroup $_filter
      * @param Tinebase_Model_Pagination $_pagination
-     * @return string 
+     * @return string
+     * 
+     * @todo exclude $_pagination from this method
      */
     protected function _parseFilterGroup(Tinebase_Model_Filter_FilterGroup $_filter = NULL,
                                             Tinebase_Model_Pagination $_pagination = NULL)
@@ -242,6 +285,11 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                     $return = $this->_parseFilterGroup($filter, $_pagination);
                     $return['paths'] = array_merge($return['paths'], 
                             (array)$this->_processPathFilters($filter->getFilter('path', true)));
+                    foreach (array('to', 'cc', 'bcc', 'flags') as $field)
+                    {
+                        $return['filters'] = array_merge($return['filters'], 
+                            (array)$this->_generateImapSearch($filter->getFilter($field, true), $_pagination));
+                    }
                 }
                 else if ($filter instanceof Tinebase_Model_Filter_Abstract)
                 {
@@ -360,7 +408,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($mailbox));
 
             // TODO: pass the search parameter too.
-            $messages[$folderId] = $imap->sort((array)$_sort);
+            $messages[$folderId] = $imap->sort((array)$_sort, (array)$_imapFilters['filters']);
             
         }
         

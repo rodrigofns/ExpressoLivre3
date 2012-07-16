@@ -645,7 +645,7 @@ class Zend_Mail_Protocol_Imap
      * @param string $charset
      * @return array
      */
-    public function sort(array $params, $uid = false, $search=null, $charset='UTF-8')
+    public function sort(array $params, $uid = false, array $search = NULL, $charset='UTF-8')
     {
        
         $command = '(';
@@ -654,7 +654,7 @@ class Zend_Mail_Protocol_Imap
         
         $tokens = array($charset);
         
-        if (is_array($search))
+        if (!empty($search))
         {
             $tokens = array_merge($tokens, $search);
         }
