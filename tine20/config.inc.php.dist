@@ -44,7 +44,7 @@ return array(
   'mapPanel' => '',
   'themes' =>
     array (
-        'default'     => 0,
+        'default'     => 1,
         'cookieTheme' => '',
         'themelist'   =>
     array (
