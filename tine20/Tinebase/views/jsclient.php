@@ -30,8 +30,6 @@
     }    
     ?>
     <!-- EXT JS -->
-     <?php echo Tinebase_View::getJSConfig()?>
-    
     <script type="text/javascript" src="library/ExtJS/adapter/ext/ext-base<?php echo TINE20_BUILDTYPE != 'RELEASE' ? '-debug' : '' ?>.js"></script>
     <script type="text/javascript" src="library/ExtJS/ext-all<?php echo TINE20_BUILDTYPE != 'RELEASE' ? '-debug' : '' ?>.js"></script>
     
@@ -49,6 +47,9 @@
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.UploadDialog.js"></script>	
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.HtmlEditor.ButtonImage.js"></script>
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/DataView-more.js"></script>		
+
+     <?php echo Tinebase_View::getJSConfig()?>
+
     <noscript><p>You need to enable javascript to use <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
 </body>
 </html>

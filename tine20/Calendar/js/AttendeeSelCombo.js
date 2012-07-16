@@ -12,11 +12,11 @@ Ext.ns('Tine.Calendar');
 
 /**
  * @namespace   Tine.Calendar
- * @class       Tine.Calendar.AttendeeGridPanel
+ * @class       Tine.Calendar.AttendeeSelCombo
  * @extends     Ext.grid.EditorGridPanel
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  */
-Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
+Tine.Calendar.AttendeeSelCombo = Ext.extend(Ext.grid.EditorGridPanel, {
     autoExpandColumn: 'user_id',
     clicksToEdit: 1,
     enableHdMenu: false,
@@ -31,7 +31,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
      * @cfg {Boolean} showNamesOnly
      * true to only show types and names in the list
      */
-    showNamesOnly: false,
+    showNamesOnly: true,
     
     /**
      * The record currently being edited
@@ -66,7 +66,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
     attendeeStore: null,
     
     stateful: true,
-    stateId: 'cal-attendeegridpanel',
+    stateId: 'cal-attendeeselcombo',
     
     initComponent: function() {
         this.app = this.app ? this.app : Tine.Tinebase.appMgr.get('Calendar');
@@ -89,7 +89,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         
         this.initColumns();
         
-        Tine.Calendar.AttendeeGridPanel.superclass.initComponent.call(this);
+        Tine.Calendar.AttendeeSelCombo.superclass.initComponent.call(this);
     },
     
     initColumns: function() {
@@ -106,16 +106,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                 app:   'Calendar',
                 keyFieldName: 'attendeeRoles'
             }
-        },/* {
-            id: 'quantity',
-            dataIndex: 'quantity',
-            width: 40,
-            sortable: true,
-            hidden: this.showNamesOnly || true,
-            header: '&#160;',
-            tooltip: this.app.i18n._('Quantity'),
-            renderer: this.renderAttenderQuantity.createDelegate(this)
-        },*/ {
+        }, {
             id: 'displaycontainer_id',
             dataIndex: 'displaycontainer_id',
             width: 200,
@@ -130,7 +121,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                 selectOnFocus: true,
                 appName: 'Calendar',
                 //startNode: 'personalOf', -> rework to startPath!
-                getValue: function() {
+                getValue: function() {alert(2);
                     if (this.selectedContainer) {
                         // NOTE: the store checks if data changed. If we don't overwrite to string, 
                         //  the check only sees [Object Object] wich of course never changes...
@@ -141,7 +132,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                 },
                 listeners: {
                     scope: this,
-                    select: function(field, newValue) {
+                    select: function(field, newValue) {alert(3);
                         // the field is already blured, due to the extra chooser window. We need to change the value per hand
                         var selection = this.getSelectionModel().getSelectedCell();
                         if (selection) {
@@ -220,10 +211,6 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                     if (! o.value.account_id ) {
                         o.record.set('status_authkey', 1);
                     }
-                    
-                    var newAttender = new Tine.Calendar.Model.Attender(Tine.Calendar.Model.Attender.getDefaultData(), 'new-' + Ext.id() );
-                    this.store.add([newAttender]);
-                    this.startEditing(o.row +1, o.column);
                 }
                 break;
                 
@@ -251,14 +238,8 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         
         if (o.field == 'displaycontainer_id') {
             if (! o.value || ! o.value.account_grants || ! o.value.account_grants.deleteGrant) {
-                o.cancel = true;
+                o.cancel = false;
             }
-            return;
-        }
-        
-        // for all other fields user need editGrant
-        if (! this.record.get('editGrant')) {
-            o.cancel = true;
             return;
         }
         
@@ -316,45 +297,6 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         }
     },
     
-    // NOTE: Ext docu seems to be wrong on arguments here
-    onContextMenu: function(e, target) {
-        e.preventDefault();
-        var row = this.getView().findRowIndex(target);
-        var attender = this.store.getAt(row);
-        if (attender) {
-            // don't delete 'add' row
-            var attender = this.store.getAt(row);
-            if (! attender.get('user_id')) {
-                return;
-            }
-			if (attender.get('user_id').account_id && Tine.Tinebase.registry.get('currentAccount').accountId==attender.get('user_id').account_id) {
-				attender.set('status_authkey', 1);
-			}
-
-            this.ctxMenu = new Ext.menu.Menu({
-                items: [{
-                    text: this.app.i18n._('Remove Attender'),
-                    iconCls: 'action_delete',
-                    scope: this,
-                    disabled: !this.record.get('editGrant'),
-                    handler: function() {
-                        this.store.removeAt(row);
-                    }
-                    
-                },{
-                    text: this.app.i18n._('Delegate Attendance'),
-                    iconCls: 'action_delegate',
-                    scope: this,
-                    disabled: !attender.get('status_authkey'),
-                    handler: function() {
-			this.delegateAttendance();
-                    }
-                }]
-            });
-            this.ctxMenu.showAt(e.getXY());
-        }
-    },
-    
     /**
      * loads this panel with data from given record
      * called by edit dialog when record is loaded
@@ -366,20 +308,9 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         this.record = record;
         this.store.removeAll();
         var attendee = record.get('attendee');
-        Ext.each(attendee, function(attender) {
 
-            var record = new Tine.Calendar.Model.Attender(attender, attender.id);
-            this.store.addSorted(record);
-            
-            if (attender.displaycontainer_id  && this.record.get('container_id') && attender.displaycontainer_id.id == this.record.get('container_id').id) {
-                this.eventOriginator = record;
-            }
-        }, this);
-        
-        if (record.get('editGrant')) {
-            // Add new attendee
-            this.store.add([new Tine.Calendar.Model.Attender(Tine.Calendar.Model.Attender.getDefaultData(), 'new-' + Ext.id() )]);
-        }
+        // Add new attendee
+        this.store.add([new Tine.Calendar.Model.Attender(Tine.Calendar.Model.Attender.getDefaultData(), 'new-' + Ext.id() )]);
     },
     
     /**
@@ -388,9 +319,12 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
      * 
      * @param {Tine.Calendar.Model.Event} record
      */
-    onRecordUpdate: function(record) {
+    onRecordUpdate: function(event, record) {
         this.stopEditing(false);
-        
+
+        var attendee = record.get('attendee');
+        this.store.setDefaultSort('user_id', 'ASC');
+
         var attendee = [];
         this.store.each(function(attender) {
             var user_id = attender.get('user_id');
@@ -399,10 +333,13 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                     attender.data.user_id = user_id.data;
                 }
                 
-               attendee.push(attender.data);
+                attendee.push(attender.data);
             }
         }, this);
         
+        record.set('readGrant', false);
+        record.set('editGrant', true);
+        record.editing = true;
         record.set('attendee', attendee);
     },
     
@@ -429,55 +366,17 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         }
     },
     
-    delegateAttendance: function(record) {
-        // delegate attendance to a new user:
-        Tine.Calendar.AttendeeEditDialog.openWindow({
-            listeners: {
-                scope: this,
-                update: function (eventJson) {
-                    var o = Tine.Calendar.backend.recordReader({responseText: eventJson}).get('attendee')[0];
-                    //o.dirty = true;
-                    //o.modified = {};
-		            this.store.each(function(attender) {
-						if (attender.get('status_authkey')) {
-			                var row = this.getView().getRow(this.store.indexOf(attender));
-					        var idx = this.store.indexOf(attender);
-						    // detect duplicate entry
-						    // TODO detect duplicate emails, too 
-						    var isDuplicate = false;
-						    this.store.each(function(att) {
-						        if (o.user_id.id == att.getUserId()
-						                && o.user_type == att.get('user_type')
-						                && o != att) {
-						            row = this.getView().getRow(this.store.indexOf(att));
-						            isDuplicate = true;
-						            return false;
-						        }
-						    }, this);
-							if (! isDuplicate) {
-							    this.store.remove(attender);
-								var record = new Tine.Calendar.Model.Attender(o, attender.id);
-							    this.store.insert(idx, record);
-					            row = this.getView().getRow(this.store.indexOf(record));
-							}
-				            Ext.fly(row).highlight();
-						}
-		            }, this);
-                }
-            }
-        });
-    },
-    
     renderAttenderName: function(name, metaData, record) {
         if (name) {
             var type = record ? record.get('user_type') : 'user';
             return this['renderAttender' + Ext.util.Format.capitalize(type) + 'Name'].apply(this, arguments);
         }
-        
-        // add new user:
-        if (arguments[1]) {
-            arguments[1].css = 'x-form-empty-field';
-            return this.app.i18n._('Click here to invite another attender...');
+        else {
+            // add new user:
+            if (arguments[1]) {
+                arguments[1].css = 'x-form-empty-field';
+                return this.app.i18n._('Click here to delegate attendance to another attender...');
+            }
         }
     },
     
@@ -500,7 +399,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
     },
     
     renderAttenderGroupmemberName: function(name) {
-        var name = Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderUserName.apply(this, arguments);
+        var name = Tine.Calendar.AttendeeSelCombo.prototype.renderAttenderUserName.apply(this, arguments);
         return name + ' ' + Tine.Tinebase.appMgr.get('Calendar').i18n._('(as a group member)');
     },
     
@@ -518,7 +417,7 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
     },
     
     renderAttenderMemberofName: function(name) {
-        return Tine.Calendar.AttendeeGridPanel.prototype.renderAttenderGroupName.apply(this, arguments);
+        return Tine.Calendar.AttendeeSelCombo.prototype.renderAttenderGroupName.apply(this, arguments);
     },
     
     renderAttenderResourceName: function(name) {
