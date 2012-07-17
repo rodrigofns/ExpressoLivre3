@@ -140,13 +140,16 @@ Tine.Messenger.Config = {
                     cls: 'messenger-client-tbar',
                     items:[
                         {
-                            text: _('Actions'),
+                            //text: Tine.Tinebase.appMgr.get('Messenger').i18n.ngettext('Action', 'Actions', 1),
+                            id: 'messenger-menu-actions',
+                            text: 'Actions',
                             menu: {
                                     id: "BuddysMenu",
                                     items:[{
                                             id: 'messenger-contact-add',
                                             icon: '/images/messenger/user_add.png',
-                                            text: _('Add Contact'),
+                                            //text: Tine.Tinebase.appMgr.get('Messenger').i18n.ngettext('Add Contact', 'Add Contact', 1),
+                                            text: 'Add Contact',
                                             disabled: true,
                                             handler: function(){
                                                 Tine.Messenger.Window.AddBuddyWindow();
@@ -154,7 +157,8 @@ Tine.Messenger.Config = {
                                     },
                                     {
                                             id: 'messenger-group-mngt-add',
-                                            text: _('Add Group'),
+                                            //text: Tine.Tinebase.appMgr.get('Messenger').i18n.ngettext('Add Group', 'Add Group', 1),
+                                            text: 'Add Group',
                                             icon: '/images/messenger/group_add.png',
                                             disabled: true,
                                             handler: function() {
@@ -165,7 +169,8 @@ Tine.Messenger.Config = {
                                      },
                                      {
                                          id: 'messenger-logout',
-                                         text: _('Logout'),
+                                         //text: Tine.Tinebase.appMgr.get('Messenger').i18n.ngettext('Logout', 'Logout', 1),
+                                         text: 'Logout',
                                          disabled: true,
                                          handler: function() {
                                              Tine.Messenger.ChatHandler.disconnect();
@@ -175,7 +180,9 @@ Tine.Messenger.Config = {
                                 }
                         },
                         {
-                            text: _('Preferences'),
+                            //text: Tine.Tinebase.appMgr.get('Messenger').i18n.ngettext('Preference', 'Preferences', 1),
+                            id: 'messenger-menu-prefs',
+                            text: 'Preferences',
                             handler: function () {
                                 if (configWindow == null)
                                     configWindow = new Tine.Messenger.ConfigWindow();
@@ -229,7 +236,7 @@ Tine.Messenger.Config = {
                         name:'message',
                         mode: 'local',
                         triggerAction: 'all',
-                        id:'status-box',
+                        id:'messenger-status-box',
                         emptyText:'your Status... (press ENTER after)',
                         selectOnFocus:true
                     }
@@ -473,14 +480,14 @@ Tine.Messenger.AddItems = function(_box) {
         
         items.push(
                 {
-                    itemId: 'messenger-chat-table',
+                    id: 'messenger-chat-table',
                     layout: 'column',
                     region: 'center',
                     minWidth: 210,
                     border: false,
                     autoScroll: true,
                     items: [{
-                                itemId: 'messenger-chat-body',
+                                id: 'messenger-chat-body',
                                 xtype: 'panel',
                                 border: styleCls ? true : false,
                                 autoScroll: true,
@@ -494,13 +501,13 @@ Tine.Messenger.AddItems = function(_box) {
             );
         items.push(
                 {
-                    itemId: 'messenger-chat-notifications',
+                    id: 'messenger-chat-notifications',
                     cls: 'messenger-chat-notifications',
                     border: false,
                     html: ''  
                 },
                 {
-                    itemId: 'messenger-chat-field',
+                    id: 'messenger-chat-field',
                     region: 'south',
                     xtype: 'textfield',
                     height: 30,

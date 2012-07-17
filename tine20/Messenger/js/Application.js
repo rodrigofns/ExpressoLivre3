@@ -1,7 +1,7 @@
 Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
-var MESSENGER_CHAT_ID_PREFIX = '#messenger-chat-',
+var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
     MESSENGER_DEBUG = false;
 
 Tine.Messenger.factory={
@@ -60,6 +60,7 @@ const IMConst = {
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
     hasMainScreen: false,
+    appName: 'Messenger',
     
     // Delayed Tasks
     showMessengerDelayedTask: null,
