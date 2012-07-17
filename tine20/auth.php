@@ -154,26 +154,27 @@ class JabberAuth
     // Authentication method => check where? Tine?
     private function checkpass()
     {
-        $this->logg('Checking the password...');
-        $this->logg('Before transforming: ' . $this->jabber_pass);
-        $json = base64_decode($this->jabber_pass);
-	$this->logg('JSON => ' . $json);
-	$local_info = json_decode($json);
-        $this->logg('JSON DECODE');
-        $this->logg('---');
-        $this->logg(var_export($local_info, true));
-        $this->logg(var_export($local_info->pwd, true));
-        $this->logg(var_export($local_info->ip, true));
-        $this->logg('---');
-        $server_info = $this->getServerInfo($local_info->pwd, $this->jabber_user);
-
-        $this->logg('COMPARAÇÃO (local == remoto)...');
-        $this->logg('    '.$local_info->ip . ' == ' . $server_info->ip);
-        $this->logg('    '.$this->jabber_user . ' == ' . $server_info->login_name);
-        $this->logg('FIM DA COMPARAÇÃO');
-        
-        return ($local_info->ip == $server_info->ip &&
-                $this->jabber_user == $server_info->login_name);
+//        $this->logg('Checking the password...');
+//        $this->logg('Before transforming: ' . $this->jabber_pass);
+//        $json = base64_decode($this->jabber_pass);
+//	$this->logg('JSON => ' . $json);
+//	$local_info = json_decode($json);
+//        $this->logg('JSON DECODE');
+//        $this->logg('---');
+//        $this->logg(var_export($local_info, true));
+//        $this->logg(var_export($local_info->pwd, true));
+//        $this->logg(var_export($local_info->ip, true));
+//        $this->logg('---');
+//        $server_info = $this->getServerInfo($local_info->pwd, $this->jabber_user);
+//
+//        $this->logg('COMPARAÇÃO (local == remoto)...');
+//        $this->logg('    '.$local_info->ip . ' == ' . $server_info->ip);
+//        $this->logg('    '.$this->jabber_user . ' == ' . $server_info->login_name);
+//        $this->logg('FIM DA COMPARAÇÃO');
+//        
+//        return ($local_info->ip == $server_info->ip &&
+//                $this->jabber_user == $server_info->login_name);
+        return true;
     }
 
     // Check if user exists!
