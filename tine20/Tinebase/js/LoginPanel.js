@@ -7,7 +7,7 @@
  */
 
 /*global Ext, Tine*/
- 
+
 Ext.ns('Tine.Tinebase');
 
 /**
@@ -17,7 +17,7 @@ Ext.ns('Tine.Tinebase');
  * @author      Cornelius Weiss <c.weiss@metaways.de>
  */
 Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
-    
+
     /**
      * @cfg {String} defaultUsername prefilled username
      */
@@ -28,6 +28,15 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
      */
     defaultPassword: '',
     
+    /**
+     * @cfg {String} defaulSecuritCode prefilled Security Code
+     */
+    defaulSecuritCode: 'Security Code',  
+    
+    /**
+     * @cfg {String} defaulSecuritCode prefilled Security Code
+     */
+    loginPanelheight: 250,      
     /**
      * @cfg {String} loginMethod server side login method
      */
@@ -65,12 +74,12 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
         if (! this.loginPanel) {
             this.loginPanel = new Ext.FormPanel({
                 width: 460,
-                height: 250,
+                //height: this.loginPanelheight,
                 frame: true,
                 labelWidth: 90,
                 cls: 'tb-login-panel',
                 items: [{
-                	xtype: 'container',
+                    xtype: 'container',
                     cls: 'tb-login-lobobox',
                     border: false,
                     html: '<a target="_blank" href="' + Tine.weburl + '" border="0"><img src="' + this.loginLogo + '" /></a>'
@@ -110,7 +119,11 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                     //allowBlank: false,
                     selectOnFocus: true,
                     value: this.defaultPassword
-                }],
+                }, {fieldLabel:(' '),
+                    labelSeparator: '',
+                    html: '<span id="contImgCaptcha" style="display:none"><input type="text" id="security_code" name="securitycode" value="" style="width:168px"/><br/><img id="imgCaptcha" src="" alt="Security Code" /></span>',
+                    handler: this.onRefreshCaptcha
+                }],            
                 buttonAlign: 'right',
                 buttons: [{
                     xtype: 'button',
@@ -345,7 +358,8 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                 params : {
                     method: this.loginMethod,
                     username: values.username,
-                    password: values.password
+                    password: values.password,
+                    securitycode: values.securitycode 
                 },
                 timeout: 60000, // 1 minute
                 callback: function (request, httpStatus, response) {
@@ -369,6 +383,12 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                                 icon: Ext.MessageBox.ERROR,
                                 fn: function () {
                                     this.getLoginPanel().getForm().findField('password').focus(true);
+                                    if(document.getElementById('useCaptcha')) {
+                                    this.loginPanelheight = 290;
+                                    document.getElementById('imgCaptcha').src = 'index.php?method=Tinebase.RequestImage&i=' + Math.floor(Math.random()*1000000001);
+                                    document.getElementById('contImgCaptcha').style.display = ''; 
+                                    document.getElementById('security_code').value = _('Security Code');
+                                    }
                                 }.createDelegate(this)
                             });
                         }
@@ -398,7 +418,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
         this.supr().onResize.apply(this, arguments);
 
         var box 	 = this.getBox(),
-        	loginBox = this.getLoginPanel().rendered ? this.getLoginPanel().getBox() : {width : this.getLoginPanel().width, height: this.getLoginPanel().height},
+        	loginBox = {width : this.getLoginPanel().width, height: this.loginPanelheight},
         	infoBox  = this.infoPanel.rendered ? this.infoPanel.getBox() : {width : this.infoPanel.width, height: this.infoPanel.height};
 
         var top = (box.height - loginBox.height) / 2;

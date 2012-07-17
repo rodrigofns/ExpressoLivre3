@@ -117,7 +117,8 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
     initActions: function () {
         this.action_editInNewWindow = new Ext.Action({
             requiredGrant: 'readGrant',
-            text: this.i18nEditActionText ? this.app.i18n._hidden(this.i18nEditActionText) : String.format(Tine.Tinebase.translation._hidden('Edit {0}'), this.i18nRecordName),
+            //text: this.i18nEditActionText ? this.app.i18n._hidden(this.i18nEditActionText) : String.format(Tine.Tinebase.translation._hidden('Edit {0}'), this.i18nRecordName),
+            text: this.i18nEditActionText ? this.app.i18n._hidden(this.i18nEditActionText) : this.app.i18n._('Edit Event'),
             disabled: true,
             handler: this.onEditInNewWindow.createDelegate(this, ["edit"]),
             iconCls: 'action_edit'

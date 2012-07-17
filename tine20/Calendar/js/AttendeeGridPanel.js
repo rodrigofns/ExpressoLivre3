@@ -327,7 +327,10 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
             if (! attender.get('user_id')) {
                 return;
             }
-                        
+			if (attender.get('user_id').account_id && Tine.Tinebase.registry.get('currentAccount').accountId==attender.get('user_id').account_id) {
+				attender.set('status_authkey', 1);
+			}
+
             this.ctxMenu = new Ext.menu.Menu({
                 items: [{
                     text: this.app.i18n._('Remove Attender'),
@@ -338,6 +341,14 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                         this.store.removeAt(row);
                     }
                     
+                },{
+                    text: this.app.i18n._('Delegate Attendance'),
+                    iconCls: 'action_delegate',
+                    scope: this,
+                    disabled: !attender.get('status_authkey'),
+                    handler: function() {
+			this.delegateAttendance();
+                    }
                 }]
             });
             this.ctxMenu.showAt(e.getXY());
@@ -416,6 +427,45 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                 }
                 break;
         }
+    },
+    
+    delegateAttendance: function(record) {
+        // delegate attendance to a new user:
+        Tine.Calendar.AttendeeEditDialog.openWindow({
+            listeners: {
+                scope: this,
+                update: function (eventJson) {
+                    var o = Tine.Calendar.backend.recordReader({responseText: eventJson}).get('attendee')[0];
+                    //o.dirty = true;
+                    //o.modified = {};
+		            this.store.each(function(attender) {
+						if (attender.get('status_authkey')) {
+			                var row = this.getView().getRow(this.store.indexOf(attender));
+					        var idx = this.store.indexOf(attender);
+						    // detect duplicate entry
+						    // TODO detect duplicate emails, too 
+						    var isDuplicate = false;
+						    this.store.each(function(att) {
+						        if (o.user_id.id == att.getUserId()
+						                && o.user_type == att.get('user_type')
+						                && o != att) {
+						            row = this.getView().getRow(this.store.indexOf(att));
+						            isDuplicate = true;
+						            return false;
+						        }
+						    }, this);
+							if (! isDuplicate) {
+							    this.store.remove(attender);
+								var record = new Tine.Calendar.Model.Attender(o, attender.id);
+							    this.store.insert(idx, record);
+					            row = this.getView().getRow(this.store.indexOf(record));
+							}
+				            Ext.fly(row).highlight();
+						}
+		            }, this);
+                }
+            }
+        });
     },
     
     renderAttenderName: function(name, metaData, record) {

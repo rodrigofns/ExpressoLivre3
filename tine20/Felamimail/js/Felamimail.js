@@ -63,6 +63,11 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
     updateInterval: null,
     
     /**
+     * @property cleanTrash already run.
+     * @type Number
+     */
+    cleanTrash: null,    
+    /**
      * transaction id of current update message cache request
      * @type Number
      */
@@ -83,6 +88,29 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
      */
     getTitle: function() {
         return this.i18n._('Email');
+    },
+
+    /**
+     * Verify trash folder for clean ...
+     */
+    verifyTrashToClean: function(account_id) {
+        if(!account_id) return;
+        if(!Tine.Felamimail.registry.get('preferences').get('deleteFromTrash')) return;
+        Ext.MessageBox.wait(_('Please wait'), _('Verifying trash folder'));
+        var params = {
+          method: 'Felamimail.deleteMsgsBeforeDate'
+        };
+        params.accountId = account_id;
+        Ext.Ajax.request({
+            params: params,
+            scope: this,
+            timeout: 150000, // 2 minutes
+            success: function(result, request){
+                //alert(result.msgs + ' Removed from trash folder');
+                Ext.MessageBox.hide();
+            }
+        });
+        return;
     },
     
     /**
@@ -133,12 +161,12 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
      */
     checkMails: function(folder, callback) {
         this.checkMailsDelayedTask.cancel();
-        
+
         if (! this.getFolderStore().getCount() && this.defaultAccount) {
             this.fetchSubfolders('/' + this.defaultAccount);
             return;
         }
-        
+
         Tine.log.info('checking mails' + (folder ? ' for folder ' + folder.get('localname') : '') + ' now: ' + new Date());
         
         // if no folder is given, see if there is a folder to check in the folderstore
@@ -216,7 +244,14 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             accountStore = this.getAccountStore(),
             doQuery = true,
             allFoldersFetched = false;
-        
+            
+            var index = accountStore.findExact('all_folders_fetched', false),
+            account = accountStore.getAt(index);
+            
+            if(!this.cleanTrash){    
+                this.verifyTrashToClean(account.id);
+                this.cleanTrash = 1;
+            }
         if (! parentPath) {
             // find first account that has unfetched folders
             var index = accountStore.findExact('all_folders_fetched', false),

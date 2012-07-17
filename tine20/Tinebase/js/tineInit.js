@@ -52,7 +52,8 @@ Tine.clientVersion.releaseTime      = 'none';
  * 
  * @type String
  */
-Tine.title = 'Tine 2.0';
+//Tine.title = 'Tine 2.0';
+Tine.title = 'Expresso 3.0';
 Tine.weburl = 'http://www.tine20.org/';
 
 /**

@@ -12,7 +12,11 @@ tine20/Tinebase/js/Locale/build/*.js
 scripts/packaging/tine20build/
 tine20/build
 scripts/weeklyevents
+<<<<<<< HEAD
 database-references.txt
 *.sql
 /tine20/.idea/
 DEPLOY
+=======
+/tine20/.idea/
+>>>>>>> 9bd23b5861b95c0e5c94afeba871a14d67c95bc1
