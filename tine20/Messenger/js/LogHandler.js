@@ -186,6 +186,33 @@ Tine.Messenger.LogHandler = {
         
         return true;
     },
+    
+    _onError: function(_iq){
+        var err_msg = $(_iq).find('error').children().get(0).tagName,
+            message = '';
+
+        switch(err_msg){
+            case 'item-not-found':
+                message = _('Cancel 404: The item was not found.');
+                break;
+            case 'feature-not-implemented':
+                message = _('Cancel 501: The feature was not implemented.');
+                break;
+            case 'internal-server-error':
+                message = _('Wait 500: Internal server error.');
+                break;
+            case 'service-unavailable':
+                message = _('Cancel 503: Service unavailable.');
+                break;
+            default:
+                message = err_msg;
+        }
+        Tine.Messenger.LogHandler.status(_('SERVER ERROR'), message);
+        Tine.Messenger.Log.error(_('Error number ') + $(_iq).children("error").attr("code"));
+        
+        return true;
+    },
+    
     onChatStatusChange: function(raw_jid, status){
         var jid = Strophe.getBareJidFromJid(raw_jid);
         var chat_id = Tine.Messenger.ChatHandler.formatChatId(jid);
