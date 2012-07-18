@@ -13,7 +13,7 @@ Tine.Messenger.ClientDialog = function(_config){
 //        extDialog.setTitle(Tine.Messenger.Credential.myJid());
         extDialog.show(opener);
 //        Ext.getCmp('status-box').on("select", changeState);
-        Ext.getCmp('status-box').on("specialkey", changeStateText);
+        Ext.getCmp('messenger-status-box').on("specialkey", changeStateText);
         Ext.getCmp('messenger-change-status-button').on("click", statusMenu);
         extDialog.doLayout();
     }
