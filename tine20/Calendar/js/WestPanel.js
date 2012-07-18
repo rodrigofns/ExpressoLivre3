@@ -44,7 +44,8 @@ Tine.Calendar.WestPanel = Ext.extend(Tine.widgets.mainscreen.WestPanel, {
     
     getDatePicker: function() {
         if (! this.datePicker) {
-            this.datePicker = new Ext.DatePicker({
+            //this.datePicker = new Ext.DatePicker({
+            this.datePicker = new Tine.Calendar.DatePickerHolliday({
                 width: 200,
                 id :'cal-mainscreen-minical',
                 plugins: [new Ext.ux.DatePickerWeekPlugin({

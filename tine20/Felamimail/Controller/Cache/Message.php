@@ -429,6 +429,50 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Cache status cache total count: {$_folder->cache_totalcount} imap total count: {$_folder->imap_totalcount} cache sequence: $this->_cacheMessageSequence imap sequence: $this->_imapMessageSequence");
     }
+
+    /**
+     * get messages befora a date 
+     * 
+     * @param  mixed  $_folderId
+     * @param  string $_date
+     * @return array
+     */
+    public function SelectBeforeDate($_folderId,$_date) 
+    {
+        $folderId = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId->getId() : $_folderId;
+        $imapbbackend = Felamimail_Controller_Message::getInstance()->_getBackendAndSelectFolder($folderId);
+        $filter = new Felamimail_Model_MessageFilter(array(
+            array(
+                'field'    => 'folder_id', 
+                'operator' => 'equals', 
+                'value'    => $folderId
+            ),
+           array(
+                'field'    => 'received', 
+                'operator' => 'before', 
+                'value'    => $_date
+            )            
+        ));
+        
+        $result = $this->_backend->searchMessageUids($filter);
+        
+        if (count($result) === 0) {
+            return null;
+        }
+        
+        $temp_result = array();
+        
+        foreach ($result as $key => $value) {
+            $imapbbackend->addFlags($value, array('\\Deleted'));
+            $temp_result[] = $key;
+        }
+        
+        $result = $this->_deleteMessagesByIdAndUpdateCounters($temp_result, $_folderId);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' Got Messages before date: ' . print_r($temp_result, TRUE));
+        
+        return $result;
+    }
     
     /**
      * get message with highest messageUid from cache 

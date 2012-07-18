@@ -136,6 +136,10 @@
           "path": "js/"
         },
         {
+          "text": "DatePickerHolliday.js",
+          "path": "js/"
+        },
+        {
           "text": "AddToEventPanel.js",
           "path": "js/"
         }
