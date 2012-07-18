@@ -17,10 +17,10 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
     actionToolbar: null,
     
     /**
-     * @property iMIPrecord
-     * @type Tine.Webconference.Model.iMIP
+     * @property WCInviteRecord
+     * @type Tine.Webconference.Model.WCInvite
      */
-    iMIPrecord: null,
+    WCInviteRecord: null,
     
     /**
      * @property statusActions
@@ -35,11 +35,11 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         
         this.app = Tine.Tinebase.appMgr.get('Webconference');
 
-        this.iMIPrecord = new Tine.Webconference.Model.iMIP(this.preparedPart.preparedData);
+        this.WCInviteRecord = new Tine.Webconference.Model.WCInvite(this.preparedPart.preparedData);
         
-        this.initIMIPToolbar();
+        this.initWCInviteToolbar();
 
-        this.on('afterrender', this.showIMIP, this);
+        this.on('afterrender', this.showWCInvite, this);
 
         Tine.Webconference.EmailDetailsPanel.superclass.initComponent.call(this);
     },
@@ -49,24 +49,24 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
     
     
     /**
-     * process IMIP
+     * process WCInvite
      * 
      * @param {String} status
      */
     processEmail: function(status, range) {
         
-        var url = this.iMIPrecord.get('url');
-        var moderator = this.iMIPrecord.get('moderator');
-        var roomName = this.iMIPrecord.get('roomName');
+        var url = this.WCInviteRecord.get('url');
+        var moderator = this.WCInviteRecord.get('moderator');
+        var roomName = this.WCInviteRecord.get('roomName');
         Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url, moderator, roomName);
         
         
     },
     
     /**
-     * iMIP action toolbar
+     * WCInvite action toolbar
      */
-    initIMIPToolbar: function() {
+    initWCInviteToolbar: function() {
         var singleRecordPanel = this.getSingleRecordPanel();
         
         this.actions = [];
@@ -82,7 +82,7 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         
         // add more actions here (no spam / apply / crush / send event / ...)
         
-        this.iMIPclause = new Ext.Toolbar.TextItem({
+        this.WCInviteClause = new Ext.Toolbar.TextItem({
             text: ''
         });
         this.tbar = this.actionToolbar = new Ext.Toolbar({
@@ -93,22 +93,22 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
                 height: 16,
                 style: 'margin: 3px 5px 2px 5px;'
             },
-            this.iMIPclause,
+            this.WCInviteClause,
             '->'
             ].concat(this.actions)
         });
     },
     
     /**
-     * show/layout iMIP panel
+     * show/layout WCInvite panel
      */
-    showIMIP: function() {
+    showWCInvite: function() {
         
         
         var singleRecordPanel = this.getSingleRecordPanel(),
         
-        method = this.iMIPrecord.get('method'),
-        url = this.iMIPrecord.get('url');
+        method = this.WCInviteRecord.get('method'),
+        url = this.WCInviteRecord.get('url');
                    
         // reset actions
         Ext.each(this.actions, function(action) {
@@ -116,7 +116,7 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         });
         
         
-        this.iMIPclause.setText(this.app.i18n._('You received an webconference invitation.'));
+        this.WCInviteClause.setText(this.app.i18n._('You received an webconference invitation.'));
         Ext.each(this.statusActions, function(action) {
             action.setHidden(false)
         });
@@ -125,8 +125,8 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         this.getLoadMask().hide();
         singleRecordPanel.setVisible(true);
         singleRecordPanel.setHeight(150);
-        this.record = this.iMIPrecord;
-        singleRecordPanel.loadRecord(this.iMIPrecord);
+        this.record = this.WCInviteRecord;
+        singleRecordPanel.loadRecord(this.WCInviteRecord);
     },
     /**
      * main event details panel

@@ -26,7 +26,7 @@ Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.T
     containerProperty: null
 });
 
-Tine.Webconference.Model.iMIP = Tine.Tinebase.data.Record.create([
+Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},
     {name: 'roomName'},
@@ -36,6 +36,6 @@ Tine.Webconference.Model.iMIP = Tine.Tinebase.data.Record.create([
     
 ], {
     appName: 'Webconference',
-    modelName: 'iMIP',
+    modelName: 'WCInvite',
     idProperty: 'id'
 });

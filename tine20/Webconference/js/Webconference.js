@@ -150,11 +150,14 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         });
         loadMask.show();
         
+        var app = Tine.Tinebase.appMgr.get('Webconference');
         Tine.Webconference.isMeetingActive(roomName, url,  function(response) {
             if(response.active){
                 
                 if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
-                    Ext.MessageBox.confirm('', _('Cancel active webconference') + ' ?', function(btn) {
+                    Ext.MessageBox.confirm('', 
+                    app.i18n._("You are already in a webconference. Accepting this invitation will make you leave the existing one.")+" "+
+                    app.i18n._('Proceed') + ' ?', function(btn) {
                         if(btn == 'yes') { 
                             Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.EMAIL;
                             Tine.Tinebase.appMgr.get('Webconference').bbbUrl = url;
