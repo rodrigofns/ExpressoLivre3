@@ -254,6 +254,8 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         $body        = $this->getMessageBody($_message, $_partId, $mimeType, $_account, true);
         $signature   = $this->getDigitalSignature($_message, $_partId);
         
+        $structure = $_message->getPartStructure($_partId, FALSE);
+        
         if ($_partId === null) {
             $message = $_message;
             
@@ -263,7 +265,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
             $message->signature_info   = $signature;
         } else {
             // create new object for rfc822 message
-            $structure = $_message->getPartStructure($_partId, FALSE);
+            //$structure = $_message->getPartStructure($_partId, FALSE);
         
             $message = new Felamimail_Model_Message(array(
                 'messageuid'  => $_message->messageuid,
@@ -278,7 +280,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
             ));
         
             $message->parseHeaders($headers);
-            $message->parseSmime($message->structure);
+            $message->parseSmime($structure);
         
             $structure = array_key_exists('messageStructure', $structure) ? $structure['messageStructure'] : $structure;
             $message->parseStructure($structure);
