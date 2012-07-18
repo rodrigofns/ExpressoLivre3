@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-06-25 11:38-0300\n"
+"PO-Revision-Date: 2012-07-13 12:01-0300\n"
 "Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr "Bem-vindo a Webconferência criada por %s"
 
 #: Controler/BigBlueButton.php:247
 msgid "Webconference Invite"
-msgstr "Convite para Webconfência"
+msgstr "Convite para Webconferência"
 
 #: Controler/BigBlueButton.php:250
 msgid "The user %s is inviting you to a Webconference"
