@@ -43,9 +43,9 @@
                 <include name="Calendar" />
                 <include name="Courses" />
                 <include name="Crm" />
-                <include name="ExampleApplication" />
                 <include name="Felamimail" />  
                 <include name="Filemanager" /> 
+                <include name="Messenger" /> 
                 <include name="Phone" /> 
                 <include name="RequestTracker" /> 
                 <include name="Sales" /> 
@@ -55,7 +55,8 @@
                 <include name="Tasks" />
                 <include name="Timetracker" />  
                 <include name="Tinebase" /> 
-                <include name="Voipmanager" /> 
+                <include name="Voipmanager" />
+                <include name="Webconference" />  
                 <exclude name="build/*" />
                 <exclude name="images/*" />
                 <exclude name="styles/*" />
