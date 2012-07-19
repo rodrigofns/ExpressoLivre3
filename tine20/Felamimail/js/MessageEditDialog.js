@@ -710,7 +710,6 @@ Ext.namespace('Tine.Felamimail');
      * @private
      */
     onRecordUpdate: function() {
-
         this.record.data.attachments = [];
         var attachmentData = null;
         
@@ -730,25 +729,6 @@ Ext.namespace('Tine.Felamimail');
         
         // need to sync once again to make sure we have the correct recipients
         this.recipientGrid.syncRecipientsToRecord();
-        
-        /*
-        if (this.record.data.note) {
-            // show message box with note editing textfield
-            //console.log(this.record.data.note);
-            Ext.Msg.prompt(
-                this.app.i18n._('Add Note'),
-                this.app.i18n._('Edit Email Note Text:'), 
-                function(btn, text) {
-                    if (btn == 'ok'){
-                        record.data.note = text;
-                    }
-                }, 
-                this,
-                100, // height of input area
-                this.record.data.body 
-            );
-        }
-        */
     },
     
     /**
@@ -985,6 +965,54 @@ Ext.namespace('Tine.Felamimail');
     },
     
     /**
+     * generic apply changes handler
+     * - NOTE: overwritten to check here if the subject is empty and if the user wants to send an empty message
+     * 
+     * @param {Ext.Button} button
+     * @param {Event} event
+     * @param {Boolean} closeWindow
+     * 
+     * TODO add note editing textfield here
+     */
+    onApplyChanges: function(button, event, closeWindow) {
+        if (this.getForm().findField('subject').getValue() == '') {
+            Tine.log.debug('Tine.Felamimail.MessageEditDialog::onApplyChanges - empty subject');
+            Ext.MessageBox.confirm(
+                this.app.i18n._('Empty subject'),
+                this.app.i18n._('Do you really want to send a message with an empty subject?'),
+                function (button) {
+                    Tine.log.debug('Tine.Felamimail.MessageEditDialog::onApplyChanges - button: ' + button);
+                    if (button == 'yes') {
+                        Tine.Felamimail.MessageEditDialog.superclass.onApplyChanges.apply(this, arguments)
+                    }
+                },
+                this
+            );
+        } else {
+            Tine.Felamimail.MessageEditDialog.superclass.onApplyChanges.apply(this, arguments)
+        }
+        
+        /*
+        if (this.record.data.note) {
+            // show message box with note editing textfield
+            //console.log(this.record.data.note);
+            Ext.Msg.prompt(
+                this.app.i18n._('Add Note'),
+                this.app.i18n._('Edit Email Note Text:'), 
+                function(btn, text) {
+                    if (btn == 'ok'){
+                        record.data.note = text;
+                    }
+                }, 
+                this,
+                100, // height of input area
+                this.record.data.body 
+            );
+        }
+        */
+    },
+    
+    /**
      * checks recipients
      * 
      * @return {Boolean}
@@ -1007,7 +1035,7 @@ Ext.namespace('Tine.Felamimail');
      */
     getValidationErrorMessage: function() {
         return this.validationErrorMessage;
-    }    
+    }
 });
 
 /**
