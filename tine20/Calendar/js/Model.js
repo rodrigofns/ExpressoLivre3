@@ -29,6 +29,7 @@ Tine.Calendar.Model.Event = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model
     { name: 'summary' },
     { name: 'url' },
     { name: 'uid' },
+    { name: 'attachments' },
     // ical common fields with multiple appearance
     //{ name: 'attach' },
     { name: 'attendee' },

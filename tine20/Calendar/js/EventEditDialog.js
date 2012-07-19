@@ -44,7 +44,83 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
         this.setTabHeight.defer(100, this);
     },
     
-    
+     /**
+     * @private
+     */
+    onSaveAndClose: function(button, event){
+        this.onApplyChanges(button, event, true);
+        this.fireEvent('saveAndClose');
+    },
+     /**
+     * generic apply changes handler
+     */
+    onApplyChanges: function(button, event, closeWindow) {
+        // we need to sync record before validating to let (sub) panels have 
+        // current data of other panels
+        this.onRecordUpdate();
+        if(this.isValid()) {
+            this.loadMask.show();
+            if (this.mode !== 'local') {
+                this.fireEvent('save');
+                this.recordProxy.saveRecord(this.record, {
+                    scope: this,
+                    success: function(record) {
+                        // override record with returned data
+                        this.record = record;
+                        
+                        if (! (closeWindow && typeof this.window.cascade == 'function')) {
+                            // update form with this new data
+                            // NOTE: We update the form also when window should be closed,
+                            //       cause sometimes security restrictions might prevent
+                            //       closing of native windows
+                            this.onRecordLoad();
+                        }
+                        this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
+                        
+                        // free 0 namespace if record got created
+                        this.window.rename(this.windowNamePrefix + this.record.id);
+                        
+                        if (closeWindow) {
+                            this.purgeListeners();
+                            this.window.close();
+                        }
+                    },
+                    failure: this.onRequestFailed,
+                    timeout: 300000 // 5 minutes
+                }, {
+                    duplicateCheck: this.doDuplicateCheck
+                });
+            } else {
+                this.onRecordLoad();
+                this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
+                
+                // free 0 namespace if record got created
+                this.window.rename(this.windowNamePrefix + this.record.id);
+                        
+                if (closeWindow) {
+                    this.purgeListeners();
+                    this.window.close();
+                }
+            }
+        } else {
+            Ext.MessageBox.alert(_('Errors'), this.getValidationErrorMessage());
+        }
+    },   
+/**
+     * init attachment grid + add button to toolbar
+     */
+    initAttachmentGrid: function() {
+        if (! this.attachmentGrid) {
+        
+            this.attachmentGrid = new Tine.widgets.grid.FileUploadGrid({
+                fieldLabel: this.app.i18n._('Attachments'),
+                hideLabel: true,
+                filesProperty: 'attachments',
+                anchor: '100% 95%'
+            });
+        }
+    },
+
     /**
      * returns dialog
      * 
@@ -52,6 +128,7 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
      * @return {Object} components this.itmes definition
      */
     getFormItems: function() { 
+        this.initAttachmentGrid();
         return {
             xtype: 'tabpanel',
             border: false,
@@ -228,11 +305,20 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                             bodyStyle: 'border:1px solid #B5B8C8;'
                         })
                     ]
+                },{
+                    // activities and tags
+                    region: 'south',
+                    layout: 'form',
+                    height: 150,
+                    split: true,
+                    header: false,
+                    //collapsed: (this.record.bodyIsFetched() && (! this.record.get('attachments') || this.record.get('attachments').length == 0)),
+                    items: [this.attachmentGrid]
                 }]
             }, new Tine.widgets.activities.ActivitiesTabPanel({
-                app: this.appName,
-                record_id: (this.record) ? this.record.id : '',
-                record_model: this.appName + '_Model_' + this.recordClass.getMeta('modelName')
+                    app: this.appName,
+                    record_id: (this.record) ? this.record.id : '',
+                    record_model: this.appName + '_Model_' + this.recordClass.getMeta('modelName')
             })]
         };
     },
@@ -263,6 +349,11 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
             isValid = false;
             
             this.rrulePanel.ownerCt.setActiveTab(this.rrulePanel);
+        }
+
+        if (this.attachmentGrid.isUploading()) {
+            result = false;
+            this.validationErrorMessage = this.app.i18n._('Files are still uploading.');
         }
         
         return isValid && Tine.Calendar.EventEditDialog.superclass.isValid.apply(this, arguments);
@@ -324,6 +415,10 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
     },
     
     onRecordUpdate: function() {
+        this.record.data.attachments = [];
+        this.attachmentGrid.store.each(function(attachment) {
+            this.record.data.attachments.push(Ext.ux.file.Upload.file.getFileData(attachment));
+        }, this)
         Tine.Calendar.EventEditDialog.superclass.onRecordUpdate.apply(this, arguments);
         this.attendeeGridPanel.onRecordUpdate(this.record);
         this.rrulePanel.onRecordUpdate(this.record);
@@ -381,7 +476,7 @@ Tine.Calendar.EventEditDialog.openWindow = function (config) {
     var id = config.recordId ? config.recordId : 0;
     var window = Tine.WindowFactory.getWindow({
         width: 800,
-        height: 500,
+        height: 600,
         name: Tine.Calendar.EventEditDialog.prototype.windowNamePrefix + id,
         contentPanelConstructor: 'Tine.Calendar.EventEditDialog',
         contentPanelConstructorConfig: config

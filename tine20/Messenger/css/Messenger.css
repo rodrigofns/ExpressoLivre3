@@ -1,0 +1,375 @@
+.MessengerIconCls {
+    background-image: url(../../images/messenger/talk-balloons.png) !important;
+}
+
+#messenger {
+    color: #000000;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+#messenger:hover {
+    text-decoration: underline;
+}
+
+.messenger-icon {
+    background-image: url(/images/messenger/talk-balloons.png);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+.messenger-icon-off {
+    background-image: url(/images/messenger/talk-balloons-off.png);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+.chat-message {
+/*    font-size: 1.2em;
+    padding: 4px;
+    border-bottom: 1px solid #bebebe;*/
+}
+
+.chat-message .x-panel-body {
+    border: 0;
+}
+
+.text-sender {
+    font-size: 100%;
+/*    font-weight: bold;*/
+    width: 100%;
+    height: 20px;
+}
+
+.messenger-receive {
+    color: blue;
+}
+
+.messenger-receive strong {
+    color: #0000a8;
+    font-weight: bold;
+}
+
+.messenger-send {
+    color: red;
+}
+
+.messenger-send strong {
+    color: #a80000;
+    font-weight: bold;
+}
+
+.messenger-notify {
+    color: green;
+    font-weight: bold;
+}
+.messenger-treeview .x-panel-body {
+    min-width: 180px;
+}
+
+.messenger-contact,
+.messenger-group,
+.messenger-groupchat{
+    font-size: 12px;
+    margin-bottom: 5px;
+    background-repeat: no-repeat;
+    background-position-x: 15px;
+    font-weight: bold;
+}
+
+.messenger-contact.unavailable {
+    background-image: url(/images/messenger/icon_unavailable.png);
+    font-weight: 400;
+}
+
+.messenger-contact.unavailable span[unselectable] {
+    color: #B3B3B3;
+}
+
+.messenger-contact.available {
+    background-image: url(/images/messenger/icon_available.png);
+}
+
+.messenger-contact.away {
+    background-image: url(/images/messenger/icon_away.png);
+}
+
+.messenger-contact.xa {
+    background-image: url(/images/messenger/icon_xa.png);
+}
+
+.messenger-contact.available span[unselectable],
+.messenger-contact.away span[unselectable] {
+    color: black;
+}
+
+.messenger-contact.donotdisturb {
+    background-image: url(/images/messenger/icon_dnd.png);
+}
+
+.messenger-contact.donotdisturb span[unselectable] {
+    color: red;
+}
+
+.messenger-contact.subscribe {
+    background-image: url(/images/messenger/icon_subscribe.png);
+}
+.messenger-contact.subscribe span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+
+}
+.messenger-contact.none {
+    background-image: url(/images/messenger/icon_none.png);
+}
+.messenger-contact.none span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+
+}
+.messenger-contact.from {
+    background-image: url(/images/messenger/change_status.png);
+}
+.messenger-contact.from span[unselectable] {
+    color: #B3B3B3;
+    font-weight: 400;
+}
+.messenger-contact.unsubscribed {
+    background-image: url(/images/messenger/icon_cancel.png);
+}
+
+.messenger-contact.unsubscribed span[unselectable] {
+    color: #B3B3B3;
+}
+
+.messenger-contact.waiting {
+    background-image: url(/images/messenger/icon_question.png);
+}
+
+.messenger-contact.waiting span[unselectable] {
+    color: #B3B3B3;
+}
+
+.messenger-group {
+    background-image: url(/images/messenger/group.png);
+}
+
+.messenger-client-tbar {
+    background: transparent;
+    border-color: #bebebe;
+}
+
+.messenger-group img.x-tree-node-icon {
+    background-image: none;
+}
+
+.x-tree-lines .x-tree-elbow {
+    background-image: none !important;
+    width: 0 !important;
+}
+
+.x-tree-lines .x-tree-elbow-end {
+    background-image: none !important;
+    width: 0 !important;
+}
+
+.x-tree-node-leaf .x-tree-node-icon {
+    background-image: none !important;
+}
+
+#messenger-loghandler-status .msg {
+    width: 95%;
+    min-height: 25px;
+    background-color: #444;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    opacity: 0.9;
+    float: left;
+    font: 1.1em;
+    color: #fff;
+    margin-top: 5px;
+    padding: 6px 10px;
+    overflow: hidden;
+    white-space: pre-line;
+}
+#messenger-loghandler-status .msg .title {
+    font-size: 120%;
+    font-weight: bold;
+    display: block;
+}
+#messenger-loghandler-status .msg .body {
+    display: block;
+}
+#messenger-loghandler-status {
+    width: 250px;
+    min-height: 10px;
+    position: fixed;
+    right: 20px;
+    bottom: auto;
+    top: 30px;
+    z-index: 9999;
+/*    display: none;*/
+/*    border:solid red 1px;*/
+}
+
+/* PRESENCE */
+/*.messenger-presence-offline {
+    background-image: url(/images/icon-offline.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+.messenger-presence-away {
+    background-image: url(/images/icon-offline.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+.messenger-presence-online {
+    background-image: url(/images/icon-presence.gif);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}*/
+
+#credential {
+    font-size: 100%;
+    width: 145px;
+    height: 35px;
+    display: block;
+    float: left;
+    overflow: hidden;
+}
+
+#credential img {
+    width: 40px;
+    height: 99%;
+    float: left;
+}
+
+#credential .name {
+    max-width: 100px;
+    font-size: 100%;
+    font-weight: bold;
+    float: left;
+    white-space: pre-line;
+    margin: 3px 0 5px 5px;
+}
+.messenger-connect-display img{
+    position: absolute;
+    top: 115px;
+    left: 70px;
+}
+.messenger-connect-cmd {
+    position: absolute;
+    top: 140px;
+    left: 68px;
+}
+
+.chat-message-balloon .chat-user {
+    width: 50px;
+    padding: 8px 3px 3px 3px;
+    text-align: center;
+    font-size: 100%;
+    font-weight: bold;
+    float: left;
+    word-break: break-all;
+    overflow: hidden;
+}
+
+.chat-message-balloon .chat-user-msg {
+    font-size: 110%;
+    float: left;
+    padding: 7px 15px;
+/*    border: solid 1px #EFEFEF;*/
+    word-break: break-all;
+/*    white-space: nowrap;*/
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.chat-user-timestamp {
+    font-size: 90%;
+    color: #777;
+}
+.chat-user-balloon {
+    padding-left: 14px;
+    float: left;
+    max-width: 70%;
+    background-repeat: no-repeat;
+    background-position-y: 6px;
+    margin-top: 6px;
+    background-image: url("/images/messenger/balloon-pointer.png");
+}
+
+.color-1 .chat-user-msg { background-color: #8fb1e8 }
+.color-1 .chat-user, .color-1 .x-tree-node-anchor span { color: #8fb1e8!important}
+.color-1 .chat-user-balloon { background-position-x: 0 }
+
+.color-2 .chat-user-msg { background-color: #98d96c }
+.color-2 .chat-user, .color-2 .x-tree-node-anchor span  { color: #98d96c!important}
+.color-2 .chat-user-balloon { background-position-x: -15px }
+
+.color-3 .chat-user-msg { background-color: #fff }
+.color-3 .chat-user, .color-3 .x-tree-node-anchor span  { color: #fff!important}
+.color-3 .chat-user-balloon { background-position-x: -30px }
+
+.color-4 .chat-user-msg { background-color: #ffb380 }
+.color-4 .chat-user, .color-4 .x-tree-node-anchor span  { color: #ffb380!important}
+.color-4 .chat-user-balloon { background-position-x: -45px }
+
+.color-5 .chat-user-msg { background-color: #ffe680 }
+.color-5 .chat-user, .color-5 .x-tree-node-anchor span  { color: #ffe680!important}
+.color-5 .chat-user-balloon { background-position-x: -60px }
+
+.color-6 .chat-user-msg { background-color: #ff8080 }
+.color-6 .chat-user, .color-6 .x-tree-node-anchor span  { color: #ff8080!important}
+.color-6 .chat-user-balloon { background-position-x: -75px }
+
+.color-7 .chat-user-msg { background-color: #ac9393 }
+.color-7 .chat-user, .color-7 .x-tree-node-anchor span  { color: #ac9393!important}
+.color-7 .chat-user-balloon { background-position-x: -90px }
+
+.messenger-chat-window {
+    padding: 3px
+}
+
+.messenger-chat-body .x-panel-body {
+    border:none;
+    overflow-x: hidden!important;
+}
+
+.messenger-chat-notifications .chat-notification {
+    background-color: #99bbe8;
+    padding: 5px 15px 3px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.messenger-chat-notifications {
+    position: absolute;
+    top: auto;
+    bottom: 28px;
+    height: 25px;
+    left: 35%;
+}
+
+.messenger-groupchat {
+    background-image: url('/images/messenger/icon_chat.png')
+}
+
+.messenger-groupchat-roster {
+    position: fixed;
+    margin-top: 20px;
+}
+
+.messenger-groupchat-roster-tree {
+    width: 100%;
+}
+
+.chat-message-notify {
+    padding: 2px 4px;
+}
+.chat-message-notify .chat-user-msg {
+    padding: 0 5px;
+    font-size: 100%;
+    font-weight: bold;
+    color: #333;
+ }

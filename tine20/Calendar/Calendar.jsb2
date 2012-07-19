@@ -80,6 +80,14 @@
           "path": "js/"
         },
         {
+          "text": "AttendeeEditDialog.js",
+          "path": "js/"
+        },
+        {
+          "text": "AttendeeSelCombo.js",
+          "path": "js/"
+        },
+        {
           "text": "AttendeeGridPanel.js",
           "path": "js/"
         },
@@ -133,6 +141,10 @@
         },
         {
           "text": "CalDAVContainerPropertiesHookField.js",
+          "path": "js/"
+        },
+        {
+          "text": "DatePickerHolliday.js",
           "path": "js/"
         },
         {

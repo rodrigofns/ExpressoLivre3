@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-03-21 09:11-0300\n"
-"Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-06-27 14:45-0300\n"
+"Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -58,6 +58,10 @@ msgstr "Marcada"
 #: js/sieve/RuleConditionsPanel.js:72
 msgid "Subject"
 msgstr "Assunto"
+
+#: js/???
+msgid "user"
+msgstr "Usuários"
 
 #: Controller/Message/Send.php:236
 #: js/MessageEditDialog.js:834
@@ -247,7 +251,12 @@ msgstr "Nova mensagem"
 msgid "Email"
 msgstr "Email"
 
+#: js/Felamimail.js:99
+msgid "Verifying trash folder"
+msgstr "Verificando a lixeira"
+
 #: js/Felamimail.js:118
+#: js/Felamimail.js:120
 msgid "Active Vacation Message"
 msgstr "Mensagem de férias ativa"
 
@@ -1012,6 +1021,14 @@ msgstr "Mover mensagens deletadas para a lixeira"
 #: Preference.php:134
 msgid "Choose yes, to Move Deleted Messages to Trash."
 msgstr "Escolher sim, para mover as mensagens para a lixeira."
+
+#: Preference.php:144
+msgid "Delete trash messages after how many days"
+msgstr "Remover msgs da lixeira após quantos dias?"
+
+#: Preference.php:145
+msgid "Choose a number of days"
+msgstr "Escolha um número de dias."
 
 #: Setup/Initialize.php:34
 msgid "All inboxes of my email accounts"

@@ -58,6 +58,12 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
      *
      */
     const MOVEDELETED_TOTRASH = 'confirmUseTrash';
+
+     /**
+     * show Use Trash option
+     *
+     */
+    const DELETE_FROMTRASH = 'deleteFromTrash';
     
     /**
      * default filter name
@@ -94,6 +100,7 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
             self::AUTOATTACHNOTE,
             self::CONFIRM_DELETE,
             self::MOVEDELETED_TOTRASH,
+            self::DELETE_FROMTRASH,            
         );
             
         return $allPrefs;
@@ -133,6 +140,10 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
                 'label'         => $translate->_('Move Deleted Messages to Trash'),
                 'description'   => $translate->_('Choose yes, to Move Deleted Messages to Trash.'),
             ),
+            self::DELETE_FROMTRASH  => array(
+                'label'         => $translate->_('Delete trash messages after how many days'),
+                'description'   => $translate->_('Choose a number of days'),
+            ),            
         );
         
         return $prefDescriptions;
@@ -192,6 +203,18 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
                         <special>' . Tinebase_Preference_Abstract::YES_NO_OPTIONS . '</special>
                     </options>';
                 break;
+            case self::DELETE_FROMTRASH:
+                $preference->value      = 0;
+                $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
+                    <options>';
+                for ($i = 1; $i <= 5; $i++) {
+                    $preference->options .= '<option>
+                        <label>'. $i . '</label>
+                        <value>'. $i . '</value>
+                    </option>';
+                }
+                $preference->options    .= '</options>';
+                break;            
             default:
                 throw new Tinebase_Exception_NotFound('Default preference with name ' . $_preferenceName . ' not found.');
         }

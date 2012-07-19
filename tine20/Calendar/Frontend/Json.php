@@ -190,7 +190,8 @@ class Calendar_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      */
     public function saveEvent($recordData, $checkBusyConflicts = FALSE)
     {
-        return $this->_save($recordData, Calendar_Controller_Event::getInstance(), 'Event', 'id', array($checkBusyConflicts));
+        $args = array_merge(array($checkBusyConflicts), array($recordData['attachments']));
+        return $this->_save($recordData, Calendar_Controller_Event::getInstance(), 'Event', 'id', $args);
     }
     
     /**
