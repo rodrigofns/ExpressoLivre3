@@ -53,7 +53,7 @@ Tine.Messenger.ChatHandler = {
            new_chat = true;
         }
         chat.show();
-        
+
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
