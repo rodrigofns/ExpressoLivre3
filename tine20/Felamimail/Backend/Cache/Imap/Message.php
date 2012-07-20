@@ -139,17 +139,70 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     *
     * @return array
     */
-    protected function _getFolderIdsOfAllInboxes()
+    protected function _getAllInboxes()
     {
-            $accounts = Felamimail_Controller_Account::getInstance()->search();
-            $folderFilter = new Felamimail_Model_FolderFilter(array(
-                array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
-                array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
-            ));
-            $folderBackend = Felamimail_Backend_Folder::getInstance();
-            $folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
+        $return = array();
+        $accounts = Felamimail_Controller_Account::getInstance()->search();
+        $folderFilter = new Felamimail_Model_FolderFilter(array(
+            array('field' => 'account_id', 'operator' => 'in', 'value' => $accounts->getArrayOfIds()),
+            array('field' => 'globalname', 'operator' => 'equals', 'value' => 'INBOX')
+        ));
+        $folderBackend = Felamimail_Backend_Folder::getInstance();
+        $folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
 
-            return $folderIds;
+        //get array of /account_id/id
+        for ($it = $folderIds->getIterator(), $it->rewind(); $it->valid(); $it->next())
+        {
+            $folder = $it->current();
+            $return[] = self::IMAPDELIMITER.$folder->account_id.self::IMAPDELIMITER.$folder->id;
+        }
+
+        return $return;
+    }
+    
+    protected function _getAllFoldersByAccountId($_accountId, $_globalname = '', $_parent = '')
+    {
+        $return = array();
+        if (empty($_parent))
+        {
+            $_parent = self::IMAPDELIMITER.$_accountId;
+        }
+        
+        $folderBackend = Felamimail_Backend_Folder::getInstance();
+        $folderFilter = new Felamimail_Model_FolderFilter(array(
+            array('field' => 'account_id', 'operator' => 'in', 'value' => $_accountId),
+            array('field' => 'parent', 'operator' => 'equals', 'value' => true),
+            array('field' => 'globalname', 'operator' => 'equals', 'value' => $_globalname)
+        ));
+        $folderBackend = Felamimail_Backend_Folder::getInstance();
+        $folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
+        
+        $return = array();
+        for ($it = $folderIds->getIterator(), $it->rewind(); $it->valid(); $it->next())
+        {
+            $folder = $it->current();
+            if ($folder->has_children)
+            {   
+                $return = array_merge($this->_getAllFoldersByAccountId($folder->account_id, 
+                    $folder->globalname, $_parent.self::IMAPDELIMITER. $folder->id), $return);                
+            }
+            $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+        }
+        
+        return $return;
+    }
+    
+    protected function _getAllFolders()
+    {
+        $return = array();
+        $accounts = Felamimail_Controller_Account::getInstance()->search()->getArrayOfIds();
+        foreach ($accounts as $account)
+        {
+            $return = array_merge($return, $this->_getAllFoldersByAccountId($account));
+        }
+        
+        return $return;
+        
     }
 
     /**
@@ -166,9 +219,18 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $paths = array();
         foreach ($_pathFilters as $pathFilter)
         {
-            $pathFilter['value'] = ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) ?
-                $this->_getFolderIdsOfAllInboxes() : ($pathFilter['operator'] === 'notin') ?
-                array_diff($this->_getFolderIdsOfAllInboxes(), $pathFilter['value']) : $pathFilter['value'];
+            if (empty($pathFilter['value'])) // get allfolders from all accounts
+            {
+                $pathFilter['value'] = $this->_getAllFolders();
+            }
+            else if ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) // get all INBOX from all accounts
+            {
+                $pathFilter['value'] = $this->_getAllInboxes();
+            }
+            else if (($pathFilter['operator'] === 'notin'))
+            {
+                $pathFilter['value'] = array_diff($this->_getAllFolders(), $pathFilter['value']);
+            }
             
             $paths = array_merge($paths,  $pathFilter['value']);
         }
@@ -207,10 +269,10 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     {
         $return = array();
         
-        if ($_filter instanceof Tinebase_Model_Filter_Abstract)
+        if (!is_array($_filter))
         {
             $filters = array();
-            $filters[] = $_filter->toArray();
+            $filters[] = $_filter;
         }
         else
         {
@@ -219,29 +281,44 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         
         foreach ($filters as $filter)
         {
-            if (!empty($filter['value']))
+            if (!is_a($filter, Tinebase_Model_Filter_Abstract))
             {
-                switch ($filter['field'])
+                $value = $filter['value'];
+                $field = $filter['field'];
+                $operator = $filter['operator'];
+            }
+            else
+            {
+                $value = $filter->getValue();
+                $field = $filter->getField();
+                $operator = $filter->getOperator();
+            }
+            
+            if (!empty($value))
+            {
+                switch ($field)
                 {
                     case 'query' :
-                        $return[] = "OR SUBJECT {$filter['value']} FROM {$filter['value']}";
+                        $return[] = "OR SUBJECT $value FROM $value";
                         break;
                     case 'subject' :
-                        $return[] = "SUBJECT {$filter['value']}";
+                        $return[] = "SUBJECT $value";
                         break;
                     case 'from_name' : // we can'nt diferentiate with imap filters
                     case 'from_email' :
-                        $return[] = "FROM {$filter['value']}";
+                        $return[] = "FROM $value";
                         break;
                     case 'to' :
-                        $return[] = "TO {$filter['value']}";
+                        $return[] = "TO $value";
                         break;
                     case 'cc' :
-                        $return[] = "CC {$filter['value']}";
+                        $return[] = "CC $value";
                         break;
                     case 'bcc' :
-                        $return[] = "BCC {$filter['value']}";
+                        $return[] = "BCC $value";
                         break;
+                    case 'received' :  // => array('filter' => 'Tinebase_Model_Filter_DateTime'),
+                        $return[] = $filter->getFilterImap();
                 }
             }
         }
@@ -283,28 +360,26 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $return['filters'] = array();
         $return['paths'] = array();
         
-        if ($_filter instanceof Tinebase_Model_Filter_FilterGroup && !$_filter->isEmpty())
+        $return['paths'] = array_merge($return['paths'], 
+            (array)$this->_processPathFilters($_filter->getFilter('path', true)));
+        foreach (array('to', 'cc', 'bcc', 'flags') as $field)
         {
-            foreach ($_filter->getFilterObjects() as $filter)
+            $return['filters'] = array_merge($return['filters'], 
+                (array)$this->_generateImapSearch($_filter->getFilter($field, true), $_pagination));
+        }
+        
+        foreach ($_filter->getFilterObjects() as $filter)
+        {
+            if ($filter instanceof Tinebase_Model_Filter_FilterGroup)
             {
-                if ($filter instanceof Tinebase_Model_Filter_FilterGroup)
-                {
-                    $return = $this->_parseFilterGroup($filter, $_pagination);
-                    $return['paths'] = array_merge($return['paths'], 
-                            (array)$this->_processPathFilters($filter->getFilter('path', true)));
-                    foreach (array('to', 'cc', 'bcc', 'flags') as $field)
-                    {
-                        $return['filters'] = array_merge($return['filters'], 
-                            (array)$this->_generateImapSearch($filter->getFilter($field, true), $_pagination));
-                    }
-                }
-                else if ($filter instanceof Tinebase_Model_Filter_Abstract)
-                {
-                    $return['filters'] = array_merge($return['filters'], 
-                            (array)$this->_generateImapSearch($filter, $_pagination));
-                }
-                
+                $return = $this->_parseFilterGroup($filter, $_pagination);
             }
+            else if ($filter instanceof Tinebase_Model_Filter_Abstract)
+            {
+                $return['filters'] = array_merge($return['filters'], 
+                        (array)$this->_generateImapSearch($filter, $_pagination));
+            }
+
         }
         
         return $return;
@@ -346,8 +421,17 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param Felamimail_Model_Folder $_folder
      * @return Felamimail_Model_Message
      */
-    protected function _createModelMessage(array $_message, Felamimail_Model_Folder $_folder)
+    protected function _createModelMessage(array $_message, Felamimail_Model_Folder $_folder = NULL)
     {
+        if (isset($_message['folder_id']))
+        {
+            $_folder = Felamimail_Controller_Folder::getInstance()->get($_message['folder_id']);
+        }
+        
+        if (empty($_folder))
+        {
+            return NULL;
+        }
         
         $message = new Felamimail_Model_Message(array(
             'id'            => self::createMessageId($_folder->account_id, $_folder->getId(), $_message['uid']),
@@ -379,7 +463,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param Felamimail_Model_Folder $_folder
      * @return Felamimail_Model_Message
      */
-    protected function _createModelMessageArray(array $_messages, Felamimail_Model_Folder $_folder)
+    protected function _createModelMessageArray(array $_messages, Felamimail_Model_Folder $_folder = NULL)
     {
         
         $return = array();
@@ -434,6 +518,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      *
      * @todo implement sort
      * @todo implement other searches
+     * @todo bug when searching in more than one folder, getting last folder in the messages list
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
@@ -466,7 +551,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 
             $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
             $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
-            $messages = array_merge($messages, $imap->getSummary($idsInFolder, $folder));
+            $messages = array_merge($messages, $imap->getSummary($idsInFolder, null, null, $folderId));
         }
 
         if (empty($messages))
@@ -577,7 +662,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $imap->selectFolder($globalname['globalName']);
         
         // we're getting just one message
-        $messages = $imap->getSummary($uid, $uid, TRUE);
+        $messages = $imap->getSummary($uid, $uid, TRUE, $folder->getId()); // $folder->getId() = ugly hack, have to try to find another solution
         
         if (count($messages) === 0)
         {
