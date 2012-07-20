@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-07-18 12:09-0300\n"
-"Last-Translator: marcelo <a@gmail.com>\n"
+"POT-Creation-Date: 2008-05-17 22:12+0100\n"
+"PO-Revision-Date: 2012-06-11 15:30-0300\n"
+"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
 "X-Generator: Launchpad (build 14886)\n"
@@ -465,7 +465,9 @@ msgstr "End token mode"
 #: js/Model.js:94
 #: js/Model.js:133
 msgid "Contact"
-msgstr "Contato"
+msgid_plural "Contacts"
+msgstr[0] "Contato"
+msgstr[1] "Contatos"
 
 #: js/ContactGrid.js:105
 #: js/Model.js:160
@@ -541,7 +543,7 @@ msgstr "Exportar Contato"
 #: js/ContactGrid.js:154
 msgid "Export {0}"
 msgid_plural "Export {0}"
-msgstr[0] "Exportar {0}"
+msgstr[0] "Export {0}"
 msgstr[1] "Exportar {0}"
 
 #: js/ContactGrid.js:163

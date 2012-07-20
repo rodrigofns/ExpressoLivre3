@@ -369,7 +369,9 @@ msgstr ""
 
 #: js/ContactFilterModel.js:35 js/Model.js:94 js/Model.js:133
 msgid "Contact"
-msgstr ""
+msgid_plural "Contacts"
+msgstr[0] ""
+msgstr[1] ""
 
 #: js/ContactGrid.js:105 js/Model.js:160
 msgid "Type"
