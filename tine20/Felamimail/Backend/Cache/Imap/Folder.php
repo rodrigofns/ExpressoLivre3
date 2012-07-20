@@ -57,25 +57,32 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
                     if($filter->getOperator() == 'startswith'){
                         $parent = true;
                         $globalName = substr($globalName, 0, -1);
-                        }
+                    }
                     break;
             }
         }
         
         $resultArray = array();
-        $account = Felamimail_Controller_Account::getInstance()->get($accountId);
+        $accountId = (array)$accountId;
         
-        if($parent === true){
-            $folders = $this->_getFoldersFromIMAP($account, $globalName);
-            foreach($folders as $folder)
-            {
-                $resultArray[] = $this->get(self::encodeFolderUid($folder['globalName'],$accountId));
-            }
-        }else{
-            $resultArray[] = $this->get(self::encodeFolderUid(Felamimail_Model_Folder::encodeFolderName($globalName),$accountId));
-        }
+        foreach ($accountId as $id)
+        {
+            $account = Felamimail_Controller_Account::getInstance()->get($id);
 
+            if($parent === true){
+                $folders = $this->_getFoldersFromIMAP($account, $globalName);
+                foreach($folders as $folder)
+                {
+                    $resultArray[] = $this->get(self::encodeFolderUid($folder['globalName'],$id));
+                }
+            }
+            else{
+                $resultArray[] = $this->get(self::encodeFolderUid(Felamimail_Model_Folder::encodeFolderName($globalName),$id));
+            }
+        }
+        
         $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder', $resultArray, true);
+        
         return $result;
     }
     

@@ -19,7 +19,7 @@
  * 
  * filters date in one property
  */
-class Tinebase_Model_Filter_Date extends Tinebase_Model_Filter_Abstract
+class Tinebase_Model_Filter_Date extends Tinebase_Model_Filter_Abstract implements Tinebase_Model_Filter_Imap_Interface
 {
     /**
      * @var array list of allowed operators
@@ -84,6 +84,44 @@ class Tinebase_Model_Filter_Date extends Tinebase_Model_Filter_Abstract
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' No filter value found, skipping operator: ' . $operator);
             }
         }
+    }
+    
+    /**
+     *
+     * @return type 
+     * @todo fix method setFromArray()
+     */
+    public function getFilterImap()
+    {
+        $format = "d-M-Y";
+        
+        
+        // prepare value
+        $value = (array) $this->_getDateValues($this->_operator, $this->_value);
+        $timezone = array_value('timezone', $this->_options);
+        foreach ($value as &$date)
+        {
+            $date = new Tinebase_DateTime($date); // should be in user timezone
+            $date->setTimezone(new DateTimeZone($timezone));
+        }
+                
+        switch ($this->_operator)
+        {
+            case 'within' :
+            case 'inweek' :
+                $return = "SINCE {$value[0]->format($format)} BEFORE {$value[1]->format($format)}";
+                break;
+            case 'before' :
+                $return = "BEFORE {$value[0]->format($format)}";
+                break;
+            case 'after' :
+                $return = "SINCE {$value[0]->format($format)}";
+                break;
+            case 'equals' : // errado
+                $return = "ON {$value[0]->format($format)}";
+        }
+        
+        return $return;
     }
     
     /**

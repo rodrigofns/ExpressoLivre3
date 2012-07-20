@@ -410,7 +410,7 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      * @param int|null $to
      * @return array with $this->_messageClass (Felamimail_Message)
      */
-    public function getSummary($from, $to = null, $_useUid = null)
+    public function getSummary($from, $to = null, $_useUid = null, $_folderId = NULL)
     {
         $useUid = ($_useUid === null) ? $this->_useUid : (bool) $_useUid;
         $summary = $this->_protocol->fetch(array('UID', 'FLAGS', 'RFC822.HEADER', 'INTERNALDATE', 'RFC822.SIZE', 'BODYSTRUCTURE'), $from, $to, $useUid);
@@ -450,6 +450,12 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
                 'structure' => $structure,
                 'uid'       => $data['UID']
             );
+            
+            if (!empty($_folderId))
+            {
+                $messages[$key]['folder_id'] = $_folderId;
+            }
+            
         }
         
         if($to === null && ctype_digit("$from")) {
