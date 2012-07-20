@@ -194,22 +194,22 @@ class Felamimail_Controller_Cache_Imap_Message extends Felamimail_Controller_Cac
     {
         $folder = ($_folder instanceof Felamimail_Model_Folder) ? $_folder : Felamimail_Controller_Folder::getInstance()->get($_folder);
         
-        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Clearing cache of ' . $folder->globalname);
+//        Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Clearing cache of ' . $folder->globalname);
+//        
+//        $this->deleteByFolder($folder);
+//        
+//        $folder->cache_timestamp        = Tinebase_DateTime::now();
+//        $folder->cache_status           = Felamimail_Model_Folder::CACHE_STATUS_EMPTY;
+//        $folder->cache_job_actions_est = 0;
+//        $folder->cache_job_actions_done = 0;
+//        
+//        Felamimail_Controller_Folder::getInstance()->updateFolderCounter($folder, array(
+//            'cache_totalcount'  => 0,
+//            'cache_recentcount' => 0,
+//            'cache_unreadcount' => 0
+//        ));
         
-        $this->deleteByFolder($folder);
-        
-        $folder->cache_timestamp        = Tinebase_DateTime::now();
-        $folder->cache_status           = Felamimail_Model_Folder::CACHE_STATUS_EMPTY;
-        $folder->cache_job_actions_est = 0;
-        $folder->cache_job_actions_done = 0;
-        
-        Felamimail_Controller_Folder::getInstance()->updateFolderCounter($folder, array(
-            'cache_totalcount'  => 0,
-            'cache_recentcount' => 0,
-            'cache_unreadcount' => 0
-        ));
-        
-        $folder = Felamimail_Controller_Folder::getInstance()->update($folder);
+//        $folder = Felamimail_Controller_Folder::getInstance()->update($folder);
         
         return $folder;
     }

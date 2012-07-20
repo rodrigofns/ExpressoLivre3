@@ -186,14 +186,10 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      */
     public function update(Tinebase_Record_Interface $_record)
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder update = $_record ' . print_r($_record,true));
-*/ 
-//        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-//        $retorno = $aux->update($_record);
         
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder update = $retorno ' . print_r($retorno,true));
-        return NULL;        
+        $folder = $_record->toArray();
+        $return = $this->get($this->encodeFolderUid($folder['globalname'], $folder['account_id']));
+        Return $return;   
     }
     
     
@@ -410,11 +406,10 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_folderId ' . print_r($_folderId,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $_counters ' . print_r($_counters,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Folder();        
-        $retorno = $aux->updateFolderCounter($_folderId, $_counters);
-        
+        $folder = ($_folderId instanceof Felamimail_Model_Folder) ? $_folderId : $this->get($_folderId);
+       
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Folder create = $retorno ' . print_r($retorno,true));
-        return $retorno;
+        return $folder;
     }
     
     /**

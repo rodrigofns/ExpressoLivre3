@@ -127,6 +127,13 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return false;
     }
     
+    public function getTableName()
+    {
+        return 'felamimail_cache_message';
+    }
+    
+    
+    
     /**
     * get folder ids of all inboxes for accounts of current user
     *
@@ -503,6 +510,19 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         return $retorno;        
     }
     
+        /**
+     * Updates multiple entries
+     *
+     * @param array $_ids to update
+     * @param array $_data
+     * @return integer number of affected rows
+     * @throws Tinebase_Exception_Record_Validation|Tinebase_Exception_InvalidArgument
+     */
+    public function updateMultiple($_ids, $_data) 
+    {   
+        return 0;
+    }
+    
     
     /**
      * Gets total count of search with $_filter
@@ -576,12 +596,19 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message delete = $_id ' . print_r($_id,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->delete($_id);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->delete($_id);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
-        return $retorno;
+        
+        
+            
+        return 0;
     }
+    
+    
+    
+    
     
     /**
      * Get multiple entries
@@ -598,10 +625,22 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message getMultiple = $_id ' . print_r($_id,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message getMultiple = $_containerIds ' . print_r($_containerIds,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->getMultiple($_id, $_containerIds = NULL);
+//       $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->getMultiple($_id, $_containerIds = NULL);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
+       $messages = Array();
+        
+        if(is_array($_id)){
+            foreach($_id as $id){
+               $messages[] = $this->get($id);
+            }
+        }else{
+            $messages[] = $this->get($_id);
+        }
+        
+        $retorno = new Tinebase_Record_RecordSet('Felamimail_Model_Message', $messages, true); 
+        
         return $retorno;
     }
 
@@ -672,8 +711,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message addFlag = $_message ' . print_r($_message,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message addFlag = $_flag ' . print_r($_flag,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $aux->addFlag($_message, $_flag);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $aux->addFlag($_message, $_flag);
+        return NULL;
     }
     
     /**
