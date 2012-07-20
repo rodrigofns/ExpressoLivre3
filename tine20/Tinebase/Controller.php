@@ -67,10 +67,16 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
      * @param   string $_password
      * @param   string $_ipAddress
      * @param   string $_clientIdString
+     * @param  string $securitycode the security code(captcha)      
      * @return  bool
      */
-    public function login($_loginname, $_password, $_ipAddress, $_clientIdString = NULL)
+    public function login($_loginname, $_password, $_ipAddress, $_clientIdString = NULL, $securitycode = NULL)
     {
+        if(isset(Tinebase_Core::getConfig()->captcha->count) && Tinebase_Core::getConfig()->captcha->count != 0){
+            if($_SESSION['tinebase']['code'] != $securitycode) {
+                    return FALSE;
+                   }
+        }
         $authResult = Tinebase_Auth::getInstance()->authenticate($_loginname, $_password);
         
         $accessLog = new Tinebase_Model_AccessLog(array(
@@ -94,6 +100,7 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
             $result = true;
         } else {
             $this->_loginFailed($_loginname, $accessLog);
+            $_SESSION['tinebase']['code'] = 'code';
             $result = false;
         } 
         
@@ -259,6 +266,58 @@ class Tinebase_Controller extends Tinebase_Controller_Abstract
         
         sleep(mt_rand(2,5));
     }
+    /**
+     * renders and send to browser one captcha image
+     * 
+     * @return void
+     */
+    public function makecaptcha()
+    {
+        $this->_makeImage();
+    }
+    /**
+     * renders and send to browser one captcha image
+     * 
+     * @return void
+     */
+    protected function _makeImage()
+    {
+        $width='170';
+        $height='40';
+        $characters= mt_rand(5,8);     // '7';
+        $possible = '123456789aAbBcCdDeEfFgGhHIijJKLmMnNpPqQrRstTuUvVwWxXyYZz';
+        $code = '';
+        $i = 0;
+        while ($i < $characters) { 
+                $code .= substr($possible, mt_rand(0, strlen($possible)-1), 1);
+                $i++;
+        }
+        $font = './fonts/MONOFONT.TTF';
+        /* font size will be 75% of the image height */
+        $font_size = $height * 0.75;
+        $image = @imagecreate($width, $height) or die('Cannot initialize new GD image stream');
+        /* set the colours */
+        $background_color = imagecolorallocate($image, 255, 255, 255);
+        $text_color = imagecolorallocate($image, 20, 40, 100);
+        $noise_color = imagecolorallocate($image, 100, 120, 180);
+        /* generate random dots in background */
+        for( $i=0; $i<($width*$height)/3; $i++ ) {
+                imagefilledellipse($image, mt_rand(0,$width), mt_rand(0,$height), 1, 1, $noise_color);
+        }
+        /* generate random lines in background */
+        for( $i=0; $i<($width*$height)/150; $i++ ) {
+                imageline($image, mt_rand(0,$width), mt_rand(0,$height), mt_rand(0,$width), mt_rand(0,$height), $noise_color);
+        }
+        /* create textbox and add text */
+        $textbox = imagettfbbox($font_size, 0, $font, $code) or die('Error in imagettfbbox function - 1') ;
+        $x = ($width - $textbox[4])/2;
+        $y = ($height - $textbox[5])/2;
+        imagettftext($image, $font_size, 0, $x, $y, $text_color, $font , $code) or die('Error in imagettftext function - 2');
+        header('Content-Type: image/jpeg');
+        imagejpeg($image);
+        imagedestroy($image);
+        $_SESSION['tinebase']['code'] = $code;        
+    } 
     
     /**
      * authenticate user but don't log in

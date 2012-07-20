@@ -158,11 +158,12 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
      *
      * @param   Tinebase_Record_Interface $_record
      * @param   bool                      $_checkBusyConflicts
+     * @param   array    $attachs
      * @return  Tinebase_Record_Interface
      * @throws  Tinebase_Exception_AccessDenied
      * @throws  Tinebase_Exception_Record_Validation
      */
-    public function create(Tinebase_Record_Interface $_record, $_checkBusyConflicts = FALSE)
+    public function create(Tinebase_Record_Interface $_record, $_checkBusyConflicts = FALSE, $attachs = FALSE)
     {
         try {
             $db = $this->_backend->getAdapter();
@@ -196,7 +197,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
         
         // send notifications
         if ($this->_sendNotifications) {
-            $this->doSendNotifications($createdEvent, $this->_currentAccount, 'created');
+            $this->doSendNotifications($createdEvent, $this->_currentAccount, 'created', FALSE, $attachs);
         }
         
         return $createdEvent;
@@ -1652,15 +1653,17 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
      * @param Tinebase_Model_FullAccount $_updater
      * @param Sting                      $_action
      * @param Calendar_Model_Event       $_oldEvent
+     * @param array                      $attachs 
      * @return void
      */
-    public function doSendNotifications($_event, $_updater, $_action, $_oldEvent=NULL)
+    public function doSendNotifications($_event, $_updater, $_action, $_oldEvent=NULL, $attachs = FALSE)
     {
         Tinebase_ActionQueue::getInstance()->queueAction('Calendar.sendEventNotifications', 
             $_event, 
             $_updater,
             $_action, 
-            $_oldEvent ? $_oldEvent : NULL
+            $_oldEvent ? $_oldEvent : NULL,
+            $attachs
         );
     }
 }

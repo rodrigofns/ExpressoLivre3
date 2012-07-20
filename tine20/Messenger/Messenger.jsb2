@@ -1,0 +1,80 @@
+{
+  "projectName": "Expresso Messenger",
+  "deployDir": "Messenger",
+  "licenseText": "MIT License",
+  "resources": [
+    
+  ],
+  "pkgs": [
+    {
+      "name": "Messenger App",
+      "file": "js/Application.js",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Window.js",
+          "path": "js/"
+        },
+        {
+          "text": "Application.js",
+          "path": "js/"
+        },
+        {
+          "text": "jquery-1.7.1.min.js",
+          "path": "js/"
+        },
+        {
+          "text": "Chat.js",
+          "path": "js/"
+        },
+        {
+          "text": "ChatHandler.js",
+          "path": "js/"
+        },
+        {
+          "text": "LogHandler.js",
+          "path": "js/"
+        },
+        {
+          "text": "RosterHandler.js",
+          "path": "js/"
+        },
+        {
+          "text": "strophe.min.js",
+          "path": "js/"
+        },
+        {
+          "text": "Layout.js",
+          "path": "js/"
+        },
+        {
+          "text": "RosterTree.js",
+          "path": "js/"
+        },
+        {
+          "text": "Groupie.js",
+          "path": "js/"
+        },
+        {
+          "text": "base64.js",
+          "path": "js/"
+        },
+        {
+          "text": "ConfigWindow.js",
+          "path": "js/"
+        }
+      ]
+    },
+    {
+      "name": "Messenger App",
+      "file": "css/Messenger.css",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Messenger.css",
+          "path": "css/"
+        }
+      ]
+    }
+  ]
+}

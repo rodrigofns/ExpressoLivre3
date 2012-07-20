@@ -266,7 +266,8 @@ class Calendar_Model_Attender extends Tinebase_Record_Abstract
         }
                 
         // resolve current attendee
-        self::resolveAttendee($_event->attendee);
+        $cattendee = clone $_event->attendee;
+        self::resolveAttendee($cattendee);
         
         // build currentMailMap
         // NOTE: non resolvable attendee will be discarded in the map

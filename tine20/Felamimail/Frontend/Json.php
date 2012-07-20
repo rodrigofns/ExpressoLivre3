@@ -81,7 +81,28 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
             'status'    =>  'success' );
     }
 
-
+     /**
+     * Remove messages from trash before date ...
+     *
+     * @param string $accountId
+     * @return array
+     */
+    public function deleteMsgsBeforeDate($accountId)
+    {
+        $result_msgids = 0;
+        $preference_value = Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DELETE_FROMTRASH};
+        $account = $this->getAccount($accountId);
+        if($account['trash_folder'] && $preference_value) {
+            $folder = Felamimail_Controller_Folder::getInstance()->getByBackendAndGlobalName($accountId, $account['trash_folder']);                               
+            $before_date = date("Y-m-d H:i:s", strtotime("-".$preference_value." day"));
+            $result_msgids = Felamimail_Controller_Cache_Message::getInstance()->SelectBeforeDate($folder,$before_date);  
+        }
+        
+        return array(
+            'status'    =>  'success',
+            'msgs'    =>  $result_msgids);
+    }
+    
     /**
      * add new folder
      *

@@ -61,6 +61,11 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     const CONTENT_TYPE_CALENDAR = 'text/calendar';
     
     /**
+     * content type text/webconference
+     */
+    const CONTENT_TYPE_WEBCONFERENCE = 'text/webconference';
+    
+    /**
      * content type text/vcard
      */
     const CONTENT_TYPE_VCARD = 'text/vcard';
@@ -443,10 +448,13 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
             
             if (array_key_exists($_preferedMimeType, $foundParts)) {
                 $result[$foundParts[$_preferedMimeType]] = $_structure['parts'][$foundParts[$_preferedMimeType]];
-            } else if (array_key_exists($alternativeType, $foundParts)) {
-                $result[$foundParts[$alternativeType]] = $_structure['parts'][$foundParts[$alternativeType]];
+  
             } else if (array_key_exists('multipart/mixed', $foundParts)) {
                 $result = $result + $this->getBodyParts($_structure['parts'][$foundParts['multipart/mixed']], $_preferedMimeType);
+            } else if (array_key_exists('multipart/related', $foundParts)) {
+                $result = $result + $this->getBodyParts($_structure['parts'][$foundParts['multipart/related']], $_preferedMimeType);
+            } else if (array_key_exists($alternativeType, $foundParts)) {
+                $result[$foundParts[$alternativeType]] = $_structure['parts'][$foundParts[$alternativeType]];
             }
         } else {
             foreach ($_structure['parts'] as $part) {

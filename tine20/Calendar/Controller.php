@@ -174,10 +174,11 @@ class Calendar_Controller extends Tinebase_Controller_Event implements Tinebase_
      * @param Tinebase_Model_FullAccount $_updater
      * @param Sting                      $_action
      * @param Calendar_Model_Event       $_oldEvent
+     * @param   array    $attachs
      * @return void
      */
-    public function sendEventNotifications($_event, $_updater, $_action, $_oldEvent=NULL)
+    public function sendEventNotifications($_event, $_updater, $_action, $_oldEvent=NULL, $attachs = FALSE)
     {
-        Calendar_Controller_EventNotifications::getInstance()->doSendNotifications($_event, $_updater, $_action, $_oldEvent);
+        Calendar_Controller_EventNotifications::getInstance()->doSendNotifications($_event, $_updater, $_action, $_oldEvent, $attachs);
     }
 }

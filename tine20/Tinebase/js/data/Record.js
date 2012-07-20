@@ -203,16 +203,16 @@ Tine.Tinebase.data.Record.create = function(o, meta) {
         return p.fields.indexOfKey(n) >= 0;
     };
     f.getRecordName = function() {
-        return Tine.Tinebase.appMgr.get(p.appName).i18n.n_(p.recordName, p.recordsName, 1);
+        return Tine.Tinebase.appMgr.get(p.appName).i18n._(p.recordName);
     };
     f.getRecordsName = function() {
-        return Tine.Tinebase.appMgr.get(p.appName).i18n.n_(p.recordName, p.recordsName, 50);
+        return Tine.Tinebase.appMgr.get(p.appName).i18n._(p.recordsName);
     };
     f.getContainerName = function() {
-        return Tine.Tinebase.appMgr.get(p.appName).i18n.n_(p.containerName, p.containersName, 1);
+        return Tine.Tinebase.appMgr.get(p.appName).i18n._(p.containerName);
     };
     f.getContainersName = function() {
-        return Tine.Tinebase.appMgr.get(p.appName).i18n.n_(p.containerName, p.containersName, 50);
+        return Tine.Tinebase.appMgr.get(p.appName).i18n._(p.containersName);
     };
     Tine.Tinebase.data.RecordMgr.add(f);
     return f;
