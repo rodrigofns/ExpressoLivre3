@@ -581,7 +581,7 @@ Tine.Messenger.AddItems = function(_box) {
                 }
             );
 //        return items;
-        _box.add(items);
+         _box.add(items);
     }
 
 }
