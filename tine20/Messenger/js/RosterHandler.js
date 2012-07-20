@@ -79,6 +79,19 @@ Tine.Messenger.RosterHandler = {
             console.error(err);
         }
         
+        var si = $(iq).find('si[profile="http://jabber.org/protocol/si/profile/file-transfer"]');
+        
+        if(si.length > 0){
+            var fname = $(si).find('file').attr('name'),
+                fsize = $(si).find('file').attr('size');
+            var raw_jid = $(si).parent().attr("from"),
+                jid = Strophe.getBareJidFromJid(raw_jid),
+                contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+                
+            Ext.MessageBox.alert('File transfer', contact.text + ' wants send to you the file "'+fname+'" with '+fsize+' bytes');
+            console.log('File transfer. File '+fname+' with '+fsize+' bytes');
+        }
+        
         return true;
     },
     
@@ -202,25 +215,6 @@ Tine.Messenger.RosterHandler = {
          }
          return false;
 //        Tine.Messenger.RosterHandler.contact_added = jid;
-    },
-    
-    _onRosterGet: function(iq){
-        var type = $(iq).find("query").attr("xmlns");
-        
-        if(type == "http://jabber.org/protocol/disco#info"){
-            var iq = $iq({to: 'fulano@simdev.sdr.serpro/expresso-3.0', type: "result"})
-                    .c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
-                    .c("feature", {"var": "http://jabber.org/protocol/bytestreams"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/disco#info"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/disco#items"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/muc"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/si/profile/file-transfer"}).up()
-                    .c("feature", {"var": "urn:xmpp:jingle:transports:raw-udp:1"}).up()
-                    .c("feature", {"var": "http://www.google.com/xmpp/protocol/session"}).up();
-
-            Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
-            Tine.Messenger.Log.debug("Eniou o iq result");
-        }
     },
     
     renameContact: function (jid, name, group) {
