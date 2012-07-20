@@ -445,6 +445,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         $return = null;
         $messages = array();
+        $filterObjects = $_filter->getFilterObjects();
+        
+        if(sizeof($filterObjects) == 1 && $filterObjects[0] instanceof Tinebase_Model_Filter_Id){
+            $ids = $filterObjects[0]->getValue();
+            return $this->getMultiple($ids);
+        }
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         $paginationAttr = $_pagination->toArray();
         
@@ -629,6 +635,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 //        $retorno = $aux->getMultiple($_id, $_containerIds = NULL);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
+       if($_id instanceof Tinebase_Record_RecordSet) 
+           return $_id;
+       
        $messages = Array();
         
         if(is_array($_id)){
