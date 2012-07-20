@@ -211,6 +211,9 @@
 /*    display: none;*/
 /*    border:solid red 1px;*/
 }
+#messenger-loghandler-status .msg:hover {
+    visibility: hidden;
+}
 
 /* PRESENCE */
 /*.messenger-presence-offline {

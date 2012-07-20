@@ -197,14 +197,14 @@ Tine.Messenger.RosterTree = function(iq){
                                     subscription: subscription,
                                     hide: false,
                                     text: label,
-                                    cls: 'messenger-contact '+cls,
+                                    cls: 'messenger-contact '+cls+' '+jid,
                                     allowDrag: true,
                                     allowDrop: false,
                                     qtip: "JID : "+jid+"<br>"
                                             +_('Status')+" : "+_(status.text)+"<br>"
                                             +_('Subscription')+" : "+subscription
                     });
-                    
+
                     _buddy.on("dblclick", Tine.Messenger.RosterHandler.openChat);
                     _buddy.on("contextmenu", buddyContext);
                     
