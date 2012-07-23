@@ -221,7 +221,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             );
                 
             // Conference handler
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.ChatHandler.onMUCMessage, null, 'message', 'normal'
             );
             
@@ -236,12 +236,16 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.RosterHandler._onRosterUpdate, 'jabber:client', 'iq', 'set'
             );
               
-            Tine.Messenger.Application.connection.addHandler(
+            XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterGet, 'jabber:client', 'iq', 'get'
             );
                 
             XMPPConnection.addHandler(
                 Tine.Messenger.RosterHandler._onRosterResult, 'jabber:client', 'iq', 'result'
+            );
+            
+            XMPPConnection.addHandler(
+                Tine.Messenger.LogHandler._onError, 'jabber:client', 'iq', 'error'
             );
 
             XMPPConnection.addHandler(
@@ -257,7 +261,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                return _("You're logged in Messenger. If you leave the page, Messenger will disconnect!");
+                //return _("You're logged in Messenger. If you leave the page, Messenger will disconnect!");
             }
 
             // Leaving the page cause disconnection

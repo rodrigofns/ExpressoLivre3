@@ -381,6 +381,15 @@ Tine.Messenger.Config = {
             },
             resize: function(_box, _width, _height){
                 Tine.Messenger.ChatHandler.adjustChatAreaHeight(_box.id, _width, _height);
+            },
+            show: function () {
+                this.setTextfieldFocus();
+            },
+            activate: function () {
+                this.setTextfieldFocus();
+            },
+            expand: function () {
+                this.setTextfieldFocus();
             }
         }
   }
@@ -507,11 +516,10 @@ Tine.Messenger.AddItems = function(_box) {
                     html: ''  
                 },
                 {
-                    id: 'messenger-chat-field',
                     region: 'south',
                     xtype: 'textfield',
                     height: 30,
-                    cls:   'text-sender',
+                    cls:   'text-sender messenger-chat-field',
                     handleMouseEvents: true,
                     enableKeyEvents: true,
                     listeners: {
@@ -523,6 +531,9 @@ Tine.Messenger.AddItems = function(_box) {
             //                                 Tine.Messenger.Chat.textToSend = '';
             //                             }
             //                        },
+                        afterrender: function (field) {
+                            field.focus(true, 200);
+                        },
                         keypress: function (field, ev) {
                             var chatId = field.ownerCt.id,
                                 type = field.ownerCt.type,
@@ -581,7 +592,7 @@ Tine.Messenger.AddItems = function(_box) {
                 }
             );
 //        return items;
-        _box.add(items);
+         _box.add(items);
     }
 
 }
