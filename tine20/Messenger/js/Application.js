@@ -263,12 +263,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                //return _("You're logged in Messenger. If you leave the page, Messenger will disconnect!");
+                Tine.Tinebase.appMgr.get('Messenger').stopConnection();
             }
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                XMPPConnection.disconnect('Leaving the Expresso Messenger page!');
+                Tine.Tinebase.appMgr.get('Messenger').stopConnection();
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
