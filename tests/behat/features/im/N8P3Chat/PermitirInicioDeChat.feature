@@ -11,12 +11,12 @@ Feature: Permitir Inicio de Chat
     And I wait 10 seconds or until css element "#username" is present
     And I wait 1 second or until css element "#password" is present
     And I wait 1 second or until css element "#ext-gen33" is present
-    When I fill in "username" with "81487819072"
-    And I fill in "password" with "cmv134.."
+    When I fill in "username" with "INSERIR AQUI O USUARIO"
+    And I fill in "password" with "INSERIR AQUI A SENHA"
     And I press "ext-gen33"
     Then I wait 20 seconds or until named element "content='Eduardo Motta Vianna, Cesar'" is present
 
-  @N1F1C1 @N8P3F1C1 @javascript
+  @N8P3F1C1 @javascript
   Scenario: Iniciar Chat com Contato
     When I wait 20 seconds or until css element "#messenger" is present
     And I click once in xpath element "//*[@id='messenger']"
@@ -29,7 +29,7 @@ Feature: Permitir Inicio de Chat
     And I wait 10 seconds or until xpath element "//div[contains(child::text(), 'poiuyt')]" is present
     Then I click once in 
 
-@N8P3F1C2 @javascript
+  @N8P3F1C2 @javascript
   Scenario: Iniciar Chat com Contato Offline
     When I wait 20 seconds or until css element "#messenger" is present
     And I click once in xpath element "//*[@id='messenger']"

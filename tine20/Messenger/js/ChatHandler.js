@@ -13,9 +13,9 @@ Tine.Messenger.ChatHandler = {
     
     formatChatTitle: function (jid, name, type) {
         if(type == 'groupchat')
-            return _('Group chat in room') + ' ' + name;
+            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Group chat in room') + ' ' + name;
         else
-            return _('Chat with') + ' ' + name + ' (' + jid + ')';
+            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Chat with') + ' ' + name + ' (' + jid + ')';
         return null;
     },
     
@@ -53,12 +53,12 @@ Tine.Messenger.ChatHandler = {
            new_chat = true;
         }
         chat.show();
-        
+
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
-            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + _('is unavailable'), _("Info"), 'messenger-notify');
-            Tine.Messenger.ChatHandler.setChatMessage(jid, _('Your messages will be sent offline'), _('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable'), Tine.Tinebase.appMgr.get('Messenger').i18n._("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._('Your messages will be sent offline'), Tine.Tinebase.appMgr.get('Messenger').i18n._('Info'), 'messenger-notify');
         }
     
         return chat;
@@ -164,10 +164,10 @@ Tine.Messenger.ChatHandler = {
         // Typing events
         if (paused.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
         } else if (composing.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
             // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name, type);
