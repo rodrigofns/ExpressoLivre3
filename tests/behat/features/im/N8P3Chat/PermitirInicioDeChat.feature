@@ -11,8 +11,8 @@ Feature: Permitir Inicio de Chat
     And I wait 10 seconds or until css element "#username" is present
     And I wait 1 second or until css element "#password" is present
     And I wait 1 second or until css element "#ext-gen33" is present
-    When I fill in "username" with "81487819072"
-    And I fill in "password" with "cmv134.."
+    When I fill in "username" with "USUARIO"
+    And I fill in "password" with "SENHA"
     And I press "ext-gen33"
     Then I wait 20 seconds or until named element "content='Eduardo Motta Vianna, Cesar'" is present
 
