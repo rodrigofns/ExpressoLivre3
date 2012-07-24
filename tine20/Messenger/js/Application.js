@@ -263,12 +263,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                Tine.Tinebase.appMgr.get('Messenger').stopConnection();
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
             }
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                Tine.Tinebase.appMgr.get('Messenger').stopConnection();
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
