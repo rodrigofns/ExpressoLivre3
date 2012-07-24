@@ -36,9 +36,15 @@ Tine.Messenger.ClientDialog = function(_config){
     var statusMenu = function(_box){
             var items = Array(),
                 statusItems = Tine.Messenger.factory.statusStore.data.items;
-            
+            /**
+             * Traduções dos status
+             * _('Online')
+             * _('Away')
+             * _('Do Not Disturb')
+             * _('Unavailable')
+             */
             for(var i=0; i < statusItems.length; i++){
-                var text = _(statusItems[i].data.text),
+                var text = Tine.Tinebase.appMgr.get('Messenger').i18n._(statusItems[i].data.text),
                     value = statusItems[i].data.value;
                 items.push({text: text,
                             value: value,
