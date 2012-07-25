@@ -136,9 +136,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         });
     },
     
-    stopMessenger: function () {
+    stopMessenger: function (reason) {
+        reason = (reason == null) ? "" : ': ' + reason;
         Tine.Messenger.Log.debug("Stopping Messenger...");
-        Tine.Tinebase.appMgr.get('Messenger').getConnection().disconnect();
+        Tine.Tinebase.appMgr.get('Messenger').getConnection().disconnect('Leaving Messenger' + reason);
         Tine.Messenger.Log.debug("Messenger Stopped!");
     },
 
@@ -263,12 +264,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger('Leave page!');
             }
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger('Close window!');
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
