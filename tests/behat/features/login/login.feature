@@ -16,8 +16,8 @@ Feature: Permitir autenticação utilizando usuário e senha
 
   @N1F1C1 @javascript
   Scenario: Autenticação e Autorização de Usuários Válidos
-    When I fill in "username" with "teste"
-    And I fill in "password" with "senha"
+    When I fill in "username" with "USUARIO"
+    And I fill in "password" with "SENHA"
     And I press "ext-gen31"
     Then I wait 10 seconds or until named element "content='teste, Teste'" is present
 

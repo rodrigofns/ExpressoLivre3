@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-20 16:55-0300\n"
-"PO-Revision-Date: 2012-06-20 16:55-0300\n"
+"POT-Creation-Date: 2012-07-24 09:05-0300\n"
+"PO-Revision-Date: 2012-07-24 09:06-0300\n"
 "Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
 "Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
@@ -81,6 +81,7 @@ msgid "Communication with the remote server has been interrupted."
 msgstr "Comunicação com o servidor remoto foi interrompida."
 
 #: Messenger/js/LogHandler.js:106
+#: Messenger/js/LogHandler.js:210
 msgid "SERVER ERROR"
 msgstr "ERRO DO SERVIDOR"
 
@@ -117,18 +118,35 @@ msgid "Error sending: "
 msgstr "Envio de erro:"
 
 #: Messenger/js/LogHandler.js:183
-#: Messenger/js/Application.js:201
-#: Messenger/js/Application.js:279
-#: Messenger/js/RosterHandler.js:309
-#: Messenger/js/RosterHandler.js:361
+#: Messenger/js/Application.js:202
+#: Messenger/js/Application.js:284
+#: Messenger/js/RosterHandler.js:303
+#: Messenger/js/RosterHandler.js:355
 msgid "Error"
 msgstr "Erro"
 
 #: Messenger/js/LogHandler.js:185
+#: Messenger/js/LogHandler.js:211
 msgid "Error number "
 msgstr "Erro número"
 
-#: Messenger/js/LogHandler.js:194
+#: Messenger/js/LogHandler.js:196
+msgid "Cancel 404: The item was not found."
+msgstr "Cancelamento 404: O item não foi encontrado"
+
+#: Messenger/js/LogHandler.js:199
+msgid "Cancel 501: The feature was not implemented."
+msgstr "Cancelamento 501: A funcionalidade não foi implementada."
+
+#: Messenger/js/LogHandler.js:202
+msgid "Wait 500: Internal server error."
+msgstr "Aguarde 500: Erro do servidor."
+
+#: Messenger/js/LogHandler.js:205
+msgid "Cancel 503: Service unavailable."
+msgstr "Cancelamento 503: Serviço indisponível."
+
+#: Messenger/js/LogHandler.js:221
 #: Messenger/js/ChatHandler.js:60
 #: Messenger/js/ChatHandler.js:61
 msgid "Info"
@@ -151,9 +169,11 @@ msgid "Group created successfully!"
 msgstr "Grupo criado com sucesso!"
 
 #: Messenger/js/Window.js:21
-#: Messenger/js/Layout.js:157
+#: Messenger/js/Layout.js:166
 msgid "Add Group"
-msgstr "Adicionar Grupo"
+msgid_plural "Add Group"
+msgstr[0] "Adicionar Grupo"
+msgstr[1] "Adicionar Grupo"
 
 #: Messenger/js/Window.js:21
 #: Messenger/js/RosterTree.js:154
@@ -173,41 +193,72 @@ msgstr "Adicionar Contato"
 msgid "Buddy not added!"
 msgstr "Contato não adicionado!"
 
-#: Messenger/js/Application.js:73
+#: Messenger/js/Application.js:74
 msgid "Messenger"
 msgid_plural "Messengers"
 msgstr[0] "Messenger"
 msgstr[1] "Messengers"
 
-#: Messenger/js/Application.js:192
+#: Messenger/js/Application.js:193
 msgid "Connecting"
 msgstr "Conectando"
 
-#: Messenger/js/Application.js:202
-#: Messenger/js/Application.js:280
+#: Messenger/js/Application.js:203
+#: Messenger/js/Application.js:285
 msgid "Authentication failed"
 msgstr "Autenticação falhou"
 
-#: Messenger/js/Application.js:259
+#: Messenger/js/Application.js:264
 msgid "You're logged in Messenger. If you leave the page, Messenger will disconnect!"
 msgstr "Você está conectado no Messenger. Se sair da página, o Messenger será desconectado!"
 
-#: Messenger/js/Layout.js:143
-msgid "Actions"
-msgstr "Ações"
+#: Messenger/js/Application.js:276
+msgid "Messenger has been disconnected!"
+msgstr "Messenger foi desconectado!"
+
+#: Messenger/js/Application.js:338
+msgid "Connect"
+msgstr "Conectar"
+
+#: Messenger/js/Layout.js:41
+msgid "Online"
+msgstr "Disponível"
+
+#: Messenger/js/Layout.js:42
+msgid "Away"
+msgstr "Ausente"
+
+#: Messenger/js/Layout.js:43
+msgid "Do Not Disturb"
+msgstr "Não Perturbe"
+
+#: Messenger/js/Layout.js:44
+msgid "Unavailable"
+msgstr "Indisponível"
 
 #: Messenger/js/Layout.js:149
-msgid "Add Contact"
-msgstr "Adicionar Contato"
+msgid "Action"
+msgid_plural "Actions"
+msgstr[0] "Ações"
+msgstr[1] "Ações"
 
-#: Messenger/js/Layout.js:168
-msgid "Logout"
-msgstr "Sair"
+#: Messenger/js/Layout.js:157
+msgid "Add Contact"
+msgid_plural "Add Contact"
+msgstr[0] "Adicionar Contato"
+msgstr[1] "Adicionar Contato"
 
 #: Messenger/js/Layout.js:178
-#: Messenger/js/ConfigWindow.js:8
-msgid "Preferences"
-msgstr "Preferências"
+msgid "Logout"
+msgid_plural "Logout"
+msgstr[0] "Sair"
+msgstr[1] "Sair"
+
+#: Messenger/js/Layout.js:189
+msgid "Preference"
+msgid_plural "Preferences"
+msgstr[0] "Preferências"
+msgstr[1] "Preferências"
 
 #: Messenger/js/RosterTree.js:17
 #: Messenger/js/RosterTree.js:126
@@ -269,6 +320,10 @@ msgstr "Excluir Grupo"
 msgid "Subscription"
 msgstr "Assinatura"
 
+#: Messenger/js/ConfigWindow.js:8
+msgid "Preferences"
+msgstr "Preferências"
+
 #: Messenger/js/ConfigWindow.js:22
 msgid "Notifications"
 msgstr "Notificações"
@@ -313,45 +368,41 @@ msgstr "Cancelar"
 msgid "was successfully removed!"
 msgstr "foi excluído com sucesso!"
 
-#: Messenger/js/RosterHandler.js:305
-#: Messenger/js/RosterHandler.js:359
+#: Messenger/js/RosterHandler.js:299
+#: Messenger/js/RosterHandler.js:353
 msgid "Successful"
 msgstr "Com sucesso"
 
-#: Messenger/js/RosterHandler.js:305
-#: Messenger/js/RosterHandler.js:359
-#: Messenger/js/RosterHandler.js:361
+#: Messenger/js/RosterHandler.js:299
+#: Messenger/js/RosterHandler.js:353
+#: Messenger/js/RosterHandler.js:355
 msgid "The group "
 msgstr "O grupo"
 
-#: Messenger/js/RosterHandler.js:305
+#: Messenger/js/RosterHandler.js:299
 msgid " was successfully renamed to "
 msgstr " foi renomeado com sucesso "
 
-#: Messenger/js/RosterHandler.js:309
+#: Messenger/js/RosterHandler.js:303
 msgid " already exist. It was not renamed."
 msgstr " já existe. Não foi renomeado."
 
-#: Messenger/js/RosterHandler.js:359
+#: Messenger/js/RosterHandler.js:353
 msgid " was successfully removed!"
 msgstr " foi excluído com sucesso!"
 
-#: Messenger/js/RosterHandler.js:361
+#: Messenger/js/RosterHandler.js:355
 msgid " was not removed!"
 msgstr " não foi excluído!"
 
-#~ msgid "Configuration"
-#~ msgstr "Configurações"
-#~ msgid "Away"
-#~ msgstr "Ausente"
-#~ msgid "Do Not Disturb"
-#~ msgstr "Não Perturbe"
-#~ msgid "Unavailable"
-#~ msgstr "Indisponível"
-#~ msgid "Available"
-#~ msgstr "Disponível"
 #~ msgid " is typing..."
 #~ msgstr " está digitando..."
+
 #~ msgid " stopped typing!"
 #~ msgstr " parou de digitar!"
 
+#~ msgid "Configuration"
+#~ msgstr "Configurações"
+
+#~ msgid "Available"
+#~ msgstr "Disponível"

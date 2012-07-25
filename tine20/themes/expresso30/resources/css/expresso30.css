@@ -1,15 +1,15 @@
 /*!
- * Ext JS Library 3.1.0
- * Copyright(c) 2006-2009 Ext JS, LLC
- * licensing@extjs.com
- * http://www.extjs.com/license
- */
+* Ext JS Library 3.1.0
+* Copyright(c) 2006-2009 Ext JS, LLC
+* licensing@extjs.com
+* http://www.extjs.com/license
+*/
 
 /*
- * Template para montagem do CSS
- * para os temas do Expresso 3.0
- * 22/dezembro/2011
- */
+* Template para montagem do CSS
+* para os temas do Expresso 3.0
+* 22/dezembro/2011
+*/
 .x-btn-medium .FelamimailIconCls { background-image: url(../images/expresso/toolbar/kmail.png) !important; }
 .x-btn-medium .action_delete { background-image: url(../images/expresso/toolbar/edit-delete.png) !important; }
 .x-btn-medium .action_email_reply { background-image: url(../images/expresso/toolbar/mail-reply-sender.png) !important; }
@@ -29,11 +29,11 @@
 .x-btn-group-ml, .x-btn-group-mr { background-image: none; }
 .x-tab-strip span.x-tab-strip-text { color: #9f9f9f; }
 .x-tab-strip-active span.x-tab-strip-text { color: #eee; }
-.tine-mainscreen-apptabspanel-menu-tabel { 
-	background-color: transparent; 
-	border-color: transparent !important; 
-	margin-top: -10px; 
-	z-index: 1000; 
+.tine-mainscreen-apptabspanel-menu-tabel {
+background-color: transparent;
+border-color: transparent !important;
+margin-top: -10px;
+z-index: 1000;
 }
 .tine-mainscreen-apptabspanel-menu-tabel span.x-tab-strip-text { font-size: 1.9em; font-weight: bold; color: #ddd; }
 .tine-mainscreen-apptabs { }
@@ -51,150 +51,137 @@
 .x-tree-node a span, .x-dd-drag-ghost a span { color: #616161; }
 .x-splitbar-h { background-color: #005483; }
 .x-splitbar-v { background-color: #005483; }
-.tine-mainscreen-centerpanel-center .x-panel-noborder .x-panel-body-noborder .x-grid-panel { /*border: solid 4px #fff;*/ }
 .x-grid3-hd-row td { border-left: solid 1px #fff; border-right: solid 1px #fff; }
 .x-grid3-header { background-color: #e4e4e4; background-image: none; }
 .tine-mainscreen-centerpanel-west .x-column-layout-ct .x-toolbar-layout-ct { border: solid 2px #fff; }
 .felamimail-recipient-grid .x-grid3 { background-color: transparent; }
 .x-grid3-row-selected { font-weight: bold; background-color: #d9e8fb; }
-.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct>.x-border-panel { 
-	border-style: solid;
-	border-width: 0 4px 0 4px;
-	border-color: #fff; 
-	padding-top: 4px;
+.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct>.x-border-panel {
+border-style: solid;
+border-width: 0 4px 0 4px;
+border-color: #fff;
+padding-top: 4px;
 }
-.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct>.x-border-panel:first-child { 
-	padding-top: 0;
+.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct>.x-border-panel:first-child {
+padding-top: 0;
 }
-.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct>.x-border-panel>.x-panel-bwrap:first-child { 
-/*	background-color: #f8b8b8;*/
-}
-.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct .x-layout-split-east { 
-	background-color: transparent;
+.tine-mainscreen-centerpanel-center>.x-panel-bwrap>.x-panel-body-noheader>.x-panel-noborder>.x-panel-bwrap>.x-border-layout-ct .x-layout-split-east {
+background-color: transparent;
 }
 .tine-mainscreen-centerpanel-west { border: solid 2px #fff; }
 .x-window {	background-color: #e4e4e4 !important; }
 .x-window-dlg { background-color: #f7f7f7 !important; }
 
-.x-toolbar .x-btn-over .x-btn-mc em.x-btn-split, 
-.x-toolbar .x-btn-click .x-btn-mc em.x-btn-split, 
-.x-toolbar .x-btn-menu-active .x-btn-mc em.x-btn-split, 
+.x-toolbar .x-btn-over .x-btn-mc em.x-btn-split,
+.x-toolbar .x-btn-click .x-btn-mc em.x-btn-split,
+.x-toolbar .x-btn-menu-active .x-btn-mc em.x-btn-split,
 .x-toolbar .x-btn-pressed .x-btn-mc em.x-btn-split {
-	background-image: url(../images/expresso/button/s-arrow-o.gif) !important;
+background-image: url(../images/expresso/button/s-arrow-o.gif) !important;
 }
 .x-toolbar .x-btn-mc em.x-btn-split {
-	background-image: url(../images/expresso/button/s-arrow-noline.gif) !important;
+background-image: url(../images/expresso/button/s-arrow-noline.gif) !important;
 }
 .x-btn-tl, .x-btn-tr, .x-btn-tc, .x-btn-ml, .x-btn-mr, .x-btn-mc, .x-btn-bl, .x-btn-br, .x-btn-bc {
-	background-image: url(../images/expresso/button/btn.gif);
-	background-image: none;
+background-image: url(../images/expresso/button/btn.gif);
+background-image: none;
 }
 .tb-login-panel table.x-btn-noicon {
-	background: url(../images/expresso/bt_entrar.png) no-repeat left top !important; height: 28px; 
+background: url(../images/expresso/bt_entrar.png) no-repeat left top !important; height: 28px;
 }
 .tb-login-panel tbody.x-btn-icon-small-left {
-	background-color: transparent;
+background-color: transparent;
 }
-/*.tb-login-panel tbody.x-btn-icon-small-left {
-	background: url(../images/expresso/bt_entrar.png) no-repeat 0px 0px !important; height: 28px; width: 80px !important; background-clip: padding-box !important;
-}*/
 .tb-login-panel .x-btn-icon-small-left tr .x-btn-mc { visibility: visible; background-color: transparent !important; }
 .tinebase-westpanel-node-favorite-shared img.x-tree-node-icon {
-	background-image: url(../images/oxygen-flat/16x16/actions/get-hot-new-stuff.png);
+background-image: url(../images/oxygen-flat/16x16/actions/get-hot-new-stuff.png);
 }
 
 .AddressbookIconCls {
-	background-image: url(../images/oxygen-flat/16x16/apps/kaddressbook.png) !important;
+background-image: url(../images/oxygen-flat/16x16/apps/kaddressbook.png) !important;
 }
 .FelamimailIconCls {
-	background-image: url(../images/oxygen-flat/16x16/apps/kmail.png) !important;
+background-image: url(../images/oxygen-flat/16x16/apps/kmail.png) !important;
 }
 .CalendarIconCls {
-	background-image: url(../images/calendar/view-calendar-day-1.png);
+background-image: url(../images/calendar/view-calendar-day-1.png);
 }
 .AdminIconCls {
-	background-image: url(../images/oxygen-flat/16x16/apps/systemtray.png) !important;
+background-image: url(../images/oxygen-flat/16x16/apps/systemtray.png) !important;
 }
 .x-btn-medium .SipgateIconCls {
-	background-image: url(../images/oxygen-flat/22x22/apps/kcall.png) !important;
+background-image: url(../images/oxygen-flat/22x22/apps/kcall.png) !important;
 }
 .x-btn-medium .PhoneIconCls {
-	background-image: url(../images/oxygen-flat/22x22/apps/kcall.png) !important;
+background-image: url(../images/oxygen-flat/22x22/apps/kcall.png) !important;
 }
-.x-progress-inner { 
-	background-color: white !important; 
-	background-image: none !important; 
-	/*padding: 1px;
-	padding-right: 1px !important;
-	overflow: hidden !important;*/
+.x-progress-inner {
+background-color: white !important;
+background-image: none !important;
 }
 .x-progress-bar {
-	background-color: #333 !important;
-	background-image: none !important;
-	border-color: #333 !important;
-	overflow: hidden !important;
-/*	height: 14px !important;
-	overflow: hidden !important;
-	margin: 1px 1px 1px 1px !important;*/
+background-color: #333 !important;
+background-image: none !important;
+border-color: #333 !important;
+overflow: hidden !important;
 }
 .x-toolbar-cell .x-progress-bar {
-	height: 10px !important;
+height: 10px !important;
 }
 .x-progress-wrap {
-	border-color: #333 !important;
-	border-radius: 1px; 
-	-moz-border-radius: 1px;
-	background-color: white !important; 
-	padding: 1px !important;
+border-color: #333 !important;
+border-radius: 1px;
+-moz-border-radius: 1px;
+background-color: white !important;
+padding: 1px !important;
 }
 .x-progress-text-back {
-	color: #333 !important;
-	font-weight: bold !important;
+color: #333 !important;
+font-weight: bold !important;
 }
 .action_saveFilter {
-	background-image: url(../images/oxygen-flat/16x16/actions/document-save.png) !important;
+background-image: url(../images/oxygen-flat/16x16/actions/document-save.png) !important;
 }
 .x-toolbar .xtb-sep {
-	background-image: none;
-	background-color: #ccc;
-	width: 1px;
+background-image: none;
+background-color: #ccc;
+width: 1px;
 }
 .x-tbar-page-first {
-	background-image: url(../images/expresso/grid/page-first.gif) !important;
+background-image: url(../images/expresso/grid/page-first.gif) !important;
 }
 .x-tbar-page-prev {
-	background-image: url(../images/expresso/grid/page-prev.gif) !important;
+background-image: url(../images/expresso/grid/page-prev.gif) !important;
 }
 .x-tbar-page-next {
-	background-image: url(../images/expresso/grid/page-next.gif) !important;
+background-image: url(../images/expresso/grid/page-next.gif) !important;
 }
 .x-tbar-page-last {
-	background-image: url(../images/expresso/grid/page-last.gif) !important;
+background-image: url(../images/expresso/grid/page-last.gif) !important;
 }
 .x-item-disabled .x-tbar-page-first {
-	background-image: url(../images/expresso/grid/page-first-disabled.gif) !important;
+background-image: url(../images/expresso/grid/page-first-disabled.gif) !important;
 }
 .x-item-disabled .x-tbar-page-prev {
-	background-image: url(../images/expresso/grid/page-prev-disabled.gif) !important;
+background-image: url(../images/expresso/grid/page-prev-disabled.gif) !important;
 }
 .x-item-disabled .x-tbar-page-next {
-	background-image: url(../images/expresso/grid/page-next-disabled.gif) !important;
+background-image: url(../images/expresso/grid/page-next-disabled.gif) !important;
 }
 .x-item-disabled .x-tbar-page-last {
-	background-image: url(../images/expresso/grid/page-last-disabled.gif) !important;
+background-image: url(../images/expresso/grid/page-last-disabled.gif) !important;
 }
 .tw-ftb-filterpanel .ux-arrowcollapse .x-tool-toggle {
-	background-color: #fff;;
+background-color: #fff;;
 }
 .ux-arrowcollapse .x-tool-toggle {
-	background-image: url(../images/expresso/tree/arrows.gif);
+background-image: url(../images/expresso/tree/arrows.gif);
 }
 
 
 /**************************************************/
-/* PRIMEIRA PARTE                                 */
+/* PRIMEIRA PARTE */
 /**************************************************/
-/* reseta o css padrao                            */
+/* reseta o css padrao */
 /**************************************************/
 /* logotipo original do tine */
 .tb-login-lobobox a img { visibility: hidden; }
@@ -203,7 +190,7 @@
 /* fundo da tela das aplicações */
 .x-tab-panel-body { background-color: transparent; }
 /* painéis da janela de login */
-.x-panel-tl, .x-panel-tr, .x-panel-tc, .x-panel-ml, .x-panel-mr, .x-panel-mc, .x-panel-bl, 
+.x-panel-tl, .x-panel-tr, .x-panel-tc, .x-panel-ml, .x-panel-mr, .x-panel-mc, .x-panel-bl,
 .x-panel-br, .x-panel-bc { border-color: transparent; background-color: transparent; background-image: none; }
 /* fundo da toolbar */
 .x-toolbar { background-color: transparent;	background-image: none; }
@@ -215,71 +202,65 @@
 /* fundo da área do nome do usuário */
 .tine-mainscreen-mainmenu .x-toolbar { background-color: transparent !important; background-image: none !important; }
 /* painel de progresso e demais popups */
-.x-window-tl, .x-window-tr, .x-window-tc, .x-window-ml, .x-window-mr, .x-window-mc, .x-window-bl, 
+.x-window-tl, .x-window-tr, .x-window-tc, .x-window-ml, .x-window-mr, .x-window-mc, .x-window-bl,
 .x-window-br, .x-window-bc { border-color: transparent; background-color: transparent !important; background-image: none; }
 
 
 /**************************************************/
-/* SEGUNDA PARTE                                  */
+/* SEGUNDA PARTE */
 /**************************************************/
-/* seta o css geral                               */
+/* seta o css geral */
 /**************************************************/
 html {
-	background: #e9e9e9 url(../images/expresso/barra-superior.png) repeat-x left top;
-/*	-webkit-background-size: contain !important;
-	-moz-background-size: contain !important;
-	-o-background-size: contain !important;
-	background-size: contain !important;*/
+background: #e9e9e9 url(../images/expresso/barra-superior.png) repeat-x left top;
 }
 
 body {
-/*    background: fundo geral */
-	background: transparent none;
+/* background: fundo geral */
+background: transparent none;
 }
 
 #tine-viewport-maincardpanel .x-panel .x-panel-bwrap .x-panel-body {
-	background-color: transparent;
+background-color: transparent;
 }
 
 
 /**************************************************/
-/* TERCEIRA PARTE                                 */
+/* TERCEIRA PARTE */
 /**************************************************/
-/* seta o css do login                            */
+/* seta o css do login */
 /**************************************************/
 .tb-login-panel { /* fundo do painel de login */
-	background: #ddd url(../images/expresso/fundo-login.png) repeat-y left top;
-	border: solid 5px #777;
-	opacity: 0.8;
-	padding: 0 !important;
-	top: 160px !important;
-	left: 60px !important;
-	width: 360px !important;
+background: #ddd url(../images/expresso/fundo-login.png) repeat-y left top;
+border: solid 5px #777;
+opacity: 0.8;
+padding: 0 !important;
+top: 160px !important;
+left: 60px !important;
+width: 360px !important;
 }
-.tb-login-panel .x-form-item { 
-	font: normal 11px tahoma, arial, helvetica, sans-serif !important; 
-	margin-bottom: 2px !important;
+.tb-login-panel .x-form-item {
+font: normal 11px tahoma, arial, helvetica, sans-serif !important;
+margin-bottom: 2px !important;
 }
 
 .tb-login-lobobox { /* logotipo do expresso */
-	background: transparent url(../images/expresso/logo-expresso-40.png) no-repeat center top; 
+background: transparent url(../images/expresso/logo-expresso-40.png) no-repeat center top;
 }
 
 .tb-login-infosection, .tb-login-big-label { /* texto do tine no login */
-	display: none;
-/*	color: #fff !important;*/
+display: none;
 }
 
 .tb-login-infosection a {
-	display: none;
-/*	color: #9ff !important;*/
+display: none;
 }
 
 
 /**************************************************/
-/* QUARTA PARTE                                   */
+/* QUARTA PARTE */
 /**************************************************/
-/* tela de aplicações                             */
+/* tela de aplicações */
 /**************************************************/
 /* fundo área central */
 .tine-mainscreen-centerpanel { background-color: white; }
@@ -291,16 +272,16 @@ body {
 
 /* fundo, layer 1 - composto por quatro painéis */
 .tine-mainscreen-topbox, .tine-mainscreen-mainmenu, .tine-mainscreen-apptabs { /* fundo área tabs */
-	background-color: transparent;
+background-color: transparent;
 }
 
 .tine-mainscreen-topbox .x-panel-body, .tine-mainscreen-mainmenu .x-panel-body, .tine-mainscreen-apptabs .x-panel-body { /* fundo área tabs */
-	background-color: #d4d4d4;
+background-color: #d4d4d4;
 }
 
 /* nome do usuário */
 .tine-mainscreen-mainmenu .x-toolbar-right .x-btn-text {
-	color: #0f3852; 
+color: #0f3852;
 }
 
 /* texto de toolbar button enabled */
@@ -313,9 +294,9 @@ body {
 
 
 /**************************************************/
-/* QUINTA PARTE                                   */
+/* QUINTA PARTE */
 /**************************************************/
-/* telas de mensagens, alertas e progresso        */
+/* telas de mensagens, alertas e progresso */
 /**************************************************/
 .x-window {	background-color: #fff;	border: solid 3px #024;	border-radius: 7px; -moz-border-radius: 7px; }
 
@@ -339,13 +320,9 @@ body {
 /* new insertions */
 body {
     background: transparent url(../images/expresso/logo-expresso-comunidade.png) no-repeat 60px 20px;
-/*	-webkit-background-size: contain !important;
-	-moz-background-size: contain !important;
-	-o-background-size: contain !important;
-	background-size: contain !important;*/
 }
 .tb-login-lobobox {
-	display: none;
+display: none;
 }
 .tb-login-panel .x-form { height: auto !important; padding-top: 10px !important; padding-bottom: 0px !important; }
 .tb-login-panel .x-form .x-form-field { width: 150px !important; }
@@ -353,156 +330,148 @@ body {
 .tb-login-panel .x-panel-footer { width: 313px !important; }
 .tb-login-panel .x-btn-text { font-size: 14px; }
 #tine-viewport-maincardpanel {
-	z-index: 0;
-	width: 100%;
-	height: 110px;
-	background: transparent url(../images/expresso/logo-expresso-trem.png) no-repeat 0px 345px;
-/*	-webkit-background-size: contain !important;
-	-moz-background-size: contain !important;
-	-o-background-size: contain !important;
-	background-size: contain !important;*/
+z-index: 0;
+width: 100%;
+height: 110px;
+background: transparent url(../images/expresso/logo-expresso-trem.png) no-repeat 0px 345px;
 }
-#ext-comp-1003 {
-	z-index: 0;
-	width: 100%;
-	height: 100%;
-	background: transparent url(../images/expresso/barra-inferior.png) repeat-x 0px 460px;
-/*	-webkit-background-size: contain !important;
-	-moz-background-size: contain !important;
-	-o-background-size: contain !important;
-	background-size: contain !important;*/
+#tine-viewport-maincardpanel>.x-panel-noborder {
+z-index: 0;
+width: 100%;
+height: 100%;
+background: transparent url(../images/expresso/barra-inferior.png) repeat-x 0px 460px;
 }
-.tine-mainscreen-centerpanel-north .x-toolbar { 
-	border-top: none; 
+.tine-mainscreen-centerpanel-north .x-toolbar {
+border-top: none;
 }
 .tine-mainscreen-apptabs {
-	position: absolute;
-	z-index: 100;
-	top: 20px !important;
-	height: 23px !important;
-	background-color: transparent; 
-/*	background: #d4d4d4 url(../images/expresso/mainmenu-bg.gif) repeat-x left bottom;*/
+position: absolute;
+z-index: 100;
+top: 20px !important;
+height: 23px !important;
+background-color: transparent;
 }
 .tine-mainscreen-apptabs .x-panel-bwrap .x-panel-body {
-	height: 23px !important;
+height: 23px !important;
 }
 .tine-mainscreen-centerpanel {
 }
 .x-tab-with-icon {
-	height: 20px !important;
+height: 20px !important;
 }
 
 .x-form-field-wrap .x-form-search-trigger {
-	background-image: url(../images/default/form/search-trigger.gif);
+background-image: url(../images/default/form/search-trigger.gif);
 }
 .x-html-editor-tb {
-	background-color: #f0f0f0; 
+background-color: #f0f0f0;
 }
 .felamimail-recipient-grid .x-grid3-td-type {
-	background-color: transparent;
+background-color: transparent;
 }
-.x-edit-spellchecker { 
-	background: url(../../../../library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/images/default/googiespell/spellc.png) 0 0 no-repeat !important;
+.x-edit-spellchecker {
+background: url(../../../../library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/images/default/googiespell/spellc.png) 0 0 no-repeat !important;
 }
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close {
-	background-image: url(../images/default/tabs/tab-close.gif);
+background-image: url(../images/default/tabs/tab-close.gif);
 }
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:hover {
-	background-image: url(../images/default/tabs/tab-close.gif);
+background-image: url(../images/default/tabs/tab-close.gif);
 }
 .x-tab-strip-active {
-	height: 21px !important;
+height: 21px !important;
 }
-.x-tab-strip-closable { 
-	border-bottom: solid 1px #444; 
+.x-tab-strip-closable {
+border-bottom: solid 1px #444;
 }
-.x-tab-strip-active { 
-	background-color: #005483; 
-	border-style: solid; 
-	border-width: 1px; 
-	border-color: #444; 
-	border-bottom: none; 
+.x-tab-strip-active {
+background-color: #005483;
+border-style: solid;
+border-width: 1px;
+border-color: #444;
+border-bottom: none;
 }
 .x-btn-medium .action_add {
-	background-image: url(../images/oxygen-flat/22x22/actions/list-add.png) !important;
+background-image: url(../images/oxygen-flat/22x22/actions/list-add.png) !important;
 }
 .x-btn-medium .AddressbookIconCls {
-	background-image: url(../images/oxygen-flat/22x22/apps/kaddressbook.png) !important;
+background-image: url(../images/oxygen-flat/22x22/apps/kaddressbook.png) !important;
 }
 .x-btn .action_saveAsDraft {
-	background-image: url(../images/oxygen-flat/16x16/places/folder-txt.png);
+background-image: url(../images/oxygen-flat/16x16/places/folder-txt.png);
 }
 .x-btn .action_saveAsTemplate {
-	background-image: url(../images/oxygen-flat/16x16/places/folder-tar.png);
+background-image: url(../images/oxygen-flat/16x16/places/folder-tar.png);
 }
 .notes_noteIcon {
-	background-image: url(../images/oxygen-flat/16x16/actions/note.png) !important;
+background-image: url(../images/oxygen-flat/16x16/actions/note.png) !important;
 }
 .x-btn-medium .action_edit {
-	background-image: url(../images/oxygen-flat/22x22/actions/edit.png) !important;
+background-image: url(../images/oxygen-flat/22x22/actions/edit.png) !important;
 }
 .action_export {
-	background-image: url(../images/oxygen-flat/16x16/actions/file-export.png) !important;
+background-image: url(../images/oxygen-flat/16x16/actions/file-export.png) !important;
 }
 .action_import {
-	background-image: url(../images/oxygen-flat/16x16/actions/file-import.png) !important;
+background-image: url(../images/oxygen-flat/16x16/actions/file-import.png) !important;
 }
 .preview-panel {
-	background-color: #e4e4e4;
+background-color: #e4e4e4;
 }
 .preview-panel-timesheet-right {
-	border-color: #e4e4e4;
+border-color: #e4e4e4;
 }
 .x-grid3-row-over {
-	background: #eef3f7 none !important;
+background: #eef3f7 none !important;
 }
 .preview-panel-felamimail {
-	padding: 0px; padding-top: 4px;
+padding: 0px; padding-top: 4px;
 }
 .x-tool {
     background-image: url(../images/default/panel/tool-sprites.gif);
 }
 .flag_unread td {
-	font-weight: bold;
+font-weight: bold;
 }
 .x-window-dlg .ext-mb-info {
-	background-image: url(../images/default/window/icon-info-flat.png);
-} 
+background-image: url(../images/default/window/icon-info-flat.png);
+}
 .x-window-dlg .ext-mb-warning {
-	background-image: url(../images/default/window/icon-warning-flat.png);
+background-image: url(../images/default/window/icon-warning-flat.png);
 }
 .x-window-dlg .ext-mb-question {
-	background-image: url(../images/default/window/icon-question-flat.png);
+background-image: url(../images/default/window/icon-question-flat.png);
 }
 .x-window-dlg .ext-mb-error {
-	background-image: url(../images/default/window/icon-error-flat.png);
+background-image: url(../images/default/window/icon-error-flat.png);
 }
 .action_logOut {
-	background-image: url(../images/oxygen-flat/16x16/actions/system-shutdown.png) !important;
+background-image: url(../images/oxygen-flat/16x16/actions/system-shutdown.png) !important;
 }
 .tine-favicon {
-	color: transparent !important;
-	background-image: none !important;
+color: transparent !important;
+background-image: none !important;
 }
-.tw-ftb-filterstructure-treepanel .x-panel-tbar-noborder .x-toolbar, 
-.tw-ftb-filterstructure-treepanel .x-panel-body, 
-.tw-ftb-filterpanel .x-panel-body, 
+.tw-ftb-filterstructure-treepanel .x-panel-tbar-noborder .x-toolbar,
+.tw-ftb-filterstructure-treepanel .x-panel-body,
+.tw-ftb-filterpanel .x-panel-body,
 .tw-ftb-filterpanel .x-toolbar {
-	background-color: white !important;
+background-color: white !important;
 }
 .x-btn-medium .cal-grid-view-type {
-	background-image: url('../images/oxygen-flat/22x22/actions/view-calendar-list.png') !important;
+background-image: url('../images/oxygen-flat/22x22/actions/view-calendar-list.png') !important;
 }
 .x-btn-medium .cal-sheet-view-type {
-	background-image: url('../images/oxygen-flat/22x22/actions/view-calendar-week.png') !important;
+background-image: url('../images/oxygen-flat/22x22/actions/view-calendar-week.png') !important;
 }
 .x-panel-bwrap .tw-filtertoolbar {
-	padding-top: 0px; 
+padding-top: 0px;
 }
-.x-accordion-hd { 
-	background: #d4d4d4 none;
+.x-accordion-hd {
+background: #d4d4d4 none;
 }
 .x-btn .x-btn-icon-small-left { border: solid 2px #68a !important; border-radius: 3px; -moz-border-radius: 3px; }
 #tine-viewport-maincardpanel>.x-panel>.x-panel-bwrap>.x-panel-body>.x-box-inner {
-	background: #d4d4d4 url(../images/expresso/logo-expresso-comunidade-small.png) no-repeat 7px 5px !important;
+background: #d4d4d4 url(../images/expresso/logo-expresso-comunidade-small.png) no-repeat 7px 5px !important;
 }
+.x-window-dlg button.x-btn-text:focus { font-style: italic; text-decoration: underline; color: #ec8537; }
