@@ -192,7 +192,7 @@ Tine.Messenger.ChatHandler = {
 
                 if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
                     message = state;
-                } else if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
+                } else if(state == Tine.Messenger.ChatHandler.PAUSED_STATE){
                     message = state;
                 } else {
                     message = state;

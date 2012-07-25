@@ -207,7 +207,7 @@ Tine.Messenger.LogHandler = {
             default:
                 message = err_msg;
         }
-        Tine.Messenger.LogHandler.status(_('SERVER ERROR'), message);
+        Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message);
         Tine.Messenger.Log.error(Tine.Tinebase.appMgr.get('Messenger').i18n._('Error number ') + $(_iq).children("error").attr("code"));
         
         return true;

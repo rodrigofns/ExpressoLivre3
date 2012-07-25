@@ -90,6 +90,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             console.log('\\/ |\\/| |     |  |\\ |');
             console.log('/\\ |  | |__   |  | \\|');
             console.log(xml);
+            console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var challenge = $(xml).find('challenge');
             if (challenge.length > 0)
                 console.log(challenge.text());
@@ -99,6 +100,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             console.log('\\/ |\\/| |     /==\\ | | ====');
             console.log('/\\ |  | |__   \\__/ |_|   |');
             console.log(xml);
+            console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var response = $(xml).find('response');
             if (response.length > 0)
                 console.log(response.text());
@@ -261,12 +263,12 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         
             // Start unload events
             window.onbeforeunload = function () {
-                //return _("You're logged in Messenger. If you leave the page, Messenger will disconnect!");
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
             }
 
             // Leaving the page cause disconnection
             window.onunload = function () {
-                XMPPConnection.disconnect('Leaving the Expresso Messenger page!');
+                Tine.Tinebase.appMgr.get('Messenger').stopMessenger();
             }
         } else if (status === Strophe.Status.DISCONNECTED) {
             Tine.Messenger.RosterHandler.clearRoster();
