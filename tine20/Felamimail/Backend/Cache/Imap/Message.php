@@ -132,8 +132,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return 'felamimail_cache_message';
     }
     
-    
-    
     /**
     * get folder ids of all inboxes for accounts of current user
     *
@@ -204,6 +202,34 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $return;
         
     }
+    
+    /**
+     *
+     * @param type $paths
+     * @return type 
+     */
+    protected function _getFoldersInfo($paths)
+    {
+        $return = array();
+        foreach ($paths as $tmp)
+        {
+            $tmp = explode(self::IMAPDELIMITER, $tmp);
+            
+            if (empty($tmp[0]))
+            {
+                array_shift($tmp);
+            }
+            
+            $userId = array_shift($tmp);
+            $folderId = array_pop($tmp);
+            $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
+            $folderArray = $folder->toArray();
+            
+            $return[$folderId] = array($userId, $folderArray['globalname']);
+        }
+        
+        return $return;
+    }
 
     /**
      * get all folders globalname and accountId
@@ -235,25 +261,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             $paths = array_merge($paths,  $pathFilter['value']);
         }
         
-        $return = array();
-        foreach ($paths as $tmp)
-        {
-            $tmp = explode(self::IMAPDELIMITER, $tmp);
-            
-            if (empty($tmp[0]))
-            {
-                array_shift($tmp);
-            }
-            
-            $userId = array_shift($tmp);
-            $folderId = array_pop($tmp);
-            $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
-            $folderArray = $folder->toArray();
-            
-            $return[$folderId] = array($userId, $folderArray['globalname']);
-        }
-        
-        return $return;
+        return $this->_getFoldersInfo($paths);
     }
     
     /**
@@ -294,33 +302,79 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                 $operator = $filter->getOperator();
             }
             
-            if (!empty($value))
-            {
+//            if (!empty($value))
+//            {
                 switch ($field)
                 {
                     case 'query' :
-                        $return[] = "OR SUBJECT $value FROM $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "OR SUBJECT $value FROM $value";
+                        }
                         break;
                     case 'subject' :
-                        $return[] = "SUBJECT $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "SUBJECT $value";
+                        }
                         break;
-                    case 'from_name' : // we can'nt diferentiate with imap filters
+                    case 'from_name' : // we can't diferentiate with imap filters
                     case 'from_email' :
-                        $return[] = "FROM $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "FROM $value";
+                        }
                         break;
                     case 'to' :
-                        $return[] = "TO $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "TO $value";
+                        }
                         break;
                     case 'cc' :
-                        $return[] = "CC $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "CC $value";
+                        }
                         break;
                     case 'bcc' :
-                        $return[] = "BCC $value";
+                        if (!empty($value))
+                        {
+                            $return[] = "BCC $value";
+                        }
                         break;
                     case 'received' :  // => array('filter' => 'Tinebase_Model_Filter_DateTime'),
-                        $return[] = $filter->getFilterImap();
+                        if (!empty($value))
+                        {
+                            $return[] = $filter->getFilterImap();
+                        }
+                        break;
+                    case 'flags' :
+                        $func = function($flag)
+                        {
+                            switch ($flag)
+                            {
+                                case '\Answered'    : return 'UNANSWERED';
+                                case '\Flagged'     : return 'UNFLAGGED';
+                                case '\Seen'        : return 'UNSEEN';
+                                case '\Draft'       : return 'UNDRAFT';
+                                case '\Deleted'     : return 'UNDELETED';
+                            }
+                        };
+                        $value = array_map($func, $value);
+                        
+                        switch ($operator)
+                        {
+                            case 'in' :
+                                $return[] = empty($value) ? 'UNSEEN' : 'NOT (' . implode(' ',$value) . ')';
+                                break;
+                            case 'notin' :
+                                $return[] = empty($value) ? 'UNSEEN' : implode(' ',$value);
+                                break;
+                        }
+                        break;
                 }
-            }
+//            }
         }
         return $return;
         
@@ -517,8 +571,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @return Tinebase_Record_RecordSet|array
      *
      * @todo implement sort
-     * @todo implement other searches
-     * @todo bug when searching in more than one folder, getting last folder in the messages list
+     * @todo implement id,messageuid,folder_id,account_id search
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
@@ -537,12 +590,18 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             return $this->getMultiple($ids);
         }
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
+        
+        if (!isset($imapFilters['paths']))
+        {
+            $paths = $this->_getAllFolders();
+            $imapFilters['paths'] = $this->_getFoldersInfo($paths);
+        }
+            
         $paginationAttr = $_pagination->toArray();
         
-        if (!(empty($imapFilters['paths'])))
-        {
-            $ids = $this->_getIds($imapFilters);
-        }
+        
+        $ids = $this->_getIds($imapFilters);
+        
         
         // get Summarys and merge results
         foreach ($ids as $folderId => $idsInFolder)
