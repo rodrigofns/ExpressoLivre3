@@ -428,6 +428,10 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             {
                 $return = $this->_parseFilterGroup($filter, $_pagination);
             }
+            else if ($filter instanceof Tinebase_Model_Filter_Id)
+            {
+                $return['filters'] = 'Id';
+            }
             else if ($filter instanceof Tinebase_Model_Filter_Abstract)
             {
                 $return['filters'] = array_merge($return['filters'], 
@@ -585,48 +589,54 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $messages = array();
         $filterObjects = $_filter->getFilterObjects();
         
-        if(sizeof($filterObjects) == 1 && $filterObjects[0] instanceof Tinebase_Model_Filter_Id){
-            $ids = $filterObjects[0]->getValue();
-            return $this->getMultiple($ids);
-        }
+        
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         
-        if (!isset($imapFilters['paths']))
-        {
-            $paths = $this->_getAllFolders();
-            $imapFilters['paths'] = $this->_getFoldersInfo($paths);
-        }
+        if($imapFilters['filters'] == 'Id'){
+            $ids = $filterObjects[0]->getValue();
+            $messages = $this->getMultiple($ids);
+            $messages = $messages->toArray();
+        }else{
+
+            if (!isset($imapFilters['paths']))
+            {
+                $paths = $this->_getAllFolders();
+                $imapFilters['paths'] = $this->_getFoldersInfo($paths);
+            }
+
             
-        $paginationAttr = $_pagination->toArray();
-        
-        
-        $ids = $this->_getIds($imapFilters);
-        
-        
-        // get Summarys and merge results
-        foreach ($ids as $folderId => $idsInFolder)
-        {
-            $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
 
-            $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
-            $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
-            $messages = array_merge($messages, $imap->getSummary($idsInFolder, null, null, $folderId));
+
+            $ids = $this->_getIds($imapFilters);
+
+
+            // get Summarys and merge results
+            foreach ($ids as $folderId => $idsInFolder)
+            {
+                $folder = Felamimail_Controller_Folder::getInstance()->get($folderId);
+
+                $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
+                $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
+                $messages = array_merge($messages, $imap->getSummary($idsInFolder, null, null, $folderId));
+            }
+
+            if (empty($messages))
+            {
+                return $this->_rawDataToRecordSet(array());
+            }
         }
-
-        if (empty($messages))
-        {
-            return $this->_rawDataToRecordSet(array());
-        }
-
         // TODO: do array sort of $messagesArray with callback()
         $sorted = $messages;
-
+        $paginationAttr = $_pagination->toArray();
         // Apply Pagination and get the resulting summary
         $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
         $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
 
         // Put headers into model
-        $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
+        if($imapFilters['filters'] == 'Id'){
+            $return = empty($chunked[$chunkIndex])?new Tinebase_Record_RecordSet('Felamimail_Model_Message', array(), true): new Tinebase_Record_RecordSet('Felamimail_Model_Message', $chunked[$chunkIndex], true);
+        }else
+            $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
 
         Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
         
@@ -670,7 +680,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
      */
     public function updateMultiple($_ids, $_data) 
     {   
-        return 0;
+        return Null;
     }
     
     
