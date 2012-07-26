@@ -32,9 +32,8 @@ class Felamimail_Controller_Cache_Folder
      *
      * don't use the constructor. use the singleton
      */
-    private function __construct() {
-        $this->_backend = Felamimail_Backend_Folder::getInstance();
-        $this->_currentAccount = Tinebase_Core::getUser();
+    private function __construct()
+    {
     }
     
     /**
