@@ -48,8 +48,12 @@
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.HtmlEditor.ButtonImage.js"></script>
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/DataView-more.js"></script>		
 
-     <?php echo Tinebase_View::getJSConfig()?>
+     <?php 
+        echo Tinebase_View::getJSConfig();
+        $locale = new Zend_Locale(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2));
+        $translate = Tinebase_Translation::getTranslation('Tinebase',$locale);
+     ?>
 
-    <noscript><p>You need to enable javascript to use <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
+    <noscript><p> <?php echo $translate->_('You need to enable javascript to use') ?> <a href="http://www.tine20.org/" title="online open source groupware and crm">Tine 2.0</a></p></noscript>
 </body>
 </html>

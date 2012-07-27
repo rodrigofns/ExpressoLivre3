@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-07-18 14:29-0300\n"
+"PO-Revision-Date: 2012-07-25 16:53-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
@@ -777,4 +777,10 @@ msgstr "Todos os contatos que eu modifiquei"
 #: Setup/setup.xml:648
 msgid "Internal Contacts"
 msgstr "Contatos Internos"
+
+msgid "tag"
+msgstr "marcador"
+
+msgid "marcadores"
+msgstr "etiquetas"
 
