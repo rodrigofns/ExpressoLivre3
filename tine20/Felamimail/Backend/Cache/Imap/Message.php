@@ -627,7 +627,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         }
         // TODO: do array sort of $messagesArray with callback()
         $sorted = $messages;
-        $paginationAttr = $_pagination->toArray();
+        if(!$_pagination){
+            $paginationAttr = array('start' => 0, 'limit' => 1000000);
+        }
+        else    
+            $paginationAttr = $_pagination->toArray();
         // Apply Pagination and get the resulting summary
         $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
         $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
@@ -753,17 +757,18 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
       */
     public function delete($_id) 
     {
-/*        
-Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message delete = $_id ' . print_r($_id,true));
-*/ 
-//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-//        $retorno = $aux->delete($_id);
-        
-//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message delete = $retorno ' . print_r($retorno,true));
-        
-        
+        if(is_array($_id)){
+            foreach($_id as $id){
+                $decodedIds = self::decodeMessageId($id);
+                $globalname = Felamimail_Backend_Cache_Imap_Folder::decodeFolderUid($decodedIds['folderId']);
+                $accountId = $decodedIds['accountId'];
+                $imap = Felamimail_Backend_ImapFactory::factory($accountId);
+                $imap->expunge($globalname['globalName']);
+                $return = count($_id);
+            }
+        }
             
-        return 0;
+        return $return; 
     }
     
     
