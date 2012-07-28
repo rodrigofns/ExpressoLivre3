@@ -18,7 +18,7 @@
  * @package     Felamimail
  * @subpackage  Controller
  */
-class Felamimail_Controller_Folder extends Felamimail_Controller_Folder_Abstract
+class Felamimail_Controller_Folder
 {
     /**
      * holds the instance of the singleton
@@ -32,10 +32,11 @@ class Felamimail_Controller_Folder extends Felamimail_Controller_Folder_Abstract
      *
      * don't use the constructor. use the singleton
      */
-    private function __construct() {
-        $this->_currentAccount = Tinebase_Core::getUser();
-        $this->_backend = Felamimail_Backend_Folder::getInstance();
-        $this->_cacheController = Felamimail_Controller_Cache_Folder::getInstance();
+    private function __construct()
+    {
+        //$this->_currentAccount = Tinebase_Core::getUser();
+        //$this->_backend = Felamimail_Backend_Folder::getInstance();
+        //$this->_cacheController = Felamimail_Controller_Cache_Folder::getInstance();
     }
     
     /**
@@ -53,8 +54,9 @@ class Felamimail_Controller_Folder extends Felamimail_Controller_Folder_Abstract
      */
     public static function getInstance() 
     {
-        if (self::$_instance === NULL) {
-            self::$_instance = new Felamimail_Controller_Folder();
+        if (self::$_instance === NULL)
+        {
+            self::$_instance = Felamimail_Controller_Cache_Folder::getInstance();
         }
         
         return self::$_instance;

@@ -27,7 +27,9 @@ class Felamimail_Controller_Cache_Imap_Message extends Felamimail_Controller_Cac
      */
     private function __construct()
     {
-        $this->_backend = Felamimail_Backend_Message::getInstance();
+        $this->_modelName = 'Felamimail_Model_Message';
+        $this->_doContainerACLChecks = FALSE;
+        $this->_backend = Felamimail_Backend_Message::getInstance();        
         $this->_currentAccount = Tinebase_Core::getUser();
     }
     
