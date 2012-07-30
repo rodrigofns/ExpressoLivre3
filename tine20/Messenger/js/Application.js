@@ -2,7 +2,7 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
-    MESSENGER_DEBUG = false;
+    MESSENGER_DEBUG = true;
 
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
@@ -257,6 +257,10 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 
             XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
+            );
+                
+            XMPPConnection.addHandler(
+                Tine.Messenger.FileTransfer.onRequest, null, 'message', 'expresso:filetransfer:request'
             );
 
             // Load emoticons.xml
