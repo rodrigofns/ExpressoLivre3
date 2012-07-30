@@ -571,16 +571,17 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 return $this->_rawDataToRecordSet(array());
             }
         }
+        
+        $pagination = !$_pagination ? new Tinebase_Model_Pagination() : $_pagination;
+        
         // TODO: do array sort of $messagesArray with callback()
-        $sorted = $messages;
-        if(!$_pagination){
-            $paginationAttr = array('start' => 0, 'limit' => 1000000);
-        }
-        else    
-            $paginationAttr = $_pagination->toArray();
+        $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
+        
+        uasort($messages, array($callback, 'compare'));
+
         // Apply Pagination and get the resulting summary
-        $chunked = array_chunk($sorted, $paginationAttr['limit'], true);
-        $chunkIndex = ($paginationAttr['start']/$paginationAttr['limit']);
+        $chunked = array_chunk($messages, $pagination->limit, true);
+        $chunkIndex = ($pagination->start/$pagination->limit);
 
         // Put headers into model
         if($imapFilters['filters'] == 'Id'){
@@ -588,7 +589,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         }else
             $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
 
-        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($sorted,true));
+        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($messages,true));
         
         return $return;
 //        
