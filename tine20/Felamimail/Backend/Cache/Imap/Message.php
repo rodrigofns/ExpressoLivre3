@@ -70,45 +70,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         ),
     );
     
-    // Use imap search command or imap list?
-    /**
-     * get type of imap command to use
-     * @param type $_filter
-     * @return boolean 
-     */
-    protected function _isSearh($_filter)
-    {
-        
-        $return = false;
-        $filters = $_filter[0]['filters'];
-        foreach ($filters as $filter)
-        {
-            
-            switch ($filter['field'])
-            {
-            
-                // TODO: do search in case of flags???
-                // TODO: we'll have cases with id, account_id, folder_id and messageuid?
-                case 'query' :
-                case 'subject' :
-                case 'from_email' :
-                case 'from_name' :
-                case 'received' :
-                case 'to' :
-                case 'cc' :
-                case 'bcc' :
-                    if (!empty($filter['value']))
-                    {
-                        $return = true;
-                    }
-                    break;
-            }
-        }
-        
-        return $return;
-        
-    }
-    
     /**
      * find existance of values recursivelly on array
      * @param array $array
@@ -381,21 +342,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
 //        $filters = $_filterArray['filters'];
 //        Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message Search = $_pagination' . print_r($_pagination,true));
         
-    }
-    
-    
-    protected function _hasFilter(Tinebase_Model_Filter_FilterGroup $_filter)
-    {
-        foreach ($_filter->getFilterModel() as $type => $value)
-        {
-            $filter = $_filter->getFilter($type);
-            if (is_array($filter) || is_object($filter))
-            {
-                $test = true;
-            }
-        }
-        
-        return $test;
     }
     
     /**
