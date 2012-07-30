@@ -193,7 +193,6 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
      */
     public function update(Tinebase_Record_Interface $_record)
     {
-        
         $folder = $_record->toArray();
         $return = $this->get($this->encodeFolderUid($folder['globalname'], $folder['account_id']));
         Return $return;   
@@ -258,21 +257,28 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                 $counter = $imap->examineFolder($folderDecoded['globalName']);
                 $status = $imap->getFolderStatus($folderDecoded['globalName']);
             }
-            if($folderDecoded['globalName'] == 'INBOX' || $folderDecoded['globalName'] == 'user')
+            $globalName = $folderDecoded['globalName'];
+            if($$globalName == 'INBOX' || $globalName == 'user')
+            {
                 $folder[$folderDecoded['globalName']]['parent'] = '';
+            }
             else
-                $folder[$folderDecoded['globalName']]['parent'] = substr($globalName, strrpos($globalName,self::IMAPDELIMITER));
+            {
+                $folder[$folderDecoded['globalName']]['parent'] = substr($globalName,0 , strrpos($globalName,self::IMAPDELIMITER));
+            }
+            $systemFolders = in_array(strtolower($folder[$folderDecoded['globalName']]['localName']), 
+                                                       Felamimail_Controller_Folder::getInstance()->getSystemFolders());
             
             return new Felamimail_Model_Folder(array(
                     'id' => $_id,
                     'account_id' => $folderDecoded['accountId'],
                     'localname' => Felamimail_Model_Folder::decodeFolderName($folder[$folderDecoded['globalName']]['localName']),
                     'globalname' => Felamimail_Model_Folder::decodeFolderName($folder[$folderDecoded['globalName']]['globalName']),
-                    'parent' => '',
+                    'parent' => $folder[$folderDecoded['globalName']]['parent'],
                     'delimiter' => $folder[$folderDecoded['globalName']]['delimiter'],
                     'is_selectable' => $folder[$folderDecoded['globalName']]['isSelectable'],
                     'has_children' => $folder[$folderDecoded['globalName']]['hasChildren'],
-                    'system_folder' => 0,
+                    'system_folder' => $systemFolders,
                     'imap_status' => Felamimail_Model_Folder::IMAP_STATUS_OK,
                     'imap_uidvalidity' => $counter['uidvalidity'],
                     'imap_totalcount' => $status['exists'],

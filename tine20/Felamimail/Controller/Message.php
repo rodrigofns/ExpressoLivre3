@@ -17,7 +17,7 @@
  * @package     Felamimail
  * @subpackage  Controller
  */
-class Felamimail_Controller_Message extends Felamimail_Controller_Message_Abstract
+class Felamimail_Controller_Message
 {
      /**
      * holds the instance of the singleton
@@ -33,11 +33,14 @@ class Felamimail_Controller_Message extends Felamimail_Controller_Message_Abstra
      */
     private function __construct() 
     {
+        /*
         $this->_modelName = 'Felamimail_Model_Message';
         $this->_doContainerACLChecks = FALSE;
         $this->_backend = Felamimail_Backend_Message::getInstance();        
         $this->_currentAccount = Tinebase_Core::getUser();        
         $this->_cacheController = Felamimail_Controller_Cache_Message::getInstance();
+         * 
+         */
     }
     
     /**
@@ -55,8 +58,9 @@ class Felamimail_Controller_Message extends Felamimail_Controller_Message_Abstra
      */
     public static function getInstance() 
     {
-        if (self::$_instance === NULL) {            
-            self::$_instance = new Felamimail_Controller_Message();
+        if (self::$_instance === NULL)
+        {            
+            self::$_instance = Felamimail_Controller_Cache_Message::getInstance();
         }
         
         return self::$_instance;
