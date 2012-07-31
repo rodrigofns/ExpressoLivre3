@@ -1,7 +1,8 @@
 <?php
 $file = '/tmp/messenger/' . $_GET['file'];
+$download = ($_GET['download'] == 1);
 
-if (file_exists($file)) {
+if (file_exists($file) && $download) {
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename='.basename($file));
@@ -13,5 +14,7 @@ if (file_exists($file)) {
     ob_clean();
     flush();
     readfile($file);
-    exit;
 }
+
+unlink($file);
+exit;

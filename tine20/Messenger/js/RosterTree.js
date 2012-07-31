@@ -40,7 +40,6 @@ Tine.Messenger.RosterTree = function(iq){
                           menu: {xtype: 'menu'}
                       });
             items.push({
-                id: 'messenger-filetransfer',
                 text: _('Send file'),
                 node: _node,
                 icon: '/images/messenger/page_go.png',

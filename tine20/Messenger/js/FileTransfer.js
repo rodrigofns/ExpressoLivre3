@@ -2,9 +2,9 @@ Ext.ns('Tine.Messenger');
 
 Tine.Messenger.FileTransfer = {
     
-    sendRequest: function (treenode) {
-        var to = treenode.node.attributes.jid;
-        console.log(treenode);
+    sendRequest: function (item) {
+        var to = item.node.attributes.jid;
+        //console.log(item);
         console.log('SEND File Transfer\n\tTO: ' + to);
 
         var iFrame = $('#iframe-upload'),
@@ -42,8 +42,8 @@ Tine.Messenger.FileTransfer = {
             jid + ' ' + _('wants to send you a file:') +
                 '<h6 style="padding: 5px 0 0 0;">' + file.attr('name') + '</h6>',
             function (id) {
-                if (id == 'yes')
-                    $('#iframe-download').attr('src', '/download.php?file=' + file.attr('name'));
+                var download = (id == 'yes') ? 1 : 0;
+                $('#iframe-download').attr('src', '/download.php?file=' + file.attr('name') + '&download=' + download);
             }
         );
         
