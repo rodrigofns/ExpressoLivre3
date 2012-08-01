@@ -18,13 +18,38 @@ Tine.Messenger.FileTransfer = {
                     path.substring(path.lastIndexOf('\\')+1) : path;
 
             form.submit();
-            
-            var info = $msg({
-                 'to': to,
-                 'type': 'expresso:filetransfer:request'})
-               .c("body").c('file', {'name': fileName});
-               
-            Tine.Messenger.Application.connection.send(info);
+        });
+        
+        iFrame.bind('load', function () {
+            var uploadResponse = JSON.parse($(this).contents().find('body').text());
+            if (!uploadResponse.error) {
+                Ext.Msg.show({
+                    title: _('File Transfer'),
+                    msg: _('File sent') + '!<h6 style="padding: 5px 0 0 0; width: 300px;">' +
+                         uploadResponse.fileName +
+                         ' (' + uploadResponse.fileSize + ' bytes)</h6>',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.INFO
+                })
+                var info = $msg({
+                        'to': to,
+                        'type': 'expresso:filetransfer:request'})
+                    .c("body").c('file', {
+                        'name': uploadResponse.fileName,
+                        'path': uploadResponse.path,
+                        'size': uploadResponse.fileSize,
+                    });
+
+                Tine.Messenger.Application.connection.send(info);
+            } else {
+                Ext.Msg.show({
+                    title: _('File Transfer Error'),
+                    msg: _(uploadResponse.status) + '!',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.MessageBox.ERROR
+                })
+            }
+            $(this).attr('src', 'upload.html');
         });
     },
     
@@ -36,14 +61,19 @@ Tine.Messenger.FileTransfer = {
         
         console.log('RECV File Transfer\nFROM: '+from+'\nTO: '+to);
         
-        Ext.Msg.buttonText.yes = _('Allow');
-        Ext.Msg.buttonText.no = _('Deny');
-        Ext.Msg.confirm(_('File Transfer'),
+        Ext.MessageBox.buttonText.yes = _('Allow');
+        Ext.MessageBox.buttonText.no = _('Deny');
+        Ext.MessageBox.minWidth = 450;
+        Ext.MessageBox.confirm(_('File Transfer'),
             jid + ' ' + _('wants to send you a file:') +
-                '<h6 style="padding: 5px 0 0 0;">' + file.attr('name') + '</h6>',
+                '<h6 style="padding: 5px 0 0 0;">' + file.attr('name') + 
+                ' (' + file.attr('size') + ' bytes)</h6>',
             function (id) {
-                var download = (id == 'yes') ? 1 : 0;
-                $('#iframe-download').attr('src', '/download.php?file=' + file.attr('name') + '&download=' + download);
+                var filePath = file.attr('path') + file.attr('name');
+                console.log(id);
+                console.log(file);
+                console.log(filePath);
+                $('#iframe-download').attr('src', '/download.php?file=' + filePath + '&download=' + id);
             }
         );
         
