@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-07-27 09:21-0300\n"
+"PO-Revision-Date: 2012-07-31 15:29-0300\n"
 "Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -2547,4 +2547,7 @@ msgstr "Código de Segurança"
 
 msgid "You need to enable javascript to use"
 msgstr "É necessário habilitar o  javascript em seu navegador para usar o "
+
+msgid "Version"
+msgstr "Versão"
 

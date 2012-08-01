@@ -50,7 +50,17 @@
 
      <?php 
         echo Tinebase_View::getJSConfig();
-        $locale = new Zend_Locale(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2));
+        $aux0 = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        $aux1 = explode('-',$aux0[0]);
+        if(count($aux1) > 1)
+            {
+               $aux = $aux1[0] . '_' . strtoupper($aux1[1]);
+            }
+        else
+            {
+                $aux = $aux1[0];
+            }
+        $locale = new Zend_Locale($aux);
         $translate = Tinebase_Translation::getTranslation('Tinebase',$locale);
      ?>
 
