@@ -540,8 +540,13 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
-            $messages = $this->getMultiple($ids);
-            $messages = $messages->toArray();
+            if($_pagination->start < count($ids)){
+                $messages = $this->getMultiple($ids);
+                $messages = $messages->toArray();
+            
+            }else{
+                $messages = array();
+            }
         }else{
 
             if (!isset($imapFilters['paths']))
