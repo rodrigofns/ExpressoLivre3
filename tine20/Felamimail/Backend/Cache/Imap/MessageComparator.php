@@ -26,12 +26,12 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
     
     protected function compareStrings($str1, $str2)
     {
-        return ($this->_pagination->dir == 'ASC') ? strcasecmp($str2, $str1) : strcasecmp($str1, $str2);
+        return ($this->_pagination->dir == 'ASC') ? strcasecmp($str1, $str2) : strcasecmp($str2, $str1);
     }
     
     protected function compareIntegers($intval1, $intval2)
     {
-        return ($this->_pagination->dir == 'ASC') ? $intval2 - $intval1 : $intval1 - $intval2;
+        return ($this->_pagination->dir == 'ASC') ? $intval1 - $intval2 :  $intval2 - $intval1;
     }
     
     /**
