@@ -3,11 +3,8 @@ Ext.ns('Tine.Messenger');
 Tine.Messenger.FileTransfer = {
     
     sendRequest: function (item) {
-        var to = item.node.attributes.jid;
-        //console.log(item);
-        console.log('SEND File Transfer\n\tTO: ' + to);
-
-        var iFrame = $('#iframe-upload'),
+        var to = item.node.attributes.jid,
+            iFrame = $('#iframe-upload'),
             inputFile = iFrame.contents().find('#sendfile');
 
         inputFile.click();
@@ -59,8 +56,6 @@ Tine.Messenger.FileTransfer = {
             to = $(msg).attr('to'),
             file = $(msg).find('file');
         
-        console.log('RECV File Transfer\nFROM: '+from+'\nTO: '+to);
-        
         Ext.MessageBox.buttonText.yes = _('Allow');
         Ext.MessageBox.buttonText.no = _('Deny');
         Ext.MessageBox.minWidth = 450;
@@ -70,9 +65,6 @@ Tine.Messenger.FileTransfer = {
                 ' (' + file.attr('size') + ' bytes)</h6>',
             function (id) {
                 var filePath = file.attr('path') + file.attr('name');
-                console.log(id);
-                console.log(file);
-                console.log(filePath);
                 $('#iframe-download').attr('src', '/download.php?file=' + filePath + '&download=' + id);
             }
         );
