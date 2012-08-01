@@ -62,6 +62,21 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
                 return $this->compareStrings(implode(',', $msg1->{$this->_pagination->sort}),
                     implode(',', $msg2->{$this->_pagination->sort}));
                     
+            case 'flags' :
+                
+                if (!empty($msg1->{$this->_pagination->sort}))
+                {
+                    sort($msg1->{$this->_pagination->sort});
+                }
+                
+                if (!empty($msg2->{$this->_pagination->sort}))
+                {
+                    sort($msg2->{$this->_pagination->sort});
+                }
+                
+                return $this->compareStrings(implode(',', $msg1->{$this->_pagination->sort}),
+                        implode(',', $msg2->{$this->_pagination->sort}));
+                    
             case 'folder_id' : // folder_ids
                 
                 $folders = array();

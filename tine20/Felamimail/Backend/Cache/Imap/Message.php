@@ -572,7 +572,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             return $this->_rawDataToRecordSet(array());
         }
         
-        $pagination = !$_pagination ? new Tinebase_Model_Pagination() : $_pagination;
+        $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
         
         $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
         
