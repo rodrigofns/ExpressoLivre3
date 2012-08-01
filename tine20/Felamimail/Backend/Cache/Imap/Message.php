@@ -521,7 +521,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @return Tinebase_Record_RecordSet|array
      *
      * @todo implement sort
-     * @todo implement id,messageuid,folder_id,account_id search
+     * @todo for one folder, try to use only imap sort
+     * @todo implement messageuid,account_id search
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
     {
@@ -534,7 +535,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $return = null;
         $messages = array();
         $filterObjects = $_filter->getFilterObjects();
-        
         
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         
@@ -550,11 +550,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $imapFilters['paths'] = $this->_getFoldersInfo($paths);
             }
 
-            
-
-
             $ids = $this->_getIds($imapFilters);
-
 
             // get Summarys and merge results
             foreach ($ids as $folderId => $idsInFolder)
@@ -574,8 +570,10 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         
         $pagination = !$_pagination ? new Tinebase_Model_Pagination() : $_pagination;
         
-        // TODO: do array sort of $messagesArray with callback()
         $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
+        
+        // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
+        $messages = ($imapFilters['filters'] == 'Id') ? $messages : $this->_createModelMessageArray($messages);
         
         uasort($messages, array($callback, 'compare'));
 
@@ -584,10 +582,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $chunkIndex = ($pagination->start/$pagination->limit);
 
         // Put headers into model
-        if($imapFilters['filters'] == 'Id'){
-            $return = empty($chunked[$chunkIndex])?new Tinebase_Record_RecordSet('Felamimail_Model_Message', array(), true): new Tinebase_Record_RecordSet('Felamimail_Model_Message', $chunked[$chunkIndex], true);
-        }else
-            $return =  $this->_rawDataToRecordSet($this->_createModelMessageArray($chunked[$chunkIndex], $folder));
+//        if($imapFilters['filters'] == 'Id'){
+//            $return = empty($chunked[$chunkIndex])?new Tinebase_Record_RecordSet('Felamimail_Model_Message', array(), true): new Tinebase_Record_RecordSet('Felamimail_Model_Message', $chunked[$chunkIndex], true);
+//        }else
+        $return =  empty($chunked[$chunkIndex]) ? 
+            $this->_rawDataToRecordSet(array()) :
+            $this->_rawDataToRecordSet($chunked[$chunkIndex]);
 
         Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($messages,true));
         
