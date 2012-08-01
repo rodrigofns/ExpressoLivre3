@@ -322,7 +322,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                                 case '\Deleted'     : return 'UNDELETED';
                             }
                         };
-                        $value = array_map($func, $value);
+                        $value = array_map($func, (array)$value);
                         
                         switch ($operator)
                         {
@@ -427,10 +427,10 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      */
     protected function _createModelMessage(array $_message, Felamimail_Model_Folder $_folder = NULL)
     {
-        if (isset($_message['folder_id']))
-        {
-            $_folder = Felamimail_Controller_Folder::getInstance()->get($_message['folder_id']);
-        }
+//        if (isset($_message['folder_id']))
+//        {
+//            $_folder = Felamimail_Controller_Folder::getInstance()->get($_message['folder_id']);
+//        }
         
         if (empty($_folder))
         {
@@ -473,10 +473,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $return = array();
         foreach ($_messages as $uid => $msg)
         {
-            
             $message = $this->_createModelMessage($msg, $_folder);
             $return[$uid] = $message;
-
         }
         
         return $return;
@@ -549,7 +547,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             }
         }else{
 
-            if (!isset($imapFilters['paths']))
+            if (empty($imapFilters['paths']))
             {
                 $paths = $this->_getAllFolders();
                 $imapFilters['paths'] = $this->_getFoldersInfo($paths);
@@ -564,13 +562,14 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 
                 $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
                 $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
-                $messages = array_merge($messages, $imap->getSummary($idsInFolder, null, null, $folderId));
+                $messagesInFolder = $imap->getSummary($idsInFolder, null, null, $folderId);
+                $messages = array_merge($messages, $this->_createModelMessageArray($messagesInFolder, $folder));
             }
-
-            if (empty($messages))
-            {
-                return $this->_rawDataToRecordSet(array());
-            }
+        }
+        
+        if (empty($messages))
+        {
+            return $this->_rawDataToRecordSet(array());
         }
         
         $pagination = !$_pagination ? new Tinebase_Model_Pagination() : $_pagination;
@@ -578,8 +577,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
         
         // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
-        $messages = ($imapFilters['filters'] == 'Id') ? $messages : $this->_createModelMessageArray($messages);
-        
         uasort($messages, array($callback, 'compare'));
 
         // Apply Pagination and get the resulting summary

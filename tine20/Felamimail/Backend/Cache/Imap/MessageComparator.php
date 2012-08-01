@@ -35,7 +35,7 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
     }
     
     /**
-     *
+     * Compare order of Felamimail_Model_Message acording to Tinebase_Model_Pagination
      * @param Felamimail_Model_Message $msg1
      * @param Felamimail_Model_Message $msg2
      * @return int 
