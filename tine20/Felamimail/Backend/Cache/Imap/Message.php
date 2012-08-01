@@ -583,8 +583,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         uasort($messages, array($callback, 'compare'));
 
         // Apply Pagination and get the resulting summary
-        $chunked = array_chunk($messages, $pagination->limit, true);
-        $chunkIndex = ($pagination->start/$pagination->limit);
+        $limit = $pagination->limit == 0?count($messages):$pagination->limit;
+        $chunked = array_chunk($messages, $limit, true);
+        $chunkIndex = ($pagination->start/$limit);
 
         // Put headers into model
 //        if($imapFilters['filters'] == 'Id'){
