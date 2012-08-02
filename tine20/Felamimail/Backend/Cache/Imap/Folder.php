@@ -379,13 +379,19 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
      */
     public function getFolderCounter($_folderId)
     {
-        $folder = self::decodeFolderUid($_folderId);
-        $imap = Felamimail_Backend_ImapFactory::factory($folder['accountId']);
-        $counter = $imap->examineFolder($folder['globalName']);
-      
+        if($_folderId instanceof Felamimail_Model_Folder){
+            $exists = $_folderId->cache_totalcount;
+            $unseen = $_folderId->cache_unreadcount;
+        }else{
+            $folder = self::decodeFolderUid($_folderId);
+            $imap = Felamimail_Backend_ImapFactory::factory($folder['accountId']);
+            $counter = $imap->examineFolder($folder['globalName']);
+            $exists = $counter['exists'];
+            $unseen = $counter['unseen'];
+        }
          return array(
-            'cache_totalcount'  => $counter['exists'],
-            'cache_unreadcount' => $counter['unseen']
+            'cache_totalcount'  => $exists,
+            'cache_unreadcount' => $unseen
         );
     }
 
