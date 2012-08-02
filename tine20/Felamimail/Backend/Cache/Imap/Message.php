@@ -533,8 +533,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $return = null;
         $messages = array();
         $filterObjects = $_filter->getFilterObjects();
-        
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
+        $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
         
         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
@@ -565,20 +565,16 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $messagesInFolder = $imap->getSummary($idsInFolder, null, null, $folderId);
                 $messages = array_merge($messages, $this->_createModelMessageArray($messagesInFolder, $folder));
             }
+             $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
+        
+            // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
+            uasort($messages, array($callback, 'compare'));
         }
         
         if (empty($messages))
         {
             return $this->_rawDataToRecordSet(array());
         }
-        
-        $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
-        
-        $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
-        
-        // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
-        uasort($messages, array($callback, 'compare'));
-
         // Apply Pagination and get the resulting summary
         $limit = $pagination->limit == 0?count($messages):$pagination->limit;
         $chunked = array_chunk($messages, $limit, true);
