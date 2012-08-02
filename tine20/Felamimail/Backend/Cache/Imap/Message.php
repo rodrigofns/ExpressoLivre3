@@ -568,7 +568,10 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
              $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
         
             // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
-            uasort($messages, array($callback, 'compare'));
+            if (!empty($pagination->sort)) // do not sort
+            {
+                uasort($messages, array($callback, 'compare'));
+            }
         }
         
         if (empty($messages))
@@ -576,9 +579,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             return $this->_rawDataToRecordSet(array());
         }
         // Apply Pagination and get the resulting summary
-        $limit = $pagination->limit == 0?count($messages):$pagination->limit;
+        $limit = empty($pagination->limit) ? count($messages) : $pagination->limit;
         $chunked = array_chunk($messages, $limit, true);
-        $chunkIndex = ($pagination->start/$limit);
+        $chunkIndex = empty($pagination->start) ? 0 : $pagination->start/$limit;
 
         // Put headers into model
 //        if($imapFilters['filters'] == 'Id'){
