@@ -38,7 +38,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     */
     protected $_defaultCountCol = 'id';
     
-    protected $_imapSortParams = array('subject','from','to','size','received','sent');
+    protected $_imapSortParams = array('subject','from_name','from_email','to','size','received','sent');
     
     /**
      * foreign tables (key => tablename)
@@ -553,7 +553,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         $chunked = array_chunk($_messages, $limit, true);
         $chunkIndex = empty($_pagination->start) ? 0 : $_pagination->start/$limit;
         
-        return $chunked[$chunkIndex];
+        return empty($chunked) ? $chunked : $chunked[$chunkIndex];
     }
 
     /*************************** abstract functions ****************************/
@@ -600,6 +600,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $imapFilters['paths'] = $this->_getFoldersInfo($paths);
             }
 
+            //$ids = 
             $ids = $this->_getIds($imapFilters, $_pagination);
 
             // get Summarys and merge results
@@ -609,17 +610,14 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 
                 $imap = Felamimail_Backend_ImapFactory::factory($folder->account_id);
                 $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
-                
-                $messagesInFolder = (count($ids) === 1) ? 
-                    $imap->getSummary($this->_doPagination($idsInFolder, $_pagination), null, null, $folderId) :
-                    $imap->getSummary($idsInFolder, null, null, $folderId);
-               
+                $idsInFolder = (count($ids) === 1) ? $this->_doPagination($idsInFolder, $_pagination) : $idsInFolder; // do pagination early
+                $messagesInFolder = $imap->getSummary($idsInFolder, null, null, $folderId);
                 $messages = array_merge($messages, $this->_createModelMessageArray($messagesInFolder, $folder));
             }
             
             // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
-            if (!empty($pagination->sort) || 
-                    (count($ids) === 1 && in_array($pagination->sort, $this->_imapSortParams))) // do not sort
+            if (!empty($pagination->sort) && (count($ids) === 1 && 
+                    !in_array($pagination->sort, $this->_imapSortParams))) // do not sort
             {
                 $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
                 uasort($messages, array($callback, 'compare'));
@@ -632,7 +630,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         }
         
         // Apply Pagination and get the resulting summary
-        $page = $this->_doPagination($messages, $_pagination);
+        $page = count($ids) === 1 ? $messages : $this->_doPagination($messages, $_pagination);
         
 //        $limit = empty($pagination->limit) ? count($messages) : $pagination->limit;
 //        $chunked = array_chunk($messages, $limit, true);
