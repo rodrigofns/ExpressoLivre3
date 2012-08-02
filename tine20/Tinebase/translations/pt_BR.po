@@ -3,8 +3,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-08-01 10:09-0300\n"
-"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-08-01 17:24-0300\n"
+"Last-Translator: Fernando Lages <fernando.lages@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -831,6 +831,36 @@ msgstr "Tabulação de Texto à Direita"
 #: js/prototypeTranslations.js:25
 msgid "Remove Formatting"
 msgstr "Remover Formatação"
+
+#: js/prototypeTranslations.js:26
+#: js/prototypeTranslations.js:27
+#: googiespell
+msgid "Spell Checker"
+msgstr "Corretor Ortográfico"
+
+#: googiespell
+msgid "No spelling errors found."
+msgstr "Nenhum erro encontrado."
+
+#: googiespell
+msgid "Close"
+msgstr "Fechar"
+
+#: googiespell
+msgid "Revert to"
+msgstr "Reverter para"
+
+#: googiespell
+msgid "Check spelling"
+msgstr "Verificar ortografia"
+
+#: googiespell
+msgid "Resume editing"
+msgstr "Continuar edição"
+
+#: googiespell
+msgid "No suggestions"
+msgstr "Nenhuma sugestão"
 
 #: js/tineInit.js:589
 msgid "Fatal Error: Client self-update failed, please contact your administrator and/or restart/reload your browser."
