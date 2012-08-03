@@ -47,7 +47,7 @@ Tine.Messenger.RosterHandler = {
 //                                Tine.Messenger.RosterHandler.removeContactElement(jid);
                                 if(contact.remove()){
                                     var label = contact.text || jid;
-                                    Tine.Messenger.LogHandler.status(label, _('was successfully removed')+'!', 'INFO');
+                                    Tine.Messenger.LogHandler.status(label, _('was successfully removed!'), 'INFO');
                                     var chat = Ext.getCmp(Tine.Messenger.ChatHandler.formatChatId(jid));
                                     if(chat){
                                         chat.close();
@@ -298,7 +298,7 @@ Tine.Messenger.RosterHandler = {
             Tine.Messenger.RosterHandler.modifyBuddys(buddys);
 //            grpNode.setText(n_gname);
             Tine.Messenger.LogHandler.status(_('Successful'),
-                                                _('The group') + ' ' + gname + ' ' + _('was successfully renamed to') + ' ' + n_gname, 
+                                                _('The group ') + gname +  _(' was successfully renamed to ') + n_gname, 
                                                 'INFO');
             
             return true;
@@ -354,11 +354,11 @@ Tine.Messenger.RosterHandler = {
         Tine.Messenger.RosterHandler.modifyBuddys(buddys);
         if(grpNode.remove()){
             Tine.Messenger.LogHandler.status(_('Successful'), 
-                                                _('The group') + ' ' + gname + ' ' + _('was successfully removed') + '!', 
+                                                _('The group ') + gname + _(' was successfully removed!'), 
                                                 'INFO');
         } else {
             Tine.Messenger.LogHandler.status(_('Error'), 
-                                                _('The group') + ' ' + gname + ' ' + _('was not removed') + '!', 
+                                                _('The group ') + gname + _(' was not removed!'), 
                                                 'INFO');
         }
     },

@@ -1,0 +1,21 @@
+FRASE:
+I wait X second(s) or until named element "TIPO=VALOR" is present
+
+Exemplo1: "field=Nome" (simples)
+Exemplo2: "link='Sair da Página'" (composto)
+
+Possíveis TIPOS
+------------------
+field
+fieldset
+link
+button
+link_or_button
+select
+checkbox
+radio
+file
+optgroup
+option
+table
+content

@@ -1,9 +1,6 @@
 
 Ext.ns('Tine.Messenger');
 
-
-// load modules
-//var i18n = require("i18n");
 Tine.Messenger.ClientDialog = function(args){
     var ClientLayout = {
             id:'ClientDialog',
@@ -142,9 +139,15 @@ Tine.Messenger.ClientDialog = function(args){
     var statusMenu = function(_box){
             var items = Array(),
                 statusItems = Tine.Messenger.factory.statusStore.data.items;
-            
+            /**
+             * Traduções dos status
+             * _('Online')
+             * _('Away')
+             * _('Do Not Disturb')
+             * _('Unavailable')
+             */
             for(var i=0; i < statusItems.length; i++){
-                var text = _(statusItems[i].data.text),
+                var text = Tine.Tinebase.appMgr.get('Messenger').i18n._(statusItems[i].data.text),
                     value = statusItems[i].data.value;
                 items.push({text: _(text),
                             value: value,
@@ -344,7 +347,9 @@ Tine.Messenger.Config = {
                         selectOnFocus:true
                     }
                 ]
-            }
+            },
+            html: '<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>' +
+                  '<iframe id="iframe-download" src="" style="display: none;"></iframe>'
     }
     
     , ChatWindowLayout : {
