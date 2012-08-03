@@ -148,21 +148,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     startMessenger: function (status, statusText) {
         Tine.Messenger.Log.debug("Starting Messenger...");
         
-//        this.getPasswordForJabber();
-        //----> Remover depois
-        Tine.Tinebase.registry.add('messengerAccount', {
-            JID: 'bruno@simdev.sdr.serpro/expresso-3.0',
-            PWD: base64.encode('12345')
-        });
-        Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
-        if (MESSENGER_DEBUG)
-            Tine.Tinebase.appMgr.get('Messenger').debugFunction();
-        Tine.Messenger.Application.connection.connect(
-            Tine.Tinebase.registry.get('messengerAccount').JID,
-            Tine.Tinebase.registry.get('messengerAccount').PWD,
-            Tine.Tinebase.appMgr.get('Messenger').connectionHandler
-        );
-        //----<
+        this.getPasswordForJabber();
         
         if(!Ext.getCmp("ClientDialog")){
             new Tine.Messenger.ClientDialog().show();
