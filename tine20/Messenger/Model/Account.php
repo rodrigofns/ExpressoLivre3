@@ -1,6 +1,6 @@
 <?php
 
-class Messenger_Model_PersonalConfig extends Tinebase_Record_Abstract
+class Messenger_Model_Account extends Tinebase_Record_Abstract
 {
     
     /**
@@ -26,10 +26,10 @@ class Messenger_Model_PersonalConfig extends Tinebase_Record_Abstract
     * @var array
     */
    protected $_validators = array(
-       'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
-       'view_notification'     => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
-       'auto_authentication'   => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
-       'messenger_login'       => array(Zend_Filter_Input::ALLOW_EMPTY => true)
+       'id'             => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
+       'notifications'  => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
+       'history'        => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
+       'custom_name'    => array(Zend_Filter_Input::ALLOW_EMPTY => true)
    );
       
 }

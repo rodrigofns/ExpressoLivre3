@@ -24,16 +24,32 @@ Tine.Messenger.Log = {
 };
 
 Tine.Messenger.LogHandler = {
-
-    log: function (msg) {
-        var handler = $("<div class='msg'>"+msg+"</div>");
-        $("#messenger-loghandler-status").append(handler);
-        handler.delay(8000).fadeOut("slow");
-    },
-    status: function(title, message){
-        var handler = $("<div class='msg'><span class='title'>"+title+"</span><span class='body'>"+message+"</span></div>");
-        $("#messenger-loghandler-status").append(handler);
-        handler.delay(8000).fadeOut("slow");
+    
+    status: function(title, message, type){
+        var showNotfications = 1;
+        
+        title   = "<span class='title'>"+title+"</span>";
+        message = "<span class='body'>"+message+"</span>";
+        
+        if(type == 'STATUS'){
+            showNotfications = Tine.Messenger.registry.get('preferences').get('showNotifications');
+        }
+        if(type == 'ERROR'){
+            //TODO: implement
+        }
+        if(type == 'INFO'){
+            //TODO: implement
+        }
+        if(type == 'LOG'){
+            title = '';
+        }
+        
+        if(showNotfications == 1){
+            var handler = $("<div class='msg'>" + title + message + "</div>");
+            $("#messenger-loghandler-status").append(handler);
+            handler.delay(8000).fadeOut("slow");
+        }
+        
     },
     
     /**
@@ -79,7 +95,7 @@ Tine.Messenger.LogHandler = {
                             }
                         }
                         if(status){
-                            Tine.Messenger.LogHandler.status(title, status);
+                            Tine.Messenger.LogHandler.status(title, status, 'STATUS');
                             Tine.Messenger.LogHandler.onChatStatusChange(from, title+" "+status);
                         }
                     }
