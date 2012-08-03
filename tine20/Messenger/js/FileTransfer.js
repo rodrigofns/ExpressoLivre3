@@ -6,14 +6,10 @@ Tine.Messenger.FileTransfer = {
         var to = item.node.attributes.jid,
             iFrame = $('#iframe-upload'),
             inputFile = iFrame.contents().find('#sendfile');
-
+        
         inputFile.click();
-        inputFile.bind('change', function (event) {
-            var path = event.target.value,
-                form = $(this).parent('form'),
-                fileName = (path.indexOf('\\') >= 0) ?
-                    path.substring(path.lastIndexOf('\\')+1) : path;
-
+        inputFile.bind('change', function () {
+            var form = $(this).parent('form');
             form.submit();
         });
         
