@@ -24,14 +24,19 @@ Tine.Messenger.FileTransfer = {
                     buttons: Ext.Msg.OK,
                     icon: Ext.MessageBox.INFO
                 })
+                var json = {
+                    "path": uploadResponse.path,
+                    "fileName": uploadResponse.fileName,
+                    "fileSize": uploadResponse.fileSize
+                };
+                console.log(to);
                 var info = $msg({
                         'to': to,
-                        'type': 'expresso:filetransfer:request'})
-                    .c("body").c('file', {
-                        'name': uploadResponse.fileName,
-                        'path': uploadResponse.path,
-                        'size': uploadResponse.fileSize,
-                    });
+                        'type': 'chat'})
+                    .c("body")
+                    .t(JSON.stringify(json))
+                    .up()
+                    .c("active", {xmlns: "http://jabber.org/protocol/chatstates"});
 
                 Tine.Messenger.Application.connection.send(info);
             } else {
@@ -50,17 +55,18 @@ Tine.Messenger.FileTransfer = {
         var from = $(msg).attr('from'),
             jid = Strophe.getBareJidFromJid(from),
             to = $(msg).attr('to'),
-            file = $(msg).find('file');
-        
+            json = $(msg).find('body').text().replace(/\&amp;/gi, '&').replace(/\&quot;/gi, '"'),
+            file = JSON.parse(json);
+
         Ext.MessageBox.buttonText.yes = _('Allow');
         Ext.MessageBox.buttonText.no = _('Deny');
         Ext.MessageBox.minWidth = 450;
         Ext.MessageBox.confirm(_('File Transfer'),
             jid + ' ' + _('wants to send you a file:') +
-                '<h6 style="padding: 5px 0 0 0;">' + file.attr('name') + 
-                ' (' + file.attr('size') + ' bytes)</h6>',
+                '<h6 style="padding: 5px 0 0 0;">' + file.fileName + 
+                ' (' + file.fileSize + ' bytes)</h6>',
             function (id) {
-                var filePath = file.attr('path') + file.attr('name');
+                var filePath = file.path + file.fileName;
                 $('#iframe-download').attr('src', '/download.php?file=' + filePath + '&download=' + id);
             }
         );

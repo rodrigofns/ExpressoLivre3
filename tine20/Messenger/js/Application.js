@@ -260,10 +260,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
             );
-                
-            XMPPConnection.addHandler(
-                Tine.Messenger.FileTransfer.onRequest, null, 'message', 'expresso:filetransfer:request'
-            );
 
             // Load emoticons.xml
             Tine.Messenger.Application.xml_raw = $.get("/images/messenger/emoticons/emoticons.xml",{dataType: "xml"});
