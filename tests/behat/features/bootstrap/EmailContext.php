@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use Behat\Behat\Context\ClosuredContextInterface,
     Behat\Behat\Context\TranslatedContextInterface,
