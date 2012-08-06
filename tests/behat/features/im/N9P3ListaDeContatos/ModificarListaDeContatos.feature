@@ -30,3 +30,11 @@ Feature: Modificar Lista de Contatos
    And I click once in css element "#messenger-group-mngt-button"
    Then I wait 10 seconds or until named element "content='Group created successfully!'" is present
    
+  @N9P3F2C4 @javascript
+  Scenario: Adicionar um Contato
+   When I click once in css element "#messenger-menu-actions"
+   And I wait 10 seconds or until css element "#messenger-contact-add" is present
+   And I click once in css element "#messenger-contact-add"
+   And I fill in "messenger-contact-add-jid" with "novo@simdev.sdr.serpro"
+   And I fill in "messenger-contact-add-name" with "Novo"
+   And I click once in xpath element "//button[contains(child::text(), 'Add')]"
