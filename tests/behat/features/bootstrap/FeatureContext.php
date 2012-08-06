@@ -13,7 +13,17 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     
     public function __construct(array $parameters) {
         $this->useContext('email', new EmailContext($this));
+        $this->useContext('chat', new IMContext($this, $parameters));
     }
+    
+    /**
+    * @BeforeScenario
+    */
+    public function restartSession()
+    {
+        $this->getSession()->restart();
+    }
+    
     
     /**
      * @Transform /(xpath|css|named) element "([^"]*)"/ 
@@ -34,23 +44,40 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
      */
     public function iWaitSeconds($sec)
     {
-        $this->getSession()->wait($sec * 1000);
+        sleep($sec);
     }
 
     /**
-     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*") is present$/
+     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*" is present( at this moment)?)$/
      */
-    public function iWaitToSeeElement($sec, $e)
-    {
+    public function iWaitToSeeElement($sec, $e, $locator, $atthismoment = null)
+    {   
+                
         $cont = 0;
         while ($cont < $sec)
         {
             sleep(1);
             $cont++;
             $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
-            if (!empty($el) && $el->isVisible())
+            /*
+             * Verifica se o elemento procurado apareceu.
+             */
+            if (!empty($el) && $el->isVisible()){
+                /*
+                 * Verifica se o horário do evento apareceu na tela. Utilziado para verificar o horário do envio de mensagem do IM
+                 */
+                if (!(is_null($atthismoment))){
+                    $element_hora = "//span[contains(child::text(), '".date ("H:i")."')]";                    
+                    $el = $this->getSession()->getPage()->find($e['selector'], $element_hora);
+                    if (!empty($el))
+                        return;
+                    else
+                        throw new \Exception("Não achou o elemento $element_hora!");
+                                                    
+                }
                 return;
-        }
+            }
+        }        
                 
         throw new \Exception("Não achou o elemento $e!");
     }
@@ -97,7 +124,7 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
             
         throw new \Exception("Não existe a opção $texto!");
     }
-    
+
     /**
      * @When /^I fill xpath "([^"]*)" with "([^"]*)"$/
      */
@@ -113,6 +140,26 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
         throw new \Exception("Elemento $locator não existe!");
     }
     
+    
+    /**
+    * @When /^I fill in ((xpath|css|named) element "[^"]*") with "([^"]*)"$/
+    */
+    public function fillElement($e, $selector, $value)
+    {
+        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
+        if (!empty($el))
+        {
+            $el->setValue($value);
+            return;
+        }
+        
+        if ($selector == 'named')
+            throw new \Exception("Elemento {$e['element'][1]} não existe!");
+        else
+            throw new \Exception("Elemento {$e['element']} não existe!");
+    }
+    
+    
     /**
     * @Then /^I press Enter in ((xpath) element "[^"]*")$/
     */
@@ -120,6 +167,16 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     {
         $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
         $el->keyPress('13');
+    }
+    
+    /**
+    * @When /^I fill in (username|password) field "([^"]*)" with "([^"]*)"$/ 
+    */
+    public function iFillInWith($fieldType, $fieldName, $value)
+    {
+        if ($fieldType == 'username') $this->login = $value;
+        if ($fieldType == 'password') $this->password = $value;
+        $this->fillField($fieldName, $value);
     }
 
 }
