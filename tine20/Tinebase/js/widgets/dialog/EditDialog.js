@@ -496,6 +496,10 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     
     /**
      * generic apply changes handler
+     * 
+     * @param {Ext.Button} button
+     * @param {Event} event
+     * @param {Boolean} closeWindow
      */
     onApplyChanges: function(button, event, closeWindow) {
         // we need to sync record before validating to let (sub) panels have 
