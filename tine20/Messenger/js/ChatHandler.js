@@ -153,12 +153,15 @@ Tine.Messenger.ChatHandler = {
             type = $(message).attr("type"),
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
-        
+
         // Capture the message body element, 
         // extract text and append to chat area
         var body = $(message).find("html > body");
         if (body.length === 0) {
             body = $(message).find("body");
+        }
+        if (body.attr('type') == "JSON") {
+            return Tine.Messenger.FileTransfer.onRequest(message);
         }
 
         // Typing events
