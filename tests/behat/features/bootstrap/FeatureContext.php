@@ -98,16 +98,43 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
      */
     
     /**
-    * @Given /^I click (once|twice) in ((xpath|css|named) element "[^"]*")$/
+    * @Given /^I( press right)? click (once|twice) in ((xpath|css|named) element "[^"]*")$/ 
     */
-    public function iClickInElement($quantity, $e)
+    
+    public function iClickInElement($right=false, $quantity, $e)
     {
         $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
-        if ($quantity == 'once')
-            $el->click();
+                
+        if ($quantity == 'once'){
+            if ($right)
+              $el->rightClick();
+            else                
+                $el->click();
+        }
         else
             $el->doubleClick();
     }
+    
+    /**
+     *@author vianna <cesar.vianna@serpro.gov.br>
+     *FUNÇÃO ABAIXO SERÁ REMOVIDA APÓS TESTES, POIS FOI SUBSTIUÍDA POR iClickInElement
+     */
+    /**
+     * @When /^I click with right button in ((xpath|css|named) element "[^"]*")$/
+     */
+    /*
+    public function iRightClickInElement($e)
+    {
+        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
+        if (!empty($el))
+        {
+            $el->rightClick();
+            return;
+        }
+        
+        throw new \Exception("Elemento ".$e['element']." não existe!");
+    }
+    */
     
     
     /**
@@ -115,14 +142,14 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
      */
     public function iChooseFrom($texto, $element)
     {
-        $valores = $this->getSession()->getPage()->findAll('css', $element);
-        foreach ($valores as $valor)
+        $valores = $this->getSession()->getPage()->findAll('css', $element);        
+        foreach ($valores as $valor)            
             if ($texto == $valor->getHtml())
             {
                 $valor->click();
                 return;
             }
-            
+            var_dump ($valor->getHtml());
         throw new \Exception("Não existe a opção $texto!");
     }
 
