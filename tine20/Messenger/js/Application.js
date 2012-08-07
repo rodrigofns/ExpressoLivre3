@@ -223,6 +223,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
             );
                 
+            // File Transfer
+            XMPPConnection.addHandler(
+                Tine.Messenger.FileTransfer.onRequest, null, 'message', 'filetransfer'
+            );
+                
             // Conference handler
             XMPPConnection.addHandler(
                 Tine.Messenger.ChatHandler.onMUCMessage, null, 'message', 'normal'
