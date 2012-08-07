@@ -207,4 +207,56 @@ class Felamimail_Controller_Cache_Imap_Folder extends Felamimail_Controller_Cach
         
         return $result;
     }
+    
+    /**
+     * rename folder
+     *
+     * @param string $_accountId
+     * @param string $_newLocalName
+     * @param string $_oldGlobalName
+     * @return Felamimail_Model_Folder
+     */
+    public function rename($_accountId, $_newLocalName, $_oldGlobalName)
+    {
+        $account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $account->delimiter;
+        
+        $newLocalName = $this->_prepareFolderName($_newLocalName);
+        $newGlobalName = $this->_buildNewGlobalName($newLocalName, $_oldGlobalName);
+        
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG))
+        {
+            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . 
+                                                          ' Renaming ... ' . $_oldGlobalName . ' -> ' . $newGlobalName);
+        }
+        
+        //$this->_renameFolderOnIMAP($account, $newGlobalName, $_oldGlobalName);
+        //$folder = $this->_renameFolderInCache($account, $newGlobalName, $_oldGlobalName, $newLocalName);
+        
+        
+        
+        //$folder = $this->update($this->get($this->_backend->encodeFolderUid($_oldGlobalName, $_accountId)));
+//Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $folder ' . print_r($folder,true));
+
+        $this->_renameFolderOnIMAP($account, $newGlobalName, $_oldGlobalName);
+        $folder = $this->get($this->_backend->encodeFolderUid($newGlobalName, $_accountId));
+        
+        
+        //$this->_updateSubfoldersAfterRename($account, $newGlobalName, $_oldGlobalName);
+        
+
+        // reload folder cache of parent
+//        $parentSubs = $this->_cacheController->update($account, $folder->parent);
+//        $folder = $parentSubs->filter('globalname', $globalname)->getFirstRecord();
+            
+Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Folder create = $folder ' . print_r($folder->toArray(),true));        
+        
+        
+//        $folder->cache_status = Felamimail_Model_Folder::CACHE_STATUS_INCOMPLETE;
+        //$this->updateFolderStatus($folder);
+        
+        //$this->_updateSubfoldersAfterRename($account, $newGlobalName, $_oldGlobalName);
+        
+        return $folder;
+    }
 }
