@@ -956,10 +956,9 @@ Ext.namespace('Tine.Felamimail');
             this.validationErrorMessage = this.app.i18n._('Files are still uploading.');
         }
         
-        if (result) {
+        if (result && this.sending) {
             result = this.validateRecipients();
         }
-        
         
         return (result && Tine.Felamimail.MessageEditDialog.superclass.isValid.call(this));
     },
