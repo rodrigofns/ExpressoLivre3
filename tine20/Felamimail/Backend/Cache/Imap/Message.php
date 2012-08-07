@@ -10,6 +10,7 @@
  * @author      Mario Cesar Kolling <mario.kolling@serpro.gov.br>
  * @copyright   Copyright (c) 2009-2013 Serpro (http://www.serpro.gov.br)
  *
+ * @todo organize the folderMap Code, put into a singleton class to use it globally????
  */
 
 class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Imap_Abstract
@@ -39,6 +40,9 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     protected $_defaultCountCol = 'id';
     
     protected $_imapSortParams = array('subject','from_name','from_email','to','size','received','sent');
+    
+    protected $_accountMap = array();
+    protected $_folderMap = array();
     
     /**
      * foreign tables (key => tablename)
@@ -429,14 +433,22 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      */
     protected function _createModelMessage(array $_message, Felamimail_Model_Folder $_folder = NULL)
     {
-//        if (isset($_message['folder_id']))
-//        {
-//            $_folder = Felamimail_Controller_Folder::getInstance()->get($_message['folder_id']);
-//        }
         
-        if (empty($_folder))
+        // Optimization!!!
+        if ($_folder == NULL)
         {
-            return NULL;
+            if (isset($_message['folder_id']))
+            {
+                $_folder = array_key_exists($_message['folder_id'], $this->_folderMap) ?
+                        $this->_folderMap[$_message['folder_id']] :
+                        $this->_folderMap[$_message['folder_id']] =
+                            Felamimail_Controller_Folder::getInstance()->get($_message['folder_id']);
+            }
+            else
+            {
+                return NULL;
+            }
+            
         }
         
         $message = new Felamimail_Model_Message(array(
@@ -565,8 +577,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param  array|string|boolean                 $_cols columns to get, * per default / use self::IDCOL or TRUE to get only ids
      * @return Tinebase_Record_RecordSet|array
      *
-     * @todo implement sort
-     * @todo for one folder, try to use only imap sort
+     * @todo implement optimizations on flags and security sorting
      * @todo implement messageuid,account_id search
      */
     public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Model_Pagination $_pagination = NULL, $_cols = '*')    
@@ -583,12 +594,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
         
+        // TODO: do pagination on $ids and return after getMultiple
         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
             if($_pagination->start < count($ids)){
                 $messages = $this->getMultiple($ids);
                 $messages = $messages->toArray();
-            
             }else{
                 $messages = array();
             }
@@ -599,8 +610,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $paths = $this->_getAllFolders();
                 $imapFilters['paths'] = $this->_getFoldersInfo($paths);
             }
-
-            //$ids = 
+            
             $ids = $this->_getIds($imapFilters, $_pagination);
 
             // get Summarys and merge results
@@ -612,12 +622,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
                 $idsInFolder = (count($ids) === 1) ? $this->_doPagination($idsInFolder, $_pagination) : $idsInFolder; // do pagination early
                 $messagesInFolder = $imap->getSummary($idsInFolder, null, null, $folderId);
-                $messages = array_merge($messages, $this->_createModelMessageArray($messagesInFolder, $folder));
+                $messages = array_merge($messages, $messagesInFolder);
             }
             
-            // TODO: optimization! Verify how difficult is to sort directly from message array than from Model_Message object
-            if (!empty($pagination->sort) && (count($ids) === 1 && 
-                    !in_array($pagination->sort, $this->_imapSortParams))) // do not sort
+            if ((count($ids) === 1 && !in_array($pagination->sort, $this->_imapSortParams)) ||
+                    count($ids) > 1) // do not sort
             {
                 $callback = new Felamimail_Backend_Cache_Imap_MessageComparator($pagination);
                 uasort($messages, array($callback, 'compare'));
@@ -641,7 +650,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 //            $return = empty($chunked[$chunkIndex])?new Tinebase_Record_RecordSet('Felamimail_Model_Message', array(), true): new Tinebase_Record_RecordSet('Felamimail_Model_Message', $chunked[$chunkIndex], true);
 //        }else
         
-        $return =  empty($page) ? $this->_rawDataToRecordSet(array()) : $this->_rawDataToRecordSet($page);
+        $return =  empty($page) ? $this->_rawDataToRecordSet(array()) :
+            $this->_rawDataToRecordSet($this->_createModelMessageArray($page));
 
         Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Imap Sort = $sorted ' . print_r($messages,true));
         
