@@ -154,7 +154,7 @@ Tine.Messenger.ChatHandler = {
             type = $(message).attr("type"),
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
-        
+
         // Capture the message body element, 
         // extract text and append to chat area
         var body = $(message).find("html > body");

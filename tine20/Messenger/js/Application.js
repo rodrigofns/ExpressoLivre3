@@ -225,6 +225,11 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 Tine.Messenger.ChatHandler.onIncomingMessage, null, 'message', 'chat'
             );
                 
+            // File Transfer
+            XMPPConnection.addHandler(
+                Tine.Messenger.FileTransfer.onRequest, null, 'message', 'filetransfer'
+            );
+                
             // Conference handler
             XMPPConnection.addHandler(
                 Tine.Messenger.ChatHandler.onMUCMessage, null, 'message', 'normal'
@@ -259,10 +264,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
                 
             XMPPConnection.addHandler(
                 Tine.Messenger.LogHandler._getPresence, 'jabber:client', 'presence'
-            );
-                
-            XMPPConnection.addHandler(
-                Tine.Messenger.FileTransfer.onRequest, null, 'message', 'expresso:filetransfer:request'
             );
 
             // Load emoticons.xml
