@@ -352,9 +352,7 @@ Tine.Messenger.Config = {
                         selectOnFocus:true
                     }
                 ]
-            },
-            html: '<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>' +
-                  '<iframe id="iframe-download" src="" style="display: none;"></iframe>'
+            }
     }
     
     , ChatWindowLayout : {
