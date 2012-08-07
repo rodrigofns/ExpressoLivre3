@@ -48,9 +48,9 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     }
 
     /**
-     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*" is present( at this moment)?)$/
+     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*"( "invisible")? is present( at this moment)?)$/
      */
-    public function iWaitToSeeElement($sec, $e, $locator, $atthismoment = null)
+    public function iWaitToSeeElement($sec, $e, $locator, $invisible = null, $atthismoment = null)
     {   
                 
         $cont = 0;
@@ -62,23 +62,24 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
             /*
              * Verifica se o elemento procurado apareceu.
              */
-            if (!empty($el) && $el->isVisible()){
-                /*
-                 * Verifica se o horário do evento apareceu na tela. Utilziado para verificar o horário do envio de mensagem do IM
-                 */
-                if (!(is_null($atthismoment))){
-                    $element_hora = "//span[contains(child::text(), '".date ("H:i")."')]";                    
-                    $el = $this->getSession()->getPage()->find($e['selector'], $element_hora);
-                    if (!empty($el))
-                        return;
-                    else
-                        throw new \Exception("Não achou o elemento $element_hora!");
-                                                    
+            
+                //Caso o elemento seja visível
+                if ((!empty($el) && $el->isVisible()) || ((!empty($el) && !empty($invisible)))){
+                    /*
+                     * Verifica se o horário do evento apareceu na tela. Utilziado para verificar o horário do envio de mensagem do IM
+                     */
+                    if (!(is_null($atthismoment))){
+                        $element_hora = "//span[contains(child::text(), '".date ("H:i")."')]";                    
+                        $el = $this->getSession()->getPage()->find($e['selector'], $element_hora);
+                        if (!empty($el))
+                            return;
+                        else
+                            throw new \Exception("Não achou o elemento $element_hora!");
+
+                    }
+                    return;
                 }
-                return;
-            }
-        }        
-                
+            }       
         throw new \Exception("Não achou o elemento $e!");
     }
     

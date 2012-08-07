@@ -21,11 +21,11 @@ Feature: Exibir a lista de Contatos ou grupos
     When I wait 20 seconds or until css element "#messenger" is present
     And I click once in xpath element "//*[@id='messenger']"
     And I wait 20 seconds or until named element "content='Expresso Messenger'" is present
-    And I wait 20 seconds or until xpath element "//*[@id='ext-gen483']/div/li/div" is present
+    And I wait 2 seconds or until css element ".x-tree-ec-icon.x-tree-elbow-minus" is present
 
   @N9P3F1C2 @javascript
   Scenario: Exibir a Lista de Contatos
     When I wait 20 seconds or until css element "#messenger" is present
     And I click once in xpath element "//*[@id='messenger']"
     And I wait 20 seconds or until named element "content='Expresso Messenger'" is present
-    And I wait 20 seconds or until xpath element "//*[@id='ext-gen483']/div/li/ul/li[1]/div" is present
+    And I wait 2 seconds or until css element ".x-tree-node-el.x-tree-node-leaf.x-unselectable.messenger-contact" is present
