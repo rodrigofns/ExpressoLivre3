@@ -125,7 +125,9 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
-        $("body").append('<div id="messenger-loghandler-status"></div>');
+        $("body").append('<div id="messenger-loghandler-status"></div>')
+                 .append('<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>')
+                 .append('<iframe id="iframe-download" src="" style="display: none;"></iframe>');
         $(window).resize(function(){
             Tine.Messenger.Window._onMoveWindowAction(Ext.getCmp('ClientDialog'));
             // Do to all open chats
