@@ -24,16 +24,32 @@ Tine.Messenger.Log = {
 };
 
 Tine.Messenger.LogHandler = {
-
-    log: function (msg) {
-        var handler = $("<div class='msg'>"+msg+"</div>");
-        $("#messenger-loghandler-status").append(handler);
-        handler.delay(8000).fadeOut("slow");
-    },
-    status: function(title, message){
-        var handler = $("<div class='msg'><span class='title'>"+title+"</span><span class='body'>"+message+"</span></div>");
-        $("#messenger-loghandler-status").append(handler);
-        handler.delay(8000).fadeOut("slow");
+    
+    status: function(title, message, type){
+        var showNotfications = 1;
+        
+        title   = "<span class='title'>"+title+"</span>";
+        message = "<span class='body'>"+message+"</span>";
+        
+        if(type == 'STATUS'){
+            showNotfications = Tine.Messenger.registry.get('preferences').get('showNotifications');
+        }
+        if(type == 'ERROR'){
+            //TODO: implement
+        }
+        if(type == 'INFO'){
+            //TODO: implement
+        }
+        if(type == 'LOG'){
+            title = '';
+        }
+        
+        if(showNotfications == 1){
+            var handler = $("<div class='msg'>" + title + message + "</div>");
+            $("#messenger-loghandler-status").append(handler);
+            handler.delay(8000).fadeOut("slow");
+        }
+        
     },
     
     /**
@@ -79,7 +95,7 @@ Tine.Messenger.LogHandler = {
                             }
                         }
                         if(status){
-                            Tine.Messenger.LogHandler.status(title, status);
+                            Tine.Messenger.LogHandler.status(title, status, 'STATUS');
                             Tine.Messenger.LogHandler.onChatStatusChange(from, title+" "+status);
                         }
                     }
@@ -103,7 +119,7 @@ Tine.Messenger.LogHandler = {
                     message = err_msg;
             }
             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_WAITING, '', message);
-            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message);
+            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message, 'ERROR');
         }
 
         return true;
@@ -121,7 +137,7 @@ Tine.Messenger.LogHandler = {
             name = $(presence).attr('name') || $(presence).find('nick').text() || from;
         
         if (type == IMConst.SB_SUBSCRIBED) {
-            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Accept your subscription'));
+            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Accept your subscription'), 'INFO');
             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_AVAILABLE, IMConst.SB_BOTH);
         }else if(type == IMConst.SB_SUBSCRIBE){
                 var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
@@ -149,7 +165,7 @@ Tine.Messenger.LogHandler = {
                 }  
             
         } else {
-            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Denied/Removed your subscription'));
+            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Denied/Removed your subscription'), 'INFO');
             Tine.Messenger.RosterTree().updateBuddy(from, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE, '', Tine.Tinebase.appMgr.get('Messenger').i18n._('Not authorized!'));
         }
     },
@@ -207,7 +223,7 @@ Tine.Messenger.LogHandler = {
             default:
                 message = err_msg;
         }
-        Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message);
+        Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message, 'ERROR');
         Tine.Messenger.Log.error(Tine.Tinebase.appMgr.get('Messenger').i18n._('Error number ') + $(_iq).children("error").attr("code"));
         
         return true;

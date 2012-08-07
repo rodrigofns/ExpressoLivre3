@@ -36,7 +36,7 @@ Tine.Messenger.Credential = {
                     '</div>';
     }
 }
-const IMConst = {
+var IMConst = {
    // Status constants
     ST_AVAILABLE : {id:"available", text:"Available"},
     ST_UNAVAILABLE : {id:"unavailable", text:"Unavailable"},
@@ -88,7 +88,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     debugFunction: function () {
         Tine.Messenger.Application.connection.xmlInput = function (xml) {
             console.log('\\/ |\\/| |     |  |\\ |');
-            console.log('/\\ |  | |__   |  | \\|');
+            console.log('/\\ |   | |__   |  | \\|');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var challenge = $(xml).find('challenge');
@@ -98,7 +98,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         };
         Tine.Messenger.Application.connection.xmlOutput = function (xml) {
             console.log('\\/ |\\/| |     /==\\ | | ====');
-            console.log('/\\ |  | |__   \\__/ |_|   |');
+            console.log('/\\ |   | |__   \\__/ |_|   |');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var response = $(xml).find('response');
@@ -116,7 +116,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             listeners: {
                 click: function () {
                       if(!Ext.getCmp("ClientDialog")){
-                        new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
+                        new Tine.Messenger.ClientDialog();
                       }
                       else{
                         Ext.getCmp("ClientDialog").show();
@@ -143,14 +143,16 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Messenger.Log.debug("Messenger Stopped!");
     },
 
-    startMessenger: function () {
+    startMessenger: function (status, statusText) {
         Tine.Messenger.Log.debug("Starting Messenger...");
         
         this.getPasswordForJabber();
         
         if(!Ext.getCmp("ClientDialog")){
-            new Tine.Messenger.ClientDialog(Tine.Messenger.Config.ClientLayout).init();
+            new Tine.Messenger.ClientDialog().show();
         }
+        Ext.getCmp('ClientDialog').status = (status != null) ? status : IMConst.ST_AVAILABLE.id;
+//        Ext.getCmp('ClientDialog').statusText = (statusText != null) ? statusText : Ext.getCmp('ClientDialog').statusText;
     },
     
     getConnection: function () {
@@ -327,6 +329,7 @@ Tine.Messenger.IM = {
         
         Ext.getCmp("ClientDialog").setIconClass('messenger-icon-off');
         Ext.getCmp("ClientDialog").connected = false;
+        Ext.getCmp("ClientDialog").status = IMConst.ST_UNAVAILABLE.id;
         
         // Disable action Add Group
         Ext.getCmp('messenger-group-mngt-add').disable();
