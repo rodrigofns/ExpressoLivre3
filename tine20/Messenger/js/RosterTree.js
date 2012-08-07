@@ -253,7 +253,7 @@ Tine.Messenger.RosterTree = function(iq){
                     _arr_groups.push(_group_name);
                     var _group = new Ext.tree.TreeNode({ 
                                     text:_group_name,
-                                    cls:"messenger-group",
+                                    cls:"messenger-group " + _group_name,
                                     expanded:true,
                                     expandable:true,
                                     allowDrag:false,
