@@ -298,8 +298,8 @@ Tine.Messenger.RosterHandler = {
             Tine.Messenger.RosterHandler.modifyBuddys(buddys);
 //            grpNode.setText(n_gname);
             Tine.Messenger.LogHandler.status(_('Successful'),
-                                                _('The group') + ' ' + gname + ' ' + _('was successfully renamed to') + ' ' + n_gname, 
-                                                'INFO');
+                                             _('The group') + ' ' + gname + ' ' + _('was successfully renamed to') + ' ' + n_gname, 
+                                             'INFO');
             
             return true;
         } else {

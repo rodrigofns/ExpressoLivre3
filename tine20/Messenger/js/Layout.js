@@ -735,4 +735,8 @@ Tine.Messenger.WindowConfig = function(window, args) {
     );
 };
 
+<<<<<<< HEAD
 Ext.extend(Tine.Messenger.WindowConfig, Ext.Window);
+=======
+Ext.extend(Tine.Messenger.WindowConfig, Ext.Window);
+>>>>>>> a9dd8d5f8e4de0436004f3f475cc7f494d4ecdac
