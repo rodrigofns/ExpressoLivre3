@@ -35,6 +35,7 @@ Feature: Modificar Lista de Contatos
    When I click once in css element "#messenger-menu-actions"
    And I wait 10 seconds or until css element "#messenger-contact-add" is present
    And I click once in css element "#messenger-contact-add"
+   And I wait 3 seconds or until css element "#messenger-contact-add-jid" is present
    And I fill in "messenger-contact-add-jid" with "novo@simdev.sdr.serpro"
    And I fill in "messenger-contact-add-name" with "Novo"
    And I click once in xpath element "//button[contains(child::text(), 'Add')]"
@@ -71,3 +72,15 @@ Feature: Modificar Lista de Contatos
      And I wait 10 seconds or until xpath element "//button[contains(child::text(), 'Sim')]" is present
      And I click once in xpath element "//button[contains(child::text(), 'Sim')]"
      Then I wait 10 seconds or until named element "content='The group meugrupo was successfully removed!'" is present
+
+   @N9P3F2C5 @javascript
+   Scenario: Excluir um Contato
+     When I wait 20 seconds or until css element "#messenger" is present
+     And I click once in xpath element "//*[@id='messenger']"
+     And I wait 20 seconds or until xpath element "//div[contains(@class,'novo@simdev.sdr.serpro')]" is present
+     And I press right click once in xpath element "//div[contains(@class,'novo@simdev.sdr.serpro')]"
+     And I wait 20 seconds or until css element ".x-menu-item-text" is present
+     And I choose "Remover" from ".x-menu-item-text"
+     And I wait 10 seconds or until xpath element "//button[contains(child::text(), 'Sim')]" is present
+     And I click once in xpath element "//button[contains(child::text(), 'Sim')]"
+     Then I wait 10 seconds or until named element "content='was successfully removed!'" is present
