@@ -11,6 +11,7 @@
  * @copyright   Copyright (c) 2009-2013 Serpro (http://www.serpro.gov.br)
  *
  * @todo create an Account Map or reuse some Zend object
+ * @todo organize the accountMap Code, put into a singleton class to use it globally????
  */
 
 final class Felamimail_Backend_Cache_Imap_MessageComparator
@@ -36,6 +37,27 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
         return ($this->_pagination->dir == 'ASC') ? $intval1 - $intval2 :  $intval2 - $intval1;
     }
     
+    protected function processSmimeValue($structure)
+    {
+        switch ($structure['contentType'])
+        {
+            case 'multipart/signed' :
+                return 'signed-data';
+            case 'application/x-pkcs7-mime':
+            case 'application/pkcs7-mime':
+                if (is_array($_structure['parameters']) && !empty($_structure['parameters']['smime-type']))
+                {
+                    return $_structure['parameters']['smime-type'];
+                }
+                else 
+                {
+                    return '';
+                }
+            default :
+                return '';
+        }
+    }
+    
     /**
      * Compare order of Felamimail_Model_Message acording to Tinebase_Model_Pagination
      * @param Felamimail_Model_Message $msg1
@@ -48,38 +70,20 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
     {
         switch ($this->_pagination->sort)
         {
-            case 'received' :
+            case 'received' : // Integer
                 $value1 = $msg1[$this->_pagination->sort];
                 $value2 = $msg2[$this->_pagination->sort];
-            case 'sent' :
+            case 'sent' : // Integer
                 $value1 = isset($value1) ? $value1 : $msg1['header']['date'];
                 $value2 = isset($value2) ? $value2 : $msg2['header']['date'];
-                $value1 = Felamimail_Message::convertDate($value1);
-                $value2 = Felamimail_Message::convertDate($value2);
-                
-                return $this->compareIntegers(intval($value1->format("U")), intval($value2->format("U")));
-            
+                $value1 = intval(Felamimail_Message::convertDate($value1)->format("U"));
+                $value2 = intval(Felamimail_Message::convertDate($value2)->format("U"));
             case 'size' : // Integer
+                $value1 = isset($value1) ? $value1 : intval($msg1[$this->_pagination->sort]);
+                $value2 = isset($value2) ? $value2 : intval($msg2[$this->_pagination->sort]);
+                return $this->compareIntegers($value1, $value2);
                 
-                return $this->compareIntegers($msg1[$this->_pagination->sort], $msg2[$this->_pagination->sort]);
-
-//                    
-//            case 'flags' :
-//                
-//                if (!empty($msg1->{$this->_pagination->sort}))
-//                {
-//                    sort($msg1->{$this->_pagination->sort});
-//                }
-//                
-//                if (!empty($msg2->{$this->_pagination->sort}))
-//                {
-//                    sort($msg2->{$this->_pagination->sort});
-//                }
-//                
-//                return $this->compareStrings(implode(',', $msg1->{$this->_pagination->sort}),
-//                        implode(',', $msg2->{$this->_pagination->sort}));
-//                    
-            case 'folder_id' : // folder_ids
+            case 'folder_id' : // Strings
                 
                 $folders = array();
                 foreach (array($msg1, $msg2) as $msg)
@@ -95,26 +99,43 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
                     $folders[] = $account->name . '/' . $folder['globalName'];
                 }
 
-                list($folder1, $folder2) = $folders;
-                return $this->compareStrings($folder1, $folder2);
+                list($value1, $value2) = $folders;
+                
+            //TODO: Should use a static method implemented on Model_Message or Expresso_Smime
+            case 'smime' :
+                $value1 = isset($value1) ? $value1 : $this->processSmimeValue($msg1['structure']);
+                $value2 = isset($value2) ? $value2 : $this->processSmimeValue($msg2['structure']);
+                
+            case 'flags' : // Strings
+                if (!isset($value1))
+                {
+                    sort($msg1['flags']);
+                    $value1 = implode(',', $msg1['flags']);
+                }
+                if (!isset($value2))
+                {
+                    sort($msg2['flags']);
+                    $value2 = implode(',', $msg2['flags']);
+                }
+            case 'subject' : // Strings
+                $value1 = isset($value1) ? $value1 : $msg1['header'][$this->_pagination->sort];
+                $value2 = isset($value2) ? $value2 : $msg2['header'][$this->_pagination->sort];
+            case 'id' : // Strings
+                $value1 = isset($value1) ? $value1 : $msg1[$this->_pagination->sort];
+                $value2 = isset($value2) ? $value2 : $msg2[$this->_pagination->sort];
+                return $this->compareStrings($value1, $value2);
                 
             case 'sender' :
             case 'to' :    
             case 'from_name' :
-            case 'from_email' :
+            case 'from_email' : // Strings
                 list($header,$field) = explode('_', $this->_pagination->sort);
                 $field = empty($field) ? 'email' : $field;
-                $value1 = Felamimail_Message::convertAddresses($msg1['header'][$header]);
-                $value2 = Felamimail_Message::convertAddresses($msg2['header'][$header]);
-                return $this->compareStrings((isset($value1[0]) && array_key_exists($field, $value1[0])) ? $value1[0][$field] : '',
-                    (isset($value2[0]) && array_key_exists($field, $value2[0])) ? $value2[0][$field] : '');
-
-            case 'subject' : // Strings
-                return $this->compareStrings($msg1['header'][$this->_pagination->sort],
-                        $msg2['header'][$this->_pagination->sort]);
-            case 'id' :
-                return $this->compareStrings($msg1[$this->_pagination->sort],
-                        $msg2[$this->_pagination->sort]);
+                $address1 = Felamimail_Message::convertAddresses($msg1['header'][$header]);
+                $address2 = Felamimail_Message::convertAddresses($msg2['header'][$header]);
+                return $this->compareStrings((isset($address1[0]) && array_key_exists($field, $address1[0])) ? $address1[0][$field] : '',
+                    (isset($address2[0]) && array_key_exists($field, $address2[0])) ? $address2[0][$field] : '');
+            
         }
     }
     
