@@ -258,7 +258,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                 $status = $imap->getFolderStatus($folderDecoded['globalName']);
             }
             $globalName = $folderDecoded['globalName'];
-            if($$globalName == 'INBOX' || $globalName == 'user')
+            if($globalName == 'INBOX' || $globalName == 'user')
             {
                 $folder[$folderDecoded['globalName']]['parent'] = '';
             }
@@ -266,8 +266,16 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
             {
                 $folder[$folderDecoded['globalName']]['parent'] = substr($globalName,0 , strrpos($globalName,self::IMAPDELIMITER));
             }
-            $systemFolders = in_array(strtolower($folder[$folderDecoded['globalName']]['localName']), 
+            /*
+             * @todo must see if it is not better do this on the model directly
+             */
+            $systemFolders = FALSE;
+            if (strtolower($folder[$folderDecoded['globalName']]['parent']) === 'inbox')
+            {
+                $systemFolders = in_array(strtolower($folder[$folderDecoded['globalName']]['localName']), 
                                                        Felamimail_Controller_Folder::getInstance()->getSystemFolders());
+            }
+            
             
             return new Felamimail_Model_Folder(array(
                     'id' => $_id,
