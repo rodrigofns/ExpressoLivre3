@@ -53,6 +53,7 @@ Tine.Messenger.RosterTree = function(iq){
     
     var renameBuddy = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
+                    id: 'messenger-contact-rename',
                     allowBlank:false,
                     blankText:Tine.Tinebase.appMgr.get('Messenger').i18n._('A name is required'),
                     selectOnFocus:true
@@ -145,6 +146,7 @@ Tine.Messenger.RosterTree = function(iq){
     
     var renameGroup = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
+                    id: 'messenger-group-rename',
                     allowBlank:false,
                     blankText: Tine.Tinebase.appMgr.get('Messenger').i18n._('A name is required'),
                     selectOnFocus:true
@@ -406,6 +408,18 @@ Tine.Messenger.RosterTree = function(iq){
             return groupExist(_group);
         },
         
+        setResources: function(fullJID) {
+            var jid = Strophe.getBareJidFromJid(fullJID),
+                resource = Strophe.getResourceFromJid(fullJID),
+                contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+                
+            if (!contact.attributes.hasOwnProperty('resources'))
+                contact.attributes.resources = [];
+            if (contact.attributes.resources.indexOf(resource) < 0)
+                contact.attributes.resources.push(resource);
+            console.log(contact.attributes);
+        },
+        
        /**
         * @method updateBuddy
         * @public
@@ -423,7 +437,7 @@ Tine.Messenger.RosterTree = function(iq){
                 _buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
             else
                 _buddy = jid;
-            
+
             if (typeof status == 'string')
                 status = Tine.Messenger.Util.getStatusObject(status);
             
