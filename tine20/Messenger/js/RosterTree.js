@@ -53,6 +53,7 @@ Tine.Messenger.RosterTree = function(iq){
     
     var renameBuddy = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
+                    id: 'messenger-contact-rename',
                     allowBlank:false,
                     blankText:_('A name is required'),
                     selectOnFocus:true
@@ -145,6 +146,7 @@ Tine.Messenger.RosterTree = function(iq){
     
     var renameGroup = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
+                    id: 'messenger-group-rename',
                     allowBlank:false,
                     blankText: _('A name is required'),
                     selectOnFocus:true
