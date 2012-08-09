@@ -14,22 +14,22 @@ Tine.Messenger.RosterTree = function(iq){
             
             var items = Array();
             
-            items.push({text: _('Rename'),
+            items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Rename'),
                           handler: renameBuddy,
                           node:_node,
                           icon: '/images/messenger/user_edit.png'});
-            items.push({text: _('Remove'), 
+            items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Remove'), 
                           handler: removeBuddy,
                           node:_node, 
                           icon:"/images/messenger/user_delete.png"});
             if( _node.attributes.subscription == "none" || 
                 _node.attributes.subscription == "to" || 
                 _node.attributes.subscription == "from")
-                    items.push({text: _('Subscribe'), 
+                    items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Subscribe'), 
                                   handler: subscribeBuddy,
                                   node:_node,
                                   icon:""});
-            items.push({text: _('Move to'),
+            items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Move to'),
                           node:_node,
                           listeners: {
                               render: function(e){
@@ -40,7 +40,7 @@ Tine.Messenger.RosterTree = function(iq){
                           menu: {xtype: 'menu'}
                       });
             items.push({
-                text: _('Send file'),
+                text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Send file'),
                 node: _node,
                 icon: '/images/messenger/page_go.png',
                 handler: Tine.Messenger.FileTransfer.sendRequest
@@ -54,7 +54,7 @@ Tine.Messenger.RosterTree = function(iq){
     var renameBuddy = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
                     allowBlank:false,
-                    blankText:_('A name is required'),
+                    blankText:Tine.Tinebase.appMgr.get('Messenger').i18n._('A name is required'),
                     selectOnFocus:true
             });
             treeEditor.on("complete",renameContact, this);
@@ -71,11 +71,11 @@ Tine.Messenger.RosterTree = function(iq){
         var jid = _node.node.attributes.jid,
             name = _node.node.attributes.text || jid;
 
-        Ext.Msg.buttonText.yes = _('Yes');
-        Ext.Msg.buttonText.no = _('No');
+        Ext.Msg.buttonText.yes = Tine.Tinebase.appMgr.get('Messenger').i18n._('Yes');
+        Ext.Msg.buttonText.no = Tine.Tinebase.appMgr.get('Messenger').i18n._('No');
         Ext.Msg.minWidth = 300;
-        Ext.Msg.confirm(_('Delete Contact') + ' - ' + jid,
-                            _('Are you sure to delete ' + name + '?'),
+        Ext.Msg.confirm(Tine.Tinebase.appMgr.get('Messenger').i18n._('Delete Contact') + ' - ' + jid,
+                            Tine.Tinebase.appMgr.get('Messenger').i18n._('Are you sure to delete ' + name + '?'),
                             function (id) {
                                 if (id == 'yes') {
                                     Tine.Messenger.RosterHandler.removeContact(jid);
@@ -110,14 +110,14 @@ Tine.Messenger.RosterTree = function(iq){
                             }
                 });
             } else if(groups.length == 1){
-                items.push({text: _('Empty'),
+                items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Empty'),
                             disabled: true 
                         });
             }
         }
-        if(user_group != _(NO_GROUP)){
+        if(user_group != Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
             items.push(new Ext.menu.Separator());
-             items.push({text: _(NO_GROUP),
+             items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP),
                          handler: function(choice, ev){
                             Tine.Messenger.RosterHandler.moveContactFromGroups(jid, choice.text);
                         }
@@ -129,11 +129,11 @@ Tine.Messenger.RosterTree = function(iq){
     var groupContext = function(_node, e){
             var items = Array();
             
-            items.push({text: _('Rename'),
+            items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Rename'),
                           handler: renameGroup,
                           node:_node,
                           icon: '/images/messenger/group_edit.png'});
-            items.push({text: _('Remove'), 
+            items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Remove'), 
                           handler: removeGroup,
                           node:_node, 
                           icon:"/images/messenger/group_delete.png"});
@@ -146,7 +146,7 @@ Tine.Messenger.RosterTree = function(iq){
     var renameGroup = function(_node, e){
             var treeEditor = new Ext.tree.TreeEditor(Ext.getCmp('messenger-roster'), {
                     allowBlank:false,
-                    blankText: _('A name is required'),
+                    blankText: Tine.Tinebase.appMgr.get('Messenger').i18n._('A name is required'),
                     selectOnFocus:true
             });
             treeEditor.on("beforecomplete",renameGroupAction,this);
@@ -157,7 +157,8 @@ Tine.Messenger.RosterTree = function(iq){
     var renameGroupAction = function(_e, name){
         if(name && name != _e.startValue){
             if(groupExist(name)){
-                Ext.Msg.alert(_('Rename Group'),_('The group already exists!'));
+                Ext.Msg.alert(Tine.Tinebase.appMgr.get('Messenger').i18n._('Rename Group'),
+                                Tine.Tinebase.appMgr.get('Messenger').i18n._('The group already exists!'));
                 return false;
             } else {
                 return true;
@@ -168,11 +169,11 @@ Tine.Messenger.RosterTree = function(iq){
     
     var removeGroup = function(_node, e){
         var grp_name = _node.node.text;
-        Ext.Msg.buttonText.yes = _('Yes');
-        Ext.Msg.buttonText.no = _('No');
+        Ext.Msg.buttonText.yes = Tine.Tinebase.appMgr.get('Messenger').i18n._('Yes');
+        Ext.Msg.buttonText.no = Tine.Tinebase.appMgr.get('Messenger').i18n._('No');
         Ext.Msg.minWidth = 300;
-        Ext.Msg.confirm(_('Delete Group') + ' - ' + grp_name,
-                            _('Are you sure to delete ' + grp_name + '?'),
+        Ext.Msg.confirm(Tine.Tinebase.appMgr.get('Messenger').i18n._('Delete Group') + ' - ' + grp_name,
+                            Tine.Tinebase.appMgr.get('Messenger').i18n._('Are you sure to delete ' + grp_name + '?'),
                             function (id) {
                                 if (id == 'yes') {
                                     Tine.Messenger.RosterHandler.removeGroup(grp_name);
@@ -207,8 +208,9 @@ Tine.Messenger.RosterTree = function(iq){
                                     allowDrag: true,
                                     allowDrop: false,
                                     qtip: "JID : "+jid+"<br>"
-                                            +_('Status')+" : "+_(status.text)+"<br>"
-                                            +_('Subscription')+" : "+subscription
+                                            +Tine.Tinebase.appMgr.get('Messenger').i18n._('Status')+" : "
+                                            +Tine.Tinebase.appMgr.get('Messenger').i18n._(status.text)+"<br>"
+                                            +Tine.Tinebase.appMgr.get('Messenger').i18n._('Subscription')+" : "+subscription
                     });
 
                     _buddy.on("dblclick", Tine.Messenger.RosterHandler.openChat);
@@ -227,13 +229,13 @@ Tine.Messenger.RosterTree = function(iq){
                         var hasGroupNoGroup = false,
                             node = -1;
                         for(i=0; i < rootNode.childNodes.length; i++){
-                            if(rootNode.childNodes[i].text == _(NO_GROUP)){
+                            if(rootNode.childNodes[i].text == Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
                                 hasGroupNoGroup = true;
                                 node = i;
                             }
                         }
                         if(!hasGroupNoGroup){
-                            Tine.Messenger.RosterTree().addGroup(_(NO_GROUP));
+                            Tine.Messenger.RosterTree().addGroup(Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP));
                             node = rootNode.childNodes.length - 1;
                         }
                         addOrderedOnTreeNodeLevel(_buddy, rootNode.childNodes[node]);
@@ -259,7 +261,7 @@ Tine.Messenger.RosterTree = function(iq){
                                     allowDrag:false,
                                     "gname":_group_name
                     });
-                    if(_group_name != _(NO_GROUP)){
+                    if(_group_name != Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
                         _group.on('contextmenu', groupContext, this);
                     }
                     addOrderedOnTreeNodeLevel(_group, rootNode);
@@ -287,13 +289,13 @@ Tine.Messenger.RosterTree = function(iq){
         var hasGroupNoGroup = false,
             node = -1;
         for(var i=0; i < rootNode.childNodes.length; i++){
-            if(rootNode.childNodes[i].text == _(NO_GROUP)){
+            if(rootNode.childNodes[i].text == Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
                 hasGroupNoGroup = true;
                 node = i;
             }
         }
         if(!hasGroupNoGroup){
-            Tine.Messenger.RosterTree().addGroup(_(NO_GROUP));
+            Tine.Messenger.RosterTree().addGroup(Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP));
             node = rootNode.childNodes.length - 1;
         }
         addOrderedOnTreeNodeLevel(_chat, rootNode.childNodes[node]);
@@ -301,12 +303,12 @@ Tine.Messenger.RosterTree = function(iq){
     
     var addOrderedOnTreeNodeLevel = function(node, parentNode){
         var v_nodes = parentNode.childNodes;
-        if(v_nodes.length == 0 || node.text == _(NO_GROUP)){
+        if(v_nodes.length == 0 || node.text == Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
             parentNode.appendChild(node);
         } else {
             var node_not_inserted = true;
             for(var i=0; i < v_nodes.length && node_not_inserted; i++){
-                if(node.text < v_nodes[i].text || v_nodes[i].text == _(NO_GROUP)){
+                if(node.text < v_nodes[i].text || v_nodes[i].text == Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
                     parentNode.insertBefore(node, v_nodes[i]);
                     node_not_inserted = false;
                 }
@@ -330,7 +332,7 @@ Tine.Messenger.RosterTree = function(iq){
     var getGroupsFromTree = function() {
         var groups = new Array();
         for(var i=0; i < rootNode.childNodes.length ; i++){
-            if(rootNode.childNodes[i].text != _(NO_GROUP)){
+            if(rootNode.childNodes[i].text != Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP)){
                 groups.push([rootNode.childNodes[i].text]);
             }
         }
@@ -397,7 +399,7 @@ Tine.Messenger.RosterTree = function(iq){
         },
         
         getNoGroup: function(){
-            return _(NO_GROUP);
+            return Tine.Tinebase.appMgr.get('Messenger').i18n._(NO_GROUP);
         },
         
         groupExist: function(_group){
@@ -442,7 +444,7 @@ Tine.Messenger.RosterTree = function(iq){
                 
                 status_text = status_text ? status_text : '';
                 message = message ? message : '';
-                _buddy.ui.textNode.setAttribute('status', _(status.text));
+                _buddy.ui.textNode.setAttribute('status', Tine.Tinebase.appMgr.get('Messenger').i18n._(status.text));
                 _buddy.ui.textNode.setAttribute('status_text', status_text);
                 _buddy.ui.textNode.setAttribute('subscription', subscription);
                 
@@ -451,8 +453,10 @@ Tine.Messenger.RosterTree = function(iq){
                 _buddy.attributes.subscription = subscription;
                 
                 _buddy.ui.textNode.setAttribute('qtip', "JID : "+jid+"<br>"+
-                                                _('Status')+" : "+ _(status.text) +"<br>"+
-                                                _('Subscription')+" : "+ _(subscription) +
+                                                Tine.Tinebase.appMgr.get('Messenger').i18n._('Status')+" : "
+                                                + Tine.Tinebase.appMgr.get('Messenger').i18n._(status.text) +"<br>"
+                                                + Tine.Tinebase.appMgr.get('Messenger').i18n._('Subscription')+" : "
+                                                + Tine.Tinebase.appMgr.get('Messenger').i18n._(subscription) +
                                                 (status_text.trim() ? '<br>'+status_text : '') +
                                                 (message.trim() ? '<br>'+message : ''));
                 
