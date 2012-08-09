@@ -61,10 +61,10 @@ Tine.Messenger.LogHandler = {
             from = $(presence).attr("from"),
             to = $(presence).attr("to"),
             jid = Strophe.getBareJidFromJid(from);
-            
+
         if (type !== 'error'){
             if(to !== from){
-                
+
                 if (type != null && type.match(/subscribe/i)) {
                     Tine.Messenger.LogHandler._subscriptionResponse(presence);
                 } else {
@@ -77,6 +77,7 @@ Tine.Messenger.LogHandler = {
                             status = Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable');
                             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE);
                         } else {
+                            Tine.Messenger.RosterTree().setResources(from);
                             var show = $(presence).find('show').text(),
                                 status_text = $(presence).find('status').text() ? 
                                                 Tine.Tinebase.appMgr.get('Messenger').i18n._('Status text')+': '+ $(presence).find('status').text() : '';
