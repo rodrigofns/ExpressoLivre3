@@ -559,13 +559,31 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
         return $messages;
     }
     
-    protected function _doPagination(array $_messages, $_pagination)
+    protected function _doPagination($_messages, $_pagination)
     {
+        $isRecordSet = false;
+        if ($_messages instanceof Tinebase_Record_RecordSet)
+        {
+            $isRecordSet = true;
+            $_messages = $_messages->toArray();
+        }
+        
         $limit = empty($_pagination->limit) ? count($_messages) : $_pagination->limit;
         $chunked = array_chunk($_messages, $limit, true);
         $chunkIndex = empty($_pagination->start) ? 0 : $_pagination->start/$limit;
         
-        return empty($chunked) ? $chunked : $chunked[$chunkIndex];
+        if (empty($chunked) || count($chunked) <= $chunkIndex)
+        {
+            return array();
+        }
+        else
+        {
+            if ($isRecordSet)
+            {
+                return $this->_rawDataToRecordSet($chunked[$chunkIndex]);
+            }
+            return $chunked[$chunkIndex];
+        }
     }
 
     /*************************** abstract functions ****************************/
@@ -597,14 +615,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         // TODO: do pagination on $ids and return after getMultiple
         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
-            if($_pagination->start < count($ids)){
-                $messages = $this->getMultiple($ids);
-                $messages = $messages->toArray();
-            }else{
-                $messages = array();
-            }
+            $ids = $this->_doPagination($ids, $_pagination);
+            return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
         }else{
-
             if (empty($imapFilters['paths']))
             {
                 $paths = $this->_getAllFolders();
@@ -678,11 +691,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message update = $_record ' . print_r($_record,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->update($_record);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->update($_record);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message update = $retorno ' . print_r($retorno,true));
-        return $retorno;        
+        return NULL;        
     }
     
         /**
@@ -838,11 +851,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message create = $_record ' . print_r($_record,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->create($_record);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->create($_record);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message create = $retorno ' . print_r($retorno,true));
-        return $retorno;        
+        return NULL;
     }
     
     
@@ -908,8 +921,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message setFlags = $_flags ' . print_r($_flags,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message setFlags = $_folderId ' . print_r($_folderId,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $aux->setFlags($_messages, $_flags, $_folderId);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $aux->setFlags($_messages, $_flags, $_folderId);
     }
     
     /**
@@ -924,8 +937,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message clearFlag = $_message ' . print_r($_message,true));
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message clearFlag = $_flag ' . print_r($_flag,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $aux->clearFlag($_messages, $_flag);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $aux->clearFlag($_messages, $_flag);
     }
     
     /**
@@ -938,8 +951,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         /**
          *TODO: remove the rest of the function  
          */
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $aux->deleteByFolderId($_folderId);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $aux->deleteByFolderId($_folderId);
     }
 
     /**
@@ -953,11 +966,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message searchCountByFolderId = $_folderId ' . print_r($_folderId,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->searchCountByFolderId($_folderId);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->searchCountByFolderId($_folderId);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message searchCountByFolderId = $retorno ' . print_r($retorno,true));
-        return $retorno;      
+        return NULL;      
     }
     
     /**
@@ -972,11 +985,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
 /*        
 Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Message seenCountByFolderId = $_folderId ' . print_r($_folderId,true));
 */ 
-        $aux = new Felamimail_Backend_Cache_Sql_Message();        
-        $retorno = $aux->seenCountByFolderId($_folderId);
+//        $aux = new Felamimail_Backend_Cache_Sql_Message();        
+//        $retorno = $aux->seenCountByFolderId($_folderId);
         
 //Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . 'Message seenCountByFolderId = $retorno ' . print_r($retorno,true));
-        return $retorno;            
+        return NULL;            
     }
     
     /**

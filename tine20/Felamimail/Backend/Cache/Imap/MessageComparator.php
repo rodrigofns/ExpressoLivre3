@@ -37,9 +37,9 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
         return ($this->_pagination->dir == 'ASC') ? $intval1 - $intval2 :  $intval2 - $intval1;
     }
     
-    protected function processSmimeValue($structure)
+    protected function processSmimeValue($_structure)
     {
-        switch ($structure['contentType'])
+        switch ($_structure['contentType'])
         {
             case 'multipart/signed' :
                 return 'signed-data';
@@ -48,10 +48,6 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
                 if (is_array($_structure['parameters']) && !empty($_structure['parameters']['smime-type']))
                 {
                     return $_structure['parameters']['smime-type'];
-                }
-                else 
-                {
-                    return '';
                 }
             default :
                 return '';
