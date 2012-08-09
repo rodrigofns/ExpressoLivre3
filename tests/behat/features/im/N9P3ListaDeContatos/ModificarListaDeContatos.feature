@@ -84,3 +84,15 @@ Feature: Modificar Lista de Contatos
      And I wait 10 seconds or until xpath element "//button[contains(child::text(), 'Sim')]" is present
      And I click once in xpath element "//button[contains(child::text(), 'Sim')]"
      Then I wait 10 seconds or until named element "content='was successfully removed!'" is present
+
+   @N9P3F2C7 @javascript
+   Scenario: Renomear um Contato
+     When I wait 20 seconds or until css element "#messenger" is present
+     And I click once in xpath element "//*[@id='messenger']"
+     And I wait 20 seconds or until xpath element "//div[contains(@class,'novo@simdev.sdr.serpro')]" is present
+     And I press right click once in xpath element "//div[contains(@class,'novo@simdev.sdr.serpro')]"
+     And I wait 20 seconds or until css element ".x-menu-item-text" is present
+     And I choose "Renomear" from ".x-menu-item-text"
+     And I wait 5 seconds or until css element "#messenger-contact-rename" is present
+     And I fill in "messenger-contact-rename" with "Novo_alterado"
+     And I press ENTER in "#messenger-contact-rename"
