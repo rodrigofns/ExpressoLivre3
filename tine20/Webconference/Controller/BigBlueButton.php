@@ -352,7 +352,8 @@ class Webconference_Controller_BigBlueButton {
         $host = $_SERVER['HTTP_HOST'];
         $base = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
         return $protocol.'://'.$host.$base.'/Webconference/views/logoutPage.html';
-        
+        // $_SERVER["SERVER_NAME"] :shows the server name
+
     }
 
 }
