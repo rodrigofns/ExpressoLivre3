@@ -186,11 +186,23 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
         });
 
+        this.action_toggleMarkAsImportant = new Ext.Action({
+            text: this.app.i18n._('Mark as Important'),
+            handler: this.onToggleMarkAsImportant,
+            iconCls: 'notes_noteIcon', // todo: change the icon
+            disabled: false,
+            scope: this,
+            enableToggle: true
+        });
+        this.button_toggleMarkAsImportant = Ext.apply(new Ext.Button(this.action_toggleMarkAsImportant), {
+            tooltip: this.app.i18n._('Activate this toggle button to mark this message as important.')
+        });
+
         this.tbar = new Ext.Toolbar({
             defaults: {height: 55},
             items: [{
                 xtype: 'buttongroup',
-                columns: 5,
+                columns: 6,
                 items: [
                     Ext.apply(new Ext.Button(this.action_send), {
                         scale: 'medium',
@@ -207,6 +219,7 @@ Ext.namespace('Tine.Felamimail');
                     this.button_saveEmailNote,
                     this.action_saveAsTemplate,
                     this.button_toggleReadingConfirmation,
+                    this.button_toggleMarkAsImportant,
                 ]
             }]
         });
@@ -656,6 +669,13 @@ Ext.namespace('Tine.Felamimail');
      */
     onToggleReadingConfirmation: function () {
         this.record.set('reading_conf', (! this.record.get('reading_conf')));
+    },
+
+    /**
+     * toggle mark as Important Message
+     */
+    onToggleMarkAsImportant: function () {
+        this.record.set('importance', (! this.record.get('importance')));
     },
 
     /**
