@@ -2,11 +2,16 @@
  * Tine 2.0
  * 
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Cornelius Weiss <c.weiss@metaways.de>
  * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 Ext.ns('Tine.Webconference.Model');
 
+/**
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.Configuration
+ * @extends     Tine.Tinebase.data.Record
+ * Configuration Record Definition
+ */
 Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
     {name: 'id'},
     {name: 'name'},
@@ -26,6 +31,12 @@ Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.T
     containerProperty: null
 });
 
+/**
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.WCInvite
+ * @extends     Tine.Tinebase.data.Record
+ * WCInvite Record Definition
+ */
 Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},

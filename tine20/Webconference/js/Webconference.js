@@ -1,7 +1,18 @@
+/* 
+ * Tine 2.0
+ * 
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author      
+ * @copyright   Copyright (c) 2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ */
 
 Ext.ns('Tine.Webconference');
 
-
+/**
+ * Enum with the list of options available to access the application.
+ * MENU: The user start/activate the application via the main menu.
+ * EMAIL: The user start/activate the application via an invitation received by email.
+ */
 const WebconferenceOrigin = {
     MENU : 0,
     EMAIL : 1
@@ -18,13 +29,35 @@ const WebconferenceOrigin = {
  * @author      Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
-	
+
+    /**
+     * The URL of the BigBlueButton webconference room used in center-panel iframe.
+     */
     bbbUrl : '',
+    
+    /**
+     * Indicates if the user is moderator in the webconference.
+     */
     moderator : false,
+    
+    /**
+     * Indicates if the user is connected to an active webconference room.
+     */
     roomActive: false,
+    
+    /**
+     * The room name.
+     */
     roomName: '',
+    
+    /**
+     * The webconference application origin (where the user started the application from).
+     */
     origin: null,
     
+    /**
+     * A global mask for the application.
+     */
     loadMask: null,
     
     
@@ -36,12 +69,25 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     getTitle: function() {
         return this.i18n.gettext('Webconference');
     },
+    
+    /**
+     * Get the roomActive property.
+     * 
+     * @return {Boolean}
+     */
     isRoomActive: function(){
         return this.roomActive;
     },
+    
+    /**
+     * Set the loadMask property.
+     * 
+     * @param {Ext.LoadMask} mask
+     */
     setLoadMask: function(mask){
         this.loadMask = mask;
     },
+    
     init: function() {
         
         this.origin = WebconferenceOrigin.MENU;
@@ -410,7 +456,10 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	
 });
 
-
+/**
+ * Component for the iframe component of the webconference application.
+ *
+ */
 Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
     onRender : function(ct, position){
         this.el = ct.createChild({
