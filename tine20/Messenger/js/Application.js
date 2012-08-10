@@ -65,7 +65,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Delayed Tasks
     showMessengerDelayedTask: null,
     startMessengerDelayedTask: null,
-    constructWindowDelayedTask: null,
     
     // Upload XML emoticons information
     xml_raw: null,

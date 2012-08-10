@@ -245,8 +245,6 @@ Tine.Messenger.Config = {
                     Tine.Messenger.Window._onMoveWindowAction(_box);
                 }
             },
-//            html: '<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>' +
-//                  '<iframe id="iframe-download" src="" style="display: none;"></iframe>',
             tbar: {
                     cls: 'messenger-client-tbar',
                     items:[
