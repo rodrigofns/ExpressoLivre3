@@ -87,6 +87,9 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     getViewRowClass: function(record, index) {
         var className = '';
         
+        if (record.isImportant()) {
+            className += ' importance_high';
+        }
         if (record.hasFlag('\\Flagged')) {
             className += ' flag_flagged';
         }
