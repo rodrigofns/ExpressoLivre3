@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9072b0eac0aac87b5cd45bf6c968f0b6835568fb
 $file = urldecode($_GET['file']);
 $download = ($_GET['download'] == 'yes');
 

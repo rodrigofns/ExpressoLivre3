@@ -61,10 +61,10 @@ Tine.Messenger.LogHandler = {
             from = $(presence).attr("from"),
             to = $(presence).attr("to"),
             jid = Strophe.getBareJidFromJid(from);
-            
+
         if (type !== 'error'){
             if(to !== from){
-                
+
                 if (type != null && type.match(/subscribe/i)) {
                     Tine.Messenger.LogHandler._subscriptionResponse(presence);
                 } else {
@@ -77,6 +77,7 @@ Tine.Messenger.LogHandler = {
                             status = Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable');
                             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE);
                         } else {
+                            Tine.Messenger.RosterTree().setResource(from);
                             var show = $(presence).find('show').text(),
                                 status_text = $(presence).find('status').text() ? 
                                                 Tine.Tinebase.appMgr.get('Messenger').i18n._('Status text')+': '+ $(presence).find('status').text() : '';
@@ -138,6 +139,7 @@ Tine.Messenger.LogHandler = {
         
         if (type == IMConst.SB_SUBSCRIBED) {
             Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Accept your subscription'));
+            Tine.Messenger.LogHandler.status(name, _('Accept your subscription'), 'INFO');
             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_AVAILABLE, IMConst.SB_BOTH);
         }else if(type == IMConst.SB_SUBSCRIBE){
                 var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);

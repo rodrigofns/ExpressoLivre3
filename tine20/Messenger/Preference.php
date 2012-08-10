@@ -4,23 +4,11 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
 {
     /**************************** application preferences/settings *****************/
     
-    /**
-     * Show notifications
-     *
-     */
     const SHOWNOTIFICATIONS = 'showNotifications';
 
-    /**
-     * 
-     *
-     */
     const CHATHISTORY = 'chatHistory';
    
-    /**
-     * 
-     *
-     */
-    const CUSTON_NAME = 'custom_name';
+    const NAME = 'name';
     
     
     /**
@@ -35,7 +23,7 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
      * 
      * @var array
      */
-    protected $_skipDefaultOption = array(self::SHOWNOTIFICATIONS);
+    protected $_skipDefaultOption = array();
         
     /**************************** public functions *********************************/
     
@@ -49,7 +37,7 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
         $allPrefs = array(
             self::SHOWNOTIFICATIONS,
             self::CHATHISTORY,
-            self::CUSTON_NAME,
+            self::NAME,
         );
         
         return $allPrefs;
@@ -73,7 +61,7 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
                 'label'         => $translate->_('Chat History'),
                 'description'   => $translate->_('History of chats ...'),
             ),
-            self::CUSTON_NAME  => array(
+            self::NAME  => array(
                 'label'         => $translate->_('Custon name'),
                 'description'   => $translate->_('Custon name ...'),
             ),
@@ -121,9 +109,8 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
                         </option>
                     </options>';
                 break;
-            case self::CUSTON_NAME:
-                $preference->personal_only  = TRUE;
-                $preference->value  = '';
+            case self::NAME:
+                $preference->value = "";
                 break;
             default:
                 throw new Tinebase_Exception_NotFound('Default preference with name ' . $_preferenceName . ' not found.');
@@ -142,12 +129,12 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
     {
         $result = array();
         switch($_value) {
-            case self::CUSTON_NAME:
-                // get all user accounts
-                $accounts = Messenger_Controller_Account::getInstance()->search();
-                foreach ($accounts as $account) {
-                    $result[] = array($account->id, $account->name);
-                }
+            case self::NAME:
+//                $accounts = Messenger_Controller_Account::getInstance()->search();
+//                foreach ($accounts as $account) {
+//                    $result[] = array($account->getId(), $account->name);
+//                }
+                $result = "";//parent::getValue($_value);
                 break;
             default:
                 $result = parent::_getSpecialOptions($_value);
