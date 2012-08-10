@@ -2,6 +2,8 @@ Ext.ns('Tine.Messenger');
 
 Tine.Messenger.FileTransfer = {
     
+    resource: null,
+    
     sendRequest: function (item) {
         var to = item.node.attributes.jid,
             iFrame = $('#iframe-upload'),
@@ -20,32 +22,50 @@ Tine.Messenger.FileTransfer = {
             if (src != '/upload.html') {
                 var uploadResponse = JSON.parse($(this).contents().find('body').text());
                 if (!uploadResponse.error) {
-                    Ext.Msg.show({
-                        title: _('File Transfer'),
-                        msg: _('File sent') + '!<h6 style="padding: 5px 0; width: 300px;">' +
-                             uploadResponse.fileName +
-                             ' (' + uploadResponse.fileSize + ' bytes)</h6>',
-                        buttons: Ext.Msg.OK,
-                        icon: Ext.MessageBox.INFO
-                    })
+                    Tine.Messenger.FileTransfer.chooseResourceAndSend(to, function () {
+                        if (Tine.Messenger.FileTransfer.resource == null) {
+                            Ext.Msg.show({
+                                title: _('File Transfer'),
+                                msg: _('You must choose a resource') + '!',
+                                buttons: Ext.Msg.OK,
+                                icon: Ext.MessageBox.INFO
+                            });
+                        } else {
+                            var info = $msg({'to': to + '/' + Tine.Messenger.FileTransfer.resource});
+                            if (Tine.Messenger.FileTransfer.resource == Tine.Tinebase.registry.get('messenger').messenger.resource) {
+                                info.attrs({'type': 'filetransfer'})
+                                    .c("file", {
+                                        'name': uploadResponse.fileName,
+                                        'path': uploadResponse.path,
+                                        'size': uploadResponse.fileSize
+                                    });
+                            } else {
+                                info.attrs({'type': 'chat'})
+                                    .c("body")
+                                    .t(_('File sent') + ' :  ' +
+                                       Tine.Messenger.FileTransfer.downloadURL(uploadResponse.fileName)
+                                    );
+                            }
+                            Tine.Messenger.Application.connection.send(info);
+                        }
 
-                    var info = $msg({
-                            'to': to,
-                            'type': 'filetransfer'})
-                        .c("file", {
-                            'name': uploadResponse.fileName,
-                            'path': uploadResponse.path,
-                            'size': uploadResponse.fileSize
+                        Ext.Msg.show({
+                            title: _('File Transfer'),
+                            msg: _('File sent') + '!<h6 style="padding: 5px 0; width: 300px;">' +
+                                 uploadResponse.fileName +
+                                 ' (' + uploadResponse.fileSize + ' bytes)</h6>',
+                            buttons: Ext.Msg.OK,
+                            icon: Ext.MessageBox.INFO
                         });
-
-                    Tine.Messenger.Application.connection.send(info);
+                    });
                 } else {
                     Ext.Msg.show({
                         title: _('File Transfer Error'),
                         msg: _(uploadResponse.status) + '!',
                         buttons: Ext.Msg.OK,
-                        icon: Ext.MessageBox.ERROR
-                    })
+                        icon: Ext.MessageBox.ERROR,
+                        width: 300
+                    });
                 }
                 $(this).attr('src', '/upload.html');
             }
@@ -58,13 +78,14 @@ Tine.Messenger.FileTransfer = {
             file = $(msg).find('file'),
             fileName = file.attr('name'),
             fileSize = file.attr('size'),
-            ext = Tine.Messenger.FileTransfer.getExtension(fileName);
-            
+            ext = Tine.Messenger.FileTransfer.getExtension(fileName),
+            contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+
         var confirm = new Ext.Window({
             title: _('File Transfer'),
             border: false,
             iconCls: 'filetransfer-icon-title',
-            html: jid + ' ' + _('wants to send you a file:') +
+            html: contact.text + ' ' + _('wants to send you a file:') +
                   '<img style="display: block; width: 64px; margin: 0 auto;"' +
                   ' src="/images/files/' + ext + '-small.png"/>' +
                   '<h6 style="padding: 5px 0; width: 300px; text-align: center;">' + fileName + 
@@ -90,6 +111,55 @@ Tine.Messenger.FileTransfer = {
         confirm.show();
         
         return true;
+    },
+    
+    chooseResourceAndSend: function (jid, callbackSend) {
+        var contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+
+        if (contact.attributes.resources.length > 1) {
+            var resourceValues = [];
+            for (var i = 0; i < contact.attributes.resources.length; i++) {
+                resourceValues.push({
+                    xtype: 'button',
+                    text: contact.attributes.resources[i],
+                    style: {
+                        margin: '3px'
+                    },
+                    handler: function (button) {
+                        Ext.getCmp('filetransfer-resources').close();
+                        Tine.Messenger.FileTransfer.resource = button.getText();
+                        callbackSend();
+                    }
+                });
+            }
+
+            var resources = new Ext.Window({
+                id: 'filetransfer-resources',
+                title: _('File Transfer'),
+                border: false,
+                iconCls: 'filetransfer-icon-title',
+                closeAction: 'close',
+                width: 300,
+                items: resourceValues,
+                html: '<h4 style="margin: 5px;">' +
+                      contact.attributes.text +
+                      _(' has more than one resource. Choose one!') + '</h4>',
+                layout: 'column'
+            });
+            resources.show();
+        } else {
+            Tine.Messenger.FileTransfer.resource = contact.attributes.resources[0];
+            callbackSend();
+        }
+    },
+    
+    downloadURL: function (fileName) {
+        var protocol = window.location.protocol,
+            host = window.location.hostname,
+            port = window.location.port != 80 ? ':' + window.location.port : '',
+            filePath = '/download/' + fileName;
+            
+        return protocol + '//' + host + port + filePath;
     },
     
     downloadHandler: function(file, download, window) {

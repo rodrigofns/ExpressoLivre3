@@ -77,7 +77,7 @@ Tine.Messenger.LogHandler = {
                             status = Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable');
                             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE);
                         } else {
-                            Tine.Messenger.RosterTree().setResources(from);
+                            Tine.Messenger.RosterTree().setResource(from);
                             var show = $(presence).find('show').text(),
                                 status_text = $(presence).find('status').text() ? 
                                                 Tine.Tinebase.appMgr.get('Messenger').i18n._('Status text')+': '+ $(presence).find('status').text() : '';
