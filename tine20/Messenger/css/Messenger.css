@@ -2,6 +2,10 @@
     background-image: url(../../images/messenger/talk-balloons.png) !important;
 }
 
+.filetransfer-icon-title {
+    background: url(/images/messenger/page_go.png);
+}
+
 #messenger {
     color: #000000;
     cursor: pointer;

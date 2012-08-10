@@ -62,6 +62,10 @@
         {
           "text": "ConfigWindow.js",
           "path": "js/"
+        },
+        {
+          "text": "FileTransfer.js",
+          "path": "js/"
         }
       ]
     },

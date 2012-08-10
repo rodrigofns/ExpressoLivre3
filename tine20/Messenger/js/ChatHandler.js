@@ -50,6 +50,7 @@ Tine.Messenger.ChatHandler = {
                 type: type,
                 privy: privy
             });
+            
            new_chat = true;
         }
         chat.show();
@@ -153,7 +154,7 @@ Tine.Messenger.ChatHandler = {
             type = $(message).attr("type"),
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
-        
+
         // Capture the message body element, 
         // extract text and append to chat area
         var body = $(message).find("html > body");
@@ -192,7 +193,7 @@ Tine.Messenger.ChatHandler = {
 
                 if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
                     message = state;
-                } else if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
+                } else if(state == Tine.Messenger.ChatHandler.PAUSED_STATE){
                     message = state;
                 } else {
                     message = state;
@@ -309,7 +310,7 @@ Tine.Messenger.ChatHandler = {
         var dialog = Ext.getCmp("messenger-groupchat");
         
         if(!dialog)
-            dialog = new Tine.Messenger.SimpleDialog(Tine.Messenger.Config.JoinChatLogin).init();
+            dialog = new Tine.Messenger.WindowConfig(Tine.Messenger.WindowLayout.Chat).show();
         
         dialog.findById('messenger-groupchat-identity').setValue(jid);
         dialog.findById('messenger-groupchat-host').setValue(host);
@@ -335,12 +336,12 @@ Tine.Messenger.ChatHandler = {
 //        chat.body.dom.innerHTML = html;
     },
     
-    connect: function() {
-        messengerLogin();
+    connect: function(status, statusText) {
+        messengerLogin(status, statusText);
     }
     
 }
 
-function messengerLogin() {
-    Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+function messengerLogin(status, statusText) {
+    Tine.Tinebase.appMgr.get('Messenger').startMessenger(status, statusText);
 }

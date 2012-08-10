@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-24 09:05-0300\n"
-"PO-Revision-Date: 2012-07-24 09:06-0300\n"
+"POT-Creation-Date: 2012-08-10 10:39-0300\n"
+"PO-Revision-Date: 2012-08-10 10:42-0300\n"
 "Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
 "Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
@@ -17,6 +17,42 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-SearchPath-0: Messenger\n"
+
+#: Messenger/Preference.php:69
+msgid "Show Notifications"
+msgstr "Exibir notificações"
+
+#: Messenger/Preference.php:70
+msgid "Show notifications ..."
+msgstr "Exibir notificações"
+
+#: Messenger/Preference.php:73
+msgid "Chat History"
+msgstr "Histórico"
+
+#: Messenger/Preference.php:74
+msgid "History of chats ..."
+msgstr "Histórico dos chats ..."
+
+#: Messenger/Preference.php:77
+msgid "Custon name"
+msgstr "Nome Personalizado"
+
+#: Messenger/Preference.php:78
+msgid "Custon name ..."
+msgstr "Nome Personalizado ..."
+
+#: Messenger/Preference.php:111
+msgid "Don't save history chat"
+msgstr "Não salvar o histórico do chat"
+
+#: Messenger/Preference.php:115
+msgid "Download history chat"
+msgstr "Fazer o download do histórico do chat"
+
+#: Messenger/Preference.php:119
+msgid "Send history chat to e-mail"
+msgstr "Enviar o histórico do chat para o e-mail"
 
 #: Messenger/js/Groupie.js:250
 msgid " has joined the room as a "
@@ -32,9 +68,9 @@ msgstr " saiu da sala."
 
 #: Messenger/js/Groupie.js:361
 #: Messenger/js/Groupie.js:538
-#: Messenger/js/RosterTree.js:204
-#: Messenger/js/RosterTree.js:276
-#: Messenger/js/RosterTree.js:448
+#: Messenger/js/RosterTree.js:212
+#: Messenger/js/RosterTree.js:284
+#: Messenger/js/RosterTree.js:468
 msgid "Status"
 msgstr "Status"
 
@@ -43,112 +79,112 @@ msgstr "Status"
 msgid "Role"
 msgstr "Papel"
 
-#: Messenger/js/LogHandler.js:61
-#: Messenger/js/ChatHandler.js:60
+#: Messenger/js/LogHandler.js:77
+#: Messenger/js/ChatHandler.js:61
 msgid "is unavailable"
 msgstr "está indisponível"
 
-#: Messenger/js/LogHandler.js:66
+#: Messenger/js/LogHandler.js:83
 msgid "Status text"
 msgstr "Texto do status"
 
-#: Messenger/js/LogHandler.js:68
+#: Messenger/js/LogHandler.js:85
 msgid "is away"
 msgstr "está indisponível"
 
-#: Messenger/js/LogHandler.js:71
+#: Messenger/js/LogHandler.js:88
 msgid "is busy"
 msgstr "está ocupado"
 
-#: Messenger/js/LogHandler.js:74
+#: Messenger/js/LogHandler.js:91
 msgid "auto status (idle)"
 msgstr "Auto Status (ocupado)"
 
-#: Messenger/js/LogHandler.js:77
+#: Messenger/js/LogHandler.js:94
 msgid "is on-line"
 msgstr "Disponível"
 
-#: Messenger/js/LogHandler.js:94
+#: Messenger/js/LogHandler.js:111
 msgid "The intended recipient is temporarily unavailable."
 msgstr "A pessoa está temporariamente indisponível."
 
-#: Messenger/js/LogHandler.js:97
+#: Messenger/js/LogHandler.js:114
 msgid "The remote server does not exist or could not be reached."
 msgstr "O servidor remoto não existe ou não pode ser alcançado."
 
-#: Messenger/js/LogHandler.js:100
+#: Messenger/js/LogHandler.js:117
 msgid "Communication with the remote server has been interrupted."
 msgstr "Comunicação com o servidor remoto foi interrompida."
 
-#: Messenger/js/LogHandler.js:106
-#: Messenger/js/LogHandler.js:210
+#: Messenger/js/LogHandler.js:123
+#: Messenger/js/LogHandler.js:227
 msgid "SERVER ERROR"
 msgstr "ERRO DO SERVIDOR"
 
-#: Messenger/js/LogHandler.js:124
+#: Messenger/js/LogHandler.js:141
 msgid "Accept your subscription"
 msgstr "Aceitar sua assinatura"
 
-#: Messenger/js/LogHandler.js:129
+#: Messenger/js/LogHandler.js:146
 msgid "Allow"
 msgstr "Permitir"
 
-#: Messenger/js/LogHandler.js:130
+#: Messenger/js/LogHandler.js:147
 msgid "Deny"
 msgstr "Negar"
 
-#: Messenger/js/LogHandler.js:132
+#: Messenger/js/LogHandler.js:149
 msgid "Subscription Approval"
 msgstr "Aprovação da Assinatura"
 
-#: Messenger/js/LogHandler.js:133
+#: Messenger/js/LogHandler.js:150
 msgid "wants to subscribe you."
 msgstr "quer colocar você na lista de presença dele."
 
-#: Messenger/js/LogHandler.js:152
+#: Messenger/js/LogHandler.js:169
 msgid "Denied/Removed your subscription"
 msgstr "Negou/Removou sua assinatura"
 
-#: Messenger/js/LogHandler.js:153
+#: Messenger/js/LogHandler.js:170
 msgid "Not authorized!"
 msgstr "Não autorizado!"
 
-#: Messenger/js/LogHandler.js:183
+#: Messenger/js/LogHandler.js:200
 msgid "Error sending: "
 msgstr "Envio de erro:"
 
-#: Messenger/js/LogHandler.js:183
-#: Messenger/js/Application.js:202
-#: Messenger/js/Application.js:284
-#: Messenger/js/RosterHandler.js:303
-#: Messenger/js/RosterHandler.js:355
+#: Messenger/js/LogHandler.js:200
+#: Messenger/js/Application.js:209
+#: Messenger/js/Application.js:296
+#: Messenger/js/RosterHandler.js:306
+#: Messenger/js/RosterHandler.js:360
 msgid "Error"
 msgstr "Erro"
 
-#: Messenger/js/LogHandler.js:185
-#: Messenger/js/LogHandler.js:211
+#: Messenger/js/LogHandler.js:202
+#: Messenger/js/LogHandler.js:228
 msgid "Error number "
 msgstr "Erro número"
 
-#: Messenger/js/LogHandler.js:196
+#: Messenger/js/LogHandler.js:213
 msgid "Cancel 404: The item was not found."
 msgstr "Cancelamento 404: O item não foi encontrado"
 
-#: Messenger/js/LogHandler.js:199
+#: Messenger/js/LogHandler.js:216
 msgid "Cancel 501: The feature was not implemented."
 msgstr "Cancelamento 501: A funcionalidade não foi implementada."
 
-#: Messenger/js/LogHandler.js:202
+#: Messenger/js/LogHandler.js:219
 msgid "Wait 500: Internal server error."
 msgstr "Aguarde 500: Erro do servidor."
 
-#: Messenger/js/LogHandler.js:205
+#: Messenger/js/LogHandler.js:222
 msgid "Cancel 503: Service unavailable."
 msgstr "Cancelamento 503: Serviço indisponível."
 
-#: Messenger/js/LogHandler.js:221
-#: Messenger/js/ChatHandler.js:60
+#: Messenger/js/LogHandler.js:238
 #: Messenger/js/ChatHandler.js:61
+#: Messenger/js/ChatHandler.js:62
 msgid "Info"
 msgstr "Informação"
 
@@ -160,38 +196,39 @@ msgstr "Chat em grupo na sala"
 msgid "Chat with"
 msgstr "Chat com"
 
-#: Messenger/js/ChatHandler.js:61
+#: Messenger/js/ChatHandler.js:62
 msgid "Your messages will be sent offline"
 msgstr "Sua mensagem será enviada offline"
 
 #: Messenger/js/Window.js:18
-msgid "Group created successfully!"
-msgstr "Grupo criado com sucesso!"
+msgid "Group created successfully"
+msgstr "Grupo criado com sucesso"
 
 #: Messenger/js/Window.js:21
-#: Messenger/js/Layout.js:166
+#: Messenger/js/Layout.js:48
+#: Messenger/js/Layout.js:273
+#: Messenger/js/Layout.js:618
 msgid "Add Group"
 msgid_plural "Add Group"
 msgstr[0] "Adicionar Grupo"
 msgstr[1] "Adicionar Grupo"
 
 #: Messenger/js/Window.js:21
-#: Messenger/js/RosterTree.js:154
-msgid "The group already exists!"
-msgstr "O grupo criado já existe!"
+msgid "The group already exists"
+msgstr "O grupo criado já existe"
 
 #: Messenger/js/Window.js:53
 #: Messenger/js/Window.js:58
-msgid "Added successfuly!"
-msgstr "Adicionado com sucesso!"
+msgid "Added successfuly"
+msgstr "Adicionado com sucesso"
 
 #: Messenger/js/Window.js:60
 msgid "Add Buddy"
 msgstr "Adicionar Contato"
 
 #: Messenger/js/Window.js:60
-msgid "Buddy not added!"
-msgstr "Contato não adicionado!"
+msgid "Buddy not added"
+msgstr "Contato não adicionado"
 
 #: Messenger/js/Application.js:74
 msgid "Messenger"
@@ -199,74 +236,184 @@ msgid_plural "Messengers"
 msgstr[0] "Messenger"
 msgstr[1] "Messengers"
 
-#: Messenger/js/Application.js:193
+#: Messenger/js/Application.js:200
 msgid "Connecting"
 msgstr "Conectando"
 
-#: Messenger/js/Application.js:203
-#: Messenger/js/Application.js:285
+#: Messenger/js/Application.js:210
+#: Messenger/js/Application.js:297
 msgid "Authentication failed"
 msgstr "Autenticação falhou"
 
-#: Messenger/js/Application.js:264
-msgid "You're logged in Messenger. If you leave the page, Messenger will disconnect!"
-msgstr "Você está conectado no Messenger. Se sair da página, o Messenger será desconectado!"
-
-#: Messenger/js/Application.js:276
+#: Messenger/js/Application.js:288
 msgid "Messenger has been disconnected!"
 msgstr "Messenger foi desconectado!"
 
-#: Messenger/js/Application.js:338
+#: Messenger/js/Application.js:351
+#: Messenger/js/Layout.js:83
 msgid "Connect"
 msgstr "Conectar"
 
-#: Messenger/js/Layout.js:41
-msgid "Online"
-msgstr "Disponível"
+#: Messenger/js/Layout.js:10
+msgid "Expresso Messenger"
+msgstr "Expresso Messenger"
 
-#: Messenger/js/Layout.js:42
-msgid "Away"
-msgstr "Ausente"
+#: Messenger/js/Layout.js:34
+msgid "Actions"
+msgstr "Ações"
 
-#: Messenger/js/Layout.js:43
-msgid "Do Not Disturb"
-msgstr "Não Perturbe"
-
-#: Messenger/js/Layout.js:44
-msgid "Unavailable"
-msgstr "Indisponível"
-
-#: Messenger/js/Layout.js:149
-msgid "Action"
-msgid_plural "Actions"
-msgstr[0] "Ações"
-msgstr[1] "Ações"
-
-#: Messenger/js/Layout.js:157
+#: Messenger/js/Layout.js:40
+#: Messenger/js/Layout.js:264
+#: Messenger/js/Layout.js:542
 msgid "Add Contact"
 msgid_plural "Add Contact"
 msgstr[0] "Adicionar Contato"
 msgstr[1] "Adicionar Contato"
 
-#: Messenger/js/Layout.js:178
+#: Messenger/js/Layout.js:57
+#: Messenger/js/Layout.js:283
 msgid "Logout"
 msgid_plural "Logout"
 msgstr[0] "Sair"
 msgstr[1] "Sair"
 
-#: Messenger/js/Layout.js:189
+#: Messenger/js/Layout.js:118
+msgid "your Status"
+msgstr "seu Status"
+
+#: Messenger/js/Layout.js:118
+msgid "press ENTER after"
+msgstr "pressione ENTER depois"
+
+#: Messenger/js/Layout.js:147
+msgid "Online"
+msgstr "Disponível"
+
+#: Messenger/js/Layout.js:148
+msgid "Away"
+msgstr "Ausente"
+
+#: Messenger/js/Layout.js:149
+msgid "Do Not Disturb"
+msgstr "Não Perturbe"
+
+#: Messenger/js/Layout.js:150
+msgid "Unavailable"
+msgstr "Indisponível"
+
+#: Messenger/js/Layout.js:256
+msgid "Action"
+msgid_plural "Actions"
+msgstr[0] "Ações"
+msgstr[1] "Ações"
+
+#: Messenger/js/Layout.js:294
 msgid "Preference"
 msgid_plural "Preferences"
 msgstr[0] "Preferências"
 msgstr[1] "Preferências"
 
+#: Messenger/js/Layout.js:560
+msgid "JID"
+msgstr "JID"
+
+#: Messenger/js/Layout.js:567
+#: Messenger/js/Layout.js:626
+msgid "Name"
+msgstr "Nome"
+
+#: Messenger/js/Layout.js:572
+msgid "Group"
+msgstr "Grupo"
+
+#: Messenger/js/Layout.js:578
+msgid "Select a group"
+msgstr "Selecione um grupo"
+
+#: Messenger/js/Layout.js:588
+#: Messenger/js/Layout.js:631
+msgid "Add"
+msgstr "Incluir"
+
+#: Messenger/js/Layout.js:664
+msgid "Join Groupchat"
+msgstr "Entrar em Sala de Bate-papo"
+
+#: Messenger/js/Layout.js:673
+msgid "Identity"
+msgstr "Identidade"
+
+#: Messenger/js/Layout.js:679
+msgid "Host"
+msgstr "Anfitrião"
+
+#: Messenger/js/Layout.js:684
+msgid "Room"
+msgstr "Sala"
+
+#: Messenger/js/Layout.js:689
+msgid "Nickname"
+msgstr "Apelido"
+
+#: Messenger/js/Layout.js:695
+msgid "Password"
+msgstr "Senha"
+
+#: Messenger/js/Layout.js:699
+msgid "Join"
+msgstr "Entrar"
+
+#: Messenger/js/FileTransfer.js:28
+#: Messenger/js/FileTransfer.js:53
+#: Messenger/js/FileTransfer.js:85
+#: Messenger/js/FileTransfer.js:138
+msgid "File Transfer"
+msgstr "Transferência de Arquivo"
+
+#: Messenger/js/FileTransfer.js:29
+msgid "You must choose a resource"
+msgstr "Você tem que escolher um recurso"
+
+#: Messenger/js/FileTransfer.js:45
+#: Messenger/js/FileTransfer.js:54
+msgid "File sent"
+msgstr "Arquivo enviado"
+
+#: Messenger/js/FileTransfer.js:63
+msgid "File Transfer Error"
+msgstr "Erro de Transferência de Arquivo"
+
+#: Messenger/js/FileTransfer.js:88
+msgid "wants to send you a file:"
+msgstr "quer enviar um arquivo para você:"
+
+#: Messenger/js/FileTransfer.js:93
+msgid "Do you allow"
+msgstr "Você permite"
+
+#: Messenger/js/FileTransfer.js:97
+#: Messenger/js/RosterTree.js:75
+#: Messenger/js/RosterTree.js:173
+msgid "Yes"
+msgstr "Sim"
+
+#: Messenger/js/FileTransfer.js:103
+#: Messenger/js/RosterTree.js:76
+#: Messenger/js/RosterTree.js:174
+msgid "No"
+msgstr "Não"
+
+#: Messenger/js/FileTransfer.js:146
+msgid " has more than one resource. Choose one!"
+msgstr " tem mais de um recurso. Escolha um!"
+
 #: Messenger/js/RosterTree.js:17
-#: Messenger/js/RosterTree.js:126
+#: Messenger/js/RosterTree.js:133
 msgid "Rename"
 msgstr "Renomear"
 
 #: Messenger/js/RosterTree.js:21
-#: Messenger/js/RosterTree.js:130
+#: Messenger/js/RosterTree.js:137
 msgid "Remove"
 msgstr "Remover"
 
@@ -278,45 +425,43 @@ msgstr "Assinar presença"
 msgid "Move to"
 msgstr "Mover para"
 
-#: Messenger/js/RosterTree.js:51
-#: Messenger/js/RosterTree.js:143
+#: Messenger/js/RosterTree.js:43
+msgid "Send file"
+msgstr "Enviar arquivo"
+
+#: Messenger/js/RosterTree.js:58
+#: Messenger/js/RosterTree.js:151
 msgid "A name is required"
 msgstr "Um nome é obrigatório"
 
-#: Messenger/js/RosterTree.js:68
-#: Messenger/js/RosterTree.js:165
-msgid "Yes"
-msgstr "Sim"
-
-#: Messenger/js/RosterTree.js:69
-#: Messenger/js/RosterTree.js:166
-msgid "No"
-msgstr "Não"
-
-#: Messenger/js/RosterTree.js:71
+#: Messenger/js/RosterTree.js:78
 msgid "Delete Contact"
 msgstr "Excluir Contato"
 
-#: Messenger/js/RosterTree.js:72
-#: Messenger/js/RosterTree.js:169
+#: Messenger/js/RosterTree.js:79
+#: Messenger/js/RosterTree.js:177
 msgid "Are you sure to delete "
 msgstr "Tem certeza que deseja excluir "
 
-#: Messenger/js/RosterTree.js:107
+#: Messenger/js/RosterTree.js:114
 msgid "Empty"
 msgstr "Vazio"
 
-#: Messenger/js/RosterTree.js:154
+#: Messenger/js/RosterTree.js:162
 msgid "Rename Group"
 msgstr "Renomear Grupo"
 
-#: Messenger/js/RosterTree.js:168
+#: Messenger/js/RosterTree.js:162
+msgid "The group already exists!"
+msgstr "O grupo criado já existe!"
+
+#: Messenger/js/RosterTree.js:176
 msgid "Delete Group"
 msgstr "Excluir Grupo"
 
-#: Messenger/js/RosterTree.js:205
-#: Messenger/js/RosterTree.js:277
-#: Messenger/js/RosterTree.js:449
+#: Messenger/js/RosterTree.js:213
+#: Messenger/js/RosterTree.js:285
+#: Messenger/js/RosterTree.js:469
 msgid "Subscription"
 msgstr "Assinatura"
 
@@ -336,18 +481,6 @@ msgstr "Exibir notificações"
 msgid "History"
 msgstr "Histórico"
 
-#: Messenger/js/ConfigWindow.js:48
-msgid "Don't save history chat"
-msgstr "Não salvar o histórico do chat"
-
-#: Messenger/js/ConfigWindow.js:54
-msgid "Download history chat"
-msgstr "Fazer o download do histórico do chat"
-
-#: Messenger/js/ConfigWindow.js:59
-msgid "Send history chat to e-mail"
-msgstr "Enviar o histórico do chat para o e-mail"
-
 #: Messenger/js/ConfigWindow.js:69
 msgid "Custom Name"
 msgstr "Nome Personalizado"
@@ -364,36 +497,55 @@ msgstr "Salvar"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: Messenger/js/RosterHandler.js:48
-msgid "was successfully removed!"
-msgstr "foi excluído com sucesso!"
+#: Messenger/js/Model.js.js:22
+msgid "Account"
+msgid_plural "Accounts"
+msgstr[0] "Conta"
+msgstr[1] "Contas"
 
-#: Messenger/js/RosterHandler.js:299
-#: Messenger/js/RosterHandler.js:353
+#: Messenger/js/Model.js.js:26
+msgid "Email Accounts"
+msgid_plural "Email Accounts"
+msgstr[0] "Conta de E-mail"
+msgstr[1] "Contas de E-mail"
+
+#: Messenger/js/RosterHandler.js:50
+#: Messenger/js/RosterHandler.js:357
+msgid "was successfully removed"
+msgstr "foi excluído com sucesso"
+
+#: Messenger/js/RosterHandler.js:300
+#: Messenger/js/RosterHandler.js:356
 msgid "Successful"
 msgstr "Com sucesso"
 
-#: Messenger/js/RosterHandler.js:299
-#: Messenger/js/RosterHandler.js:353
-#: Messenger/js/RosterHandler.js:355
-msgid "The group "
+#: Messenger/js/RosterHandler.js:301
+#: Messenger/js/RosterHandler.js:357
+#: Messenger/js/RosterHandler.js:361
+msgid "The group"
 msgstr "O grupo"
 
-#: Messenger/js/RosterHandler.js:299
-msgid " was successfully renamed to "
+#: Messenger/js/RosterHandler.js:301
+msgid "was successfully renamed to"
 msgstr " foi renomeado com sucesso "
 
-#: Messenger/js/RosterHandler.js:303
+#: Messenger/js/RosterHandler.js:306
 msgid " already exist. It was not renamed."
 msgstr " já existe. Não foi renomeado."
 
-#: Messenger/js/RosterHandler.js:353
-msgid " was successfully removed!"
-msgstr " foi excluído com sucesso!"
+#: Messenger/js/RosterHandler.js:361
+msgid "was not removed"
+msgstr " não foi excluído"
 
-#: Messenger/js/RosterHandler.js:355
-msgid " was not removed!"
-msgstr " não foi excluído!"
+#~ msgid ""
+#~ "You're logged in Messenger. If you leave the page, Messenger will "
+#~ "disconnect!"
+#~ msgstr ""
+#~ "Você está conectado no Messenger. Se sair da página, o Messenger será "
+#~ "desconectado!"
+
+#~ msgid " was successfully removed!"
+#~ msgstr " foi excluído com sucesso!"
 
 #~ msgid " is typing..."
 #~ msgstr " está digitando..."

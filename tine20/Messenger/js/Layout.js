@@ -1,36 +1,140 @@
 
 Ext.ns('Tine.Messenger');
 
-Tine.Messenger.ClientDialog = function(_config){
-    var extDialog=null;
-    var config=_config;
-    var id="ClientDialog";
-    var opener=Ext.getBody();
-    var status = "";
-    var statusText = "";
-    var createDialog=function(){
-        extDialog=new Ext.Window(config);
-//        extDialog.setTitle(Tine.Messenger.Credential.myJid());
-        extDialog.show(opener);
-//        Ext.getCmp('status-box').on("select", changeState);
-        Ext.getCmp('messenger-status-box').on("specialkey", changeStateText);
-        Ext.getCmp('messenger-change-status-button').on("click", statusMenu);
-        extDialog.doLayout();
-    }
+Tine.Messenger.ClientDialog = function(args){
+    var ClientLayout = {
+            id:'ClientDialog',
+            title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Expresso Messenger'),
+            iconCls: 'messenger-icon-off',
+            connected: false,
+            status: '',
+            width: 220,
+            minWidth: 220,
+            height: 420,
+            minHeight: 270,
+            closeAction: 'hide', //'close' - destroy the component
+            collapsible: true,
+            plain: true,
+            autoScroll:   true,
+            border: false,
+            layout: 'border', // 'fit'
+            listeners: {
+                move: function(_box){
+                    Tine.Messenger.Window._onMoveWindowAction(_box);
+                }
+            },
+            tbar: {
+                    cls: 'messenger-client-tbar',
+                    items:[
+                        {
+                            id: 'messenger-menu-actions',
+                            text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Actions'),
+                            menu: {
+                                    id: "BuddysMenu",
+                                    items:[{
+                                            id: 'messenger-contact-add',
+                                            icon: '/images/messenger/user_add.png',
+                                            text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Contact'),
+                                            disabled: true,
+                                            handler: function(){
+                                                Tine.Messenger.Window.AddBuddyWindow();
+                                            }
+                                    },
+                                    {
+                                            id: 'messenger-group-mngt-add',
+                                            text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Group'),
+                                            icon: '/images/messenger/group_add.png',
+                                            disabled: true,
+                                            handler: function() {
+                                                new Tine.Messenger.WindowConfig(Tine.Messenger.WindowLayout.Groups).show();
+                                            }
+                                     },
+                                     {
+                                         id: 'messenger-logout',
+                                         text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Logout'),
+                                         disabled: true,
+                                         handler: function() {
+                                             Tine.Messenger.ChatHandler.disconnect();
+                                         }
+                                     }
+                                    ]
+                                }
+                        }]
+            },
+            items:[{
+			region:'center',
+			border:false,
+                        bodyStyle:'padding:6px 3px 0 3px;',
+			layout:'fit',
+                        items: Tine.Messenger._Roster
+                    } 
+                    ,{
+                        id: 'messenger-connect-display',
+                        html: '<img src="/images/messenger/loading_animation_liferay.gif" style="display:none" />',
+                        cls: 'messenger-connect-display',
+                        region:'center',
+                        border: false,
+                        buttons: [
+                                {
+                                    id: 'messenger-connect-cmd',
+                                    text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Connect'),
+                                    region:'center',
+                                    cls: 'messenger-connect-cmd',
+                                    handler: function() {
+                                        Tine.Messenger.ChatHandler.connect();
+                                    }
+                                }
+                            ]
+                    }
+		]
+            ,bbar:{
+                id: 'status-container',
+                height: 27,
+                cls: 'messenger-client-tbar',
+                items: [{   
+                        id: 'messenger-change-status-button',
+                        icon: '/images/messenger/user_offline.png',
+                        listeners: {
+                            click: function (field, ev) {
+                                statusMenu(this);
+                            }
+                        }
+                    },
+                    {xtype: 'tbspacer', width: 5},
+                    {
+                        xtype:'textfield',
+//                        store: Tine.Messenger.factory.statusStore,
+                        displayField:'text',
+                        width: 175,
+                        valueField:'value',
+                        typeAhead: true,
+                        name:'message',
+                        mode: 'local',
+                        triggerAction: 'all',
+                        id:'messenger-status-box',
+                        emptyText:Tine.Tinebase.appMgr.get('Messenger').i18n._('your Status') + '...' 
+                                                            + '(' + Tine.Tinebase.appMgr.get('Messenger').i18n._('press ENTER after') + ')',
+                        selectOnFocus:true,
+                        listeners: {
+                            specialkey: function (field, ev) {
+                                if (ev.getKey() == ev.ENTER) {
+                                    changeStateText(this);
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+    };
     
     var changeStateText = function(_box){
-        var stText = _box.getValue().trim();
-        if(stText != statusText && Ext.getCmp('ClientDialog').connected){
-            statusText = stText;
-            Tine.Messenger.RosterHandler.changeStatus(status, statusText);
-        }
+        Tine.Messenger.RosterHandler.changeStatus(Ext.getCmp('ClientDialog').status, 
+                                                    _box.getValue());
     }
     
     var changeStateHandler = function(_e){
-        if(_e.value != status){
-            Ext.getCmp('ClientDialog').status = status = _e.value;
-            Tine.Messenger.RosterHandler.changeStatus(status, statusText);
-        }
+        Tine.Messenger.RosterHandler.changeStatus(_e.value, 
+                                                    Ext.get('messenger-status-box').getValue());
     }
     
     var statusMenu = function(_box){
@@ -46,7 +150,7 @@ Tine.Messenger.ClientDialog = function(_config){
             for(var i=0; i < statusItems.length; i++){
                 var text = Tine.Tinebase.appMgr.get('Messenger').i18n._(statusItems[i].data.text),
                     value = statusItems[i].data.value;
-                items.push({text: text,
+                items.push({text: Tine.Tinebase.appMgr.get('Messenger').i18n._(text),
                             value: value,
                             icon: '/images/messenger/user_'+value+'.png',
                             handler: changeStateHandler
@@ -58,15 +162,13 @@ Tine.Messenger.ClientDialog = function(_config){
                     });
             menu.show(_box.getPositionEl());
     }
-    
-    return{
-        init:function(){
-            if(!extDialog){
-                createDialog();
-            }
-        }
-    }
-}
+
+    Tine.Messenger.WindowConfig.superclass.constructor.call(this,
+        Ext.apply(ClientLayout, args || {})
+    );
+};
+
+Ext.extend(Tine.Messenger.ClientDialog, Ext.Window);
 
 Tine.Messenger._Roster = new Ext.tree.TreePanel({
                                     id:           'messenger-roster',
@@ -104,6 +206,7 @@ Tine.Messenger.SimpleDialog = function(_config){
     var opener=Ext.getBody();
     var createDialog=function(){
         extDialog=new Ext.Window(config);
+        console.log(opener);
         extDialog.show(opener);
         extDialog.doLayout();
         return extDialog;
@@ -118,7 +221,7 @@ Tine.Messenger.SimpleDialog = function(_config){
 }
 
 var configWindow = null;
-
+    
 Tine.Messenger.Config = {
     
     ClientLayout : {
@@ -142,6 +245,8 @@ Tine.Messenger.Config = {
                     Tine.Messenger.Window._onMoveWindowAction(_box);
                 }
             },
+//            html: '<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>' +
+//                  '<iframe id="iframe-download" src="" style="display: none;"></iframe>',
             tbar: {
                     cls: 'messenger-client-tbar',
                     items:[
@@ -168,9 +273,7 @@ Tine.Messenger.Config = {
                                             icon: '/images/messenger/group_add.png',
                                             disabled: true,
                                             handler: function() {
-                                                new Tine.Messenger.SimpleDialog(
-                                                        Tine.Messenger.Config.AddGroupLayout
-                                                    ).init();
+                                                new Tine.Messenger.WindowConfig(Tine.Messenger.Window.Groups).show();
                                             }
                                      },
                                      {
@@ -250,126 +353,6 @@ Tine.Messenger.Config = {
             }
     }
     
-    , AddBuddyLayout: {
-        id: 'messenger-contact-add-client',
-        closeAction: 'close',
-        layout: 'fit',
-        plain: true,
-        modal: true,
-        title: 'Add Contact',
-        listeners: {
-            render: function(e){
-                Ext.getCmp('messenger-contact-add-group').store
-                    .loadData(
-                        Tine.Messenger.RosterTree()
-                        .getGroupsFromTree()
-                    );
-            }
-        },
-        items: [
-            {
-                xtype: 'form',
-                border: false,
-                items: [
-                    {
-                        xtype: 'textfield',
-                        id: 'messenger-contact-add-jid',
-                        fieldLabel: 'JID',
-                        value: '',
-                        disabled: false
-                    },
-                    {
-                        xtype: 'textfield',
-                        id: 'messenger-contact-add-name',
-                        fieldLabel: 'Name'
-                    },
-                    {
-                        xtype: 'combo',
-                        id: 'messenger-contact-add-group',
-                        fieldLabel: 'Group',
-                        store: new Ext.data.SimpleStore({
-//                                        data: Tine.Messenger.RosterTree().getGroupsFromTree(),
-                                        id: 0,
-                                        fields: ['text']
-                                }),
-                        emptyText: 'Select a group' + '...',
-                        valueField: 'text',
-                        displayField: 'text',
-                        triggerAction: 'all',
-                        editable: false,
-                        mode : 'local'
-                    },
-                    {
-                        xtype: 'button',
-                        id: 'messenger-contact-add-button',
-                        text: 'Add',
-                        listeners: {
-                            click: function () {
-                               Tine.Messenger.Window.AddBuddyHandler(
-                                                        Ext.getCmp('messenger-contact-add-client')
-                                                    );
-                            }
-                        }
-                    }
-                ],
-                keys: [
-                    {
-                        key: [Ext.EventObject.ENTER],
-                        handler: function () {
-                            Tine.Messenger.Window.AddBuddyHandler(
-                                                    Ext.getCmp('messenger-contact-add-client')
-                                                );
-                        }
-                    }
-                ]
-            }
-        ]
-    }
-    
-    , AddGroupLayout: {
-        id: 'messenger-group-add-client',
-        closeAction: 'close',
-        layout: 'fit',
-        plain: true,
-        modal: true,
-        title: 'Add Group',
-        items: [{
-                xtype: 'form',
-                border: false,
-                items: [
-                    {
-                        xtype: 'textfield',
-                        id: 'messenger-group-mngt-name',
-                        fieldLabel: 'Name'
-                    },
-                    {
-                        xtype: 'button',
-                        id: 'messenger-group-mngt-button',
-                        text: 'Add',
-                        listeners: {
-                            click: function () {
-                                Tine.Messenger.Window.AddGroupHandler(
-                                                        Ext.getCmp('messenger-group-add-client')
-                                                    );
-                            }
-                        }
-                    }
-                ]
-            }
-        ],
-        keys: [
-            {
-                key: [Ext.EventObject.ENTER],
-                handler: function () {
-                    Tine.Messenger.Window.AddGroupHandler(
-                                            Ext.getCmp('messenger-group-add-client')
-                                        );
-                }
-            }
-        ]
-        
-    }
-    
     , ChatWindowLayout : {
         iconCls:     'messenger-icon',
         cls:         'messenger-chat-window',
@@ -399,69 +382,6 @@ Tine.Messenger.Config = {
             }
         }
   }
-  
- ,JoinChatLogin : {
-    id: 'messenger-groupchat',
-    layout: 'anchor',
-    closeAction: 'close',
-    plain: true,
-    width: 300,
-    height: 150,
-    minHeight: 150,
-    title: 'Join Groupchat',
-    modal: true,
-    items: {
-        xtype: 'form',
-        border: false,
-        items: [
-            {
-                xtype: 'textfield',
-                id: 'messenger-groupchat-identity',
-                fieldLabel: 'Identity',
-                disabled: true
-            },
-            {
-                xtype: 'textfield',
-                id: 'messenger-groupchat-host',
-                fieldLabel: 'Host'
-            },
-            {
-                xtype: 'textfield',
-                id: 'messenger-groupchat-room',
-                fieldLabel: 'Room'
-            },
-            {
-                xtype: 'textfield',
-                id: 'messenger-groupchat-nick',
-                fieldLabel: 'Nickname'
-            },
-            {
-                xtype: 'textfield',
-                inputType: 'password',
-                id: 'messenger-groupchat-pwd',
-                fieldLabel: 'Password'
-            },
-            {
-                xtype: 'button',
-                text: 'Join',
-                listeners: {
-                    click: function (ev, data) {
-                        Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
-                    }
-                }
-            }
-        ],
-
-        keys: [
-            {
-                key: [Ext.EventObject.ENTER],
-                handler: function () {
-                    Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
-                }
-            }
-        ]
-    }
- }
     
 }
 
@@ -602,3 +522,215 @@ Tine.Messenger.AddItems = function(_box) {
     }
 
 }
+
+Tine.Messenger.WindowLayout = {
+    Buddy   : 'AddBuddyLayout',
+    Groups  : 'AddGroupLayout',
+    Chat    : 'JoinChatLogin'
+}
+
+Tine.Messenger.WindowConfig = function(window, args) {
+    
+    var AddBuddyLayout = {
+        id: 'messenger-contact-add-client',
+        closeAction: 'close',
+        layout: 'fit',
+        plain: true,
+        modal: true,
+        title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Contact'),
+        listeners: {
+            render: function(e){
+                Ext.getCmp('messenger-contact-add-group').store
+                    .loadData(
+                        Tine.Messenger.RosterTree()
+                        .getGroupsFromTree()
+                    );
+            }
+        },
+        items: [
+            {
+                xtype: 'form',
+                border: false,
+                items: [
+                    {
+                        xtype: 'textfield',
+                        id: 'messenger-contact-add-jid',
+                        fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('JID'),
+                        value: '',
+                        disabled: false
+                    },
+                    {
+                        xtype: 'textfield',
+                        id: 'messenger-contact-add-name',
+                        fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Name')
+                    },
+                    {
+                        xtype: 'combo',
+                        id: 'messenger-contact-add-group',
+                        fieldLabel: _('Group'),
+                        store: new Ext.data.SimpleStore({
+//                                        data: Tine.Messenger.RosterTree().getGroupsFromTree(),
+                                        id: 0,
+                                        fields: ['text']
+                                }),
+                        emptyText: Tine.Tinebase.appMgr.get('Messenger').i18n._('Select a group') + '...',
+                        valueField: 'text',
+                        displayField: 'text',
+                        triggerAction: 'all',
+                        editable: false,
+                        mode : 'local'
+                    },
+                    {
+                        xtype: 'button',
+                        id: 'messenger-contact-add-button',
+                        text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add'),
+                        listeners: {
+                            click: function () {
+                               Tine.Messenger.Window.AddBuddyHandler(
+                                                        Ext.getCmp('messenger-contact-add-client')
+                                                    );
+                            }
+                        }
+                    }
+                ],
+                keys: [
+                    {
+                        key: [Ext.EventObject.ENTER],
+                        handler: function () {
+                            Tine.Messenger.Window.AddBuddyHandler(
+                                                    Ext.getCmp('messenger-contact-add-client')
+                                                );
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+    
+    var AddGroupLayout = {
+        id: 'messenger-group-add-client',
+        closeAction: 'close',
+        layout: 'fit',
+        plain: true,
+        modal: true,
+        title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Group'),
+        items: [{
+                xtype: 'form',
+                border: false,
+                items: [
+                    {
+                        xtype: 'textfield',
+                        id: 'messenger-group-mngt-name',
+                        fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Name')
+                    },
+                    {
+                        xtype: 'button',
+                        id: 'messenger-group-mngt-button',
+                        text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Add'),
+                        listeners: {
+                            click: function () {
+                                Tine.Messenger.Window.AddGroupHandler(
+                                                        Ext.getCmp('messenger-group-add-client')
+                                                    );
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        keys: [
+            {
+                key: [Ext.EventObject.ENTER],
+                handler: function () {
+                    Tine.Messenger.Window.AddGroupHandler(
+                                            Ext.getCmp('messenger-group-add-client')
+                                        );
+                }
+            }
+        ]
+        
+    };
+    
+    var JoinChatLogin = {
+        id: 'messenger-groupchat',
+        layout: 'anchor',
+        closeAction: 'close',
+        plain: true,
+        width: 300,
+        height: 150,
+        minHeight: 150,
+        title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Join Groupchat'),
+        modal: true,
+        items: {
+            xtype: 'form',
+            border: false,
+            items: [
+                {
+                    xtype: 'textfield',
+                    id: 'messenger-groupchat-identity',
+                    fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Identity'),
+                    disabled: true
+                },
+                {
+                    xtype: 'textfield',
+                    id: 'messenger-groupchat-host',
+                    fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Host')
+                },
+                {
+                    xtype: 'textfield',
+                    id: 'messenger-groupchat-room',
+                    fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Room')
+                },
+                {
+                    xtype: 'textfield',
+                    id: 'messenger-groupchat-nick',
+                    fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Nickname')
+                },
+                {
+                    xtype: 'textfield',
+                    inputType: 'password',
+                    id: 'messenger-groupchat-pwd',
+                    fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Password')
+                },
+                {
+                    xtype: 'button',
+                    text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Join'),
+                    listeners: {
+                        click: function (ev, data) {
+                            Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
+                        }
+                    }
+                }
+            ],
+
+            keys: [
+                {
+                    key: [Ext.EventObject.ENTER],
+                    handler: function () {
+                        Tine.Messenger.Groupie.MUCLogin(Ext.getCmp('messenger-groupchat'));
+                    }
+                }
+            ]
+        }
+    };
+    
+    var config = {};
+    
+    switch(window){
+        case Tine.Messenger.WindowLayout.Buddy:
+            config = AddBuddyLayout;
+            break;
+        case Tine.Messenger.WindowLayout.Groups:
+            config = AddGroupLayout;
+            break;
+        case Tine.Messenger.WindowLayout.Chat:
+            config = JoinChatLogin;
+            break;
+    }
+    
+    Tine.Messenger.WindowConfig.superclass.constructor.call(this,
+        Ext.apply(config, args || {})
+    );
+};
+
+Ext.extend(Tine.Messenger.WindowConfig, Ext.Window);

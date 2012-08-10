@@ -31,5 +31,5 @@ class Messenger_Model_PersonalConfig extends Tinebase_Record_Abstract
        'auto_authentication'   => array(Zend_Filter_Input::ALLOW_EMPTY => false, 'presence'=>'required'),
        'messenger_login'       => array(Zend_Filter_Input::ALLOW_EMPTY => true)
    );
-    
+      
 }

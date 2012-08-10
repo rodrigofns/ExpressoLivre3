@@ -16,7 +16,7 @@ Feature: Permitir que as mensagens sejam criadas
     When I fill in "username" with "USUARIO"
     And I fill in "password" with "SENHA"
     And I press "ext-gen33"
-    Then I wait 20 seconds or until named element "content='Lima Albuquerque, Marcio'" is present
+    Then I wait 20 seconds or until named element "content='teste, Teste'" is present
 
   @N4F2C1 @javascript
   Scenario: Criar e-mail
