@@ -554,13 +554,31 @@ Ext.extend(Tine.Felamimail.TreePanel, Ext.tree.TreePanel, {
      * @param {Object} folderData
      */
     onFolderRename: function(folderData) {
-        var record = this.folderStore.getById(folderData.id);
-        record.set('globalname', folderData.globalname);
-        record.set('localname', folderData.localname);
-        
-        Tine.log.debug('Renamed folder:' + record.get('globalname'));
+        try{
+            var record = this.folderStore.getById(folderData.id);
+            record.set('globalname', folderData.globalname);
+            record.set('localname', folderData.localname);
+            Tine.log.debug('Renamed folder:' + record.get('globalname'));
+        }catch(e){
+             this.onFolderAdd(folderData);
+             var node = this.getNodeById(folderData.id);
+             node.select();
+             node.parentNode.sort(function(x,y){
+                var a = x.text.toUpperCase(); 
+                var b = y.text.toUpperCase(); 
+                if (a > b) 
+                   return 1 
+                if (a < b) 
+                   return -1 
+                return 0; 
+              });
+             node = this.getNodeById(this.ctxNode.id);
+             node.remove();
+             
+       }
+
     },
-        
+    
     /**
      * remove deleted folder from the store
      * 

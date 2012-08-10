@@ -234,11 +234,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                    return new Felamimail_Model_Folder(array(
                     'id' => $_id,
                     'account_id' => Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT},
-                    'localname' => $folderDecoded['globalName'],
+                    'localname' => "Compartilhadas",
                     'globalname' => $folderDecoded['globalName'],
                     'parent' => '',
                     'delimiter' => self::IMAPDELIMITER,
-                    'is_selectable' => 1,
+                    'is_selectable' => 0,
                     'has_children' => 1,
                     'system_folder' => 1,
                     'imap_status' => Felamimail_Model_Folder::IMAP_STATUS_OK,
