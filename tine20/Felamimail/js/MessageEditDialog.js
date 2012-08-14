@@ -189,7 +189,7 @@ Ext.namespace('Tine.Felamimail');
         this.action_toggleMarkAsImportant = new Ext.Action({
             text: this.app.i18n._('Mark as Important'),
             handler: this.onToggleMarkAsImportant,
-            iconCls: 'notes_noteIcon', // todo: change the icon
+            iconCls: 'emblems_emblemImportant',
             disabled: false,
             scope: this,
             enableToggle: true
