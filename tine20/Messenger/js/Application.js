@@ -88,7 +88,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     debugFunction: function () {
         Tine.Messenger.Application.connection.xmlInput = function (xml) {
             console.log('\\/ |\\/| |     |  |\\ |');
-            console.log('/\\ |   | |__   |  | \\|');
+            console.log('/\\ |  | |__   |  | \\|');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var challenge = $(xml).find('challenge');
@@ -98,7 +98,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         };
         Tine.Messenger.Application.connection.xmlOutput = function (xml) {
             console.log('\\/ |\\/| |     /==\\ | | ====');
-            console.log('/\\ |   | |__   \\__/ |_|   |');
+            console.log('/\\ |  | |__   \\__/ |_|   |');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var response = $(xml).find('response');
@@ -148,7 +148,22 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     startMessenger: function (status, statusText) {
         Tine.Messenger.Log.debug("Starting Messenger...");
         
-        this.getPasswordForJabber();
+//        this.getPasswordForJabber();
+        //----> Remover depois
+        Tine.Tinebase.registry.add('messengerAccount', {
+            JID: 'bruno@simdev.sdr.serpro/expresso-3.0',
+            PWD: base64.encode('12345')
+        });
+        Tine.Messenger.Log.info("Custon name: " + Tine.Messenger.registry.get('preferences').get('name'));
+        Tine.Messenger.Application.connection = new Strophe.Connection("/http-bind");
+        if (MESSENGER_DEBUG)
+            Tine.Tinebase.appMgr.get('Messenger').debugFunction();
+        Tine.Messenger.Application.connection.connect(
+            Tine.Tinebase.registry.get('messengerAccount').JID,
+            Tine.Tinebase.registry.get('messengerAccount').PWD,
+            Tine.Tinebase.appMgr.get('Messenger').connectionHandler
+        );
+        //----<
         
         if(!Ext.getCmp("ClientDialog")){
             new Tine.Messenger.ClientDialog().show();
