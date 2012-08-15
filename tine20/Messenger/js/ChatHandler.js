@@ -13,9 +13,9 @@ Tine.Messenger.ChatHandler = {
     
     formatChatTitle: function (jid, name, type) {
         if(type == 'groupchat')
-            return _('Group chat in room') + ' ' + name;
+            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Group chat in room') + ' ' + name;
         else
-            return _('Chat with') + ' ' + name + ' (' + jid + ')';
+            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Chat with') + ' ' + name + ' (' + jid + ')';
         return null;
     },
     
@@ -50,15 +50,16 @@ Tine.Messenger.ChatHandler = {
                 type: type,
                 privy: privy
             });
+            
            new_chat = true;
         }
         chat.show();
-        
+
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
-            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + _('is unavailable'), _("Info"), 'messenger-notify');
-            Tine.Messenger.ChatHandler.setChatMessage(jid, _('Your messages will be sent offline'), _('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable'), Tine.Tinebase.appMgr.get('Messenger').i18n._("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._('Your messages will be sent offline'), Tine.Tinebase.appMgr.get('Messenger').i18n._('Info'), 'messenger-notify');
         }
     
         return chat;
@@ -153,7 +154,7 @@ Tine.Messenger.ChatHandler = {
             type = $(message).attr("type"),
             composing = $(message).find("composing"),
             paused = $(message).find("paused");
-        
+
         // Capture the message body element, 
         // extract text and append to chat area
         var body = $(message).find("html > body");
@@ -164,10 +165,10 @@ Tine.Messenger.ChatHandler = {
         // Typing events
         if (paused.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
         } else if (composing.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, _(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
             // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name, type);
@@ -192,7 +193,7 @@ Tine.Messenger.ChatHandler = {
 
                 if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
                     message = state;
-                } else if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
+                } else if(state == Tine.Messenger.ChatHandler.PAUSED_STATE){
                     message = state;
                 } else {
                     message = state;
@@ -309,7 +310,7 @@ Tine.Messenger.ChatHandler = {
         var dialog = Ext.getCmp("messenger-groupchat");
         
         if(!dialog)
-            dialog = new Tine.Messenger.SimpleDialog(Tine.Messenger.Config.JoinChatLogin).init();
+            dialog = new Tine.Messenger.WindowConfig(Tine.Messenger.WindowLayout.Chat).show();
         
         dialog.findById('messenger-groupchat-identity').setValue(jid);
         dialog.findById('messenger-groupchat-host').setValue(host);
@@ -335,12 +336,12 @@ Tine.Messenger.ChatHandler = {
 //        chat.body.dom.innerHTML = html;
     },
     
-    connect: function() {
-        messengerLogin();
+    connect: function(status, statusText) {
+        messengerLogin(status, statusText);
     }
     
 }
 
-function messengerLogin() {
-    Tine.Tinebase.appMgr.get('Messenger').startMessenger();
+function messengerLogin(status, statusText) {
+    Tine.Tinebase.appMgr.get('Messenger').startMessenger(status, statusText);
 }

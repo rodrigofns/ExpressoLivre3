@@ -12,7 +12,9 @@ Tine.Messenger.RosterHandler = {
             // Modify Main Menu status
             Tine.Tinebase.MainScreen.getMainMenu().onlineStatus.setStatus('online');
             
-            Tine.Messenger.RosterHandler.changeStatus(Ext.getCmp('ClientDialog').status);
+            Tine.Messenger.RosterHandler.changeStatus(Ext.getCmp("ClientDialog").status, 
+                                                        '',//Ext.getCmp("ClientDialog").statusText, 
+                                                        true);
             
         } catch (e) {
             alert('Something went wrong!\n'+e.getMessage());
@@ -45,7 +47,7 @@ Tine.Messenger.RosterHandler = {
 //                                Tine.Messenger.RosterHandler.removeContactElement(jid);
                                 if(contact.remove()){
                                     var label = contact.text || jid;
-                                    Tine.Messenger.LogHandler.status(label, _('was successfully removed!'));
+                                    Tine.Messenger.LogHandler.status(label, _('was successfully removed')+'!', 'INFO');
                                     var chat = Ext.getCmp(Tine.Messenger.ChatHandler.formatChatId(jid));
                                     if(chat){
                                         chat.close();
@@ -77,6 +79,19 @@ Tine.Messenger.RosterHandler = {
         } catch (err) {
             alert('Something go wrong!');
             console.error(err);
+        }
+        
+        var si = $(iq).find('si[profile="http://jabber.org/protocol/si/profile/file-transfer"]');
+        
+        if(si.length > 0){
+            var fname = $(si).find('file').attr('name'),
+                fsize = $(si).find('file').attr('size');
+            var raw_jid = $(si).parent().attr("from"),
+                jid = Strophe.getBareJidFromJid(raw_jid),
+                contact = Tine.Messenger.RosterHandler.getContactElement(jid);
+                
+            Ext.MessageBox.alert('File transfer', contact.text + ' wants send to you the file "'+fname+'" with '+fsize+' bytes');
+            console.log('File transfer. File '+fname+' with '+fsize+' bytes');
         }
         
         return true;
@@ -141,36 +156,35 @@ Tine.Messenger.RosterHandler = {
         Tine.Messenger.Application.connection.send(presence);
     },
     
-    changeStatus: function(status, statusText) {
-        
-        var statusValue = '',
-            statusItems = Tine.Messenger.factory.statusStore.data.items;
-        statusText = statusText ? statusText : '';
-        for(var i=0; i < statusItems.length; i++){
-            if(statusItems[i].data.value == status){
-                statusValue = statusItems[i].data.text;
-            }
-        }
-        
-        if(status != 'unavailable' && !Ext.getCmp('ClientDialog').connected){
-            Tine.Messenger.ChatHandler.connect();
-        } else {
-            switch(status){
-                case 'available':
-                case 'away':
-                case 'dnd':
-                    var presence = $pres().c('show').t(status).up().c('status').t(statusText);
-                    break;
-
-                case 'unavailable':
-                    Tine.Messenger.ChatHandler.disconnect();
-                    break;
-            }
-            if(statusValue != ''){
-                Tine.Messenger.Application.connection.send(presence);
-                Ext.getCmp('messenger-change-status-button')
-                        .setIcon('/images/messenger/user_'+status+'.png')
-                        .setTooltip(_(statusValue));
+    changeStatus: function(status, statusText, firstTime) {
+        if(Ext.getCmp("ClientDialog").status != status || Ext.getCmp("ClientDialog").statusText != statusText || firstTime){
+            if(status != IMConst.ST_UNAVAILABLE.id && !Ext.getCmp('ClientDialog').connected){
+                Tine.Messenger.ChatHandler.connect(status, statusText);
+            } else {
+                var statusValue = '';
+                var presence = $pres().c('show').t(status).up().c('status').t(statusText);
+                switch(status){
+                    case IMConst.ST_AVAILABLE.id:
+                        statusValue = IMConst.ST_AVAILABLE.text;
+                        break;
+                    case IMConst.ST_AWAY.id:
+                        statusValue = IMConst.ST_AWAY.text;
+                        break;
+                    case IMConst.ST_DONOTDISTURB.id:
+                        statusValue = IMConst.ST_DONOTDISTURB.text;
+                        break;
+                    case IMConst.ST_UNAVAILABLE.id:
+                        Tine.Messenger.ChatHandler.disconnect();
+                        break;
+                }
+                if(statusValue != '' && status != IMConst.ST_UNAVAILABLE.id){
+                    Tine.Messenger.Application.connection.send(presence);
+                    Ext.getCmp('messenger-change-status-button')
+                            .setIcon('/images/messenger/user_'+status+'.png')
+                            .setTooltip(_(statusValue));
+                }
+                Ext.getCmp('ClientDialog').status = status;
+                Ext.getCmp('ClientDialog').statusText = statusText;
             }
         }
         
@@ -202,25 +216,6 @@ Tine.Messenger.RosterHandler = {
          }
          return false;
 //        Tine.Messenger.RosterHandler.contact_added = jid;
-    },
-    
-    _onRosterGet: function(iq){
-        var type = $(iq).find("query").attr("xmlns");
-        
-        if(type == "http://jabber.org/protocol/disco#info"){
-            var iq = $iq({to: 'fulano@simdev.sdr.serpro/expresso-3.0', type: "result"})
-                    .c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
-                    .c("feature", {"var": "http://jabber.org/protocol/bytestreams"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/disco#info"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/disco#items"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/muc"}).up()
-                    .c("feature", {"var": "http://jabber.org/protocol/si/profile/file-transfer"}).up()
-                    .c("feature", {"var": "urn:xmpp:jingle:transports:raw-udp:1"}).up()
-                    .c("feature", {"var": "http://www.google.com/xmpp/protocol/session"}).up();
-
-            Tine.Tinebase.appMgr.get('Messenger').getConnection().sendIQ(iq);
-            Tine.Messenger.Log.debug("Eniou o iq result");
-        }
     },
     
     renameContact: function (jid, name, group) {
@@ -302,11 +297,13 @@ Tine.Messenger.RosterHandler = {
             }
             Tine.Messenger.RosterHandler.modifyBuddys(buddys);
 //            grpNode.setText(n_gname);
-            Tine.Messenger.LogHandler.status(_('Successful'), _('The group ') + gname + _(' was successfully renamed to ') + n_gname);
+            Tine.Messenger.LogHandler.status(_('Successful'),
+                                                _('The group') + ' ' + gname + ' ' + _('was successfully renamed to') + ' ' + n_gname, 
+                                                'INFO');
             
             return true;
         } else {
-//            Tine.Messenger.LogHandler.status(_('Error'), n_gname + _(' already exist. It was not renamed.'));
+//            Tine.Messenger.LogHandler.status(_('Error'), n_gname + _(' already exist. It was not renamed.'), Tine.Messenger.LogHandler.INFO);
             Tine.Messenger.Log.info("Rename to No Group name is not permitted.");
         }
         return false;
@@ -356,9 +353,13 @@ Tine.Messenger.RosterHandler = {
         }
         Tine.Messenger.RosterHandler.modifyBuddys(buddys);
         if(grpNode.remove()){
-            Tine.Messenger.LogHandler.status(_('Successful'), _('The group ') + gname + _(' was successfully removed!'));
+            Tine.Messenger.LogHandler.status(_('Successful'), 
+                                                _('The group') + ' ' + gname + ' ' + _('was successfully removed') + '!', 
+                                                'INFO');
         } else {
-            Tine.Messenger.LogHandler.status(_('Error'), _('The group ') + gname + _(' was not removed!'));
+            Tine.Messenger.LogHandler.status(_('Error'), 
+                                                _('The group') + ' ' + gname + ' ' + _('was not removed') + '!', 
+                                                'INFO');
         }
     },
     

@@ -3,8 +3,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-07-11 15:14-0300\n"
-"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-08-01 17:24-0300\n"
+"Last-Translator: Fernando Lages <fernando.lages@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -619,7 +619,7 @@ msgstr "Login realizado com sucesso. Carregando {0}..."
 #: js/LoginPanel.js:354
 #: js/MainMenu.js:227
 msgid "Please wait!"
-msgstr "Please wait!"
+msgstr "Aguarde, por favor!"
 
 #: js/LoginPanel.js:366
 msgid "Login failure"
@@ -831,6 +831,36 @@ msgstr "Tabulação de Texto à Direita"
 #: js/prototypeTranslations.js:25
 msgid "Remove Formatting"
 msgstr "Remover Formatação"
+
+#: js/prototypeTranslations.js:26
+#: js/prototypeTranslations.js:27
+#: googiespell
+msgid "Spell Checker"
+msgstr "Corretor Ortográfico"
+
+#: googiespell
+msgid "No spelling errors found."
+msgstr "Nenhum erro encontrado."
+
+#: googiespell
+msgid "Close"
+msgstr "Fechar"
+
+#: googiespell
+msgid "Revert to"
+msgstr "Reverter para"
+
+#: googiespell
+msgid "Check spelling"
+msgstr "Verificar ortografia"
+
+#: googiespell
+msgid "Resume editing"
+msgstr "Continuar edição"
+
+#: googiespell
+msgid "No suggestions"
+msgstr "Nenhuma sugestão"
 
 #: js/tineInit.js:589
 msgid "Fatal Error: Client self-update failed, please contact your administrator and/or restart/reload your browser."
@@ -1297,16 +1327,16 @@ msgstr "The merge failed. Both {0} haven't been touched."
 
 #: js/widgets/dialog/DuplicateMergeDialog.js:188
 msgid "Merge {0}, prefer First"
-msgstr "Merge {0}, prefer First"
+msgstr "Intercalar {0}, preferir o primeiro"
 
 #: js/widgets/dialog/DuplicateMergeDialog.js:189
 msgid "Merge {0}, prefer Second"
-msgstr "Merge {0}, prefer Second"
+msgstr "Intercalar {0}, preferir o segundo"
 
 #: js/widgets/dialog/DuplicateMergeDialog.js:196
 #: js/widgets/grid/GridPanel.js:438
 msgid "Merge {0}"
-msgstr "Merge {0}"
+msgstr "Intercalar {0}"
 
 #: js/widgets/dialog/DuplicateMergeDialog.js:199
 msgid "First {0}"
@@ -1322,7 +1352,7 @@ msgstr "Final {0}"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:41
 msgid "The record you try to add might already exist."
-msgstr "The record you try to add might already exist."
+msgstr "O registro que você tentou adicionar pode já existir."
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:132
 msgid "Field Group"
@@ -1330,35 +1360,35 @@ msgstr "Field Group"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:146
 msgid "My Value"
-msgstr "My Value"
+msgstr "Valor informado"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:154
 msgid "Existing Value"
-msgstr "Existing Value"
+msgstr "Valor existente"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:162
 msgid "Final Value"
-msgstr "Final Value"
+msgstr "Valor final"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:179
 msgid "Action:"
-msgstr "Action:"
+msgstr "Ação:"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:195
 msgid "Merge, keeping existing details"
-msgstr "Merge, keeping existing details"
+msgstr "Intercalar, mantendo valores existentes"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:196
 msgid "Merge, keeping my details"
-msgstr "Merge, keeping my details"
+msgstr "Intercalar, mantendo valor informado"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:197
 msgid "Keep existing record and discard mine"
-msgstr "Keep existing record and discard mine"
+msgstr "Manter registro existente e desconsiderar o meu"
 
 #: js/widgets/dialog/DuplicateResolveGridPanel.js:198
 msgid "Keep both records"
-msgstr "Keep both records"
+msgstr "Manter ambos registros"
 
 #: js/widgets/dialog/EditDialog.js:258
 #: js/widgets/EditRecord.js:188
@@ -1412,7 +1442,7 @@ msgstr "Não foi possível excluir {0}."
 
 #: js/widgets/dialog/EditDialog.js:632
 msgid "Resolve Duplicate {0} Suspicion"
-msgstr "Resolve Duplicate {0} Suspicion"
+msgstr "Resolvendo Suspeita de {0} duplicado"
 
 #: js/widgets/dialog/ExportDialog.js:74
 msgid "Export {0} {1}"
@@ -2544,4 +2574,15 @@ msgstr "Espere, por favor, ou contate o administrador"
 #: LoginPanel.js:384
 msgid "Security Code"
 msgstr "Código de Segurança"
+
+msgid "You need to enable javascript to use"
+msgstr "É necessário habilitar o  javascript em seu navegador para usar o "
+
+#j: s/AboutDialog.js:33
+msgid "Version"
+msgstr "Versão"
+
+#: js/AboutDialog.js:35
+msgid "Copyright"
+msgstr "Direitos autorais"
 

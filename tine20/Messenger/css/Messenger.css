@@ -2,6 +2,10 @@
     background-image: url(../../images/messenger/talk-balloons.png) !important;
 }
 
+.filetransfer-icon-title {
+    background: url(/images/messenger/page_go.png);
+}
+
 #messenger {
     color: #000000;
     cursor: pointer;
@@ -211,6 +215,9 @@
 /*    display: none;*/
 /*    border:solid red 1px;*/
 }
+#messenger-loghandler-status .msg:hover {
+    visibility: hidden;
+}
 
 /* PRESENCE */
 /*.messenger-presence-offline {
@@ -373,3 +380,7 @@
     font-weight: bold;
     color: #333;
  }
+ 
+#ClientDialog .x-panel-body,
+.messenger-chat-body .x-panel-body
+{background-color: transparent!important}
