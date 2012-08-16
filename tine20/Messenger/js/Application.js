@@ -2,7 +2,7 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
-    MESSENGER_DEBUG = true;
+    MESSENGER_DEBUG = false;
 
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
