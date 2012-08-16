@@ -4,15 +4,6 @@ Ext.ns('Tine.Messenger');
 var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
     MESSENGER_DEBUG = true;
 
-IM = {
-    app: function(){
-        return Tine.Tinebase.appMgr.get('Messenger');
-    },
-    i18n: function(){
-        return Tine.Tinebase.appMgr.get('Messenger').i18n;
-    }
-}
-
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
         fields:["value","text"],

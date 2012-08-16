@@ -12,14 +12,17 @@ Tine.Messenger.ChatHandler = {
     },
     
     formatChatTitle: function (jid, name, type) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
+        
         if(type == 'groupchat')
-            return IM.i18n()._('Group chat in room') + ' ' + name;
+            return app.i18n._('Group chat in room') + ' ' + name;
         else
-            return IM.i18n()._('Chat with') + ' ' + name + ' (' + jid + ')';
+            return app.i18n._('Chat with') + ' ' + name + ' (' + jid + ')';
         return null;
     },
     
     showChatWindow: function (jid, name, type, privy) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
         var title = '',
             _type = type,
             new_chat = false;
@@ -77,9 +80,9 @@ Tine.Messenger.ChatHandler = {
                                 switch (Tine.Messenger.registry.get('preferences').get('chatHistory')) {
                                     case 'download': 
                                         Ext.Msg.confirm(
-                                            IM.i18n()._('Chat History'),
-                                            IM.i18n()._('You chose to download the every chat history') + '.<br>' +
-                                            IM.i18n()._('Do you want to download this chat') + '?',
+                                            app.i18n._('Chat History'),
+                                            app.i18n._('You chose to download the every chat history') + '.<br>' +
+                                            app.i18n._('Do you want to download this chat') + '?',
                                             function (id) {
                                                 if (id == 'yes')
                                                     $('#iframe-history').attr('src', '/download/' + response.fileName);
@@ -94,8 +97,8 @@ Tine.Messenger.ChatHandler = {
                                 }
                             } else {
                                 Ext.Msg.show({
-                                    title: IM.i18n()._('Error'),
-                                    msg: IM.i18n()._('Error downloading Chat History')+'!',
+                                    title: app.i18n._('Error'),
+                                    msg: app.i18n._('Error downloading Chat History')+'!',
                                     buttons: Ext.Msg.OK,
                                     icon: Ext.MessageBox.ERROR
                                 });
@@ -104,7 +107,7 @@ Tine.Messenger.ChatHandler = {
                         error: function (xhr, status, err) {
                             Ext.Msg.show({
                                 title: _('Error'),
-                                msg: IM.i18n()._(status) + ': ' + IM.i18n()._(err) + '!',
+                                msg: app.i18n._(status) + ': ' + app.i18n._(err) + '!',
                                 buttons: Ext.Msg.OK,
                                 icon: Ext.MessageBox.ERROR
                             });
@@ -120,8 +123,8 @@ Tine.Messenger.ChatHandler = {
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
-            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + IM.i18n()._('is unavailable'), IM.i18n()._("Info"), 'messenger-notify');
-            Tine.Messenger.ChatHandler.setChatMessage(jid, IM.i18n()._('Your messages will be sent offline'), IM.i18n()._('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + app.i18n._('is unavailable'), app.i18n._("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, app.i18n._('Your messages will be sent offline'), app.i18n._('Info'), 'messenger-notify');
         }
     
         return chat;
@@ -209,6 +212,7 @@ Tine.Messenger.ChatHandler = {
     },
     
     onIncomingMessage: function (message) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
         var raw_jid = $(message).attr("from"),
             jid = Strophe.getBareJidFromJid(raw_jid),
             name = $(message).attr("name") ||
@@ -227,10 +231,10 @@ Tine.Messenger.ChatHandler = {
         // Typing events
         if (paused.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, IM.i18n()._(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
         } else if (composing.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, IM.i18n()._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
             // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name, type);
