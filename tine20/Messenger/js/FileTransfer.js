@@ -25,8 +25,8 @@ Tine.Messenger.FileTransfer = {
                     Tine.Messenger.FileTransfer.chooseResourceAndSend(to, function () {
                         if (Tine.Messenger.FileTransfer.resource == null) {
                             Ext.Msg.show({
-                                title: Tine.Tinebase.appMgr.get('Messenger').i18n._('File Transfer'),
-                                msg: Tine.Tinebase.appMgr.get('Messenger').i18n._('You must choose a resource') + '!',
+                                title: IM.i18n()._('File Transfer'),
+                                msg: IM.i18n()._('You must choose a resource') + '!',
                                 buttons: Ext.Msg.OK,
                                 icon: Ext.MessageBox.INFO
                             });
@@ -50,8 +50,8 @@ Tine.Messenger.FileTransfer = {
                         }
 
                         Ext.Msg.show({
-                            title: Tine.Tinebase.appMgr.get('Messenger').i18n._('File Transfer'),
-                            msg: Tine.Tinebase.appMgr.get('Messenger').i18n._('File sent') +
+                            title: IM.i18n()._('File Transfer'),
+                            msg: IM.i18n()._('File sent') +
                                  '!<h6 style="padding: 5px 0; width: 300px;">' +
                                  uploadResponse.fileName +
                                  ' (' + uploadResponse.fileSize + ' bytes)</h6>',
@@ -61,8 +61,8 @@ Tine.Messenger.FileTransfer = {
                     });
                 } else {
                     Ext.Msg.show({
-                        title: Tine.Tinebase.appMgr.get('Messenger').i18n._('File Transfer Error'),
-                        msg: Tine.Tinebase.appMgr.get('Messenger').i18n._(uploadResponse.status) + '!',
+                        title: IM.i18n()._('File Transfer Error'),
+                        msg: IM.i18n()._(uploadResponse.status) + '!',
                         buttons: Ext.Msg.OK,
                         icon: Ext.MessageBox.ERROR,
                         width: 300
@@ -83,26 +83,26 @@ Tine.Messenger.FileTransfer = {
             contact = Tine.Messenger.RosterHandler.getContactElement(jid);
 
         var confirm = new Ext.Window({
-            title: Tine.Tinebase.appMgr.get('Messenger').i18n._('File Transfer'),
+            title: IM.i18n()._('File Transfer'),
             border: false,
             iconCls: 'filetransfer-icon-title',
             html: contact.text + ' ' +
-                  Tine.Tinebase.appMgr.get('Messenger').i18n._('wants to send you a file:') +
+                  IM.i18n()._('wants to send you a file:') +
                   '<img style="display: block; width: 64px; margin: 0 auto;"' +
                   ' src="/images/files/' + ext + '-small.png"/>' +
                   '<h6 style="padding: 5px 0; width: 300px; text-align: center;">' + fileName + 
                   ' (' + fileSize + ' bytes)</h6>' +
-                  '<div>' + Tine.Tinebase.appMgr.get('Messenger').i18n._('Do you allow') + '?</div>',
+                  '<div>' + IM.i18n()._('Do you allow') + '?</div>',
             closeAction: 'close',
             buttons: [
                 {
-                    text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Yes'),
+                    text: IM.i18n()._('Yes'),
                     handler: function() {
                         Tine.Messenger.FileTransfer.downloadHandler(file, 'yes', confirm)
                     }
                 },
                 {
-                    text: Tine.Tinebase.appMgr.get('Messenger').i18n._('No'),
+                    text: IM.i18n()._('No'),
                     handler: function() {
                         Tine.Messenger.FileTransfer.downloadHandler(file, 'no', confirm)
                     }
@@ -137,7 +137,7 @@ Tine.Messenger.FileTransfer = {
 
             var resources = new Ext.Window({
                 id: 'filetransfer-resources',
-                title: Tine.Tinebase.appMgr.get('Messenger').i18n._('File Transfer'),
+                title: IM.i18n()._('File Transfer'),
                 border: false,
                 iconCls: 'filetransfer-icon-title',
                 closeAction: 'close',
@@ -145,7 +145,7 @@ Tine.Messenger.FileTransfer = {
                 items: resourceValues,
                 html: '<h4 style="margin: 5px;">' +
                       contact.attributes.text +
-                      Tine.Tinebase.appMgr.get('Messenger').i18n._(' has more than one resource. Choose one!') +
+                      IM.i18n()._(' has more than one resource. Choose one!') +
                       '</h4>',
                 layout: 'column'
             });

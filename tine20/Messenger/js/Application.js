@@ -4,6 +4,15 @@ Ext.ns('Tine.Messenger');
 var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
     MESSENGER_DEBUG = true;
 
+IM = {
+    app: function(){
+        return Tine.Tinebase.appMgr.get('Messenger');
+    },
+    i18n: function(){
+        return Tine.Tinebase.appMgr.get('Messenger').i18n;
+    }
+}
+
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
         fields:["value","text"],
@@ -197,7 +206,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-cmd').setText(Tine.Tinebase.appMgr.get('Messenger').i18n._('Connecting')+'...').disable();
+            Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connecting')+'...').disable();
             $('.messenger-connect-display img').css('display','block');
             
         } else if (status === Strophe.Status.CONNFAIL) {
@@ -285,7 +294,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // Disable components
             Tine.Messenger.IM.disableOnDisconnect();
             
-            Ext.Msg.alert('Expresso Messenger', Tine.Tinebase.appMgr.get('Messenger').i18n._('Messenger has been disconnected!'));
+            Ext.Msg.alert('Expresso Messenger', IM.i18n()._('Messenger has been disconnected!'));
             window.onbeforeunload = null;
             window.onunload = null;
         } else if (status === Strophe.Status.AUTHFAIL) {
@@ -293,8 +302,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
             // Disable components
             Tine.Messenger.IM.disableOnDisconnect();
             Ext.Msg.show({
-                title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Error'),
-                msg: Tine.Tinebase.appMgr.get('Messenger').i18n._('Authentication failed') + '!',
+                title: IM.i18n()._('Error'),
+                msg: IM.i18n()._('Authentication failed') + '!',
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.ERROR
             });
@@ -348,7 +357,7 @@ Tine.Messenger.IM = {
         });
         
         Ext.getCmp('messenger-connect-display').show();
-        Ext.getCmp('messenger-connect-cmd').setText(Tine.Tinebase.appMgr.get('Messenger').i18n._('Connect')).enable();
+        Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connect')).enable();
         $('.messenger-connect-display img').css('display','none');
     }
 }
