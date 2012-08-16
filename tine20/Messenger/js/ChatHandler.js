@@ -59,55 +59,58 @@ Tine.Messenger.ChatHandler = {
                 var chat_text = '',
                     host = window.location.host,
                     protocol = window.location.protocol;
-                if (chat_lines.length > 0)
+                if (chat_lines.length > 0 && Tine.Messenger.registry.get('preferences').get('chatHistory') != 'dont') {
                     for (var i = 0; i < chat_lines.length; i++)
                         chat_text += chat_lines[i].body.dom.innerHTML + '<br style="clear: both;"/>';
 
-                chat_text = chat_text.replace(/src\=\"/gi, 'src="' + protocol + '//' + host);
-                $.ajax('/history', {
-                    dataType: 'json',
-                    type: 'POST',
-                    data: {
-                        "chat_conversation": chat_text,
-                        "chat_id": chat.id,
-                        "chat_title": chat.title
-                    },
-                    success: function (response) {
-                        if (response.code == 0) {
-                            switch (Tine.Messenger.registry.get('preferences').get('chatHistory')) {
-                                case 'download': 
-                                    Ext.Msg.confirm(
-                                        Tine.Tinebase.appMgr.get('Messenger').i18n._('Chat History'),
-                                        Tine.Tinebase.appMgr.get('Messenger').i18n._('You chose to download the every chat history') + '.<br>' +
-                                        Tine.Tinebase.appMgr.get('Messenger').i18n._('Do you want to download this chat') + '?',
-                                        function (id) {
-                                            if (id == 'yes')
-                                                $('#iframe-history').attr('src', '/download/' + response.fileName);
-                                        }
-                                    );
-                                    break;
-                                case 'email':
-                                    alert('Por email!');
-                                    break;
+                    chat_text = chat_text.replace(/src\=\"/gi, 'src="' + protocol + '//' + host);
+                    $.ajax('/history', {
+                        dataType: 'json',
+                        type: 'POST',
+                        data: {
+                            "chat_conversation": chat_text,
+                            "chat_id": chat.id,
+                            "chat_title": chat.title
+                        },
+                        success: function (response) {
+                            if (response.code == 0) {
+                                switch (Tine.Messenger.registry.get('preferences').get('chatHistory')) {
+                                    case 'download': 
+                                        Ext.Msg.confirm(
+                                            Tine.Tinebase.appMgr.get('Messenger').i18n._('Chat History'),
+                                            Tine.Tinebase.appMgr.get('Messenger').i18n._('You chose to download the every chat history') + '.<br>' +
+                                            Tine.Tinebase.appMgr.get('Messenger').i18n._('Do you want to download this chat') + '?',
+                                            function (id) {
+                                                if (id == 'yes')
+                                                    $('#iframe-history').attr('src', '/download/' + response.fileName);
+                                                else
+                                                    $('#iframe-history').attr('src', '/nodownload/' + response.fileName);
+                                            }
+                                        );
+                                        break;
+                                    case 'email':
+                                        alert('Por email!');
+                                        break;
+                                }
+                            } else {
+                                Ext.Msg.show({
+                                    title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Error'),
+                                    msg: Tine.Tinebase.appMgr.get('Messenger').i18n._('Error downloading Chat History')+'!',
+                                    buttons: Ext.Msg.OK,
+                                    icon: Ext.MessageBox.ERROR
+                                });
                             }
-                        } else {
+                        },
+                        error: function (xhr, status, err) {
                             Ext.Msg.show({
-                                title: Tine.Tinebase.appMgr.get('Messenger').i18n._('Error'),
-                                msg: Tine.Tinebase.appMgr.get('Messenger').i18n._('Error downloading Chat History')+'!',
+                                title: _('Error'),
+                                msg: Tine.Tinebase.appMgr.get('Messenger').i18n._(status) + ': ' + Tine.Tinebase.appMgr.get('Messenger').i18n._(err) + '!',
                                 buttons: Ext.Msg.OK,
                                 icon: Ext.MessageBox.ERROR
                             });
                         }
-                    },
-                    error: function (xhr, status, err) {
-                        Ext.Msg.show({
-                            title: _('Error'),
-                            msg: Tine.Tinebase.appMgr.get('Messenger').i18n._(status) + ': ' + Tine.Tinebase.appMgr.get('Messenger').i18n._(err) + '!',
-                            buttons: Ext.Msg.OK,
-                            icon: Ext.MessageBox.ERROR
-                        });
-                    }
-                });
+                    });
+                }
             });
             
             new_chat = true;

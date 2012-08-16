@@ -24,9 +24,12 @@ Tine.Messenger.Chat = Ext.extend(Ext.Window, {
                                         id: 'messenger-chat-send',
                                         icon: '/images/messenger/page_go.png',
                                         text: Tine.Tinebase.appMgr.get('Messenger').i18n._('Send file'),
-                                        disabled: true,
                                         handler: function(){
-                                            
+                                            var window_chat = this.ownerCt.ownerCt.ownerCt.ownerCt,
+                                                id = window_chat.id.substr(MESSENGER_CHAT_ID_PREFIX.length),
+                                                jid = Tine.Messenger.Util.idToJid(id);
+                                                
+                                            Tine.Messenger.FileTransfer.sendRequest(jid);
                                         }
                                     },
                                     {
