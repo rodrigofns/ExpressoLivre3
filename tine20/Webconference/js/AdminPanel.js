@@ -14,8 +14,8 @@ Ext.namespace('Tine.Webconference');
 /**
  * admin settings panel
  * 
- * @namespace   Tine.Tinebase
- * @class       Tine.Tinebase.AdminPanel
+ * @namespace   Tine.Webconference
+ * @class       Tine.Webconference.AdminPanel
  * @extends     Ext.TabPanel
  * 
  * <p>Tinebase Admin Panel</p>
@@ -23,13 +23,10 @@ Ext.namespace('Tine.Webconference');
  * </pre></p>
  * 
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
- * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
- * @param       {Object} config
- * @constructor
- * Create a new Tine.Tinebase.AdminPanel
- * @TODO        Invent some kind of registry for inner panels
+ * Create a new Tine.Webconference.AdminPanel
  */
 Tine.Webconference.AdminPanel = Ext.extend(Ext.TabPanel, {
     
