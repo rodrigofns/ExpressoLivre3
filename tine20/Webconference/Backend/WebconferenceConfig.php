@@ -6,7 +6,7 @@
  * @subpackage  Backend
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>
- * @copyright   Copyright (c) 2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 class Webconference_Backend_WebconferenceConfig extends Tinebase_Backend_Sql_Abstract
