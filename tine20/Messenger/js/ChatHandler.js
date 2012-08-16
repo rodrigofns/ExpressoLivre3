@@ -244,7 +244,7 @@ Tine.Messenger.ChatHandler = {
             chat = Ext.getCmp(chat_id);
        
         if(chat){
-            var node = chat.getComponent('messenger-chat-notifications');
+            var node = chat.findById('messenger-chat-notifications');
             if(state){
                 var message = state,
                     html = '',
@@ -387,7 +387,7 @@ Tine.Messenger.ChatHandler = {
         var html = '<div class="chat-notification">' 
                   +    message
                   +'</div>';
-        var node = chat.getComponent('messenger-chat-notifications');
+        var node = chat.findById('messenger-chat-notifications');
         node.hide();
 //        html.delay(8000).fadeOut("slow");
         node.body.dom.innerHTML = html;
