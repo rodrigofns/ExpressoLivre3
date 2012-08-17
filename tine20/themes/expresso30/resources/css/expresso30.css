@@ -475,3 +475,11 @@ background: #d4d4d4 none;
 background: #d4d4d4 url(../images/expresso/logo-expresso-comunidade-small.png) no-repeat 7px 5px !important;
 }
 .x-window-dlg button.x-btn-text:focus { font-style: italic; text-decoration: underline; color: #ec8537; }
+
+.tb-about-img { 
+background: transparent url(../images/expresso/logo-expresso-comunidade-small.png) no-repeat center top; 
+}
+
+.tb-about-img > a > img { 
+visibility: hidden; 
+}

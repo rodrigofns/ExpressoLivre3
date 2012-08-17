@@ -28,6 +28,7 @@
  * @property    string  $messageuid     the message uid on the imap server
  * @property    integer $smime          true if is a digitaly signed message
  * @property    integer $reading_conf   true if it must send a reading confirmation
+ * @property    string  $importance     true if must mark importance as high
  */
 class Felamimail_Model_Message extends Tinebase_Record_Abstract
 {
@@ -147,6 +148,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'reading_conf'          => array(Zend_Filter_Input::ALLOW_EMPTY => true,
                                          Zend_Filter_Input::DEFAULT_VALUE => 0),
         'signature_info'        => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'importance'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     );
     
     /**
@@ -210,6 +212,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
             }
         }
         
+        $this->importance = (isset($_headers['importance']) && $_headers['importance'] === 'high') ? true : false;
         $this->subject = (isset($_headers['subject'])) ? Felamimail_Message::convertText($_headers['subject']) : null;
         
         if (array_key_exists('date', $_headers)) {
