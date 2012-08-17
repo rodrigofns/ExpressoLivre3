@@ -1,3 +1,4 @@
+<?php
 
 $file = urldecode($_GET['file']);
 $download = ($_GET['download'] == 'yes');
