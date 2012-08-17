@@ -1,7 +1,24 @@
 
 Ext.namespace('Tine.Webconference');
 
-
+/**
+ * contact picker dialog
+ * 
+ * @namespace   Tine.Webconference
+ * @class       Tine.Webconference.ContactPickerDialog
+ * @extends     Tine.widgets.dialog.EditDialog
+ * 
+ * <p>Tinebase Webconference ContactGridPanel</p>
+ * <p><pre>
+ * </pre></p>
+ * 
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ * 
+ * Create a new Tine.Webconference.ContactGridPanel
+ * 
+ */
 Tine.Webconference.ContactPickerDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
     
     /**
