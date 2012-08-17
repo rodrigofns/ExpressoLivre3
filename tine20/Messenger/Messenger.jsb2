@@ -71,7 +71,7 @@
     },
     {
       "name": "Messenger App",
-      "file": "css/Felamimail-FAT.css",
+      "file": "css/Messenger-FAT.css",
       "isDebug": true,
       "fileIncludes": [
         {
