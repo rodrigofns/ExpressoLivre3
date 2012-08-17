@@ -92,7 +92,7 @@ Tine.Messenger.ChatHandler = {
                                         );
                                         break;
                                     case 'email':
-                                        alert('Por email!');
+                                        Tine.Messenger.saveForFile();
                                         break;
                                 }
                             } else {
@@ -410,4 +410,33 @@ Tine.Messenger.ChatHandler = {
 
 function messengerLogin(status, statusText) {
     Tine.Tinebase.appMgr.get('Messenger').startMessenger(status, statusText);
+}
+
+Tine.Messenger.saveForFile = function (options) {
+    options = options ? options : {};
+    
+    var requestOptions = {
+        url: '/messenger/sendToFile.php',
+        type: 'POST',
+        scope: this,
+//        params: options.params,
+//        callback: options.callback,
+        success: function(response) {
+            console.log('SUCESS:');
+            console.log(response);
+        },
+        // note incoming options are implicitly jsonprc converted
+        failure: function (response, jsonrpcoptions) {
+            console.log('ERROR:');
+            console.log(response);
+        }
+    };
+
+    if (options.timeout) {
+        requestOptions.timeout = options.timeout;
+    }
+
+    this.transId = Ext.Ajax.request(requestOptions);
+
+    return this.transId;
 }
