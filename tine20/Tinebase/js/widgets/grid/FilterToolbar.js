@@ -589,8 +589,8 @@ Ext.extend(Tine.widgets.grid.FilterToolbar, Ext.Panel, {
             }
             
             // auto add self id filter
-            this.ownRecordFilterModel = this.createFilterModel({filtertype: 'ownrecord', ownRecordClass: this.recordClass});
-            this.filterModels.push(this.ownRecordFilterModel);
+ //           this.ownRecordFilterModel = this.createFilterModel({filtertype: 'ownrecord', ownRecordClass: this.recordClass});
+ //           this.filterModels.push(this.ownRecordFilterModel);
 //            filtersFields.push(this.ownRecordFilterModel);
         }
         

@@ -5,7 +5,7 @@
  * @package     Expresso
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @copyright   Copyright (c) 2007-2008 Serpro (www.serpro.gov.br)
- * @author      Mário César Kolling <mario.kolling@serpro.gov.br>
+ * @author      MÃ¡rio CÃ©sar Kolling <mario.kolling@serpro.gov.br>
  * 
  */
 

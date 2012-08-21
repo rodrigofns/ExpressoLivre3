@@ -404,9 +404,6 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
         }, this);
 
         this.statusActions.push(new Ext.Action({
-            text: this.app.i18n._('Delegate'),
-            handler: this.delegateAttendance.createDelegate(this, [null]),
-            icon: 'action_delegate'
             text: this.app.i18n._('Open/Delegate'),
             handler: this.delegateAttendance.createDelegate(this, [null]),
             icon: 'images/list-delegate-16x16.png'

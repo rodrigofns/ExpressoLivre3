@@ -636,6 +636,40 @@ class Zend_Mail_Protocol_Imap
     }
     
     /**
+     * Get ids of messages sorted through Imap sort extension
+     * 
+     * @param array $params
+     * @param boolean $uid
+     * @param boolean $descending
+     * @param mixed $search
+     * @param string $charset
+     * @return array
+     */
+    public function sort(array $params, $uid = false, array $search = NULL, $charset='UTF-8')
+    {
+       
+        $command = '(';
+        $command .= implode(' ', $params);
+        $command .= ')';
+        
+        $tokens = array($charset);
+        
+        if (!empty($search))
+        {
+            $tokens = array_merge($tokens, $search);
+        }
+        else {
+            $tokens[] = 'ALL';
+        }
+        
+        $response = $this->requestAndResponse($uid ? "UID SORT $command":"SORT $command", $tokens);
+        
+        $return = array_slice($response[0], 1);
+        
+        return $return;
+    }
+    
+    /**
      * get server namespace
      * 
      * @return bool|array false if error, array with returned namespace information

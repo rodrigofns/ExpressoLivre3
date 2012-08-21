@@ -109,14 +109,16 @@ Ext.extend(Tine.widgets.grid.FilterPanel, Ext.Panel, {
         
         this.initQuickFilterField();
         
-        this.items = [{
-            region: 'east',
-            width: 200,
-            border: false,
-            layout: 'fit',
-            split: true,
-            items: [new Tine.widgets.grid.FilterStructureTreePanel({filterPanel: this})]
-        }, {
+        this.items = [
+//            {
+//            region: 'east',
+//            width: 200,
+//            border: false,
+//            layout: 'fit',
+//            split: true,
+//            items: [new Tine.widgets.grid.FilterStructureTreePanel({filterPanel: this})]
+//        }, 
+        {
             region: 'center',
             border: false,
             layout: 'card',
@@ -126,7 +128,7 @@ Ext.extend(Tine.widgets.grid.FilterPanel, Ext.Panel, {
             listeners: {
                 scope: this,
                 afterlayout: this.manageHeight
-            }
+        }
         }];
         
         Tine.widgets.grid.FilterPanel.superclass.initComponent.call(this);

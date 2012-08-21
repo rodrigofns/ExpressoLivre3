@@ -31,7 +31,7 @@ class Tinebase_Model_Filter_DateTime extends Tinebase_Model_Filter_Date
     {
         $result = parent::toArray($_valueToJson);
        
-        if ($this->_operator != 'within' && $_valueToJson == true) {
+        if ($this->_operator != 'within' && $this->_operator != 'inweek' && $_valueToJson == true) {
             $date = new Tinebase_DateTime($result['value']);
             $date->setTimezone(Tinebase_Core::get(Tinebase_Core::USERTIMEZONE));
             $result['value'] = $date->toString(Tinebase_Record_Abstract::ISO8601LONG);
@@ -47,7 +47,7 @@ class Tinebase_Model_Filter_DateTime extends Tinebase_Model_Filter_Date
      */
     public function setValue($_value)
     {
-        if ($this->_operator != 'within') {
+        if ($this->_operator != 'within' && $this->_operator != 'inweek') {
             $_value = $this->_convertStringToUTC($_value);
         }
         
@@ -64,7 +64,7 @@ class Tinebase_Model_Filter_DateTime extends Tinebase_Model_Filter_Date
      */
     protected function _getDateValues($_operator, $_value)
     {        
-        if ($_operator === 'within') {
+        if ($_operator === 'within' || $_operator === 'inweek') {
             // get beginning / end date and add 00:00:00 / 23:59:59
             date_default_timezone_set(array_key_exists('timezone', $this->_options) && ! empty($this->_options['timezone']) ? $this->_options['timezone'] : Tinebase_Core::get(Tinebase_Core::USERTIMEZONE));
             $value = parent::_getDateValues(
