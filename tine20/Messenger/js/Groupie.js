@@ -170,7 +170,7 @@ Tine.Messenger.Groupie = {
         return true;
     }
     
-}
+};
 
 Tine.Messenger.Groupie.handlers = {
     
@@ -282,7 +282,7 @@ Tine.Messenger.Groupie.handlers = {
         
         return true;
     }
-}
+};
 
 Tine.Messenger.Groupie.Roster = function() {
     var chat = Tine.Messenger.Groupie.chat_room,
@@ -545,4 +545,4 @@ Tine.Messenger.Groupie.Roster = function() {
             }
         }
     }
-}
+};

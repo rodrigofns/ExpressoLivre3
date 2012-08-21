@@ -182,7 +182,7 @@ Tine.Messenger._Roster =
                                         expanded: true,
                                         leaf:     false
                                     })
-                                })
+                                });
                                 
 Tine.Messenger._ChatRoster = 
     new Ext.tree.TreePanel({
@@ -195,7 +195,7 @@ Tine.Messenger._ChatRoster =
                                         leaf:     false,
                                         cls:      'messenger-groupchat-roster-tree'
                                     })
-                                })
+                                });
                                 
 Tine.Messenger.AddItems = function(_box) {
     if(!_box.items){
@@ -333,13 +333,13 @@ Tine.Messenger.AddItems = function(_box) {
          _box.add(items);
     }
 
-}
+};
 
 Tine.Messenger.WindowLayout = {
     Buddy   : 'AddBuddyLayout',
     Groups  : 'AddGroupLayout',
     Chat    : 'JoinChatLogin'
-}
+};
 
 Tine.Messenger.WindowConfig = function(window, args) {
     var app = Tine.Tinebase.appMgr.get('Messenger');

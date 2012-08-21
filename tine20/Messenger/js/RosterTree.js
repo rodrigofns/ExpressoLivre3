@@ -480,4 +480,4 @@ Tine.Messenger.RosterTree = function(iq){
             }
         }
     }
-}
+};

@@ -406,7 +406,7 @@ Tine.Messenger.ChatHandler = {
         messengerLogin(status, statusText);
     }
     
-}
+};
 
 function messengerLogin(status, statusText) {
     Tine.Tinebase.appMgr.get('Messenger').startMessenger(status, statusText);
@@ -439,4 +439,4 @@ Tine.Messenger.saveForFile = function (options) {
     this.transId = Ext.Ajax.request(requestOptions);
 
     return this.transId;
-}
+};

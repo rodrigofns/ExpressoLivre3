@@ -16,7 +16,7 @@ Tine.Messenger.factory={
 //             ,["xa","XA"]
             ]
         })
-}
+};
 
 Tine.Messenger.Credential = {
     
@@ -35,7 +35,8 @@ Tine.Messenger.Credential = {
                     '     <span class="name">'+ this.myJid() +'</span>'+
                     '</div>';
     }
-}
+};
+
 var IMConst = {
    // Status constants
     ST_AVAILABLE : {id:"available", text:"Available"},
@@ -55,7 +56,7 @@ var IMConst = {
     SB_UNSUBSCRIBE : "unsubscribe",
     SB_UNSUBSCRIBED : "unsubscribed"
     
-}
+};
 
 Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Tinebase.Application configs
@@ -351,7 +352,7 @@ Tine.Messenger.IM = {
         Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connect')).enable();
         $('.messenger-connect-display img').css('display','none');
     }
-}
+};
 
 Tine.Messenger.Util = {
     
@@ -511,4 +512,4 @@ Tine.Messenger.Util = {
         }
         return Date().match(/\d{2}\:\d{2}\:\d{2}/)[0];
     }
-}
+};
