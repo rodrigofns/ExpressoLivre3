@@ -2,7 +2,7 @@ Ext.ns('Tine.Messenger');
 
 // Messenger Application constants
 var MESSENGER_CHAT_ID_PREFIX = 'messenger-chat-',
-    MESSENGER_DEBUG = true;
+    MESSENGER_DEBUG = false;
 
 Tine.Messenger.factory={
     statusStore : new Ext.data.SimpleStore({
@@ -87,7 +87,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     debugFunction: function () {
         Tine.Messenger.Application.connection.xmlInput = function (xml) {
             console.log('\\/ |\\/| |     |  |\\ |');
-            console.log('/\\ |   | |__   |  | \\|');
+            console.log('/\\ |  | |__   |  | \\|');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var challenge = $(xml).find('challenge');
@@ -97,7 +97,7 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         };
         Tine.Messenger.Application.connection.xmlOutput = function (xml) {
             console.log('\\/ |\\/| |     /==\\ | | ====');
-            console.log('/\\ |   | |__   \\__/ |_|   |');
+            console.log('/\\ |  | |__   \\__/ |_|   |');
             console.log(xml);
             console.log('Copy >>> '+(new XMLSerializer()).serializeToString(xml));
             var response = $(xml).find('response');
@@ -126,7 +126,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
         $("body").append('<div id="messenger-loghandler-status"></div>')
                  .append('<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>')
-                 .append('<iframe id="iframe-download" src="" style="display: none;"></iframe>');
+                 .append('<iframe id="iframe-download" src="" style="display: none;"></iframe>')
+                 .append('<iframe id="iframe-history" src="" style="display: none;"></iframe>');
         $(window).resize(function(){
             Tine.Messenger.Window._onMoveWindowAction(Ext.getCmp('ClientDialog'));
             // Do to all open chats

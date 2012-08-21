@@ -120,7 +120,7 @@ Tine.Messenger.LogHandler = {
                     message = err_msg;
             }
             Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_WAITING, '', message);
-            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message);
+            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message, 'ERROR');
         }
 
         return true;
@@ -167,7 +167,7 @@ Tine.Messenger.LogHandler = {
                 }  
             
         } else {
-            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Denied/Removed your subscription'));
+            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Denied/Removed your subscription'), 'INFO');
             Tine.Messenger.RosterTree().updateBuddy(from, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE, '', Tine.Tinebase.appMgr.get('Messenger').i18n._('Not authorized!'));
         }
     },
@@ -225,7 +225,7 @@ Tine.Messenger.LogHandler = {
             default:
                 message = err_msg;
         }
-        Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message);
+        Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('SERVER ERROR'), message, 'ERROR');
         Tine.Messenger.Log.error(Tine.Tinebase.appMgr.get('Messenger').i18n._('Error number ') + $(_iq).children("error").attr("code"));
         
         return true;

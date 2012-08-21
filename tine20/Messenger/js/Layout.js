@@ -170,29 +170,25 @@ Tine.Messenger.ClientDialog = function(args){
 
 Ext.extend(Tine.Messenger.ClientDialog, Ext.Window);
 
-Tine.Messenger._Roster = new Ext.tree.TreePanel({
+Tine.Messenger._Roster = 
+    new Ext.tree.TreePanel({
                                     id:           'messenger-roster',
                                     loader:       new Ext.tree.TreeLoader(),
                                     border:       false,
                                     cls:          'messenger-treeview',
                                     rootVisible:  false,
-//                                    renderTo:     Ext.getBody(),
-                                    
                                     root: new Ext.tree.AsyncTreeNode({
                                         expanded: true,
                                         leaf:     false
                                     })
                                 })
                                 
-Tine.Messenger._ChatRoster = new Ext.tree.TreePanel({
-//                                    id:           'messenger-groupchat-roster',
+Tine.Messenger._ChatRoster = 
+    new Ext.tree.TreePanel({
                                     loader:       new Ext.tree.TreeLoader(),
                                     border:       false,
                                     cls:          'messenger-groupchat-roster',
                                     rootVisible:  false,
-//                                    width: 200,
-//                                    renderTo:     Ext.getBody(),
-                                    
                                     root: new Ext.tree.AsyncTreeNode({
                                         expanded: true,
                                         leaf:     false,
@@ -245,8 +241,6 @@ Tine.Messenger.Config = {
                     Tine.Messenger.Window._onMoveWindowAction(_box);
                 }
             },
-//            html: '<iframe id="iframe-upload" src="/upload.html" style="display: none;"></iframe>' +
-//                  '<iframe id="iframe-download" src="" style="display: none;"></iframe>',
             tbar: {
                     cls: 'messenger-client-tbar',
                     items:[
@@ -567,7 +561,7 @@ Tine.Messenger.WindowConfig = function(window, args) {
                     {
                         xtype: 'combo',
                         id: 'messenger-contact-add-group',
-                        fieldLabel: _('Group'),
+                        fieldLabel: Tine.Tinebase.appMgr.get('Messenger').i18n._('Group'),
                         store: new Ext.data.SimpleStore({
 //                                        data: Tine.Messenger.RosterTree().getGroupsFromTree(),
                                         id: 0,
