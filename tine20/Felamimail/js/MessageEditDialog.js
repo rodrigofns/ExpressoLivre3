@@ -198,11 +198,23 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to mark this message as important.')
         });
 
+        this.action_toggleSendAsPlain = new Ext.Action({
+            text: this.app.i18n._('Send as Plain'),
+            handler: this.onToggleSendAsPlain,
+            iconCls: 'notes_noteIcon', // todo: change the icon
+            disabled: false,
+            scope: this,
+            enableToggle: true
+        });
+        this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
+            tooltip: this.app.i18n._('Activate this toggle button to send this message as text/plain.')
+        });
+
         this.tbar = new Ext.Toolbar({
             defaults: {height: 55},
             items: [{
                 xtype: 'buttongroup',
-                columns: 6,
+                columns: 7,
                 items: [
                     Ext.apply(new Ext.Button(this.action_send), {
                         scale: 'medium',
@@ -220,6 +232,7 @@ Ext.namespace('Tine.Felamimail');
                     this.action_saveAsTemplate,
                     this.button_toggleReadingConfirmation,
                     this.button_toggleMarkAsImportant,
+                    this.button_toggleSendAsPlain,
                 ]
             }]
         });
@@ -678,6 +691,9 @@ Ext.namespace('Tine.Felamimail');
         this.record.set('importance', (! this.record.get('importance')));
     },
 
+    onToggleSendAsPlain: function () {
+        this.record.set('sending_plain', (! this.record.get('sending_plain')));
+    },
     /**
      * search for contacts as recipients
      */
@@ -730,6 +746,13 @@ Ext.namespace('Tine.Felamimail');
      * @private
      */
     onRecordUpdate: function() {
+        if (this.record.get('sending_plain')) {
+            this.record.set('display_format','content_type');
+            this.record.set('body_content_type', 'text/plain');
+            this.record.data.body = Ext.util.Format.stripTags(this.record.data.body);
+            Ext.lib.Ajax.setDefaultPostHeader('Content-type: text/plain');
+        }
+        
         this.record.data.attachments = [];
         var attachmentData = null;
         
