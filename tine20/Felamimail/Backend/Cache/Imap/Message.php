@@ -635,6 +635,20 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 $imap->selectFolder(Felamimail_Model_Folder::encodeFolderName($folder->globalname));
                 $idsInFolder = (count($ids) === 1) ? $this->_doPagination($idsInFolder, $_pagination) : $idsInFolder; // do pagination early
                 $messagesInFolder = $imap->getSummary($idsInFolder, null, null, $folderId);
+                
+                if (count($ids) === 1)
+                {
+                    $tmp = array();
+                    // We cannot trust the order we get from getSummary(), so we'll have to
+                    // put it the right order, defined by $idsInFolder
+                    // TODO: Put it into Felamilail_Backend_Imap->getSummary()????
+                    foreach ($idsInFolder as $id){
+                        $tmp[$id] = $messagesInFolder[$id];
+                    }
+                    $messagesInFolder = $tmp;
+                    unset($tmp);
+                }
+                
                 $messages = array_merge($messages, $messagesInFolder);
             }
             
