@@ -645,6 +645,8 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                     foreach ($idsInFolder as $id){
                         $tmp[$id] = $messagesInFolder[$id];
                     }
+                    $messagesInFolder = $tmp;
+                    unset($tmp);
                 }
                 
                 $messages = array_merge($messages, $messagesInFolder);
