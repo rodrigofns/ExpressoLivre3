@@ -172,6 +172,7 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message_A
      * @param boolean $_saveInSent
      * @param Felamimail_Model_Message $_message
      * @param array $_nonPrivateRecipients
+     * @todo implement sasl plain auth on SMTP
      */
     protected function _sendMailViaTransport(Zend_Mail $_mail, Felamimail_Model_Account $_account, Felamimail_Model_Message $_message = NULL, $_saveInSent = false, $_nonPrivateRecipients = array())
     {
