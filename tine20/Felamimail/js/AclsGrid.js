@@ -60,7 +60,13 @@ Tine.Felamimail.AclsGrid = Ext.extend(Tine.widgets.account.PickerGridPanel, {
                 tooltip: _('Write and delete messages from folders'),
                 dataIndex: 'writeacl',
                 width: 55
-            })
+            }),
+            new Ext.ux.grid.CheckColumn({
+                header: _('Send as'),
+                tooltip: _('Send as folder owner'),
+                dataIndex: 'sendacl',
+                width: 55
+            })            
         ];
     }
 });

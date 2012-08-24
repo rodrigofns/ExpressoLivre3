@@ -740,8 +740,10 @@ Ext.namespace('Tine.Felamimail');
         var accountId = this.accountCombo.getValue(),
             account = this.accountCombo.getStore().getById(accountId),
             emailFrom = account.get('email');
+            nameFrom = account.get('from');
             
         this.record.set('from_email', emailFrom);
+        this.record.set('from_name', nameFrom);
         
         Tine.Felamimail.MessageEditDialog.superclass.onRecordUpdate.call(this);
 
@@ -816,6 +818,8 @@ Ext.namespace('Tine.Felamimail');
             aliases = null,
             id = null
             
+        var otherAccounts = Tine.Felamimail.registry.get('extraSenderAccounts');    
+
         accountStore.each(function(account) {
             aliases = [ account.get('email') ];
 
@@ -826,6 +830,19 @@ Ext.namespace('Tine.Felamimail');
                     aliases = aliases.concat(user.emailUser.emailAliases);
                 }
             }
+            for(other in otherAccounts.results){
+                if(otherAccounts.results[other].accountEmailAddress){
+                    id = Ext.id();
+                    var otherAccount = account.copy(id);
+                    otherAccount.data.id = id;
+                    otherAccount.set('email', otherAccounts.results[other].accountEmailAddress);
+                    otherAccount.set('name', otherAccounts.results[other].accountFullName+ ' ('+otherAccounts.results[other].accountEmailAddress+')');
+                    otherAccount.set('from', otherAccounts.results[other].accountFullName);
+                    otherAccount.set('original_id', account.id);
+                    accountComboStore.add(otherAccount);
+                }
+            }
+        
             
             for (var i = 0; i < aliases.length; i++) {
                 id = (i == 0) ? account.id : Ext.id();
