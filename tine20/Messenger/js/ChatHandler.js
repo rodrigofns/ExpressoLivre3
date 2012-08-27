@@ -12,14 +12,17 @@ Tine.Messenger.ChatHandler = {
     },
     
     formatChatTitle: function (jid, name, type) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
+        
         if(type == 'groupchat')
-            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Group chat in room') + ' ' + name;
+            return app.i18n._('Group chat in room') + ' ' + name;
         else
-            return Tine.Tinebase.appMgr.get('Messenger').i18n._('Chat with') + ' ' + name + ' (' + jid + ')';
+            return app.i18n._('Chat with') + ' ' + name + ' (' + jid + ')';
         return null;
     },
     
     showChatWindow: function (jid, name, type, privy) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
         var title = '',
             _type = type,
             new_chat = false;
@@ -50,16 +53,78 @@ Tine.Messenger.ChatHandler = {
                 type: type,
                 privy: privy
             });
+
+            chat.on('hide', function (window_chat) {
+                var chat_table = window_chat.getComponent('messenger-chat-table'),
+                    chat_area = chat_table.getComponent('messenger-chat-body'),
+                    chat_lines = chat_area.items.items;
+                    
+                var chat_text = '',
+                    host = window.location.host,
+                    protocol = window.location.protocol;
+                if (chat_lines.length > 0 && Tine.Messenger.registry.get('preferences').get('chatHistory') != 'dont') {
+                    for (var i = 0; i < chat_lines.length; i++)
+                        chat_text += chat_lines[i].body.dom.innerHTML + '<br style="clear: both;"/>';
+
+                    chat_text = chat_text.replace(/src\=\"/gi, 'src="' + protocol + '//' + host);
+                    $.ajax('/history', {
+                        dataType: 'json',
+                        type: 'POST',
+                        data: {
+                            "chat_conversation": chat_text,
+                            "chat_id": chat.id,
+                            "chat_title": chat.title
+                        },
+                        success: function (response) {
+                            if (response.code == 0) {
+                                switch (Tine.Messenger.registry.get('preferences').get('chatHistory')) {
+                                    case 'download': 
+                                        Ext.Msg.confirm(
+                                            app.i18n._('Chat History'),
+                                            app.i18n._('You chose to download the every chat history') + '.<br>' +
+                                            app.i18n._('Do you want to download this chat') + '?',
+                                            function (id) {
+                                                if (id == 'yes')
+                                                    $('#iframe-history').attr('src', '/download/' + response.fileName);
+                                                else
+                                                    $('#iframe-history').attr('src', '/nodownload/' + response.fileName);
+                                            }
+                                        );
+                                        break;
+                                    case 'email':
+                                        Tine.Messenger.saveForFile();
+                                        break;
+                                }
+                            } else {
+                                Ext.Msg.show({
+                                    title: app.i18n._('Error'),
+                                    msg: app.i18n._('Error downloading Chat History')+'!',
+                                    buttons: Ext.Msg.OK,
+                                    icon: Ext.MessageBox.ERROR
+                                });
+                            }
+                        },
+                        error: function (xhr, status, err) {
+                            Ext.Msg.show({
+                                title: _('Error'),
+                                msg: app.i18n._(status) + ': ' + app.i18n._(err) + '!',
+                                buttons: Ext.Msg.OK,
+                                icon: Ext.MessageBox.ERROR
+                            });
+                        }
+                    });
+                }
+            });
             
-           new_chat = true;
+            new_chat = true;
         }
         chat.show();
 
         Tine.Messenger.ChatHandler.adjustChatAreaHeight(chat_id);
         
         if (Tine.Messenger.RosterHandler.isContactUnavailable(jid) && new_chat) {
-            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('is unavailable'), Tine.Tinebase.appMgr.get('Messenger').i18n._("Info"), 'messenger-notify');
-            Tine.Messenger.ChatHandler.setChatMessage(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._('Your messages will be sent offline'), Tine.Tinebase.appMgr.get('Messenger').i18n._('Info'), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, name + ' ' + app.i18n._('is unavailable'), app.i18n._("Info"), 'messenger-notify');
+            Tine.Messenger.ChatHandler.setChatMessage(jid, app.i18n._('Your messages will be sent offline'), app.i18n._('Info'), 'messenger-notify');
         }
     
         return chat;
@@ -147,6 +212,7 @@ Tine.Messenger.ChatHandler = {
     },
     
     onIncomingMessage: function (message) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
         var raw_jid = $(message).attr("from"),
             jid = Strophe.getBareJidFromJid(raw_jid),
             name = $(message).attr("name") ||
@@ -165,10 +231,10 @@ Tine.Messenger.ChatHandler = {
         // Typing events
         if (paused.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
         } else if (composing.length > 0) {
 //            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, Tine.Tinebase.appMgr.get('Messenger').i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
         } else if (body.length > 0){
             // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name, type);
@@ -340,8 +406,37 @@ Tine.Messenger.ChatHandler = {
         messengerLogin(status, statusText);
     }
     
-}
+};
 
 function messengerLogin(status, statusText) {
     Tine.Tinebase.appMgr.get('Messenger').startMessenger(status, statusText);
 }
+
+Tine.Messenger.saveForFile = function (options) {
+    options = options ? options : {};
+    
+    var requestOptions = {
+        url: '/messenger/sendToFile.php',
+        type: 'POST',
+        scope: this,
+//        params: options.params,
+//        callback: options.callback,
+        success: function(response) {
+            console.log('SUCESS:');
+            console.log(response);
+        },
+        // note incoming options are implicitly jsonprc converted
+        failure: function (response, jsonrpcoptions) {
+            console.log('ERROR:');
+            console.log(response);
+        }
+    };
+
+    if (options.timeout) {
+        requestOptions.timeout = options.timeout;
+    }
+
+    this.transId = Ext.Ajax.request(requestOptions);
+
+    return this.transId;
+};

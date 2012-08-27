@@ -236,7 +236,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
                 this.getSelectionModel().clearSelections();
                 
                 var folder = this.app.getFolderStore().getById(this.ctxNode.id),
-                    account = folder ? this.app.getAccountStore().getById(folder.get('account_id')) :
+                account = folder ? this.app.getAccountStore().getById(folder.get('account_id')) :
                                        this.app.getAccountStore().getById(this.ctxNode.id);
                 this.ctxNode.getUI().addClass("x-tree-node-loading");
                 // call update folder cache
@@ -323,9 +323,9 @@ Tine.Felamimail.setTreeContextMenus = function() {
     
     // account ctx menu
     if(Tine.Felamimail.registry.get('defaults').useSystemAccount == 1)
-        var actions = [addFolderToRootAction, updateFolderCacheAction, manageAclsAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
+        var actions = [addFolderToRootAction,  manageAclsAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
     else
-        var actions = [addFolderToRootAction, updateFolderCacheAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
+        var actions = [addFolderToRootAction,  editVacationAction, editRulesAction, editAccountAction, 'delete'];
     
     this.contextMenuAccount = Tine.widgets.tree.ContextMenu.getMenu({
         nodeName: this.app.i18n.n_('Account', 'Accounts', 1),

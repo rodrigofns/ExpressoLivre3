@@ -9,7 +9,7 @@ Tine.Messenger.Window.AddGroupHandler = function(dialog){
     if(Tine.Messenger.Window._addGroupAction(gname)){
         dialog.close();
     }   
-}
+};
 
 Tine.Messenger.Window._addGroupAction = function(name){
     if(name){
@@ -22,7 +22,7 @@ Tine.Messenger.Window._addGroupAction = function(name){
         }
     }
     return false;
-}
+};
 
 Tine.Messenger.Window.AddBuddyWindow = function(_jid){
     
@@ -33,7 +33,7 @@ Tine.Messenger.Window.AddBuddyWindow = function(_jid){
     
     if(_jid)
         dialog.findById('messenger-contact-add-jid').setValue(_jid).disable();
-}
+};
 
 Tine.Messenger.Window.AddBuddyHandler = function(dialog){
     
@@ -44,7 +44,7 @@ Tine.Messenger.Window.AddBuddyHandler = function(dialog){
     if( Tine.Messenger.Window._addBuddyAction(jid, name, group) )
         dialog.close();
     
-}
+};
 
 Tine.Messenger.Window._addBuddyAction = function(jid, name, group){
     var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
@@ -63,7 +63,7 @@ Tine.Messenger.Window._addBuddyAction = function(jid, name, group){
         }
     }
     return false;
-}
+};
 
 Tine.Messenger.Window._onMoveWindowAction = function (_dialog){
     var pos_X = _dialog.x,
@@ -82,4 +82,4 @@ Tine.Messenger.Window._onMoveWindowAction = function (_dialog){
 
     if(pos_X != new_X || pos_Y != new_Y)
         _dialog.setPagePosition(new_X, new_Y);
-}
+};

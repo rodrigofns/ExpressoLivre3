@@ -162,6 +162,25 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'sent',
     );
     
+    public function fixToListModel()
+    {
+        foreach (array('to', 'cc', 'bcc') as $field)
+        {
+            if (!empty($this->$field) && is_array($this->$field))
+            {
+                $tmp = array();
+                foreach($this->$field as $value)
+                {
+                    $tmp[] = !empty($value['email']) ? $value['email'] : '';
+                }
+                $this->$field = $tmp;
+            }
+            else {
+                $this->$field = NULL;
+            }
+        }
+    }
+    
     /**
      * check if message has \SEEN flag
      * 

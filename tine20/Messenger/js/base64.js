@@ -57,7 +57,7 @@ base64.getbyte64 = function(s,i) {
 	throw "Cannot decode base64";
     }
     return idx;
-}
+};
 
 base64.decode = function(s) {
     // convert to string
@@ -101,7 +101,7 @@ base64.decode = function(s) {
         break;
     }
     return x.join('');
-}
+};
 
 base64.getbyte = function(s,i) {
     var x = s.charCodeAt(i);
@@ -109,7 +109,7 @@ base64.getbyte = function(s,i) {
         throw "INVALID_CHARACTER_ERR: DOM Exception 5";
     }
     return x;
-}
+};
 
 
 base64.encode = function(s) {
@@ -151,4 +151,4 @@ base64.encode = function(s) {
         break;
     }
     return x.join('');
-}
+};

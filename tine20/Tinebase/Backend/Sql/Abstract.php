@@ -454,7 +454,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
             $_pagination->appendSort($select);
             
             $rows = $this->_fetch($select, self::FETCH_ALL);
-            
+ 
             return $this->_rawDataToRecordSet($rows);
         }
     }

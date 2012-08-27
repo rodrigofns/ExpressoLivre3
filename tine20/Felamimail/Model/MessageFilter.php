@@ -179,7 +179,7 @@ class Felamimail_Model_MessageFilter extends Tinebase_Model_Filter_FilterGroup
 						array('field' => 'account_id',  'operator' => 'in',     'value' => $accounts->getArrayOfIds()),
 						array('field' => 'localname',   'operator' => 'equals', 'value' => 'INBOX')
 				));
-				$folderBackend = new Felamimail_Backend_Folder();
+				$folderBackend = Felamimail_Backend_Folder::getInstance();
 				$folderIds = $folderBackend->search($folderFilter, NULL, TRUE);
 
 				return $folderIds;

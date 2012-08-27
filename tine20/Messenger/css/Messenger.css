@@ -352,10 +352,10 @@
 }
 .messenger-chat-notifications {
     position: absolute;
-    top: auto;
+    top: auto!important;
     bottom: 28px;
     height: 25px;
-    left: 35%;
+    left: 35%!important;
 }
 
 .messenger-groupchat {

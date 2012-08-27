@@ -40,7 +40,7 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      *   - port port for IMAP server [optional, default = 110]
      *   - ssl 'SSL' or 'TLS' for secure sockets
      *   - folder select this folder [optional, default = 'INBOX']
-     *
+     * 
      * @param  object $params mail reader specific parameters
      */
     public function __construct($params)
@@ -267,6 +267,25 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
             throw new Zend_Mail_Storage_Exception('cannot set flags, have you tried to set the recent flag or special chars?');
         }
     }
+        
+    /**
+     * Get sorted messages through the Impa sort command
+     * 
+     * @param array $params
+     * @param boolean $uid
+     * @param boolean $descending
+     * @param array $search
+     * @param string $charset
+     * @return array
+     * 
+     * @todo verify capabilities and throw an exception if server don't implement sort extension
+     */
+    public function sort(array $params, array $search = NULL, $charset = 'UTF-8')
+    {
+        $result = $this->_protocol->sort($params, $this->_useUid, $search, $charset);
+        
+        return $result;
+    }
     
     /**
      * do a search request
@@ -391,7 +410,7 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      * @param int|null $to
      * @return array with $this->_messageClass (Felamimail_Message)
      */
-    public function getSummary($from, $to = null, $_useUid = null)
+    public function getSummary($from, $to = null, $_useUid = null, $_folderId = NULL)
     {
         $useUid = ($_useUid === null) ? $this->_useUid : (bool) $_useUid;
         $summary = $this->_protocol->fetch(array('UID', 'FLAGS', 'RFC822.HEADER', 'INTERNALDATE', 'RFC822.SIZE', 'BODYSTRUCTURE'), $from, $to, $useUid);
@@ -431,6 +450,12 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
                 'structure' => $structure,
                 'uid'       => $data['UID']
             );
+            
+            if (!empty($_folderId))
+            {
+                $messages[$key]['folder_id'] = $_folderId;
+            }
+            
         }
         
         if($to === null && ctype_digit("$from")) {

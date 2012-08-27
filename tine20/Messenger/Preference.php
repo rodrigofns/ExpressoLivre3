@@ -119,12 +119,14 @@ class Messenger_Preference extends Tinebase_Preference_Abstract
         return $preference;
     }
     
+    
     /**
      * get special options
      *
      * @param string $_value
      * @return array
      */
+    
     protected function _getSpecialOptions($_value)
     {
         $result = array();

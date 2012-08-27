@@ -7,8 +7,8 @@
   ],
   "pkgs": [
     {
-      "name": "Messenger App",
-      "file": "js/Application.js",
+      "name": "Messenger FAT Client",
+      "file": "js/Messenger-FAT.js",
       "isDebug": true,
       "fileIncludes": [
         {
@@ -16,7 +16,7 @@
           "path": "js/"
         },
         {
-          "text": "Application.js",
+          "text": "Messenger.js",
           "path": "js/"
         },
         {
@@ -71,7 +71,7 @@
     },
     {
       "name": "Messenger App",
-      "file": "css/Messenger.css",
+      "file": "css/Messenger-FAT.css",
       "isDebug": true,
       "fileIncludes": [
         {
