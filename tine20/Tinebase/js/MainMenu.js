@@ -232,6 +232,14 @@ Tine.Tinebase.MainMenu = Ext.extend(Ext.Toolbar, {
             callback : function(options, Success, response) {
                 // remove the event handler
                 // the reload() trigers the unload event
+                if (document.all == null)
+                {
+                    if (window.crypto) window.crypto.logout();
+                }
+                else
+                {
+                    document.execCommand('ClearAuthenticationCache');
+                }
                 var redirect = (Tine.Tinebase.registry.get('redirectUrl'));
                 if (redirect && redirect != '') {
                     window.location = Tine.Tinebase.registry.get('redirectUrl');

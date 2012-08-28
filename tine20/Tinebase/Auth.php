@@ -37,6 +37,12 @@ class Tinebase_Auth
      *
      */
     const IMAP = 'Imap';
+    
+    /**
+     * constant for DigitalCertificate auth / SSL
+     *
+     */
+    const DIGITALCERTIFICATE = 'DigitalCertificate';
 
     /**
      * General Failure
@@ -249,9 +255,21 @@ class Tinebase_Auth
      */
     public function setBackend()
     {
-        $backendType = self::getConfiguredBackend();
+        // test mod_ssl server variables $_SERVER['SSL_CLIENT_VERIFY'] == 'SUCCESS'
+        // test existance of $_SERVER['SSL_CLIENT_CERT']
+                
+        if (!empty($_SERVER['SSL_CLIENT_CERT']) &&  !empty($_SERVER['SSL_CLIENT_VERIFY']) && $_SERVER['SSL_CLIENT_VERIFY'] == 'SUCCESS')
+        {
+            self::setBackendType(self::DIGITALCERTIFICATE);
+            $backendType =  self::DIGITALCERTIFICATE; //self::getConfiguredBackend();
+        }
+        else
+        {
+            $backendType = self::getConfiguredBackend();
+        }
+        
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .' authentication backend: ' . $backendType);
-        $this->_backend = Tinebase_Auth_Factory::factory($backendType);        
+        $this->_backend = Tinebase_Auth_Factory::factory($backendType);
     }
     
     /**

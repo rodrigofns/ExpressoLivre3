@@ -46,7 +46,11 @@ class Tinebase_Auth_Factory
                 $options = array(Tinebase_Auth::getBackendConfiguration());
                 $instance = new Tinebase_Auth_Imap($options);
                 break;
-                
+            
+            case Tinebase_Auth::DIGITALCERTIFICATE:
+                // We don't use options array, for now!
+                $instance = new Tinebase_Auth_ModSsl();
+                break;
             default:
                 throw new Tinebase_Exception_InvalidArgument('Unknown authentication backend');
                 break;
