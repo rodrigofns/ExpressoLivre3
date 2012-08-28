@@ -65,6 +65,7 @@ Tine.Addressbook.Model.ContactArray = Tine.Tinebase.Model.genericFields.concat([
     {name: 'url_home', label: 'Web (private)', group: 'Private Communication' }, //_('Web (private)')
     {name: 'freebusy_uri', omitDuplicateResolving: true},
     {name: 'calendar_uri', omitDuplicateResolving: true},
+    {name: 'employee_number', label: 'Employee Number', group: 'Name' },
     {name: 'note', label: 'Description' }, //_('Description')
     {name: 'tz', omitDuplicateResolving: true},
     {name: 'pubkey', omitDuplicateResolving: true},

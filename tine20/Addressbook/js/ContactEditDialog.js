@@ -112,9 +112,14 @@ Tine.Addressbook.ContactEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, 
                                     }
                                 }
                             }), {
-                                columnWidth: 0.65,
+                                columnWidth: 0.30,
                                 fieldLabel: this.app.i18n._('Title'), 
                                 name: 'n_prefix',
+                                maxLength: 64
+                            }, {
+                                columnWidth: 0.35,
+                                fieldLabel: this.app.i18n._('Employee Number'), 
+                                name: 'employee_number',
                                 maxLength: 64
                             }, {
                                 width: 100,
