@@ -56,7 +56,7 @@ class Tinebase_Server_Http implements Tinebase_Server_Interface
             }
             
             // Try verify ModSsl Login
-            Tinebase_Controller::getInstance()->login();
+            Tinebase_Controller::getInstance()->login(null, null);
             if (empty($_REQUEST['method'])) {
                 $_REQUEST['method'] = 'Tinebase.login';
             }
