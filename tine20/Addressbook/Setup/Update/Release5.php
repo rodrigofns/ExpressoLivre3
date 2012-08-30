@@ -230,6 +230,6 @@ class Addressbook_Setup_Update_Release5 extends Setup_Update_Abstract
         }
         
         $this->setTableVersion('addressbook', '17');
-        $this->setApplicationVersion('Addressbook', '6.0');
+        $this->setApplicationVersion('Addressbook', '5.7');
       }
 }
