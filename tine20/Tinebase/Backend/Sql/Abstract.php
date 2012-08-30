@@ -1285,8 +1285,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     					{
     						$group[] = $element;
     					}
-                                        // adds expression column into group by clause (expression)
-                                        else if (is_a($column[1], 'Zend_Db_Expr')){
+                                        // adds expression column into group by clause (expression) in addressbook image
+                                        //substr($column[1], 0, 30) == ("(CASE WHEN \"addressbook_image\"")
+                                        else if (substr($column[1], 0, 10) == ("(CASE WHEN")){
                                             $group[] = $column[1]; 
                                         }
     				}
