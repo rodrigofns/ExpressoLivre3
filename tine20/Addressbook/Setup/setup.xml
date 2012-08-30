@@ -159,6 +159,12 @@
                     <notnull>false</notnull>
                 </field>
                 <field>
+                    <name>employee_number</name>
+                    <type>text</type>
+                    <length>32</length>
+                    <notnull>false</notnull>
+                </field>
+                <field>
                     <name>label</name>
                     <type>clob</type>
                 </field>

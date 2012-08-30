@@ -140,6 +140,7 @@ class Addressbook_Model_Contact extends Tinebase_Record_Abstract
         'tel_prefer'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'tz'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'geo'                   => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'employee_number'       => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     // modlog fields
         'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'creation_time'         => array(Zend_Filter_Input::ALLOW_EMPTY => true),
