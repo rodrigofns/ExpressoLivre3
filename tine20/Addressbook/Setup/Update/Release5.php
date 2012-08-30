@@ -208,4 +208,28 @@ class Addressbook_Setup_Update_Release5 extends Setup_Update_Abstract
         $this->setTableVersion('addressbook', '16');
         $this->setApplicationVersion('Addressbook', '5.6');
     }
+    
+    /**
+     * update to 6.0
+     *
+     * @return void
+     */
+      public function update_6()
+      {
+        $declaration = new Setup_Backend_Schema_Field_Xml('
+            <field>
+                <name>employee_number</name>
+                <type>text</type>
+                <length>32</length>
+                <notnull>false</notnull>
+            </field>');
+        try {
+            $this->_backend->addCol('addressbook', $declaration);
+        } catch (Exception $e) {
+            echo "employee_number already exists.\n";
+        }
+        
+        $this->setTableVersion('addressbook', '17');
+        $this->setApplicationVersion('Addressbook', '6.0');
+      }
 }
