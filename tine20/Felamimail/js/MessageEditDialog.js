@@ -250,7 +250,80 @@ Ext.namespace('Tine.Felamimail');
             }]
         });
     },
+ 
+    /**
+     * onSaveAndClose
+     */
+	onSaveAndClose: function() {
+
+        this.supr().onSaveAndClose.apply(this, arguments);    
+
+		this.checkUnknownContacts();
+		
+	},
+
+    /**
+     * checkUnknownEmails
+     */
+    checkUnknownContacts: function() {
+
+        var emailRecipients = this.record.get('to');
+        emailRecipients.concat(this.record.get('cc'));
+        emailRecipients.concat(this.record.get('bcc'));
+
+		this.contacts = [];
+        
+		var filterValue = [], emailRegExp = /<([^>]*)>/;
+        Ext.each(emailRecipients, function(email) {
+            if (emailRegExp.exec(email)) {
+		        if (RegExp.$1 != '') {
+		            filterValue.push(RegExp.$1);
+		        }
+			}
+			else {
+				this.contacts.push(email);
+			}
+        }, this);
+		this.contacts.concat(filterValue);
+
+        var filter = [{field: 'email_query', operator: 'in', value: filterValue}];
+		
+	    Tine.Addressbook.searchContacts(filter, null, function(response) {
+	        var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
+			Ext.each(knownEmails, function(email) {
+				var pos = this.contacts.indexOf(email);
+				if (pos >= 0) {
+					this.contacts.splice(pos,1);
+				}
+			}, this);
+			if (this.contacts.length > 0) {
+				this.addDynamicContacts();
+			}
+	    }, this);
+
+    },
     
+    /**
+     * addDynamicContacts
+     */
+	addDynamicContacts: function() {
+
+        var popupWindow = Tine.Addressbook.DynamicContactsDialog.openWindow({
+			mailContacts: this.contacts,
+            listeners: {
+                scope: this,
+				mailTo: this.record.get('to'),
+                'load': function(editdlg) {
+                    //editdlg.record.set('email', all_emails);
+					editdlg.mailContacts = this.contacts;
+                }
+            }
+        }, this);
+
+		this.window.close();
+
+	},
+
     /**
      * @private
      */
@@ -792,7 +865,7 @@ Ext.namespace('Tine.Felamimail');
         
         // need to sync once again to make sure we have the correct recipients
         this.recipientGrid.syncRecipientsToRecord();
-    },
+    }, 
     
     /**
      * show error if request fails
@@ -1097,7 +1170,7 @@ Ext.namespace('Tine.Felamimail');
      */
     getValidationErrorMessage: function() {
         return this.validationErrorMessage;
-    }
+    }    
 });
 
 /**
