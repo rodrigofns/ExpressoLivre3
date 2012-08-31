@@ -165,6 +165,42 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
         return this.tinePanel;
     },
     
+    getAboutPanel: function () {
+        if (! this.aboutPanel) {
+            this.aboutPanel = new Ext.Container({
+                layout: 'fit',
+                cls: 'tb-about-panel',
+                border: false,
+                items: [{
+                    xtype: 'button',
+                    id: 'about_button',
+                    width: 30,
+                    tooltip: String.format(_('About {0}'),('Expresso 3')),
+                    scope: this,
+                    handler: this.onAboutTine20
+                }]
+            });
+        }
+        
+        return this.aboutPanel;
+    },
+    
+    getPoweredByPanel: function () {
+        if (! this.poweredByPanel) {
+            this.poweredByPanel = new Ext.Container({
+                layout: 'fit',
+                cls: 'tb-about-panel',
+                border: false,
+                defaults: {xtype: 'label'},
+                items: [{
+                    html: '<span>' + _('Powered by:') + ' <a target="_blank" href="' + Tine.weburl + 'border="0">Tine 2.0</a></span>'
+                }]
+            });
+        }
+        
+        return this.poweredByPanel;
+    },
+    
     getSurveyData: function (cb) {
         var ds = new Ext.data.Store({
             proxy: new Ext.data.ScriptTagProxy({
@@ -338,9 +374,19 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
             border: false,
             items: [
                 this.getLoginPanel(),
-                this.infoPanel
+                this.infoPanel,
+                this.getAboutPanel(),
+                this.getPoweredByPanel()
             ]
         }];
+    },
+    
+    /**
+     * @private
+     */
+    onAboutTine20: function() {
+        var aboutDialog = new Tine.Tinebase.AboutDialog();
+        aboutDialog.show();
     },
     
     /**
@@ -433,6 +479,9 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                 
         this.getLoginPanel().setPosition(loginLeft, top);
         this.infoPanel.setPosition(loginLeft + loginBox.width, top);
+        
+        this.getPoweredByPanel().setPosition(650, 463);
+        this.getAboutPanel().setPosition(760, 455);
     },
     
     renderSurveyPanel: function (survey) {
