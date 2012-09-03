@@ -224,7 +224,7 @@ class Tinebase_Translation
             }
         } catch (Exception $e) {
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " $e, falling back to locale en");
-            $locale = new Zend_Locale('en');
+            $locale = new Zend_Locale(Zend_Locale::BROWSER);
         }
         
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " selected locale: '$locale'");

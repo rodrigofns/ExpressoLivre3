@@ -922,13 +922,21 @@ class Tinebase_Core
                 // check if cookie or pref with language is available
                 if (isset($_COOKIE['TINE20LOCALE'])) {
                     $localeString = $_COOKIE['TINE20LOCALE'];
-                    if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__
-                        . " Got locale from cookie: '$localeString'");
                     
-                } elseif (isset($session->currentAccount)) {
-                    $localeString = self::getPreference()->getValue(Tinebase_Preference::LOCALE, 'auto');
-                    if (self::isLogLevel(Zend_Log::DEBUG)) self::getLogger()->debug(__METHOD__ . '::' . __LINE__ 
-                        . " Got locale from preference: '$localeString'");
+                    if (self::isLogLevel(Zend_Log::DEBUG)) {
+                        self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Got locale from cookie: '$localeString'");
+                    }                    
+                } 
+                else {
+                  if (isset($session->currentAccount)) {
+                      $localeString = self::getPreference()->getValue(Tinebase_Preference::LOCALE, 'auto');
+                      if (self::isLogLevel(Zend_Log::DEBUG)) {
+                          self::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " Got locale from preference: '$localeString'");
+                      }
+                  }
+                  else {
+                    $localeString = new Zend_Locale(Zend_Locale::BROWSER);
+                  }
                 }
             }
             
@@ -946,7 +954,9 @@ class Tinebase_Core
         
         // save locale as preference
         if (is_object(Tinebase_Core::getUser()) && ($saveaspreference || self::getPreference()->{Tinebase_Preference::LOCALE} === 'auto')) {
-            self::getPreference()->{Tinebase_Preference::LOCALE} = (string)$locale;
+            $browserLocale = new Zend_Locale(Zend_Locale::BROWSER);
+            self::set('locale', $browserLocale);        
+            self::getPreference()->{Tinebase_Preference::LOCALE} = (string)$browserLocale;
         }
     }
 
