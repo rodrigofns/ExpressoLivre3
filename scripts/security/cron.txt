@@ -1,0 +1,3 @@
+ Incluir esta linha na cron para atualizar periódicamente as crls...
+
+*/50 * * * * /opt/security/crl_admin/crl_admin.py
