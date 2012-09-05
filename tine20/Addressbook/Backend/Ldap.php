@@ -155,6 +155,7 @@ class Addressbook_Backend_Ldap implements Tinebase_Backend_Interface
             'n_fileas'              => 'displayname',
             'label'                 => 'postaladdress',
             'pubkey'                => 'usersmimecertificate',
+            'employee_number'       => 'employeenumber'
         ),
         
         /**
