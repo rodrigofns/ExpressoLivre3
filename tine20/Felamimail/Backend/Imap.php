@@ -986,10 +986,22 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
      * @param  Zend_Mail_Storage_Folder|string $globalName global name of folder or instance for subfolder
      * @return array with folder values
      */
-    public function getFolderAcls($globalName)
+    public function getFolderAcls($_globalName)
     {
-        $this->_currentFolder = $globalName;
+        $this->_currentFolder = $_globalName;
         $result = $this->_protocol->getFolderAcls($this->_currentFolder);        
+        return $result;
+    }
+    
+     /**
+     * get folder Acls
+     * 
+     * @param  Zend_Mail_Storage_Folder|string $globalName global name of folder or instance for subfolder
+     * @return array with folder values
+     */
+    public function getUsersWithSendAsAcl($_folders)
+    {
+        $result = $this->_protocol->getUsersWithSendAsAcl($_folders);        
         return $result;
     }
     

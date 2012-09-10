@@ -374,6 +374,27 @@ abstract class Felamimail_Controller_Folder_Abstract extends Tinebase_Controller
         return $return;
     }
     
+            /**
+     * Get Acls for a folder
+     *
+     * @param string $_accountId
+     * @return 
+     */
+    public function getUsersWithSendAsAcl($_accountId)
+    {
+        $_account = Felamimail_Controller_Account::getInstance()->get($_accountId);
+        $this->_delimiter = $_account->delimiter;
+        
+        $filter = new Felamimail_Model_FolderFilter(array(
+            array('field' => 'parent', 'operator' => 'equals',  'value' => 'user'),
+            array('field' => 'account_id', 'operator' => 'equals',  'value' => $_accountId),
+        ));
+        
+        $folders =  $this->_backend->search($filter);
+        $imap = Felamimail_Backend_ImapFactory::factory($_account);
+        $return = $imap->getUsersWithSendAsAcl($folders->toArray());
+        return $return;
+    }
     
     /** Set Acls for a folder
      *

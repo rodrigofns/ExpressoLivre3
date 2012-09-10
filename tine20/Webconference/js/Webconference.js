@@ -20,13 +20,20 @@ const WebconferenceOrigin = {
 
 
 /**
+ * Webconference Application Object
+ * 
  * @namespace   Tine.Webconference
  * @class       Tine.Webconference.Application
  * @extends     Tine.Tinebase.Application
  * 
- * Webconference Application Object <br>
- * 
+ * <p>Webconference Application Object</p>
+ * <p><pre>
+ * </pre></p> * 
+ *
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ * 
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 

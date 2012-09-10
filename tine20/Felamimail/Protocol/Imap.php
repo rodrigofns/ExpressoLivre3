@@ -247,13 +247,17 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
             for($i = 2; $i < count($result); $i = $i+2){
                 $writeacl = false;
                 $readacl = false;
+                $sendacl = false;
                 
                 if(stristr($result[$i+1],'w')){
                     $writeacl = true;
                 }
                 if(stristr($result[$i+1],'r')){
                     $readacl = true;
-                }   
+                } 
+                if(stristr($result[$i+1],'p')){
+                    $sendacl = true;
+                }
                 try{    
                 $user =  Tinebase_User::getInstance()->getFullUserByLoginName($result[$i])->toArray();
                 $current = Tinebase_Core::getUser()->toArray();
@@ -269,7 +273,7 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                                      'contact_id' => $user['contact_id']);
                                      
                
-                $results[] = Array('account_name' => $account_name, 'account_id' => $user['accountLoginName'], 'readacl' => $readacl, 'writeacl' => $writeacl);
+                $results[] = Array('account_name' => $account_name, 'account_id' => $user['accountLoginName'], 'readacl' => $readacl, 'writeacl' => $writeacl, 'sendacl' => $sendacl);
                 }catch(Exception $e){
                     
                 }
@@ -281,6 +285,51 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
        
         return $return;
     
+    }
+    
+    
+     /**
+     * get acls for a folder
+     * 
+     * @param  array $box which folders to get the acls
+     * @param  string $username with login name of current user
+     * @return bool|array false if error, array with all users with sendas for this folder.
+     * @throws Zend_Mail_Protocol_Exception
+     */
+    public function getUsersWithSendAsAcl($boxes){
+       
+        $currentUser = Tinebase_Core::getUser()->toArray();
+        foreach ($boxes as $box){
+            $this->sendRequest("GETACL", array($this->escapeString($box['globalname'])), $tag);
+
+            $result = array();
+            while (!$this->readLine($tokens, $tag)) {
+                $result = $tokens;
+            }
+
+            if ($tokens[0] != 'OK') {
+                return false;
+            }else{
+                $results = Array();
+                //* TODO: pegar o delimitador correto....
+                list(,$boxusername) = explode('/',$box['globalname']);
+                for($i = 2; $i < count($result); $i = $i+2){
+
+                    if($currentUser['accountLoginName'] != $result[$i]) continue;
+
+                    if(stristr($result[$i+1],'p')){
+                        $aux = Tinebase_User::getInstance()->getFullUserByLoginName($boxusername)->toArray();   
+                        $results[] = $aux;
+
+                    } 
+                }
+            }
+        }
+
+        $return = Array('results' => $results, 'totalcount' => count($results));
+       
+        return $return;
+
     }
     
         
@@ -310,6 +359,7 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
             if(!$find){
                $currentAcls[$index]['writeacl'] = false;
                $currentAcls[$index]['readacl'] = false;
+               $currentAcls[$index]['sendacl'] = false;
                $acls[]=$currentAcls[$index];
             }
         }
@@ -322,10 +372,13 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
                 $login = $user['account_id'];
             }
             foreach($folderList as $folder => $value){
-                $currentUser = Tinebase_Core::getUser()->toArray();
-                $this->setACL($folder, $currentUser['accountId'], 'lrswipcda');
-                if($user['writeacl']){
+//                $currentUser = Tinebase_Core::getUser()->toArray();
+//                $this->setACL($folder, $currentUser['accountId'], 'lrswipcda');
+                if($user['sendacl']){
                     $setACL = $this->setACL($folder, $login, 'lrswipcd');
+                    }
+                elseif($user['writeacl']){
+                    $setACL = $this->setACL($folder, $login, 'lrswicd');
                     }
                 elseif($user['readacl']){
                     $setACL = $this->setACL($folder, $login, 'lrs');

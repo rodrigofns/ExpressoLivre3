@@ -1,10 +1,17 @@
 <?php
 
+/**
+ * Tine 2.0
+ * @package     Webconference
+ * @subpackage  Model
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
+ * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ */
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 class Webconference_Model_Invite extends Tinebase_Record_Abstract{
 
     
