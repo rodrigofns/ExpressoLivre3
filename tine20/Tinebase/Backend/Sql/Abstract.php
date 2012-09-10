@@ -240,6 +240,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         
         $this->_traitGroup($select);
 
+    //    throw new Tinebase_Exception($select);
+        
         $stmt = $this->_db->query($select);
         $queryResult = $stmt->fetch();
         $stmt->closeCursor();
@@ -1283,6 +1285,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     					{
     						$group[] = $element;
     					}
+                                        // adds expression column into group by clause (expression) in addressbook image
+                                        //substr($column[1], 0, 30) == ("(CASE WHEN \"addressbook_image\"")
+                                        else if (substr($column[1], 0, 10) == ("(CASE WHEN")){
+                                            $group[] = $column[1]; 
+                                        }
     				}
     			}
     		}

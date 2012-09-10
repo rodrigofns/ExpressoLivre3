@@ -139,6 +139,7 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             { id: 'note', header: this.app.i18n._('Note'), dataIndex: 'note' },
             { id: 'tz', header: this.app.i18n._('Timezone'), dataIndex: 'tz' },
             { id: 'geo', header: this.app.i18n._('Geo'), dataIndex: 'geo' },
+            { id: 'employee_number', header: this.app.i18n._('Employee Number'), dataIndex: 'employee_number' },
             { id: 'bday', header: this.app.i18n._('Birthday'), dataIndex: 'bday', renderer: Tine.Tinebase.common.dateRenderer }
         ].concat(this.getModlogColumns().concat(this.getCustomfieldColumns()));
     },

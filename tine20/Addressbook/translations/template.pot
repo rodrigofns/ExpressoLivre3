@@ -672,3 +672,7 @@ msgstr ""
 #: Setup/setup.xml:648
 msgid "Internal Contacts"
 msgstr ""
+
+#: Addressbook/js/ContactEditDialog.js:121
+msgid "Employee Number"
+msgstr ""
