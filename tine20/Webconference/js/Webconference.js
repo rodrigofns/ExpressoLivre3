@@ -1,7 +1,18 @@
+/* 
+ * Tine 2.0
+ * 
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author      
+ * @copyright   Copyright (c) 2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ */
 
 Ext.ns('Tine.Webconference');
 
-
+/**
+ * Enum with the list of options available to access the application.
+ * MENU: The user start/activate the application via the main menu.
+ * EMAIL: The user start/activate the application via an invitation received by email.
+ */
 const WebconferenceOrigin = {
     MENU : 0,
     EMAIL : 1
@@ -18,13 +29,35 @@ const WebconferenceOrigin = {
  * @author      Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
  */
 Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
-	
+
+    /**
+     * The URL of the BigBlueButton webconference room used in center-panel iframe.
+     */
     bbbUrl : '',
+    
+    /**
+     * Indicates if the user is moderator in the webconference.
+     */
     moderator : false,
+    
+    /**
+     * Indicates if the user is connected to an active webconference room.
+     */
     roomActive: false,
+    
+    /**
+     * The room name.
+     */
     roomName: '',
+    
+    /**
+     * The webconference application origin (where the user started the application from).
+     */
     origin: null,
     
+    /**
+     * A global mask for the application.
+     */
     loadMask: null,
     
     
@@ -36,12 +69,25 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     getTitle: function() {
         return this.i18n.gettext('Webconference');
     },
+    
+    /**
+     * Get the roomActive property.
+     * 
+     * @return {Boolean}
+     */
     isRoomActive: function(){
         return this.roomActive;
     },
+    
+    /**
+     * Set the loadMask property.
+     * 
+     * @param {Ext.LoadMask} mask
+     */
     setLoadMask: function(mask){
         this.loadMask = mask;
     },
+    
     init: function() {
         
         this.origin = WebconferenceOrigin.MENU;
@@ -97,7 +143,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             this.createRoom();
             
         }
-        
+
         var west = Ext.get('west'); // this is west panel region
         west.hide(); 
         var westComponent = Ext.getCmp('west'); // this is west panel region component
@@ -150,11 +196,14 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         });
         loadMask.show();
         
+        var app = Tine.Tinebase.appMgr.get('Webconference');
         Tine.Webconference.isMeetingActive(roomName, url,  function(response) {
             if(response.active){
                 
                 if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
-                    Ext.MessageBox.confirm('', _('Cancel active webconference') + ' ?', function(btn) {
+                    Ext.MessageBox.confirm('', 
+                    app.i18n._("You are already in a webconference. Accepting this invitation will make you leave the existing one.")+" "+
+                    app.i18n._('Proceed') + ' ?', function(btn) {
                         if(btn == 'yes') { 
                             Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.EMAIL;
                             Tine.Tinebase.appMgr.get('Webconference').bbbUrl = url;
@@ -257,9 +306,9 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             //record: new Tine.Felamimail.Model.Message(Tine.Felamimail.Model.Message.getDefaultData(), 0),
             listeners: {
                 scope: this,
-//                'update': function(record) {
-//                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
-//                },
+                //                'update': function(record) {
+                //                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
+                //                },
                 'cancel':function(win){
                     Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
                 },
@@ -298,80 +347,125 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
             Tine.Tinebase.appMgr.get('Webconference').i18n._('This will kick all participants out of the meeting. Terminate webconference') + ' ?', 
             function(btn) {
             
-            if(btn == 'yes') { 
+                if(btn == 'yes') { 
                 
-                var roomName = Tine.Tinebase.appMgr.get('Webconference').roomName;
-                Ext.Ajax.request({
-                    params: {
-                        method: 'Webconference.endMeeting',
-                        roomName: roomName
-                    },
-                    scope: this,
-                    success: function(_result, _request){
-                        //var result = Ext.util.JSON.decode(_result.responseText);
+                    var roomName = Tine.Tinebase.appMgr.get('Webconference').roomName;
+                    Ext.Ajax.request({
+                        params: {
+                            method: 'Webconference.endMeeting',
+                            roomName: roomName
+                        },
+                        scope: this,
+                        success: function(_result, _request){
+                            //var result = Ext.util.JSON.decode(_result.responseText);
                 
-                        Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
-                        Tine.Tinebase.appMgr.get('Webconference').onExit();
+                            Tine.Tinebase.appMgr.get('Webconference').roomActive = false;
+                            Tine.Tinebase.appMgr.get('Webconference').onExit();
                 
             
-                    }
-                });
-            }
-            else {
-                Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
-            }
+                        }
+                    });
+                }
+                else {
+                    Tine.Tinebase.appMgr.get('Webconference').getMainScreen().getCenterPanel().show();
+                }
                 
-        }, this);
+            }, this);
         
        
     }
     
-//    ,fixFlash:function() {
-//        var embed = document.getElementsByTagName('embed');
-//        for(var i = 0; i < embed.length; i++){
-//            embed[i].setAttribute('wmode','transparent');
-//        }
-//        // FF does a "live" array when working directly with elements,
-//        // so "els" changes as we add/remove elements; to avoid problems
-//        // with indexing, copy to a temporary array
-//        var els = document.getElementsByTagName('object');
-//        var obj = [];
-//        for(var i = 0; i < els.length; i++){
-//            obj[i] = els[i];
-//        }
-//        for(var i = 0; i < obj.length; i++){
-//            var param = document.createElement('param');
-//            param.setAttribute('name','wmode');
-//            param.setAttribute('value','transparent');
-//            obj[i].appendChild(param);
-//
-//            var wrapper = document.createElement('div');
-//            obj[i].parentNode.appendChild(wrapper);
-//
-//            if(obj[i].outerHTML){
-//                // IE
-//                var html = obj[i].outerHTML;
-//                obj[i].parentNode.removeChild(obj[i]);
-//                wrapper.innerHTML = html;
-//            }else{
-//                // ff/chrome
-//                obj[i].parentNode.removeChild(obj[i]);
-//                wrapper.appendChild(obj[i]);
+//    ,
+//    fixFlash:function() {
+//        alert('oi');
+//        var iframe = document.getElementById('webconference-iframe');
+//        var doc = iframe.contentWindow.document;
+//        
+//        
+//        
+//        //console.debug(Ext.get('webconference-iframe').dom.query('object'));
+//        //console.debug(Ext.fly('webconference-iframe').dom);
+//        
+//        console.debug(doc.getElementsByTagName('embed'));
+//        
+//        // loop through every embed tag on the site
+//        var embeds = doc.getElementsByTagName('embed');
+//        for (i = 0; i < embeds.length; i++) {
+//            embed = embeds[i];
+//            var new_embed;
+//            // everything but Firefox & Konqueror
+//            if (embed.outerHTML) {
+//                var html = embed.outerHTML;
+//                // replace an existing wmode parameter
+//                if (html.match(/wmode\s*=\s*('|")[a-zA-Z]+('|")/i))
+//                    new_embed = html.replace(/wmode\s*=\s*('|")window('|")/i, "wmode='transparent'");
+//                // add a new wmode parameter
+//                else
+//                    new_embed = html.replace(/<embed\s/i, "<embed wmode='transparent' ");
+//                // replace the old embed object with the fixed version
+//                embed.insertAdjacentHTML('beforeBegin', new_embed);
+//                embed.parentNode.removeChild(embed);
+//            } else {
+//                // cloneNode is buggy in some versions of Safari & Opera, but works fine in FF
+//                new_embed = embed.cloneNode(true);
+//                if (!new_embed.getAttribute('wmode') || new_embed.getAttribute('wmode').toLowerCase() == 'window')
+//                    new_embed.setAttribute('wmode', 'transparent');
+//                embed.parentNode.replaceChild(new_embed, embed);
+//            }
+//        } 
+//        // loop through every object tag on the site
+//        var objects = doc.getElementsByTagName('object');
+//        
+//        alert(objects.length);
+//        
+//        for (i = 0; i < objects.length; i++) {
+//            object = objects[i];
+//            var new_object;
+//            // object is an IE specific tag so we can use outerHTML here
+//            if (object.outerHTML) {
+//                var html = object.outerHTML;
+//                // replace an existing wmode parameter
+//                if (html.match(/<param\s+name\s*=\s*('|")wmode('|")\s+value\s*=\s*('|")[a-zA-Z]+('|")\s*\/?\>/i))
+//                    new_object = html.replace(/<param\s+name\s*=\s*('|")wmode('|")\s+value\s*=\s*('|")window('|")\s*\/?\>/i, "<param name='wmode' value='transparent' />");
+//                // add a new wmode parameter
+//                else
+//                    new_object = html.replace(/<\/object\>/i, "<param name='wmode' value='transparent' />\n</object>");
+//                // loop through each of the param tags
+//                var children = object.childNodes;
+//                for (j = 0; j < children.length; j++) {
+//                    try {
+//                        if (children[j] != null) {
+//                            var theName = children[j].getAttribute('name');
+//                            if (theName != null && theName.match(/flashvars/i)) {
+//                                new_object = new_object.replace(/<param\s+name\s*=\s*('|")flashvars('|")\s+value\s*=\s*('|")[^'"]*('|")\s*\/?\>/i, "<param name='flashvars' value='" + children[j].getAttribute('value') + "' />");
+//                            }
+//                        }
+//                    }
+//                    catch (err) {
+//                    }
+//                }
+//                // replace the old embed object with the fixed versiony
+//                object.insertAdjacentHTML('beforeBegin', new_object);
+//                object.parentNode.removeChild(object);
 //            }
 //        }
-//      
+      
 //    }
     
     
 	
 });
 
-
+/**
+ * Component for the iframe component of the webconference application.
+ *
+ */
 Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
     onRender : function(ct, position){
         this.el = ct.createChild({
             tag: 'iframe', 
             id: 'webconference-iframe', 
+            name: 'webconference-iframe',
             frameBorder: 0, 
             src: this.url
         });
@@ -440,54 +534,54 @@ Ext.extend(Tine.Webconference.MainScreen, Tine.widgets.MainScreen, {
         contentType = contentType || this.getActiveContentType();
         
         //if (! this[contentType + 'ActionToolbar'] || this[contentType + 'ActionToolbar']) {
-            try {
+        try {
                 
-                var actionToolbar = new Ext.Toolbar({
-                    items: [{
-                        xtype: 'buttongroup',
-                        columns: 5,
-                        items: [
-                        Ext.apply( new Ext.Button(this.actions.addUser), {
-                            scale: 'medium',
-                            rowspan: 2,
-                            iconAlign: 'top'
-                        })
-                        ,{
-                            xtype: 'tbspacer', 
-                            width: 10
-                        }
-                        ,Ext.apply(new Ext.Button(this.actions.exit), {
-                            scale: 'medium',
-                            rowspan: 2,
-                            iconAlign: 'top'
-                        })
-                        ,{
-                            xtype: 'tbspacer', 
-                            width: 10
-                        }
-                        ,Ext.apply(new Ext.Button(this.actions.terminate), {
-                            scale: 'medium',
-                            rowspan: 2,
-                            iconAlign: 'top'
-                        })
-                        ]
-                    }]
-                });
+            var actionToolbar = new Ext.Toolbar({
+                items: [{
+                    xtype: 'buttongroup',
+                    columns: 5,
+                    items: [
+                    Ext.apply( new Ext.Button(this.actions.addUser), {
+                        scale: 'medium',
+                        rowspan: 2,
+                        iconAlign: 'top'
+                    })
+                    ,{
+                        xtype: 'tbspacer', 
+                        width: 10
+                    }
+                    ,Ext.apply(new Ext.Button(this.actions.exit), {
+                        scale: 'medium',
+                        rowspan: 2,
+                        iconAlign: 'top'
+                    })
+                    ,{
+                        xtype: 'tbspacer', 
+                        width: 10
+                    }
+                    ,Ext.apply(new Ext.Button(this.actions.terminate), {
+                        scale: 'medium',
+                        rowspan: 2,
+                        iconAlign: 'top'
+                    })
+                    ]
+                }]
+            });
                
                 
-                this[contentType + 'ActionToolbar'] = new Ext.Panel({
+            this[contentType + 'ActionToolbar'] = new Ext.Panel({
                 		
-                    items: [ actionToolbar]
-                });
+                items: [ actionToolbar]
+            });
                 
                 
-            } catch (e) {
-                Tine.log.err('Could not create northPanel');
-                Tine.log.err(e);
-                this[contentType + 'ActionToolbar'] = new Ext.Panel({
-                    html: 'ERROR'
-                });
-            }
+        } catch (e) {
+            Tine.log.err('Could not create northPanel');
+            Tine.log.err(e);
+            this[contentType + 'ActionToolbar'] = new Ext.Panel({
+                html: 'ERROR'
+            });
+        }
         //}
         
         return this[contentType + 'ActionToolbar'];
