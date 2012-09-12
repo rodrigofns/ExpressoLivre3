@@ -63,12 +63,6 @@ class Felamimail_Controller_Cache_Imap_Folder extends Felamimail_Controller_Cach
      */
     public function updateCacheFolder($_accountId, $_folderName = '', $_recursive = FALSE)
     {
-        
-        
-    
-        
-        
-        
     	if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ .  ' getting (sub) folder and creating folders in db backend cache');
     	
         $account = ($_accountId instanceof Felamimail_Model_Account) ? $_accountId : Felamimail_Controller_Account::getInstance()->get($_accountId);
@@ -79,7 +73,7 @@ class Felamimail_Controller_Cache_Imap_Folder extends Felamimail_Controller_Cach
             $result = $this->_getOrCreateFolders($folders, $account, $_folderName);
             
             $hasChildren = (empty($folders) || count($folders) > 0 && count($result) == 0) ? 0 : 1;
-            $this->_updateHasChildren($_accountId, $_folderName, $hasChildren);
+            $this->_updateHasChildrenCache($_accountId, $_folderName, $hasChildren);
             
             if ($_recursive) {
                 $this->_updateRecursive($account, $result);

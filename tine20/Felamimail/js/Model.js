@@ -834,5 +834,6 @@ Tine.Felamimail.Model.Acl = Ext.data.Record.create([
     {name: 'account_id'},
     {name: 'account_name', sortType: Tine.Tinebase.common.accountSortType},
     {name: 'readacl',    type: 'boolean'},
-    {name: 'writeacl',     type: 'boolean'}
+    {name: 'writeacl',     type: 'boolean'},
+    {name: 'sendacl',     type: 'boolean'}
 ]);

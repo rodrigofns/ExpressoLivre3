@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - ExampleApplication\n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2008-07-29 21:14+0100\n"
-"Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
+"PO-Revision-Date: 2012-09-10 14:14-0300\n"
+"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,8 @@ msgstr "Example Application"
 msgid "Quick search"
 msgstr "Quick search"
 
-#: js/ExampleRecordGridPanel.js:102 js/ExampleRecordEditDialog.js:104
+#: js/ExampleRecordGridPanel.js:102
+#: js/ExampleRecordEditDialog.js:104
 msgid "Name"
 msgstr "Name"
 
@@ -66,3 +67,4 @@ msgstr "ExampleApplication"
 #, python-format
 msgid "%s's personal example records"
 msgstr "%s's personal example records"
+

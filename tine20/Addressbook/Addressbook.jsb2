@@ -40,6 +40,10 @@
           "path": "js/"
         },
         {
+          "text": "DynamicContactsDialog.js",
+          "path": "js/"
+        },
+        {
           "text": "SearchCombo.js",
           "path": "js/"
         },

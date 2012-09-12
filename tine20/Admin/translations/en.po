@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Admin\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-02-10 12:00+0000\n"
-"Last-Translator: Cornelius Weiss <c.weiss@metaways.de>\n"
+"PO-Revision-Date: 2012-09-10 14:09-0300\n"
+"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -31,8 +31,7 @@ msgstr "manage accounts"
 
 #: Acl/Rights.php:190
 msgid "add and edit users and groups, add group members, change user passwords"
-msgstr ""
-"add and edit users and groups, add group members, change user passwords"
+msgstr "add and edit users and groups, add group members, change user passwords"
 
 #: Acl/Rights.php:193
 msgid "manage applications"
@@ -47,10 +46,8 @@ msgid "manage roles"
 msgstr "manage roles"
 
 #: Acl/Rights.php:198
-msgid ""
-"add and edit roles, add new members to roles, add application rights to roles"
-msgstr ""
-"add and edit roles, add new members to roles, add application rights to roles"
+msgid "add and edit roles, add new members to roles, add application rights to roles"
+msgstr "add and edit roles, add new members to roles, add application rights to roles"
 
 #: Acl/Rights.php:201
 msgid "manage shared tags"
@@ -132,31 +129,39 @@ msgstr "Your container has been changed"
 msgid "Your container has been changed by %1$s %2$sNote: %3$s"
 msgstr "Your container has been changed by %1$s %2$sNote: %3$s"
 
-#: js/AccessLog.js:105 js/Admin.js:87 js/Models.js:51
+#: js/AccessLog.js:105
+#: js/Admin.js:87
+#: js/Models.js:51
 msgid "Access Log"
 msgid_plural "Access Logs"
 msgstr[0] "Access Log"
 msgstr[1] "Access Logs"
 
-#: js/AccessLog.js:106 js/AccessLog.js:132
+#: js/AccessLog.js:106
+#: js/AccessLog.js:132
 msgid "IP Address"
 msgstr "IP Address"
 
-#: js/AccessLog.js:107 js/Admin.js:23 js/user/Users.js:72
+#: js/AccessLog.js:107
+#: js/Admin.js:23
+#: js/user/Users.js:72
 msgid "User"
 msgid_plural "Users"
 msgstr[0] "User"
 msgstr[1] "Users"
 
-#: js/AccessLog.js:108 js/AccessLog.js:133
+#: js/AccessLog.js:108
+#: js/AccessLog.js:133
 msgid "Login Time"
 msgstr "Login Time"
 
-#: js/AccessLog.js:109 js/AccessLog.js:134
+#: js/AccessLog.js:109
+#: js/AccessLog.js:134
 msgid "Logout Time"
 msgstr "Logout Time"
 
-#: js/AccessLog.js:110 js/AccessLog.js:136
+#: js/AccessLog.js:110
+#: js/AccessLog.js:136
 msgid "Client Type"
 msgstr "Client Type"
 
@@ -164,14 +169,23 @@ msgstr "Client Type"
 msgid "Session ID"
 msgstr "Session ID"
 
-#: js/AccessLog.js:130 js/user/EditDialog.js:763 js/user/EditDialog.js:806
+#: js/AccessLog.js:130
+#: js/user/EditDialog.js:763
+#: js/user/EditDialog.js:806
 msgid "Login Name"
 msgstr "Login Name"
 
-#: js/AccessLog.js:131 js/Applications.js:278 js/container/EditDialog.js:123
-#: js/customfield/EditDialog.js:595 js/customfield/GridPanel.js:72
-#: js/Groups.js:235 js/Roles.js:238 js/SambaMachineGrid.js:86 js/Tags.js:225
-#: js/user/EditDialog.js:285 js/user/EditDialog.js:321
+#: js/AccessLog.js:131
+#: js/Applications.js:278
+#: js/container/EditDialog.js:123
+#: js/customfield/EditDialog.js:595
+#: js/customfield/GridPanel.js:72
+#: js/Groups.js:235
+#: js/Roles.js:238
+#: js/SambaMachineGrid.js:86
+#: js/Tags.js:225
+#: js/user/EditDialog.js:285
+#: js/user/EditDialog.js:321
 msgid "Name"
 msgstr "Name"
 
@@ -211,7 +225,8 @@ msgstr "failure"
 msgid "success"
 msgstr "success"
 
-#: js/Admin.js:36 js/Models.js:87
+#: js/Admin.js:36
+#: js/Models.js:87
 msgid "Groups"
 msgstr "Groups"
 
@@ -223,7 +238,8 @@ msgstr "Roles"
 msgid "Computers"
 msgstr "Computers"
 
-#: js/Admin.js:74 js/Models.js:128
+#: js/Admin.js:74
+#: js/Models.js:128
 msgid "Applications"
 msgstr "Applications"
 
@@ -247,9 +263,12 @@ msgstr "Admin"
 msgid "Default Addressbook for new contacts and groups"
 msgstr "Default Addressbook for new contacts and groups"
 
-#: js/ApplicationFilter.js:33 js/container/EditDialog.js:135
-#: js/container/GridPanel.js:72 js/customfield/EditDialog.js:387
-#: js/customfield/EditDialog.js:528 js/customfield/GridPanel.js:74
+#: js/ApplicationFilter.js:33
+#: js/container/EditDialog.js:135
+#: js/container/GridPanel.js:72
+#: js/customfield/EditDialog.js:387
+#: js/customfield/EditDialog.js:528
+#: js/customfield/GridPanel.js:74
 #: js/Models.js:128
 msgid "Application"
 msgid_plural "Applications"
@@ -272,15 +291,20 @@ msgstr "disable application"
 msgid "settings"
 msgstr "settings"
 
-#: js/Applications.js:183 js/Groups.js:176 js/Roles.js:176 js/Tags.js:169
+#: js/Applications.js:183
+#: js/Groups.js:176
+#: js/Roles.js:176
+#: js/Tags.js:169
 msgid "Search:"
 msgstr "Search:"
 
-#: js/Applications.js:226 js/user/EditDialog.js:834
+#: js/Applications.js:226
+#: js/user/EditDialog.js:834
 msgid "disabled"
 msgstr "disabled"
 
-#: js/Applications.js:229 js/user/EditDialog.js:834
+#: js/Applications.js:229
+#: js/user/EditDialog.js:834
 msgid "enabled"
 msgstr "enabled"
 
@@ -296,11 +320,14 @@ msgstr "Displaying application {0} - {1} of {2}"
 msgid "No applications to display"
 msgstr "No applications to display"
 
-#: js/Applications.js:277 js/customfield/EditDialog.js:625
+#: js/Applications.js:277
+#: js/customfield/EditDialog.js:625
 msgid "Order"
 msgstr "Order"
 
-#: js/Applications.js:279 js/user/EditDialog.js:828 js/user/GridPanel.js:176
+#: js/Applications.js:279
+#: js/user/EditDialog.js:828
+#: js/user/GridPanel.js:176
 msgid "Status"
 msgstr "Status"
 
@@ -308,14 +335,17 @@ msgstr "Status"
 msgid "Version"
 msgstr "Version"
 
-#: js/container/Container.js:46 js/container/GridPanel.js:103
+#: js/container/Container.js:46
+#: js/container/GridPanel.js:103
 msgid "Container"
 msgid_plural "Containers"
 msgstr[0] "Container"
 msgstr[1] "Containers"
 
-#: js/container/EditDialog.js:144 js/container/GridPanel.js:73
-#: js/container/GridPanel.js:104 js/customfield/EditDialog.js:583
+#: js/container/EditDialog.js:144
+#: js/container/GridPanel.js:73
+#: js/container/GridPanel.js:104
+#: js/customfield/EditDialog.js:583
 #: js/customfield/GridPanel.js:73
 msgid "Type"
 msgstr "Type"
@@ -328,7 +358,9 @@ msgstr "personal"
 msgid "shared"
 msgstr "shared"
 
-#: js/container/EditDialog.js:159 js/TagEditDialog.js:232 js/Tags.js:222
+#: js/container/EditDialog.js:159
+#: js/TagEditDialog.js:232
+#: js/Tags.js:222
 msgid "Color"
 msgstr "Color"
 
@@ -336,9 +368,13 @@ msgstr "Color"
 msgid "Note for Owner"
 msgstr "Note for Owner"
 
-#: js/container/GridPanel.js:70 js/customfield/EditDialog.js:283
-#: js/customfield/GridPanel.js:70 js/Groups.js:234 js/Roles.js:237
-#: js/SambaMachineGrid.js:79 js/user/GridPanel.js:175
+#: js/container/GridPanel.js:70
+#: js/customfield/EditDialog.js:283
+#: js/customfield/GridPanel.js:70
+#: js/Groups.js:234
+#: js/Roles.js:237
+#: js/SambaMachineGrid.js:79
+#: js/user/GridPanel.js:175
 msgid "ID"
 msgstr "ID"
 
@@ -346,14 +382,18 @@ msgstr "ID"
 msgid "Container Name"
 msgstr "Container Name"
 
-#: js/customfield/Customfield.js:44 js/customfield/GridPanel.js:115
+#: js/customfield/Customfield.js:44
+#: js/customfield/GridPanel.js:115
 msgid "Customfield"
 msgid_plural "Customfields"
 msgstr[0] "Customfield"
 msgstr[1] "Customfields"
 
-#: js/customfield/EditDialog.js:137 js/customfield/EditDialog.js:432
-#: js/GroupEditDialog.js:78 js/RoleEditDialog.js:114 js/TagEditDialog.js:88
+#: js/customfield/EditDialog.js:137
+#: js/customfield/EditDialog.js:432
+#: js/GroupEditDialog.js:78
+#: js/RoleEditDialog.js:114
+#: js/TagEditDialog.js:88
 msgid "Errors"
 msgstr "Errors"
 
@@ -377,7 +417,8 @@ msgstr "Value"
 msgid "Add a New Value..."
 msgstr "Add a New Value..."
 
-#: js/customfield/EditDialog.js:307 js/customfield/EditDialog.js:313
+#: js/customfield/EditDialog.js:307
+#: js/customfield/EditDialog.js:313
 msgid "Error"
 msgstr "Error"
 
@@ -401,7 +442,8 @@ msgstr "Given record class not found"
 msgid "OK"
 msgstr "OK"
 
-#: js/customfield/EditDialog.js:470 js/user/EditDialog.js:691
+#: js/customfield/EditDialog.js:470
+#: js/user/EditDialog.js:691
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -409,7 +451,8 @@ msgstr "Cancel"
 msgid "Configure store"
 msgstr "Configure store"
 
-#: js/customfield/EditDialog.js:549 js/customfield/GridPanel.js:75
+#: js/customfield/EditDialog.js:549
+#: js/customfield/GridPanel.js:75
 msgid "Model"
 msgstr "Model"
 
@@ -453,7 +496,8 @@ msgstr "Key Field"
 msgid "Record"
 msgstr "Record"
 
-#: js/customfield/EditDialog.js:601 js/customfield/GridPanel.js:71
+#: js/customfield/EditDialog.js:601
+#: js/customfield/GridPanel.js:71
 msgid "Label"
 msgstr "Label"
 
@@ -465,7 +509,9 @@ msgstr "Length"
 msgid "Custom field additional properties"
 msgstr "Custom field additional properties"
 
-#: js/customfield/EditDialog.js:620 js/GroupEditDialog.js:222 js/Models.js:87
+#: js/customfield/EditDialog.js:620
+#: js/GroupEditDialog.js:222
+#: js/Models.js:87
 msgid "Group"
 msgid_plural "Groups"
 msgstr[0] "Group"
@@ -475,7 +521,9 @@ msgstr[1] "Groups"
 msgid "Customfield already exists. Please choose another name."
 msgstr "Customfield already exists. Please choose another name."
 
-#: js/customfield/GridPanel.js:131 js/Groups.js:52 js/Roles.js:47
+#: js/customfield/GridPanel.js:131
+#: js/Groups.js:52
+#: js/Roles.js:47
 #: js/Tags.js:64
 msgid "Confirm"
 msgstr "Confirm"
@@ -484,16 +532,23 @@ msgstr "Confirm"
 msgid "Restart application to apply new cusomfields?"
 msgstr "Restart application to apply new cusomfields?"
 
-#: js/GroupEditDialog.js:38 js/RoleEditDialog.js:70 js/TagEditDialog.js:38
+#: js/GroupEditDialog.js:38
+#: js/RoleEditDialog.js:70
+#: js/TagEditDialog.js:38
 msgid "Please wait"
 msgstr "Please wait"
 
-#: js/GroupEditDialog.js:38 js/RoleEditDialog.js:70
+#: js/GroupEditDialog.js:38
+#: js/RoleEditDialog.js:70
 msgid "Updating Memberships"
 msgstr "Updating Memberships"
 
-#: js/GroupEditDialog.js:73 js/Groups.js:74 js/RoleEditDialog.js:107
-#: js/RoleEditDialog.js:135 js/Roles.js:69 js/TagEditDialog.js:83
+#: js/GroupEditDialog.js:73
+#: js/Groups.js:74
+#: js/RoleEditDialog.js:107
+#: js/RoleEditDialog.js:135
+#: js/Roles.js:69
+#: js/TagEditDialog.js:83
 msgid "Failed"
 msgstr "Failed"
 
@@ -501,7 +556,9 @@ msgstr "Failed"
 msgid "Could not save group."
 msgstr "Could not save group."
 
-#: js/GroupEditDialog.js:78 js/RoleEditDialog.js:114 js/TagEditDialog.js:88
+#: js/GroupEditDialog.js:78
+#: js/RoleEditDialog.js:114
+#: js/TagEditDialog.js:88
 msgid "Please fix the errors noted."
 msgstr "Please fix the errors noted."
 
@@ -509,25 +566,35 @@ msgstr "Please fix the errors noted."
 msgid "Group Name"
 msgstr "Group Name"
 
-#: js/GroupEditDialog.js:129 js/Groups.js:236 js/RoleEditDialog.js:293
-#: js/Roles.js:239 js/SambaMachineGrid.js:62 js/SambaMachineGrid.js:92
-#: js/TagEditDialog.js:226 js/Tags.js:226 js/user/GridPanel.js:99
+#: js/GroupEditDialog.js:129
+#: js/Groups.js:236
+#: js/RoleEditDialog.js:293
+#: js/Roles.js:239
+#: js/SambaMachineGrid.js:62
+#: js/SambaMachineGrid.js:92
+#: js/TagEditDialog.js:226
+#: js/Tags.js:226
+#: js/user/GridPanel.js:99
 msgid "Description"
 msgstr "Description"
 
-#: js/GroupEditDialog.js:137 js/user/EditDialog.js:842
+#: js/GroupEditDialog.js:137
+#: js/user/EditDialog.js:842
 msgid "Visibility"
 msgstr "Visibility"
 
-#: js/GroupEditDialog.js:143 js/user/EditDialog.js:848
+#: js/GroupEditDialog.js:143
+#: js/user/EditDialog.js:848
 msgid "Display in addressbook"
 msgstr "Display in addressbook"
 
-#: js/GroupEditDialog.js:143 js/user/EditDialog.js:848
+#: js/GroupEditDialog.js:143
+#: js/user/EditDialog.js:848
 msgid "Hide from addressbook"
 msgstr "Hide from addressbook"
 
-#: js/GroupEditDialog.js:159 js/user/EditDialog.js:862
+#: js/GroupEditDialog.js:159
+#: js/user/EditDialog.js:862
 msgid "Saved in Addressbook"
 msgstr "Saved in Addressbook"
 
@@ -535,11 +602,14 @@ msgstr "Saved in Addressbook"
 msgid "Group Members"
 msgstr "Group Members"
 
-#: js/GroupEditDialog.js:222 js/RoleEditDialog.js:360 js/TagEditDialog.js:290
+#: js/GroupEditDialog.js:222
+#: js/RoleEditDialog.js:360
+#: js/TagEditDialog.js:290
 msgid "Transferring {0}..."
 msgstr "Transferring {0}..."
 
-#: js/GroupEditDialog.js:227 js/GroupEditDialog.js:238
+#: js/GroupEditDialog.js:227
+#: js/GroupEditDialog.js:238
 msgid "Add new group"
 msgstr "Add new group"
 
@@ -575,7 +645,8 @@ msgstr "delete group"
 msgid "Displaying groups {0} - {1} of {2}"
 msgstr "Displaying groups {0} - {1} of {2}"
 
-#: js/Groups.js:224 js/Groups.js:278
+#: js/Groups.js:224
+#: js/Groups.js:278
 msgid "No groups to display"
 msgstr "No groups to display"
 
@@ -587,7 +658,8 @@ msgstr "Could not save role."
 msgid "Deleting role..."
 msgstr "Deleting role..."
 
-#: js/RoleEditDialog.js:135 js/Roles.js:69
+#: js/RoleEditDialog.js:135
+#: js/Roles.js:69
 msgid "Some error occurred while trying to delete the role."
 msgstr "Some error occurred while trying to delete the role."
 
@@ -639,11 +711,13 @@ msgstr "delete role"
 msgid "Displaying roles {0} - {1} of {2}"
 msgstr "Displaying roles {0} - {1} of {2}"
 
-#: js/Roles.js:227 js/Roles.js:281
+#: js/Roles.js:227
+#: js/Roles.js:281
 msgid "No roles to display"
 msgstr "No roles to display"
 
-#: js/SambaMachineEditDialog.js:42 js/SambaMachineGrid.js:61
+#: js/SambaMachineEditDialog.js:42
+#: js/SambaMachineGrid.js:61
 msgid "Computer Name"
 msgstr "Computer Name"
 
@@ -721,7 +795,8 @@ msgstr "delete tag"
 msgid "Displaying tags {0} - {1} of {2}"
 msgstr "Displaying tags {0} - {1} of {2}"
 
-#: js/Tags.js:212 js/Tags.js:268
+#: js/Tags.js:212
+#: js/Tags.js:268
 msgid "No tags to display"
 msgstr "No tags to display"
 
@@ -733,7 +808,8 @@ msgstr "Usage:&#160;"
 msgid "Domain is not allowed. Check your SMTP domain configuration."
 msgstr "Domain is not allowed. Check your SMTP domain configuration."
 
-#: js/user/EditDialog.js:234 js/user/EditDialog.js:237
+#: js/user/EditDialog.js:234
+#: js/user/EditDialog.js:237
 #: js/user/EditDialog.js:688
 msgid "Passwords do not match!"
 msgstr "Passwords do not match!"
@@ -742,7 +818,8 @@ msgstr "Passwords do not match!"
 msgid "Passwords match!"
 msgstr "Passwords match!"
 
-#: js/user/EditDialog.js:286 js/user/EditDialog.js:811
+#: js/user/EditDialog.js:286
+#: js/user/EditDialog.js:811
 msgid "Primary group"
 msgstr "Primary group"
 
@@ -770,7 +847,8 @@ msgstr "Home Drive"
 msgid "Logon Time"
 msgstr "Logon Time"
 
-#: js/user/EditDialog.js:408 js/user/EditDialog.js:891
+#: js/user/EditDialog.js:408
+#: js/user/EditDialog.js:891
 #: js/user/EditDialog.js:895
 msgid "never logged in"
 msgstr "never logged in"
@@ -795,7 +873,8 @@ msgstr "Profile Path"
 msgid "Password Last Set"
 msgstr "Password Last Set"
 
-#: js/user/EditDialog.js:428 js/user/EditDialog.js:839
+#: js/user/EditDialog.js:428
+#: js/user/EditDialog.js:839
 #: js/user/EditDialog.js:899
 msgid "never"
 msgstr "never"
@@ -808,7 +887,8 @@ msgstr "Logon Script"
 msgid "Password Can Change"
 msgstr "Password Can Change"
 
-#: js/user/EditDialog.js:438 js/user/EditDialog.js:443
+#: js/user/EditDialog.js:438
+#: js/user/EditDialog.js:443
 #: js/user/EditDialog.js:448
 msgid "not set"
 msgstr "not set"
@@ -825,11 +905,13 @@ msgstr "Kick Off Time"
 msgid "IMAP Quota (MB)"
 msgstr "IMAP Quota (MB)"
 
-#: js/user/EditDialog.js:485 js/user/EditDialog.js:523
+#: js/user/EditDialog.js:485
+#: js/user/EditDialog.js:523
 msgid "Quota"
 msgstr "Quota"
 
-#: js/user/EditDialog.js:486 js/user/EditDialog.js:524
+#: js/user/EditDialog.js:486
+#: js/user/EditDialog.js:524
 msgid "no quota set"
 msgstr "no quota set"
 
@@ -845,7 +927,8 @@ msgstr "Sieve Quota (MB)"
 msgid "Current Sieve size"
 msgstr "Current Sieve size"
 
-#: js/user/EditDialog.js:543 js/user/EditDialog.js:874
+#: js/user/EditDialog.js:543
+#: js/user/EditDialog.js:874
 msgid "Information"
 msgstr "Information"
 
@@ -909,7 +992,8 @@ msgstr "no password set"
 msgid "Emailaddress"
 msgstr "Emailaddress"
 
-#: js/user/EditDialog.js:805 js/user/GridPanel.js:182
+#: js/user/EditDialog.js:805
+#: js/user/GridPanel.js:182
 msgid "OpenID"
 msgstr "OpenID"
 
@@ -921,19 +1005,23 @@ msgstr "expired"
 msgid "blocked"
 msgstr "blocked"
 
-#: js/user/EditDialog.js:837 js/user/GridPanel.js:186
+#: js/user/EditDialog.js:837
+#: js/user/GridPanel.js:186
 msgid "Expires"
 msgstr "Expires"
 
-#: js/user/EditDialog.js:889 js/user/GridPanel.js:183
+#: js/user/EditDialog.js:889
+#: js/user/GridPanel.js:183
 msgid "Last login at"
 msgstr "Last login at"
 
-#: js/user/EditDialog.js:891 js/user/EditDialog.js:895
+#: js/user/EditDialog.js:891
+#: js/user/EditDialog.js:895
 msgid "don't know"
 msgstr "don't know"
 
-#: js/user/EditDialog.js:893 js/user/GridPanel.js:184
+#: js/user/EditDialog.js:893
+#: js/user/GridPanel.js:184
 msgid "Last login from"
 msgstr "Last login from"
 
@@ -1020,3 +1108,4 @@ msgid "Email User"
 msgid_plural "Email Users"
 msgstr[0] "Email User"
 msgstr[1] "Email Users"
+

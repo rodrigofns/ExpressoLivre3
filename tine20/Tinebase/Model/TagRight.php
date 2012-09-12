@@ -73,6 +73,11 @@ class Tinebase_Model_TagRight extends Tinebase_Record_Abstract
             $_data['view_right'] = in_array(self::VIEW_RIGHT, $rights);
             $_data['use_right']  = in_array(self::USE_RIGHT, $rights);
         }
+        /**
+         * account_id needs to be string, but 0 is coming as int. Cast it.
+         */
+        if (is_int($_data['account_id']))
+            $_data['account_id']=(string)$_data['account_id'];
         parent::__construct($_data, $_bypassFilters, $_convertDates);
     }
     

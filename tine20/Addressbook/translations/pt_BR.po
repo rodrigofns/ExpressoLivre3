@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Addressbook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-07-25 16:53-0300\n"
-"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2012-09-10 14:08-0300\n"
+"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
 "X-Generator: Launchpad (build 14886)\n"
@@ -464,12 +464,15 @@ msgstr "End token mode"
 #: js/ContactFilterModel.js:35
 #: js/Model.js:94
 #: js/Model.js:133
+#, fuzzy
 msgid "Contact"
-msgstr "Contato"
+msgid_plural "Contacts"
+msgstr[0] "Contato"
+msgstr[1] "Contato"
 
-#msgid_plural "Contacts"
-#msgstr[0] "Contato"
-#msgstr[1] "Contatos"
+# msgid_plural "Contacts"
+# msgstr[0] "Contato"
+# msgstr[1] "Contatos"
 #: js/ContactGrid.js:105
 #: js/Model.js:160
 msgid "Type"
@@ -778,9 +781,12 @@ msgstr "Todos os contatos que eu modifiquei"
 msgid "Internal Contacts"
 msgstr "Contatos Internos"
 
-msgid "tag"
-msgstr "marcador"
+#: Addressbook/js/ContactEditDialog.js:121
+msgid "Employee Number"
+msgstr "Matrícula"
 
-msgid "marcadores"
-msgstr "etiquetas"
+#~ msgid "tag"
+#~ msgstr "marcador"
+#~ msgid "marcadores"
+#~ msgstr "etiquetas"
 

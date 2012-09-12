@@ -98,7 +98,7 @@ abstract class Felamimail_Controller_Cache_Folder_Abstract extends Felamimail_Co
      * @param string $_folderName
      * @param boolean $_hasChildren
      */
-    protected function _updateHasChildren($_accountId, $_folderName, $_hasChildren)
+    protected function _updateHasChildrenCache($_accountId, $_folderName, $_hasChildren)
     {
         if (empty($_folderName)) {
             return;

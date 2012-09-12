@@ -68,7 +68,8 @@ class Tinebase_Model_TagFilter extends Tinebase_Record_Abstract
             ->where($db->quoteIdentifier('is_deleted') . ' = 0')
             //->order('type', 'DESC')
             ->order('name', 'ASC');
-        
+
+        $appZero =$db->quoteInto('?', "0");
         if (!empty($this->application)) {
             $applicationId = Tinebase_Application::getInstance()->getApplicationByName($this->application)->getId();
             
@@ -76,7 +77,7 @@ class Tinebase_Model_TagFilter extends Tinebase_Record_Abstract
                 array('context' => SQL_TABLE_PREFIX . 'tags_context'), 
                 $db->quoteIdentifier('tags.id') . ' = ' . $db->quoteIdentifier('context.tag_id'),
                 array()
-            )->where($db->quoteInto($db->quoteIdentifier('context.application_id') . ' IN (\'0\', ?)', $applicationId));
+            )->where($db->quoteInto($db->quoteIdentifier('context.application_id') . ' IN ('.$appZero . ', ?)', $applicationId));
         }
         
         $orWhere = array();

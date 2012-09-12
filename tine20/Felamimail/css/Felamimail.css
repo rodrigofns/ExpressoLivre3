@@ -147,6 +147,16 @@
     background-image:url(../../images/oxygen/32x32/actions/arrow-down.png) !important;
 }
 
+.x-btn .emblems_emblemImportant {
+    background-image: url(../../images/oxygen/16x16/emblems/emblem-important.png) !important;
+}
+.x-btn-medium .emblems_emblemImportant {
+    background-image: url(../../images/oxygen/22x22/emblems/emblem-important.png) !important;
+}
+.x-btn-large .emblems_emblemImportant {
+    background-image: url(../../images/oxygen/32x32/emblems/emblem-important.png) !important;
+}
+
 /***** Importance class *****/
 .importance_high {
     color: #FF6600;

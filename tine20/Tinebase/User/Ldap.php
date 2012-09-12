@@ -790,6 +790,7 @@ class Tinebase_User_Ldap extends Tinebase_User_Sql implements Tinebase_User_Inte
             'adr_one_postalcode'    => 'postalcode',
             'adr_one_street'        => 'street',
             'adr_one_region'        => 'st',
+            'employee_number'       => 'employeenumber'
         );
 
         foreach ($_userData as $key => $value) {

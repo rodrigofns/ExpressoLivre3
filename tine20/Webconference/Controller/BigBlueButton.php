@@ -6,7 +6,7 @@
  * @subpackage  Controller
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
- * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
  * 
  */
 define('MODERATOR_PW', 'moderatorpw');
@@ -352,7 +352,8 @@ class Webconference_Controller_BigBlueButton {
         $host = $_SERVER['HTTP_HOST'];
         $base = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
         return $protocol.'://'.$host.$base.'/Webconference/views/logoutPage.html';
-        
+        // $_SERVER["SERVER_NAME"] :shows the server name
+
     }
 
 }

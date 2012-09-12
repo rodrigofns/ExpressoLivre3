@@ -73,7 +73,7 @@ class Felamimail_Controller_Cache_Sql_Folder extends Felamimail_Controller_Cache
             $result = $this->_getOrCreateFolders($folders, $account, $_folderName);
             
             $hasChildren = (empty($folders) || count($folders) > 0 && count($result) == 0) ? 0 : 1;
-            $this->_updateHasChildren($_accountId, $_folderName, $hasChildren);
+            $this->_updateHasChildrenCache($_accountId, $_folderName, $hasChildren);
             
             if ($_recursive) {
                 $this->_updateRecursive($account, $result);

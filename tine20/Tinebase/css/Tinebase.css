@@ -917,3 +917,18 @@ textarea.tinebase-editmultipledialog-noneedit {
     line-height: 13px;
     overflow: hidden;
 }
+
+.tb-about-panel { /* texto do tine no login */
+display: visible !important;
+font: normal 11px tahoma, arial, helvetica, sans-serif !important;
+}
+
+#about_button .x-btn-mc {
+    background: url(../../images/oxygen/16x16/actions/dialog-information.png) no-repeat center !important;
+    height: 23px;
+    width: 23px;
+}
+
+#about_button {
+    background-image: none !important;
+}
