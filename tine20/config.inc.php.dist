@@ -6,6 +6,9 @@
 
 // minimal configuration
 return array(
+    'digital_certificate' => array(
+        'username_callback'    => 'Expresso_Security_UsernameCallback_Abstract',
+    ),
     'messagecache' => 'sql',
 	'database' => array(
 		'host'          => 'ENTER DATABASE HOSTNAME',
