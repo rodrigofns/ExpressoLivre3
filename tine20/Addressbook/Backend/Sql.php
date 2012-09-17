@@ -63,12 +63,12 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             'joinOn'        => 'contact_id',
             'singleValue'   => TRUE,
         ),
-    );
+    );    
     
     public function __construct($_dbAdapter=null, array $_options = array())
     {
     	parent::__construct($_dbAdapter, $_options);
-    	$_foreignTables['jpegphoto'] ['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($this->_db, $this->_db->quoteIdentifier('addressbook_image.contact_id'), 0, 1));    			    	
+    	$this->_foreignTables['jpegphoto'] ['select'] = array('jpegphoto' => Tinebase_Backend_Sql_Command::getIfIsNull($this->_db, $this->_db->quoteIdentifier('addressbook_image.contact_id'), 0, 1));    			    	
     }
     
     /**
@@ -157,7 +157,8 @@ class Addressbook_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $select = $this->_db->select()
             ->from($this->_tablePrefix . 'addressbook_image', array('image'))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('contact_id'). ' = ?', $_contactId));
-        $imageData = $this->_db->fetchOne($select, 'image');
+        $rowImageData = $this->_db->fetchRow($select);
+        $imageData = $rowImageData['image'];
         
         return $imageData ? base64_decode($imageData) : '';
     }

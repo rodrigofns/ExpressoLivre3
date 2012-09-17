@@ -139,6 +139,7 @@ Tine.Addressbook.ContactGridDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsP
                             '<span class="preview-panel-symbolcompare">' + this.il8n._('Phone') + '</span>{[this.encode(values.tel_work)]}<br/>',
                             '<span class="preview-panel-symbolcompare">' + this.il8n._('Mobile') + '</span>{[this.encode(values.tel_cell)]}<br/>',
                             '<span class="preview-panel-symbolcompare">' + this.il8n._('Fax') + '</span>{[this.encode(values.tel_fax)]}<br/>',
+                            '<span class="preview-panel-symbolcompare">' + this.il8n._('Employee Number') + '</span>{[this.encode(values.employee_number)]}<br/>',
                             '<span class="preview-panel-symbolcompare">' + this.il8n._('E-Mail') 
                                 + '</span>{[this.getMailLink(values.email, ' + this.felamimail + ')]}<br/>',
                             '<span class="preview-panel-symbolcompare">' + this.il8n._('Web') + '</span><a href="{[this.encode(values.url, "href")]}" target="_blank">{[this.encode(values.url, "shorttext")]}</a><br/>',

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-06-25 11:38-0300\n"
-"Last-Translator: marcelo <a@gmail.com>\n"
+"PO-Revision-Date: 2012-09-10 14:14-0300\n"
+"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr "Bem-vindo a Webconferência criada por %s"
 
 #: Controler/BigBlueButton.php:247
 msgid "Webconference Invite"
-msgstr "Convite para Webconfência"
+msgstr "Convite para Webconferência"
 
 #: Controler/BigBlueButton.php:250
 msgid "The user %s is inviting you to a Webconference"
@@ -112,8 +112,12 @@ msgid "Invite Users"
 msgstr "Convidar usuários"
 
 #: js/Webconference.js:157
-msgid "Cancel active webconference"
-msgstr "Cancelar webconferência ativa"
+msgid "You are already in a webconference. Accepting this invitation will make you leave the existing one."
+msgstr "Você já está participando de uma webconferência. Aceitando este convite fará com que você saia desta webconferência."
+
+#: js/Webconference.js:157
+msgid "Proceed"
+msgstr "Prosseguir"
 
 #: js/Webconference.js:296
 msgid "This will kick all participants out of the meeting. Terminate webconference"
@@ -152,6 +156,8 @@ msgstr "Use o link abaixo para acessar a webconferência"
 msgid "ERROR (the webconference server is unreachable)"
 msgstr "ERRO  (o servidor de webconferência está inacessível)"
 
+#~ msgid "Cancel active webconference"
+#~ msgstr "Cancelar webconferência ativa"
 #~ msgid "Quick search"
 #~ msgstr "Quick search"
 #~ msgid "Name"

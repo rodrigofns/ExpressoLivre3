@@ -360,8 +360,9 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message_A
             ? $_account->from 
             : Tinebase_Core::getUser()->accountFullName;
         
+        isset($_message->from_name)?$from = $_message->from_name:$from = $from;
+    
         $email = ($_message !== NULL && ! empty($_message->from_email)) ? $_message->from_email : $_account->email;
-        
         if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Set from for mail: ' . $email . ' / ' . $from);
         
         $_mail->setFrom($email, $from);
@@ -418,6 +419,7 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message_A
     {
         // add user agent
         $_mail->addHeader('User-Agent', 'Tine 2.0 Email Client (version ' . TINE20_CODENAME . ' - ' . TINE20_PACKAGESTRING . ')');
+        $_mail->setReturnPath($_account->email);
         
         // set organization
         if (isset($_account->organization) && ! empty($_account->organization)) {
@@ -451,8 +453,6 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message_A
     }
     
     /**
-<<<<<<< HEAD
-=======
      * set In-Reply-To and References headers
      * 
      * @param Zend_Mail $mail

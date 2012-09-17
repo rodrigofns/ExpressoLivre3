@@ -1,7 +1,24 @@
  
 Ext.ns('Tine.Webconference');
 
-
+/**
+ * contact grid panel
+ * 
+ * @namespace   Tine.Webconference
+ * @class       Tine.Webconference.ContactGridPanel
+ * @extends     Tine.Addressbook.ContactGridPanel
+ * 
+ * <p>Tinebase Webconference ContactGridPanel</p>
+ * <p><pre>
+ * </pre></p>
+ * 
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author      Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
+ * 
+ * Create a new Tine.Webconference.ContactGridPanel
+ * 
+ */
 Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPanel, {
 
     hasDetailsPanel: false,

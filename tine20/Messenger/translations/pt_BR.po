@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-08-15 16:27-0300\n"
-"PO-Revision-Date: 2012-08-15 16:27-0300\n"
-"Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
+"PO-Revision-Date: 2012-09-10 14:12-0300\n"
+"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -553,35 +553,27 @@ msgid "Start video chat"
 msgstr "Iniciar video chat"
 
 #~ msgid "Action"
-
 #~ msgid_plural "Actions"
 #~ msgstr[0] "Ações"
 #~ msgstr[1] "Ações"
-
 #~ msgid "Preference"
-
 #~ msgid_plural "Preferences"
 #~ msgstr[0] "Preferências"
 #~ msgstr[1] "Preferências"
-
 #~ msgid ""
 #~ "You're logged in Messenger. If you leave the page, Messenger will "
 #~ "disconnect!"
 #~ msgstr ""
 #~ "Você está conectado no Messenger. Se sair da página, o Messenger será "
 #~ "desconectado!"
-
 #~ msgid " was successfully removed!"
 #~ msgstr " foi excluído com sucesso!"
-
 #~ msgid " is typing..."
 #~ msgstr " está digitando..."
-
 #~ msgid " stopped typing!"
 #~ msgstr " parou de digitar!"
-
 #~ msgid "Configuration"
 #~ msgstr "Configurações"
-
 #~ msgid "Available"
 #~ msgstr "Disponível"
+

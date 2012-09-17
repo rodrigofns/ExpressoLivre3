@@ -7,7 +7,7 @@
  * @subpackage  Controller
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Edgar de Lucca <edgar.lucca@sepro.gov.br>
- * @copyright   Copyright (c) 2007-2009 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
  *
  */
 
