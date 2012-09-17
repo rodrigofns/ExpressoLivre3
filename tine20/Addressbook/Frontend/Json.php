@@ -234,10 +234,12 @@ class Addressbook_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         if (! empty($contactArray['jpegphoto'])) {
             $link = Tinebase_Model_Image::getImageUrl('Addressbook', $contactArray['id'], '');
         } else if (isset($contactArray['salutation']) && ! empty($contactArray['salutation'])) {
+            /*
             $salutationRecord = Addressbook_Config::getInstance()->get(Addressbook_Config::CONTACT_SALUTATION)->records->getById($contactArray['salutation']);
             if ($salutationRecord && $salutationRecord->image) {
                 $link = $salutationRecord->image;
             }
+            */
         }
         
         return $link;
