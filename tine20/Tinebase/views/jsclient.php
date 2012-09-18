@@ -30,6 +30,12 @@
     }    
     ?>
     <!-- EXT JS -->
+
+     <?php 
+        $js_config = Tinebase_View::getJSConfig();
+		echo $js_config[0];
+     ?>
+
     <script type="text/javascript" src="library/ExtJS/adapter/ext/ext-base<?php echo TINE20_BUILDTYPE != 'RELEASE' ? '-debug' : '' ?>.js"></script>
     <script type="text/javascript" src="library/ExtJS/ext-all<?php echo TINE20_BUILDTYPE != 'RELEASE' ? '-debug' : '' ?>.js"></script>
     
@@ -42,14 +48,10 @@
     <link type="text/css" rel="stylesheet" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/resources/css/htmleditorplugins.css" />
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.MidasCommand.js"></script>
     <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.SpellChecker.js"></script>
-    <link rel="stylesheet" type="text/css" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/resources/css/Ext.ux.UploadDialog.css" />
-    <link rel="stylesheet" type="text/css" href="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/resources/css/chooser.css" />
-    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.UploadDialog.js"></script>	
-    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/Ext.ux.HtmlEditor.ButtonImage.js"></script>
-    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.ButtonImage/src/DataView-more.js"></script>		
+    <script type="text/javascript" src="library/ExtJS/plugins/ExtJS.ux.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js"></script>
 
      <?php 
-        echo Tinebase_View::getJSConfig();
+		echo $js_config[1];
         $aux0 = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $aux1 = explode('-',$aux0[0]);
         if(count($aux1) > 1)

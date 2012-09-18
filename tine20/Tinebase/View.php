@@ -21,6 +21,8 @@ class Tinebase_View
 	{
 		$extJS     = 'ext-all.css';
 		$pathTheme = 'tine20/resources/css/tine20.css';
+		$output = array('','');
+
 		if(isset(Tinebase_Core::getConfig()->themes->default))
 		{
 			$numDefaultTheme = Tinebase_Core::getConfig()->themes->default;
@@ -43,9 +45,8 @@ class Tinebase_View
 			}
 		}
 		
-		$output =  '<link rel="stylesheet" type="text/css" href="library/ExtJS/resources/css/'.$extJS.'" />';
-		$output .=  '<link rel="stylesheet" type="text/css" href="themes/'.$pathTheme.'/resources/css/'.$pathTheme.'.css" />';
-		$output .= "\n";
+		$output[0] =  '<link rel="stylesheet" xlass="1" type="text/css" href="library/ExtJS/resources/css/'.$extJS.'" />';
+		$output[1] =  '<link rel="stylesheet" xlass="2" type="text/css" href="themes/'.$pathTheme.'/resources/css/'.$pathTheme.'.css" />';
 		return $output;
 	}
 

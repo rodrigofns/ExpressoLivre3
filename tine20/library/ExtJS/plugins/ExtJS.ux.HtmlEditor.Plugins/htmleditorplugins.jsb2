@@ -46,6 +46,9 @@
             text: 'Ext.ux.form.HtmlEditor.Image.js',
             path: 'src/'
         },{
+            text: 'Ext.ux.form.HtmlEditor.UploadImage.js',
+            path: 'src/'
+        },{
             text: 'Ext.ux.form.HtmlEditor.FindAndReplace.js',
             path: 'src/'
         },{
