@@ -66,7 +66,7 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
      * @var string
      */
     protected $_syncKey;
-    
+   
     /**
      * parse FolderSync request
      *
@@ -89,16 +89,18 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
             
             // reset state of foldersync
             $this->_syncStateBackend->resetState($this->_device, 'FolderSync');
+            $this->_folderBackend->resetState($this->_device);
         } else {
             if (($this->_syncState = $this->_syncStateBackend->validate($this->_device, 'FolderSync', $syncKey)) instanceof Syncope_Model_SyncState) {
                 $this->_syncState->lastsync = $this->_syncTimeStamp;
             } else  {
                 $this->_syncStateBackend->resetState($this->_device, 'FolderSync');
+                $this->_folderBackend->resetState($this->_device);
             }
         }
     }
     
-    /**
+     /**
      * generate FolderSync response
      * 
      * @todo changes are missing in response (folder got renamed for example)
@@ -117,6 +119,7 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
             
             $adds = array();
             $deletes = array();
+            $updates = array();
             
             foreach($this->_classes as $class) {
                 try {
@@ -166,9 +169,30 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
                 foreach($serverDiff as $serverFolderId) {
                     $deletes[] = $clientFolders[$serverFolderId];
                 }
+                
+                // calculate changed entries
+                $serverIntersect = array_intersect($clientFoldersIds, $serverFoldersIds);
+                foreach ($serverIntersect as $serverIntersectId)
+                {
+                	if (($serverFolders[$serverIntersectId][parentId] != $clientFolders[$serverIntersectId]->parentid) or 
+                			($serverFolders[$serverIntersectId][displayName] != $clientFolders[$serverIntersectId]->displayname)) 
+                	{
+                		$updates[] = new Syncope_Model_Folder(array(
+                				'id'                => $clientFolders[$serverIntersectId]->id,
+                				'device_id'         => $this->_device,
+                				'class'             => $class,
+                				'folderid'          => $serverFolders[$serverIntersectId]['folderId'],
+                				'parentid'          => $serverFolders[$serverIntersectId]['parentId'],
+                				'displayname'       => $serverFolders[$serverIntersectId]['displayName'],
+                				'type'              => $serverFolders[$serverIntersectId]['type'],
+                				'creation_time'     => $this->_syncTimeStamp,
+                				'lastfiltertype'    => null
+                		));
+                	}
+                }
             }
             
-            $count = count($adds) + /*count($changes) + */count($deletes);
+            $count = count($adds) + count($updates) + count($deletes);
             if($count > 0) {
                 $this->_syncState->counter++;
             }
@@ -197,6 +221,20 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
                 }
             }
             
+            foreach($updates as $folder) {
+            	$update = $changes->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Update'));
+            	$update->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'ServerId', $folder->folderid));
+            	$update->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'ParentId', $folder->parentid));
+            
+            	$displayName = $this->_outputDom->createElementNS('uri:FolderHierarchy', 'DisplayName');
+            	$displayName->appendChild($this->_outputDom->createTextNode($folder->displayname));
+            	$update->appendChild($displayName);
+            
+            	$update->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Type', $folder->type));
+            
+            	$this->_folderBackend->update($folder);
+            }
+            
             foreach($deletes as $folder) {
                 $delete = $changes->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Delete'));
                 $delete->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'ServerId', $folder->folderid));
@@ -212,5 +250,6 @@ class Syncope_Command_FolderSync extends Syncope_Command_Wbxml
         }
         
         return $this->_outputDom;
-    }    
+    } 
+
 }

@@ -360,11 +360,12 @@ Tine.Felamimail.sieve.RuleEditDialog.openWindow = function (config) {
  * @return {Array}
  */
 Tine.Felamimail.sieve.RuleEditDialog.getActionTypes = function(app) {
+    var i18n = (typeof(app) === 'undefined') ? Tine.Tinebase.appMgr.get('Felamimail').i18n : app.i18n;
+       
     return [
-        ['fileinto',    app.i18n._('Move mail to folder')],
-        ['redirect',    app.i18n._('Redirect mail to address')],
-        ['reject',      app.i18n._('Reject mail with this text')],
-        ['discard',     app.i18n._('Discard mail')]
-        //['keep',        app.i18n._('Keep mail')],
+      ['fileinto', i18n._('Move mail to folder')],
+      ['redirect', i18n._('Redirect mail to address')],
+      ['reject',   i18n._('Reject mail with this text')],
+      ['discard',  i18n._('Discard mail')]
     ];
 };
