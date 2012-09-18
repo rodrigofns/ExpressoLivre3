@@ -506,7 +506,7 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
             Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " accountData " . print_r($account->toArray(), true));
         
         // update folder cache
-        Felamimail_Controller_Cache_Folder::getInstance()->update($account);
+        Felamimail_Controller_Cache_Folder::getInstance()->updateCacheFolder($account);
         
         // get folders
         $folderController = Felamimail_Controller_Folder::getInstance();
