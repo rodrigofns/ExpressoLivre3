@@ -295,33 +295,48 @@ class Felamimail_Protocol_Imap extends Zend_Mail_Protocol_Imap
      * @param  string $username with login name of current user
      * @return bool|array false if error, array with all users with sendas for this folder.
      * @throws Zend_Mail_Protocol_Exception
+     * @TODO get the info from users not found in the getFullUserByLoginName
      */
-    public function getUsersWithSendAsAcl($boxes){
-       
+    public function getUsersWithSendAsAcl($boxes)
+    {
         $currentUser = Tinebase_Core::getUser()->toArray();
-        foreach ($boxes as $box){
+        foreach ($boxes as $box)
+        {
             $this->sendRequest("GETACL", array($this->escapeString($box['globalname'])), $tag);
 
             $result = array();
-            while (!$this->readLine($tokens, $tag)) {
+            while (!$this->readLine($tokens, $tag))
+            {
                 $result = $tokens;
             }
 
-            if ($tokens[0] != 'OK') {
+            if ($tokens[0] != 'OK')
+            {
                 return false;
-            }else{
+            }
+            else
+            {
                 $results = Array();
-                //* TODO: pegar o delimitador correto....
-                list(,$boxusername) = explode('/',$box['globalname']);
-                for($i = 2; $i < count($result); $i = $i+2){
-
+                list(,$boxusername) = explode(Felamimail_Backend_Cache_Imap_Abstract::IMAPDELIMITER,$box['globalname']);
+                for($i = 2; $i < count($result); $i = $i+2)
+                {
                     if($currentUser['accountLoginName'] != $result[$i]) continue;
-
-                    if(stristr($result[$i+1],'p')){
-                        $aux = Tinebase_User::getInstance()->getFullUserByLoginName($boxusername)->toArray();   
+                    
+                    if(stristr($result[$i + 1],'p'))
+                    {
+                        try
+                        {
+                            $aux = Tinebase_User::getInstance()->getFullUserByLoginName($boxusername)->toArray();   
+                        }
+                        catch (Tinebase_Exception_NotFound $e)
+                        {
+                            $aux = array();
+                            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__
+                                                    . ' Error trying to get info from shared mailbox ' . $boxusername);
+                            Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__. ' ' . $e);
+                        }                        
                         $results[] = $aux;
-
-                    } 
+                    }
                 }
             }
         }
