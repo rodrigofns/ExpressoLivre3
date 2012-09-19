@@ -201,9 +201,9 @@ result = true;
 }
 else {
 Ext.Msg.alert(
-this.i18n.error_msgbox_title,
+_(this.i18n.error_msgbox_title),
 String.format(
-this.i18n.err_file_type_not_permitted,
+_(this.i18n.err_file_type_not_permitted),
 filename,
 this.permitted_extensions.join(', ')
 )
@@ -314,7 +314,7 @@ this.fsa.postEvent('file-selected', btn);
 onAjaxSuccess : function(response, options) {
 var json_response = {
 'success' : false,
-'error' : this.i18n.note_upload_error
+'error' : _(this.i18n.note_upload_error)
 }
 try {
 var rt = response.responseText;
@@ -344,7 +344,7 @@ var data = {
 record : options.record,
 response : {
 'success' : false,
-'error' : this.i18n.note_upload_failed
+'error' : _(this.i18n.note_upload_failed)
 }
 }
 
@@ -371,8 +371,8 @@ this.cmp.getToolbar().addButton([new Ext.Toolbar.Separator()]);
             iconCls : 'x-edit-image',
 handler	: this.onAddButtonFileSelected,
             scope : this,
-            tooltip : {title: this.i18n.title},
-            overflowText : this.i18n.title
+            tooltip : {title: _(this.i18n.title)},
+            overflowText : _(this.i18n.title)
         }));
 
 this.onWindowRender();
@@ -387,9 +387,9 @@ img.append('<img alt="'+fileName+'" src="index.php?method=Felamimail.showTempIma
 onUploadError : function(dialog, filename, resp_data, record) {
      var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
 Ext.Msg.alert(
-this.i18n.error_msgbox_title,
+_(this.i18n.error_msgbox_title),
 String.format(
-this.i18n.note_upload_error,
+_(this.i18n.note_upload_error),
 filename
 )
 );
@@ -398,9 +398,9 @@ filename
 onUploadFailed : function(dialog, filename, resp_data, record) {
      var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
 Ext.Msg.alert(
-this.i18n.error_msgbox_title,
+_(this.i18n.error_msgbox_title),
 String.format(
-this.i18n.note_upload_failed,
+_(this.i18n.note_upload_failed),
 filename
 )
 );

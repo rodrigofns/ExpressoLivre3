@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Tine 2.0 - Tinebase\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-09-10 14:12-0300\n"
-"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-09-19 15:22-0300\n"
+"Last-Translator: Fernando Lages <fernando.lages@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1100,6 +1100,7 @@ msgid "Updating Grants"
 msgstr "Updating Grants"
 
 #: js/widgets/container/GrantsDialog.js:126
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:862
 msgid "Error"
 msgstr "Error"
 
@@ -2552,6 +2553,26 @@ msgstr "Please wait or contact your administrator"
 #: js/LoginPanel.js:196
 msgid "Powered by:"
 msgstr "Powered by:"
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:861
+msgid "Insert Image"
+msgstr "Insert Image"
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:863
+msgid "This file type is not allowed.<br/>Please, select a file of the following extensions: {1}"
+msgstr "This file type is not allowed.<br/>Please, select a file of the following extensions: {1}"
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:864
+msgid "Server internal error or unavailable service."
+msgstr "Server internal error or unavailable service."
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:865
+msgid "Completed."
+msgstr "Completed."
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:866
+msgid "Upload Error."
+msgstr "Upload Error."
 
 #~ msgid "Either {0} or {1} must be given"
 #~ msgstr "Either {0} or {1} must be given"
