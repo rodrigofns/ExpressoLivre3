@@ -164,10 +164,11 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         
         try {
             if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
-                . ' trying to get subfolders of ' . $_folderName . $this->_delimiter);
+                . ' trying to get subfolders of ' . $_folderName . self::IMAPDELIMITER);
 
             $imap = Felamimail_Backend_ImapFactory::factory($_account);
-            $result = $imap->getFolders(Felamimail_Model_Folder::encodeFolderName($_folderName) . '/', '%');
+            $result = $imap->getFolders(
+                                   Felamimail_Model_Folder::encodeFolderName($_folderName) . self::IMAPDELIMITER , '%');
             
             // remove folder if self
             if (in_array($_folderName, array_keys($result))) {
