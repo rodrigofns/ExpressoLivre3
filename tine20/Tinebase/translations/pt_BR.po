@@ -1129,6 +1129,7 @@ msgid "Updating Grants"
 msgstr "Atualizando Privilégios"
 
 #: js/widgets/container/GrantsDialog.js:125
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:862
 msgid "Error"
 msgstr "Erro"
 
@@ -2593,4 +2594,23 @@ msgstr "Direitos autorais"
 msgid "Powered by:"
 msgstr "Baseado no:"
 
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:861
+msgid "Insert Image"
+msgstr "Inserir imagem"
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:863
+msgid "This file type is not allowed.<br/>Please, select a file of the following extensions: {1}"
+msgstr "Tipo de arquivo não permitido.<br/>Por favor, selecione um arquivo com uma das seguintes extensões: {1}"
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:864
+msgid "Server internal error or unavailable service."
+msgstr "Erro interno do servidor ou serviço indisponível."
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:865
+msgid "Completed."
+msgstr "Completado."
+
+#: /library/ExtJS/plugins/Ext.ux.form.HtmlEditor.Plugins/src/Ext.ux.form.HtmlEditor.UploadImage.js:866
+msgid "Upload Error."
+msgstr "Erro no carregamento."
 
