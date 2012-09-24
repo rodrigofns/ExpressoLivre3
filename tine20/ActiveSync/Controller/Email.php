@@ -592,6 +592,18 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     }
     
     /**
+     * Update server folder
+     *
+     * @param String $_accountId
+     * @param String $_newLocalName
+     * @param String $_oldGlobalName
+     */
+    public function updateFolder($_accountId, $_newLocalName, $_oldGlobalName)
+    {
+    	Felamimail_Controller_Folder::getInstance()->rename($_accountId, $_newLocalName, $_oldGlobalName);
+    }
+        
+    /**
      * Delete server folder
      *
      * @param Felamimail_Model_Folder $_folderName
