@@ -254,13 +254,13 @@ Ext.namespace('Tine.Felamimail');
     /**
      * onSaveAndClose
      */
-	onSaveAndClose: function() {
+    onSaveAndClose: function() {
 
         this.supr().onSaveAndClose.apply(this, arguments);    
 
-		this.checkUnknownContacts();
-		
-	},
+        this.checkUnknownContacts();
+
+    },
 
     /**
      * checkUnknownEmails
@@ -271,35 +271,35 @@ Ext.namespace('Tine.Felamimail');
         emailRecipients.concat(this.record.get('cc'));
         emailRecipients.concat(this.record.get('bcc'));
 
-		this.contacts = [];
+        this.contacts = [];
         
-		var filterValue = [], emailRegExp = /<([^>]*)>/;
+        var emailRegExp = /<([^>]*)>/;
+
         Ext.each(emailRecipients, function(email) {
             if (emailRegExp.exec(email)) {
-		        if (RegExp.$1 != '') {
-		            filterValue.push(RegExp.$1);
-		        }
-			}
-			else {
-				this.contacts.push(email);
-			}
+                if (RegExp.$1 != '') {
+                    this.contacts.push(RegExp.$1);
+                }
+            }
+            else {
+                    this.contacts.push(email);
+            }
         }, this);
-		this.contacts.concat(filterValue);
 
-        var filter = [{field: 'email_query', operator: 'in', value: filterValue}];
+        var filter = [{field: 'email_query', operator: 'in', value: this.contacts}];
 		
-	    Tine.Addressbook.searchContacts(filter, null, function(response) {
-	        var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
-			Ext.each(knownEmails, function(email) {
-				var pos = this.contacts.indexOf(email);
-				if (pos >= 0) {
-					this.contacts.splice(pos,1);
-				}
-			}, this);
-			if (this.contacts.length > 0) {
-				this.addDynamicContacts();
-			}
-	    }, this);
+        Tine.Addressbook.searchContacts(filter, null, function(response) {
+            var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
+            Ext.each(knownEmails, function(email) {
+                var pos = this.contacts.indexOf(email);
+                if (pos >= 0) {
+                        this.contacts.splice(pos,1);
+                }
+            }, this);
+            if (this.contacts.length > 0) {
+                this.addDynamicContacts();
+            }
+        }, this);
 
     },
     
