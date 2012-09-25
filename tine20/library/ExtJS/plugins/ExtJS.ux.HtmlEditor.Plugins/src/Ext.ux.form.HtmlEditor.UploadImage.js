@@ -1,164 +1,164 @@
 Ext.ux.form.HtmlEditor.UploadImage = Ext.extend(Ext.util.Observable, {
 
-url : 'index.php',
-base_params : { method : 'Felamimail.uploadImage' },
+    url : 'index.php',
+    base_params : { method : 'Felamimail.uploadImage' },
     permitted_extensions: ['jpg', 'jpeg', 'png', 'bmp', 'gif'],
-fsa : null,
-form : null,
-upload_frame : null,
-image_file: null,
+    fsa : null,
+    form : null,
+    upload_frame : null,
+    image_file: null,
 
     init : function(cmp) {
-var win;
+        var win;
 
         this.cmp = cmp;
         this.cmp.on('render', this.onRender, this);
-this.on('uploadsuccess', this.onUploadSuccess, this);
-this.on('uploaderror', this.onUploadError, this);
-this.on('uploadfailed', this.onUploadFailed, this);
+        this.on('uploadsuccess', this.onUploadSuccess, this);
+        this.on('uploaderror', this.onUploadError, this);
+        this.on('uploadfailed', this.onUploadFailed, this);
 
-var css = '.x-edit-image {background: url(ux/icons/picture.png) 0 0 no-repeat !important;}';
-Ext.util.CSS.createStyleSheet(css, 'editor-css');
+        var css = '.x-edit-image {background: url(ux/icons/picture.png) 0 0 no-repeat !important;}';
+        Ext.util.CSS.createStyleSheet(css, 'editor-css');
 
-// Setting automata protocol
-var tt = {
-// --------------
-'created' : {
-// --------------
-'window-render' : [
-{
-action: this.createForm,
-state: 'ready'
-}
-]
-},
-// --------------
-'ready' : {
-// --------------
-'file-selected' : [
-{
-predicate: [ this.fireFileTestEvent, this.isPermittedFile ],
-action: this.addFileToUploadQueue,
-state: 'adding-file'
-},
-{
-// If file is not permitted then do nothing.
-}
-],
-'start-upload' : [
-{
-predicate: this.hasUnuploadedFiles,
-action: [ this.prepareNextUploadTask, this.fireUploadStartEvent ],
-state: 'uploading'
-}
-],
-'stop-upload' : [
-{
-// We are not uploading, do nothing. Can be posted by user only at this state.
-}
-]
-},
-// --------------
-'adding-file' : {
-// --------------
-'file-added' : [
-{
-action: [ this.startUpload, this.fireFileAddEvent ],
-state: 'ready'
-}
-]
-},
-// --------------
-'uploading' : {
-// --------------
-'file-selected' : [
-{
-predicate: [ this.fireFileTestEvent, this.isPermittedFile ],
-action: this.addFileToUploadQueue,
-state: 'adding-file'
-},
-{
-// If file is not permitted then do nothing.
-}
-],
-'start-upload' : [
-{
-// Can be posted only by user in this state.
-}
-],
-'stop-upload' : [
-{
-predicate: this.hasUnuploadedFiles,
-action: [ this.abortUpload, this.fireUploadStopEvent ],
-state: 'ready'
-},
-{
-action: [ this.abortUpload, this.fireUploadStopEvent, this.fireUploadCompleteEvent ],
-state: 'ready'
-}
-],
-'file-upload-start' : [
-{
-action: [ this.uploadFile, this.findUploadFrame, this.fireFileUploadStartEvent ]
-}
-],
-'file-upload-success' : [
-{
-predicate: this.hasUnuploadedFiles,
-action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadSuccessEvent ]
-},
-{
-action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadSuccessEvent, this.fireUploadCompleteEvent ],
-state: 'ready'
-}
-],
-'file-upload-error' : [
-{
-predicate: this.hasUnuploadedFiles,
-action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadErrorEvent ]
-},
-{
-action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadErrorEvent, this.fireUploadCompleteEvent ],
-state: 'ready'
-}
-],
-'file-upload-failed' : [
-{
-predicate: this.hasUnuploadedFiles,
-action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadFailedEvent ]
-},
-{
-action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadFailedEvent, this.fireUploadCompleteEvent ],
-state: 'ready'
-}
-],
-'hide' : [
-{
-predicate: this.getResetOnHide,
-action: [ this.stopUpload, this.repostHide ],
-state: 'created'
-},
-{
-// Do nothing.
-}
-]
-}
-};
-this.fsa = new Ext.ux.Utils.FSA('created', tt, this);
+        // Setting automata protocol
+        var tt = {
+            // --------------
+            'created' : {
+            // --------------
+            'window-render' : [
+                {
+                action: this.createForm,
+                state: 'ready'
+                }
+            ]
+            },
+            // --------------
+            'ready' : {
+            // --------------
+            'file-selected' : [
+                {
+                predicate: [ this.fireFileTestEvent, this.isPermittedFile ],
+                action: this.addFileToUploadQueue,
+                state: 'adding-file'
+                },
+                {
+                // If file is not permitted then do nothing.
+                }
+            ],
+            'start-upload' : [
+                {
+                predicate: this.hasUnuploadedFiles,
+                action: [ this.prepareNextUploadTask, this.fireUploadStartEvent ],
+                state: 'uploading'
+                }
+            ],
+            'stop-upload' : [
+                {
+                // We are not uploading, do nothing. Can be posted by user only at this state.
+                }
+            ]
+            },
+            // --------------
+            'adding-file' : {
+            // --------------
+            'file-added' : [
+                {
+                action: [ this.startUpload, this.fireFileAddEvent ],
+                state: 'ready'
+                }
+            ]
+            },
+            // --------------
+            'uploading' : {
+            // --------------
+            'file-selected' : [
+                {
+                predicate: [ this.fireFileTestEvent, this.isPermittedFile ],
+                action: this.addFileToUploadQueue,
+                state: 'adding-file'
+                },
+                {
+                // If file is not permitted then do nothing.
+                }
+            ],
+            'start-upload' : [
+                {
+                // Can be posted only by user in this state.
+                }
+            ],
+            'stop-upload' : [
+                {
+                predicate: this.hasUnuploadedFiles,
+                action: [ this.abortUpload, this.fireUploadStopEvent ],
+                state: 'ready'
+                },
+                {
+                action: [ this.abortUpload, this.fireUploadStopEvent, this.fireUploadCompleteEvent ],
+                state: 'ready'
+                }
+            ],
+            'file-upload-start' : [
+                {
+                action: [ this.uploadFile, this.findUploadFrame, this.fireFileUploadStartEvent ]
+                }
+            ],
+            'file-upload-success' : [
+                {
+                predicate: this.hasUnuploadedFiles,
+                action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadSuccessEvent ]
+                },
+                {
+                action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadSuccessEvent, this.fireUploadCompleteEvent ],
+                state: 'ready'
+                }
+            ],
+            'file-upload-error' : [
+                {
+                predicate: this.hasUnuploadedFiles,
+                action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadErrorEvent ]
+                },
+                {
+                action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadErrorEvent, this.fireUploadCompleteEvent ],
+                state: 'ready'
+                }
+            ],
+            'file-upload-failed' : [
+                {
+                predicate: this.hasUnuploadedFiles,
+                action: [ this.resetUploadFrame, this.updateRecordState, this.prepareNextUploadTask, this.fireUploadFailedEvent ]
+                },
+                {
+                action: [ this.resetUploadFrame, this.updateRecordState, this.fireUploadFailedEvent, this.fireUploadCompleteEvent ],
+                state: 'ready'
+                }
+            ],
+            'hide' : [
+                {
+                predicate: this.getResetOnHide,
+                action: [ this.stopUpload, this.repostHide ],
+            state: 'created'
+                },
+                {
+                // Do nothing.
+                }
+            ]
+            }
+        };
+        this.fsa = new Ext.ux.Utils.FSA('created', tt, this);
 
-// Registering dialog events.
-this.addEvents({
-'filetest': true,
-'fileadd' : true,
-'fileremove' : true,
-'uploadsuccess' : true,
-'uploaderror' : true,
-'uploadfailed' : true,
-'uploadstart' : true,
-'uploadstop' : true,
-'uploadcomplete' : true,
-'fileuploadstart' : true
-});
+        // Registering dialog events.
+        this.addEvents({
+            'filetest': true,
+            'fileadd' : true,
+            'fileremove' : true,
+            'uploadsuccess' : true,
+            'uploaderror' : true,
+            'uploadfailed' : true,
+            'uploadstart' : true,
+            'uploadstop' : true,
+            'uploadcomplete' : true,
+            'fileuploadstart' : true
+        });
     
     },
 
@@ -368,6 +368,7 @@ this.cmp.getToolbar().addButton([new Ext.Toolbar.Separator()]);
 
         var cmp = this.cmp;
         this.btn = this.cmp.getToolbar().addButton(new Ext.ux.UploadImage.TBBrowseButton({
+            input_name : 'upload',
             iconCls : 'x-edit-image',
 handler	: this.onAddButtonFileSelected,
             scope : this,
@@ -379,13 +380,13 @@ this.onWindowRender();
     },
 
 onUploadSuccess : function(dialog, filename, resp_data, record) {
-var img = Ext.getCmp('message_editor_body');
+var img = dialog.cmp;
                 var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
 img.append('<img alt="'+fileName+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+resp_data.id+'"/>');
 },
 
 onUploadError : function(dialog, filename, resp_data, record) {
-     var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
+                var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
 Ext.Msg.alert(
 _(this.i18n.error_msgbox_title),
 String.format(
