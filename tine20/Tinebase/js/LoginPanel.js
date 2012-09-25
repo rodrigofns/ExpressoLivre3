@@ -90,6 +90,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                 }, {
                     xtype: 'tinelangchooser',
                     name: 'locale',
+                    editable: false,
                     width: 170,
                     tabindex: 1
                 }, {
