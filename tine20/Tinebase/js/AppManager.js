@@ -194,23 +194,27 @@ Ext.extend(Tine.Tinebase.AppManager, Ext.util.Observable, {
      * @return {Tine.Application}
      */
     getDefault: function() {
-        if (! this.defaultApp) {
-            var defaultAppName = (Tine.Tinebase.registry.get('preferences') && Tine.Tinebase.registry.get('preferences').get('defaultapp')) 
-                ? Tine.Tinebase.registry.get('preferences').get('defaultapp') 
-                : this.defaultAppName;
-                
-            this.defaultApp = this.get(defaultAppName) || this.apps.find(function(app) {return app.hasMainScreen});
-            
-            if (! this.defaultApp) {
-                // no global exception concept yet...
-                //throw Ext.Error('no apps enabled', 620);
-                Ext.MessageBox.show({
-                    title: _('Missing Applications'), 
-                    msg: _('There are no applications enabled for you. Please contact your administrator.'),
-                    buttons: Ext.Msg.OK,
-                    icon: Ext.MessageBox.WARNING
-                });
+        var defaultAppName = this.defaultAppName;
+        var prefs = Tine.Tinebase.registry.get('preferences');
+
+        if (prefs) {
+            var d_app = prefs.get('defaultapp');
+            if (d_app) {
+                defaultAppName = d_app;        
             }
+        }
+                
+        this.defaultApp = this.get(defaultAppName) || this.apps.find(function(app) {return app.hasMainScreen});
+            
+        if (! this.defaultApp) {
+            // no global exception concept yet...
+            //throw Ext.Error('no apps enabled', 620);
+            Ext.MessageBox.show({
+                title: _('Missing Applications'), 
+                msg: _('There are no applications enabled for you. Please contact your administrator.'),
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.WARNING
+            });
         }
         
         return this.defaultApp;
