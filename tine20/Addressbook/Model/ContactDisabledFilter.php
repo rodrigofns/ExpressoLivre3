@@ -53,11 +53,9 @@ class Addressbook_Model_ContactDisabledFilter extends Tinebase_Model_Filter_Bool
             }
             
             $_select->where($where);
-            
-            
-            $select = $_select instanceof Zend_Db_Select ? $_select : $_select->getSelect();
-                        
-            Tinebase_Backend_Sql_Abstract::traitGroup($db, $_backend->getTablePrefix(), $select);
+                     
+            $select = $_select instanceof Zend_Db_Select ? $_select : $_select->getSelect();                      
+            $select = Tinebase_Backend_Sql_Abstract::traitGroup($db, $_backend->getTablePrefix(), $select);
 
             $_select instanceof Zend_Db_Select ? $_select = $select : $_select->setSelect($select);
             
