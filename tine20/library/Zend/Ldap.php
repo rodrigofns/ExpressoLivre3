@@ -890,6 +890,10 @@ class Zend_Ldap
         if ($filter instanceof Zend_Ldap_Filter_Abstract) {
             $filter = $filter->toString();
         }
+        
+        if (! is_array($attributes)) {
+            $attributes = array($attributes);
+        }
 
         switch ($scope) {
             case self::SEARCH_SCOPE_ONE:
@@ -909,11 +913,11 @@ class Zend_Ldap
              * @see Zend_Ldap_Exception
              */
             require_once 'Zend/Ldap/Exception.php';
-            throw new Zend_Ldap_Exception($this, 'searching: ' . $filter);
+            throw new Zend_Ldap_Exception($this, ' (basedn)(filter)(attr) = ' . '(' . $basedn . ')' . '(' . $filter . ')' . '(' . $attributes->toString() . ')');
         }
         if (!is_null($sort) && is_string($sort)) {
             $isSorted = @ldap_sort($this->getResource(), $search, $sort);
-            if($search === false) {
+            if($isSorted === false) {
                 /**
                  * @see Zend_Ldap_Exception
                  */
