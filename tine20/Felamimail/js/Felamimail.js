@@ -223,12 +223,9 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
             
             if (allFoldersFetched) {
                 Tine.log.info('nothing more to do -> will check mails again in "' + this.updateInterval/1000 + '" seconds');
-                if (this.updateInterval > 0) {
-                    this.checkMailsDelayedTask.delay(this.updateInterval);
-                }
-            } else {
-                this.checkMailsDelayedTask.delay(20000);
             }
+            var delay = (isNaN(this.updateInterval)) ? 0 : this.updateInterval;
+            this.checkMailsDelayedTask.delay(delay);
         }
     },
     
@@ -425,7 +422,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
                 folderToUpdate.set('cache_status', 'pending');
             }, this);
             
-            this.checkMailsDelayedTask.delay(1000);
+            this.checkMailsDelayedTask.delay(this.updateInterval);
         } else {
             Tine.log.debug('Tine.Felamimail.Application::onGetFolderStatusSuccess() -> No folders for update found.');
         }
@@ -496,7 +493,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
                 
                 // as soon as we get a folder with status != complete we need to trigger checkmail soon!
                 if (['complete', 'pending'].indexOf(record.get('cache_status')) === -1) {
-                    this.checkMailsDelayedTask.delay(1000);
+                    this.checkMailsDelayedTask.delay(this.updateInterval);
                 }
                 
                 if (record.isInbox() && record.isModified('cache_unreadcount')) {
