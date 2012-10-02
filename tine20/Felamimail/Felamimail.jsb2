@@ -138,6 +138,10 @@
         {
           "text": "FolderFilterModel.js",
           "path": "js/"
+        },
+        {
+          "text": "SignatureAppletPanel.js",
+          "path": "js/"
         }
       ]
     },

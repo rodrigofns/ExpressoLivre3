@@ -1024,6 +1024,12 @@ Ext.namespace('Tine.Felamimail');
         
         this.initAttachmentGrid();
         this.initAccountCombo();
+        this.signatureAppletPanel = new Tine.Felamimail.SignatureAppletPanel({
+            record: this.record,
+            width: 0,
+            height: 0,
+            region: 'east'
+        });
         
         this.recipientGrid = new Tine.Felamimail.RecipientGrid({
             record: this.record,
@@ -1090,7 +1096,7 @@ Ext.namespace('Tine.Felamimail');
                     }
                 }, this.htmlEditor
                 ]
-            }, this.southPanel]
+            }, this.southPanel, this.signatureAppletPanel]
         };
     },
 
