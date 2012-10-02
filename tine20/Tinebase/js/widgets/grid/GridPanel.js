@@ -403,16 +403,16 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             scope: this
         });
 
-        this.actions_print = new Ext.Action({
+        this.action_print = new Ext.Action({
             requiredGrant: 'readGrant',
             text: _('Print Page'),
-            disabled: false,
             handler: function() {
-                Ext.ux.Printer.print(this.getGrid());
+                this.onPrint(this.grid);
             },
             iconCls:'action_print',
             scope: this,
-            allowMultiple: true
+            allowMultiple: true,
+            app: this.app
         });
 
         this.initDeleteAction();
@@ -983,7 +983,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
                             rowspan: 2,
                             iconAlign: 'top'
                         }),
-                        Ext.apply(new Ext.Button(this.actions_print), {
+                        Ext.apply(new Ext.Button(this.action_print), {
                             scale: 'medium',
                             rowspan: 2,
                             iconAlign: 'top'
@@ -1115,10 +1115,10 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
      */
     getModlogColumns: function() {
         var result = [
-            { id: 'creation_time',      header: _('Creation Time'),         dataIndex: 'creation_time',         renderer: Tine.Tinebase.common.dateRenderer,        hidden: true },
-            { id: 'created_by',         header: _('Created By'),            dataIndex: 'created_by',            renderer: Tine.Tinebase.common.usernameRenderer,    hidden: true },
-            { id: 'last_modified_time', header: _('Last Modified Time'),    dataIndex: 'last_modified_time',    renderer: Tine.Tinebase.common.dateRenderer,        hidden: true },
-            { id: 'last_modified_by',   header: _('Last Modified By'),      dataIndex: 'last_modified_by',      renderer: Tine.Tinebase.common.usernameRenderer,    hidden: true }
+            {id: 'creation_time',      header: _('Creation Time'),         dataIndex: 'creation_time',         renderer: Tine.Tinebase.common.dateRenderer,        hidden: true},
+            {id: 'created_by',         header: _('Created By'),            dataIndex: 'created_by',            renderer: Tine.Tinebase.common.usernameRenderer,    hidden: true},
+            {id: 'last_modified_time', header: _('Last Modified Time'),    dataIndex: 'last_modified_time',    renderer: Tine.Tinebase.common.dateRenderer,        hidden: true},
+            {id: 'last_modified_by',   header: _('Last Modified By'),      dataIndex: 'last_modified_by',      renderer: Tine.Tinebase.common.usernameRenderer,    hidden: true}
         ];
 
         return result;
@@ -1211,6 +1211,13 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
      */
     getGrid: function() {
         return this.grid;
+    },
+    
+    /**
+     * onPrint handler
+     */
+    onPrint: function(grid) {
+       Ext.ux.Printer.print(grid); 
     },
 
     /**
@@ -1415,7 +1422,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             modelName: this.recordClass.getMeta('modelName')
         });
         
-        window.on('contentschange', function() { this.store.reload(); }, this);
+        window.on('contentschange', function() {this.store.reload();}, this);
     },
     
     /**
@@ -1495,7 +1502,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             }
 
             var i18nItems = this.app.i18n.n_hidden(this.recordClass.getMeta('recordName'), this.recordClass.getMeta('recordsName'), records.length),
-                recordIds = [].concat(records).map(function(v){ return v.id; });
+                recordIds = [].concat(records).map(function(v){return v.id;});
 
             if (sm.isFilterSelect && this.filterSelectionDelete) {
                 if (! this.deleteMask) {

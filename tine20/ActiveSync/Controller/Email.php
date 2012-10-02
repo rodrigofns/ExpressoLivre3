@@ -592,6 +592,18 @@ class ActiveSync_Controller_Email extends ActiveSync_Controller_Abstract
     }
     
     /**
+     * Delete server folder
+     *
+     * @param Felamimail_Model_Folder $_folderName
+     */
+    public function deleteFolder($_folder)
+    {
+    	$defaultAccountId = Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT};
+    	$felamimail_model_folder = Felamimail_Controller_Folder::getInstance()->get($_folder->folderid);
+    	Felamimail_Controller_Folder::getInstance()->delete($defaultAccountId, $felamimail_model_folder['globalname'], FALSE);
+    }
+    
+    /**
      * get folder identified by $_folderId
      *
      * @param string $_folderId
