@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Tine 2.0 - Addressbook\n"
+"Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-17 22:12+0100\n"
-"PO-Revision-Date: 2012-09-10 14:12-0300\n"
-"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
-"Language-Team: Tine 2.0 Translators\n"
+"POT-Creation-Date: 2012-10-02 14:39-0300\n"
+"PO-Revision-Date: 2012-10-02 14:40-0300\n"
+"Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
+"Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,767 +13,987 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2012-03-02 09:32+0000\n"
 "X-Generator: Launchpad (build 14886)\n"
-"X-Poedit-Country: GB\n"
+"X-Poedit-Country: UNITED STATES\n"
 "X-Poedit-Language: en\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-SearchPath-0: Messenger\n"
 
-#: Acl/Rights.php:98
-msgid "manage shared addressbooks"
-msgstr "manage shared addressbooks"
+#: Messenger/Preference.php:57
+msgid "Show Notifications"
+msgstr "Show Notifications"
 
-#: Acl/Rights.php:99
-msgid "Create new shared addressbook folders"
-msgstr "Create new shared addressbook folders"
+#: Messenger/Preference.php:58
+msgid "Show notifications ..."
+msgstr "Show notifications ..."
 
-#: Acl/Rights.php:102
-msgid "manage shared addressbook favorites"
-msgstr "manage shared addressbook favorites"
+#: Messenger/Preference.php:61
+msgid "Chat History"
+msgstr "Chat History"
 
-#: Acl/Rights.php:103
-msgid "Create or update shared addressbook favorites"
-msgstr "Create or update shared addressbook favorites"
+#: Messenger/Preference.php:62
+msgid "History of chats ..."
+msgstr "History of chats ..."
 
-#: Config.php:45
-msgid "Contact duplicate check fields"
-msgstr "Contact duplicate check fields"
+#: Messenger/Preference.php:65
+msgid "Custon name"
+msgstr "Custon name"
 
-#: Config.php:47
-msgid "These fields are checked when a new contact is created. If a record with the same data in the fields is found, a duplicate exception is thrown."
-msgstr "These fields are checked when a new contact is created. If a record with the same data in the fields is found, a duplicate exception is thrown."
+#: Messenger/Preference.php:66
+msgid "Custon name ..."
+msgstr "Custon name ..."
 
-#: Config.php:59
-msgid "Contact salutations available"
-msgstr "Contact salutations available"
+#: Messenger/Preference.php:99
+msgid "Don't save history chat"
+msgstr "Don't save history chat"
 
-#: Config.php:61
-msgid "Possible contact salutations. Please note that additional values might impact other Addressbook systems on export or syncronisation."
-msgstr "Possible contact salutations. Please note that additional values might impact other Addressbook systems on export or syncronisation."
+#: Messenger/Preference.php:103
+msgid "Download history chat"
+msgstr "Download history chat"
 
-#: Config.php:69
-msgid "Parsing rules for addresses"
-msgstr "Parsing rules for addresses"
+#: Messenger/Preference.php:107
+msgid "Send history chat to e-mail"
+msgstr "Send history chat to e-mail"
 
-#: Config.php:71
-msgid "Path to a XML file with address parsing rules."
-msgstr "Path to a XML file with address parsing rules."
+#: Messenger/js/Groupie.js:250
+msgid " has joined the room as a "
+msgstr " has joined the room as a "
 
-#: Controller.php:98
-#, python-format
-msgid "%s's personal addressbook"
-msgstr "%s's personal addressbook"
+#: Messenger/js/Groupie.js:259
+msgid " is now known as "
+msgstr " is now known as "
 
-#: Export/Pdf.php:37
-msgid "Business Contact Data"
-msgstr "Business Contact Data"
+#: Messenger/js/Groupie.js:262
+msgid " has left the room."
+msgstr " has left the room."
 
-#: Export/Pdf.php:39
-msgid "Organisation / Unit"
-msgstr "Organisation / Unit"
+#: Messenger/js/Groupie.js:361
+#: Messenger/js/Groupie.js:538
+#: Messenger/js/RosterTree.js:214
+#: Messenger/js/RosterTree.js:287
+#: Messenger/js/RosterTree.js:471
+msgid "Status"
+msgstr "Status"
 
-#: Export/Pdf.php:44
-msgid "Business Address"
-msgstr "Business Address"
-
-#: Export/Pdf.php:52
-#: js/ContactGrid.js:127
-msgid "Email"
-msgstr "Email"
-
-#: Export/Pdf.php:55
-msgid "Telephone Work"
-msgstr "Telephone Work"
-
-#: Export/Pdf.php:58
-msgid "Telephone Cellphone"
-msgstr "Telephone Cellphone"
-
-#: Export/Pdf.php:61
-msgid "Telephone Car"
-msgstr "Telephone Car"
-
-#: Export/Pdf.php:64
-msgid "Telephone Fax"
-msgstr "Telephone Fax"
-
-#: Export/Pdf.php:67
-msgid "Telephone Page"
-msgstr "Telephone Page"
-
-#: Export/Pdf.php:70
-msgid "URL"
-msgstr "URL"
-
-#: Export/Pdf.php:73
+#: Messenger/js/Groupie.js:362
+#: Messenger/js/Groupie.js:539
 msgid "Role"
 msgstr "Role"
 
-#: Export/Pdf.php:76
-#: js/ContactEditDialog.js:180
-#: js/ContactGrid.js:116
-#: js/Model.js:33
-msgid "Room"
-msgstr "Room"
-
-#: Export/Pdf.php:79
-msgid "Assistant"
-msgstr "Assistant"
-
-#: Export/Pdf.php:82
-msgid "Assistant Telephone"
-msgstr "Assistant Telephone"
-
-#: Export/Pdf.php:86
-msgid "Private Contact Data"
-msgstr "Private Contact Data"
-
-#: Export/Pdf.php:88
-#: js/ContactEditDialog.js:297
-#: js/Model.js:43
-#: js/Model.js:155
-#: js/Model.js:156
-#: js/Model.js:157
-#: js/Model.js:158
-#: js/Model.js:159
-msgid "Private Address"
-msgstr "Private Address"
-
-#: Export/Pdf.php:96
-msgid "Email Home"
-msgstr "Email Home"
-
-#: Export/Pdf.php:99
-msgid "Telephone Home"
-msgstr "Telephone Home"
-
-#: Export/Pdf.php:102
-msgid "Telephone Cellphone Private"
-msgstr "Telephone Cellphone Private"
-
-#: Export/Pdf.php:105
-msgid "Telephone Fax Home"
-msgstr "Telephone Fax Home"
-
-#: Export/Pdf.php:108
-msgid "URL Home"
-msgstr "URL Home"
-
-#: Export/Pdf.php:112
-msgid "Other Data"
-msgstr "Other Data"
-
-#: Export/Pdf.php:114
-#: js/ContactEditDialog.js:168
-#: js/ContactGrid.js:142
-#: js/Model.js:26
-#: js/Model.js:149
-msgid "Birthday"
-msgstr "Birthday"
-
-#: Export/Pdf.php:117
-#: js/ContactEditDialog.js:162
-#: js/ContactGrid.js:114
-#: js/Model.js:30
-#: js/Model.js:144
-msgid "Job Title"
-msgstr "Job Title"
-
-#: Import/definitions/adb_google_import_csv.xml:12
-msgid "Contact import from Google address book"
-msgstr "Contact import from Google address book"
-
-#: Import/definitions/adb_import_vcard.xml:13
-msgid "Contact VCARD import"
-msgstr "Contact VCARD import"
-
-#: Import/definitions/adb_mac_import_csv.xml:16
-msgid "Contact CSV import from mac address book"
-msgstr "Contact CSV import from mac address book"
-
-#: Import/definitions/adb_outlook2007_de_import_csv.xml:14
-msgid "CSV Outlook 2007 German"
-msgstr "CSV Outlook 2007 German"
-
-#: Import/definitions/adb_outlook_import_csv.xml:13
-msgid "Contact CSV import from Outlook address book"
-msgstr "Contact CSV import from Outlook address book"
-
-#: Import/definitions/adb_tine_import_csv.xml:11
-msgid "Contact CSV import"
-msgstr "Contact CSV import"
-
-#: Import/definitions/adb_tine_import_csv.xml:18
-msgid "Import list (###CURRENTDATE###)"
-msgstr "Import list (###CURRENTDATE###)"
-
-#: Import/definitions/adb_tine_import_csv.xml:20
-msgid "Contacts imported on ###CURRENTDATE### at ###CURRENTTIME### by ###USERFULLNAME###"
-msgstr "Contacts imported on ###CURRENTDATE### at ###CURRENTTIME### by ###USERFULLNAME###"
-
-#: js/Addressbook.js:22
-msgid "New Contact"
-msgstr "New Contact"
-
-#: js/Addressbook.js:32
-#: js/Model.js:98
-#: js/Model.js:205
-msgid "Addressbook"
-msgid_plural "Addressbooks"
-msgstr[0] "Addressbook"
-msgstr[1] "Addressbooks"
-
-#: js/CardDAVContainerPropertiesHookField.js:35
-msgid "CardDAV URL"
-msgstr "CardDAV URL"
-
-#: js/ContactEditDialog.js:45
-#: js/ContactEditDialog.js:51
-#: js/MapPanel.js:40
-msgid "Map"
-msgstr "Map"
-
-#: js/ContactEditDialog.js:77
-msgid "Personal Information"
-msgstr "Personal Information"
-
-#: js/ContactEditDialog.js:98
-#: js/ContactGrid.js:107
-#: js/Model.js:29
-msgid "Salutation"
-msgstr "Salutation"
-
-#: js/ContactEditDialog.js:116
-#: js/Model.js:22
-msgid "Title"
-msgstr "Title"
-
-#: js/ContactEditDialog.js:124
-#: js/ContactGrid.js:109
-#: js/Model.js:20
-#: js/Model.js:139
-msgid "First Name"
-msgstr "First Name"
-
-#: js/ContactEditDialog.js:129
-#: js/Model.js:21
-msgid "Middle Name"
-msgstr "Middle Name"
-
-#: js/ContactEditDialog.js:134
-#: js/ContactEditDialog.js:440
-#: js/ContactEditDialog.js:458
-#: js/ContactGrid.js:108
-#: js/Model.js:19
-#: js/Model.js:140
-msgid "Last Name"
-msgstr "Last Name"
-
-#: js/ContactEditDialog.js:143
-#: js/ContactEditDialog.js:440
-#: js/ContactEditDialog.js:458
-#: js/ContactGrid.js:112
-#: js/ContactGridDetailsPanel.js:131
-#: js/Model.js:27
-#: js/Model.js:141
-#: Setup/Initialize.php:65
-#: Setup/Update/Release5.php:191
-msgid "Company"
-msgstr "Company"
-
-#: js/ContactEditDialog.js:148
-#: js/ContactGrid.js:113
-#: js/Model.js:28
-#: js/Model.js:142
-msgid "Unit"
-msgstr "Unit"
-
-#: js/ContactEditDialog.js:157
-#: js/ContactGrid.js:111
-#: js/Model.js:24
-msgid "Display Name"
-msgstr "Display Name"
-
-#: js/ContactEditDialog.js:172
-#: js/Model.js:23
-msgid "Suffix"
-msgstr "Suffix"
-
-#: js/ContactEditDialog.js:176
-#: js/ContactGrid.js:115
-#: js/Model.js:31
-#: js/Model.js:145
-msgid "Job Role"
-msgstr "Job Role"
-
-#: js/ContactEditDialog.js:187
-msgid "Contact Information"
-msgstr "Contact Information"
-
-#: js/ContactEditDialog.js:192
-#: js/ContactGrid.js:128
-#: js/ContactGridDetailsPanel.js:139
-#: js/ContactGridDetailsPanel.js:163
-#: js/Model.js:51
-#: js/Model.js:143
-msgid "Phone"
-msgstr "Phone"
-
-#: js/ContactEditDialog.js:197
-#: js/ContactGrid.js:129
-#: js/ContactGridDetailsPanel.js:140
-#: js/ContactGridDetailsPanel.js:164
-#: js/Model.js:52
-msgid "Mobile"
-msgstr "Mobile"
-
-#: js/ContactEditDialog.js:202
-#: js/ContactGrid.js:130
-#: js/ContactGridDetailsPanel.js:141
-#: js/ContactGridDetailsPanel.js:165
-#: js/Model.js:53
-msgid "Fax"
-msgstr "Fax"
-
-#: js/ContactEditDialog.js:207
-#: js/ContactGrid.js:133
-#: js/Model.js:57
-msgid "Phone (private)"
-msgstr "Phone (private)"
-
-#: js/ContactEditDialog.js:212
-#: js/ContactGrid.js:135
-#: js/Model.js:59
-msgid "Mobile (private)"
-msgstr "Mobile (private)"
-
-#: js/ContactEditDialog.js:217
-#: js/ContactGrid.js:134
-#: js/Model.js:58
-msgid "Fax (private)"
-msgstr "Fax (private)"
-
-#: js/ContactEditDialog.js:222
-#: js/ContactGridDetailsPanel.js:142
-#: js/ContactGridDetailsPanel.js:166
-#: js/Model.js:62
-#: js/Model.js:147
-msgid "E-Mail"
-msgstr "E-Mail"
-
-#: js/ContactEditDialog.js:228
-#: js/Model.js:63
-msgid "E-Mail (private)"
-msgstr "E-Mail (private)"
-
-#: js/ContactEditDialog.js:235
-#: js/ContactGrid.js:137
-#: js/ContactGridDetailsPanel.js:144
-#: js/ContactGridDetailsPanel.js:168
-#: js/Model.js:64
-msgid "Web"
-msgstr "Web"
-
-#: js/ContactEditDialog.js:268
-#: js/Model.js:34
-#: js/Model.js:150
-#: js/Model.js:151
-#: js/Model.js:152
-#: js/Model.js:153
-#: js/Model.js:154
-msgid "Company Address"
-msgstr "Company Address"
-
-#: js/ContactEditDialog.js:271
-#: js/ContactEditDialog.js:300
-#: js/ContactGrid.js:117
-#: js/Model.js:150
-#: js/Model.js:155
-msgid "Street"
-msgstr "Street"
-
-#: js/ContactEditDialog.js:275
-#: js/ContactEditDialog.js:304
-msgid "Street 2"
-msgstr "Street 2"
-
-#: js/ContactEditDialog.js:279
-#: js/ContactEditDialog.js:308
-#: js/ContactGrid.js:119
-#: js/Model.js:151
-#: js/Model.js:156
-msgid "Region"
-msgstr "Region"
-
-#: js/ContactEditDialog.js:283
-#: js/ContactEditDialog.js:312
-#: js/Model.js:152
-#: js/Model.js:157
-msgid "Postal Code"
-msgstr "Postal Code"
-
-#: js/ContactEditDialog.js:287
-#: js/ContactEditDialog.js:316
-#: js/ContactGrid.js:118
-#: js/Model.js:153
-#: js/Model.js:158
-msgid "City"
-msgstr "City"
-
-#: js/ContactEditDialog.js:292
-#: js/ContactEditDialog.js:321
-#: js/ContactGrid.js:121
-#: js/Model.js:154
-#: js/Model.js:159
-msgid "Country"
-msgstr "Country"
-
-#: js/ContactEditDialog.js:342
-#: js/Model.js:68
-msgid "Description"
-msgstr "Description"
-
-#: js/ContactEditDialog.js:356
-msgid "Enter description"
-msgstr "Enter description"
-
-#: js/ContactEditDialog.js:408
-msgid "Export as pdf"
-msgstr "Export as pdf"
-
-#: js/ContactEditDialog.js:416
-#: js/ContactEditDialog.js:501
-msgid "Parse address"
-msgstr "Parse address"
-
-#: js/ContactEditDialog.js:440
-#: js/ContactEditDialog.js:458
-msgid "Either {0} or {1} must be given"
-msgstr "Either {0} or {1} must be given"
-
-#: js/ContactEditDialog.js:493
-msgid "Paste address"
-msgstr "Paste address"
-
-#: js/ContactEditDialog.js:493
-msgid "Please paste an address that should be parsed:"
-msgstr "Please paste an address that should be parsed:"
-
-#: js/ContactEditDialog.js:527
-msgid "End token mode"
-msgstr "End token mode"
-
-#: js/ContactFilterModel.js:35
-#: js/Model.js:94
-#: js/Model.js:133
-msgid "Contact"
-msgid_plural "Contacts"
-msgstr[0] "Contact"
-msgstr[1] "Contacts"
-
-#: js/ContactGrid.js:105
-#: js/Model.js:160
-msgid "Type"
-msgstr "Type"
-
-#: js/ContactGrid.js:106
-msgid "Tags"
-msgstr "Tags"
-
-#: js/ContactGrid.js:110
-msgid "Full Name"
-msgstr "Full Name"
-
-#: js/ContactGrid.js:120
-msgid "Postalcode"
-msgstr "Postalcode"
-
-#: js/ContactGrid.js:122
-msgid "Street (private)"
-msgstr "Street (private)"
-
-#: js/ContactGrid.js:123
-msgid "City (private)"
-msgstr "City (private)"
-
-#: js/ContactGrid.js:124
-msgid "Region (private)"
-msgstr "Region (private)"
-
-#: js/ContactGrid.js:125
-msgid "Postalcode (private)"
-msgstr "Postalcode (private)"
-
-#: js/ContactGrid.js:126
-msgid "Country (private)"
-msgstr "Country (private)"
-
-#: js/ContactGrid.js:131
-msgid "Car phone"
-msgstr "Car phone"
-
-#: js/ContactGrid.js:132
-msgid "Pager"
-msgstr "Pager"
-
-#: js/ContactGrid.js:136
-msgid "Email (private)"
-msgstr "Email (private)"
-
-#: js/ContactGrid.js:138
-msgid "URL (private)"
-msgstr "URL (private)"
-
-#: js/ContactGrid.js:139
-#: js/Model.js:146
-msgid "Note"
-msgstr "Note"
-
-#: js/ContactGrid.js:140
-msgid "Timezone"
-msgstr "Timezone"
-
-#: js/ContactGrid.js:141
-msgid "Geo"
-msgstr "Geo"
-
-#: js/ContactGrid.js:152
-msgid "Export Contact"
-msgstr "Export Contact"
-
-#: js/ContactGrid.js:153
-#: js/ContactGrid.js:154
-msgid "Export {0}"
-msgid_plural "Export {0}"
-msgstr[0] "Export {0}"
-msgstr[1] "Export {0}"
-
-#: js/ContactGrid.js:163
-msgid "Export as PDF"
-msgstr "Export as PDF"
-
-#: js/ContactGrid.js:170
-msgid "Export as CSV"
-msgstr "Export as CSV"
-
-#: js/ContactGrid.js:177
-msgid "Export as ODS"
-msgstr "Export as ODS"
-
-#: js/ContactGrid.js:184
-msgid "Export as XLS"
-msgstr "Export as XLS"
-
-#: js/ContactGrid.js:191
-msgid "Export as ..."
-msgstr "Export as ..."
-
-#: js/ContactGrid.js:203
-msgid "Import contacts"
-msgstr "Import contacts"
-
-#: js/ContactGrid.js:292
-msgid "Internal Contact"
-msgstr "Internal Contact"
-
-#: js/ContactGridDetailsPanel.js:62
-#: js/Model.js:94
-msgid "Contacts"
-msgstr "Contacts"
-
-#: js/ContactGridDetailsPanel.js:65
-msgid "Select contact"
-msgstr "Select contact"
-
-#: js/ContactGridDetailsPanel.js:155
-msgid "Private"
-msgstr "Private"
-
-#: js/ContactGridDetailsPanel.js:178
+#: Messenger/js/LogHandler.js:78
+#: Messenger/js/ChatHandler.js:126
+msgid "is unavailable"
+msgstr "is unavailable"
+
+#: Messenger/js/LogHandler.js:84
+msgid "Status text"
+msgstr "Status text"
+
+#: Messenger/js/LogHandler.js:86
+msgid "is away"
+msgstr "is away"
+
+#: Messenger/js/LogHandler.js:89
+msgid "is busy"
+msgstr "is busy"
+
+#: Messenger/js/LogHandler.js:92
+msgid "auto status (idle)"
+msgstr "auto status (idle)"
+
+#: Messenger/js/LogHandler.js:95
+msgid "is on-line"
+msgstr "is on-line"
+
+#: Messenger/js/LogHandler.js:112
+msgid "The intended recipient is temporarily unavailable."
+msgstr "The intended recipient is temporarily unavailable."
+
+#: Messenger/js/LogHandler.js:115
+msgid "The remote server does not exist or could not be reached."
+msgstr "The remote server does not exist or could not be reached."
+
+#: Messenger/js/LogHandler.js:118
+msgid "Communication with the remote server has been interrupted."
+msgstr "Communication with the remote server has been interrupted."
+
+#: Messenger/js/LogHandler.js:124
+#: Messenger/js/LogHandler.js:232
+msgid "SERVER ERROR"
+msgstr "SERVER ERROR"
+
+#: Messenger/js/LogHandler.js:143
+#: Messenger/js/LogHandler.js:144
+msgid "Accept your subscription"
+msgstr "Accept your subscription"
+
+#: Messenger/js/LogHandler.js:149
+msgid "Allow"
+msgstr "Allow"
+
+#: Messenger/js/LogHandler.js:150
+msgid "Deny"
+msgstr "Deny"
+
+#: Messenger/js/LogHandler.js:152
+msgid "Subscription Approval"
+msgstr "Subscription Approval"
+
+#: Messenger/js/LogHandler.js:153
+msgid "wants to subscribe you."
+msgstr "wants to subscribe you."
+
+#: Messenger/js/LogHandler.js:172
+msgid "Denied/Removed your subscription"
+msgstr "Denied/Removed your subscription"
+
+#: Messenger/js/LogHandler.js:173
+msgid "Not authorized!"
+msgstr "Not authorized!"
+
+#: Messenger/js/LogHandler.js:204
+msgid "Error sending: "
+msgstr "Error sending: "
+
+#: Messenger/js/LogHandler.js:204
+#: Messenger/js/ChatHandler.js:100
+#: Messenger/js/ChatHandler.js:109
+#: Messenger/js/Messenger.js:210
+#: Messenger/js/Messenger.js:297
+#: Messenger/js/RosterHandler.js:306
+#: Messenger/js/RosterHandler.js:360
+msgid "Error"
+msgstr "Error"
+
+#: Messenger/js/LogHandler.js:206
+#: Messenger/js/LogHandler.js:233
+msgid "Error number "
+msgstr "Error number "
+
+#: Messenger/js/LogHandler.js:218
+msgid "Cancel 404: The item was not found."
+msgstr "Cancel 404: The item was not found."
+
+#: Messenger/js/LogHandler.js:221
+msgid "Cancel 501: The feature was not implemented."
+msgstr "Cancel 501: The feature was not implemented."
+
+#: Messenger/js/LogHandler.js:224
+msgid "Wait 500: Internal server error."
+msgstr "Wait 500: Internal server error."
+
+#: Messenger/js/LogHandler.js:227
+msgid "Cancel 503: Service unavailable."
+msgstr "Cancel 503: Service unavailable."
+
+#: Messenger/js/LogHandler.js:244
+#: Messenger/js/ChatHandler.js:126
+#: Messenger/js/ChatHandler.js:127
 msgid "Info"
 msgstr "Info"
 
-#: js/ContactGridDetailsPanel.js:214
-msgid "Insecure link"
-msgstr "Insecure link"
+#: Messenger/js/ChatHandler.js:18
+msgid "Group chat in room"
+msgstr "Group chat in room"
 
-#: js/ContactGridDetailsPanel.js:214
-msgid "Please review this link in edit dialog."
-msgstr "Please review this link in edit dialog."
+#: Messenger/js/ChatHandler.js:20
+msgid "Chat with"
+msgstr "Chat with"
 
-#: js/ListMemberFilterModel.js:37
-msgid "Member of List"
-msgstr "Member of List"
+#: Messenger/js/ChatHandler.js:84
+msgid "You chose to download the every chat history"
+msgstr "You chose to download the every chat history"
 
-#: js/MapPanel.js:58
-msgid "Company address"
-msgstr "Company address"
+#: Messenger/js/ChatHandler.js:85
+msgid "Do you want to download this chat"
+msgstr "Do you want to download this chat"
 
-#: js/MapPanel.js:65
-msgid "Private address"
-msgstr "Private address"
+#: Messenger/js/ChatHandler.js:101
+msgid "Error downloading Chat History"
+msgstr "Error downloading Chat History"
 
-#: js/Model.js:19
+#: Messenger/js/ChatHandler.js:127
+msgid "Your messages will be sent offline"
+msgstr "Your messages will be sent offline"
+
+#: Messenger/js/Window.js:18
+msgid "Group created successfully"
+msgstr "Group created successfully"
+
+#: Messenger/js/Window.js:21
+#: Messenger/js/Layout.js:46
+#: Messenger/js/Layout.js:428
+msgid "Add Group"
+msgstr "Add Group"
+
+#: Messenger/js/Window.js:21
+msgid "The group already exists"
+msgstr "The group already exists"
+
+#: Messenger/js/Window.js:53
+#: Messenger/js/Window.js:58
+msgid "Added successfuly"
+msgstr "Added successfuly"
+
+#: Messenger/js/Window.js:60
+msgid "Add Buddy"
+msgstr "Add Buddy"
+
+#: Messenger/js/Window.js:60
+msgid "Buddy not added"
+msgstr "Buddy not added"
+
+#: Messenger/js/Messenger.js:74
+msgid "Messenger"
+msgid_plural "Messengers"
+msgstr[0] "Messenger"
+msgstr[1] "Messengers"
+
+#: Messenger/js/Messenger.js:201
+msgid "Connecting"
+msgstr "Connecting"
+
+#: Messenger/js/Messenger.js:211
+#: Messenger/js/Messenger.js:298
+msgid "Authentication failed"
+msgstr "Authentication failed"
+
+#: Messenger/js/Messenger.js:289
+msgid "Messenger has been disconnected!"
+msgstr "Messenger has been disconnected!"
+
+#: Messenger/js/Messenger.js:352
+#: Messenger/js/Layout.js:81
+msgid "Connect"
+msgstr "Connect"
+
+#: Messenger/js/Layout.js:8
+msgid "Expresso Messenger"
+msgstr "Expresso Messenger"
+
+#: Messenger/js/Layout.js:32
+msgid "Actions"
+msgstr "Actions"
+
+#: Messenger/js/Layout.js:38
+#: Messenger/js/Layout.js:352
+msgid "Add Contact"
+msgstr "Add Contact"
+
+#: Messenger/js/Layout.js:55
+msgid "Logout"
+msgstr "Logout"
+
+#: Messenger/js/Layout.js:116
+msgid "your Status"
+msgstr "your Status"
+
+#: Messenger/js/Layout.js:117
+msgid "press ENTER after"
+msgstr "press ENTER after"
+
+#: Messenger/js/Layout.js:146
+msgid "Online"
+msgstr "Online"
+
+#: Messenger/js/Layout.js:147
+msgid "Away"
+msgstr "Away"
+
+#: Messenger/js/Layout.js:148
+msgid "Do Not Disturb"
+msgstr "Do Not Disturb"
+
+#: Messenger/js/Layout.js:149
+msgid "Unavailable"
+msgstr "Unavailable"
+
+#: Messenger/js/Layout.js:370
+msgid "JID"
+msgstr "JID"
+
+#: Messenger/js/Layout.js:377
+#: Messenger/js/Layout.js:436
 msgid "Name"
 msgstr "Name"
 
-#: js/Model.js:34
-msgid "Street (Company Address)"
-msgstr "Street (Company Address)"
+#: Messenger/js/Layout.js:382
+msgid "Group"
+msgstr "Group"
 
-#: js/Model.js:35
-msgid "Street 2 (Company Address)"
-msgstr "Street 2 (Company Address)"
+#: Messenger/js/Layout.js:388
+msgid "Select a group"
+msgstr "Select a group"
 
-#: js/Model.js:36
-msgid "City (Company Address)"
-msgstr "City (Company Address)"
+#: Messenger/js/Layout.js:398
+#: Messenger/js/Layout.js:441
+msgid "Add"
+msgstr "Add"
 
-#: js/Model.js:37
-msgid "Region (Company Address)"
-msgstr "Region (Company Address)"
+#: Messenger/js/Layout.js:474
+msgid "Join Groupchat"
+msgstr "Join Groupchat"
 
-#: js/Model.js:38
-msgid "Postal Code (Company Address)"
-msgstr "Postal Code (Company Address)"
+#: Messenger/js/Layout.js:483
+msgid "Identity"
+msgstr "Identity"
 
-#: js/Model.js:39
-msgid "Country (Company Address)"
-msgstr "Country (Company Address)"
+#: Messenger/js/Layout.js:489
+msgid "Host"
+msgstr "Host"
 
-#: js/Model.js:43
-msgid "Street (Private Address)"
-msgstr "Street (Private Address)"
+#: Messenger/js/Layout.js:494
+msgid "Room"
+msgstr "Room"
 
-#: js/Model.js:44
-msgid "Street 2 (Private Address)"
-msgstr "Street 2 (Private Address)"
+#: Messenger/js/Layout.js:499
+msgid "Nickname"
+msgstr "Nickname"
 
-#: js/Model.js:45
-msgid "City (Private Address)"
-msgstr "City (Private Address)"
+#: Messenger/js/Layout.js:505
+msgid "Password"
+msgstr "Password"
 
-#: js/Model.js:46
-msgid "Region (Private Address)"
-msgstr "Region (Private Address)"
+#: Messenger/js/Layout.js:509
+msgid "Join"
+msgstr "Join"
 
-#: js/Model.js:47
-msgid "Postal Code (Private Address)"
-msgstr "Postal Code (Private Address)"
+#: Messenger/js/FileTransfer.js:29
+#: Messenger/js/FileTransfer.js:54
+#: Messenger/js/FileTransfer.js:88
+#: Messenger/js/FileTransfer.js:143
+msgid "File Transfer"
+msgstr "File Transfer"
 
-#: js/Model.js:48
-msgid "Country (Private Address)"
-msgstr "Country (Private Address)"
+#: Messenger/js/FileTransfer.js:30
+msgid "You must choose a resource"
+msgstr "You must choose a resource"
 
-#: js/Model.js:51
-msgid "Company Communication"
-msgstr "Company Communication"
+#: Messenger/js/FileTransfer.js:46
+#: Messenger/js/FileTransfer.js:55
+msgid "File sent"
+msgstr "File sent"
 
-#: js/Model.js:57
-msgid "Private Communication"
-msgstr "Private Communication"
+#: Messenger/js/FileTransfer.js:65
+msgid "File Transfer Error"
+msgstr "File Transfer Error"
 
-#: js/Model.js:65
-msgid "Web (private)"
-msgstr "Web (private)"
+#: Messenger/js/FileTransfer.js:92
+msgid "wants to send you a file:"
+msgstr "wants to send you a file:"
 
-#: js/Model.js:98
-#: js/Model.js:205
-msgid "Addressbooks"
-msgstr "Addressbooks"
+#: Messenger/js/FileTransfer.js:97
+msgid "Do you allow"
+msgstr "Do you allow"
 
-#: js/Model.js:133
-msgid "User Account"
-msgstr "User Account"
+#: Messenger/js/FileTransfer.js:101
+#: Messenger/js/RosterTree.js:76
+#: Messenger/js/RosterTree.js:175
+msgid "Yes"
+msgstr "Yes"
 
-#: js/Model.js:136
-msgid "Quick search"
-msgstr "Quick search"
+#: Messenger/js/FileTransfer.js:107
+#: Messenger/js/RosterTree.js:77
+#: Messenger/js/RosterTree.js:176
+msgid "No"
+msgstr "No"
 
-#: js/Model.js:161
-msgid "Last modified"
-msgstr "Last modified"
+#: Messenger/js/FileTransfer.js:151
+msgid " has more than one resource. Choose one!"
+msgstr " has more than one resource. Choose one!"
 
-#: js/Model.js:162
-msgid "Last modifier"
-msgstr "Last modifier"
+#: Messenger/js/RosterTree.js:18
+#: Messenger/js/RosterTree.js:134
+msgid "Rename"
+msgstr "Rename"
 
-#: js/Model.js:163
-msgid "Creation Time"
-msgstr "Creation Time"
+#: Messenger/js/RosterTree.js:22
+#: Messenger/js/RosterTree.js:138
+msgid "Remove"
+msgstr "Remove"
 
-#: js/Model.js:164
-msgid "Creator"
-msgstr "Creator"
+#: Messenger/js/RosterTree.js:29
+msgid "Subscribe"
+msgstr "Subscribe"
 
-#: js/Model.js:201
-msgid "List"
-msgid_plural "Lists"
-msgstr[0] "List"
-msgstr[1] "Lists"
+#: Messenger/js/RosterTree.js:33
+msgid "Move to"
+msgstr "Move to"
 
-#: js/Model.js:201
-msgid "Lists"
-msgstr "Lists"
+#: Messenger/js/RosterTree.js:44
+#: Messenger/js/Chat.js:27
+msgid "Send file"
+msgstr "Send file"
 
-#: Preference.php:28
-msgid "All contacts"
-msgstr "All contacts"
+#: Messenger/js/RosterTree.js:59
+#: Messenger/js/RosterTree.js:152
+msgid "A name is required"
+msgstr "A name is required"
 
-#: Preference.php:65
-msgid "Default Addressbook"
-msgstr "Default Addressbook"
+#: Messenger/js/RosterTree.js:79
+msgid "Delete Contact"
+msgstr "Delete Contact"
 
-#: Preference.php:66
-msgid "The default addressbook for new contacts"
-msgstr "The default addressbook for new contacts"
+#: Messenger/js/RosterTree.js:80
+#: Messenger/js/RosterTree.js:179
+msgid "Are you sure to delete "
+msgstr "Are you sure to delete "
 
-#: Preference.php:69
-msgid "Default Favorite"
-msgstr "Default Favorite"
+#: Messenger/js/RosterTree.js:115
+msgid "Empty"
+msgstr "Empty"
 
-#: Preference.php:70
-msgid "The default favorite which is loaded on addressbook startup"
-msgstr "The default favorite which is loaded on addressbook startup"
+#: Messenger/js/RosterTree.js:163
+msgid "Rename Group"
+msgstr "Rename Group"
 
-#: Setup/Initialize.php:63
-#: Setup/Update/Release5.php:189
-msgid "Mr"
-msgstr "Mr"
+#: Messenger/js/RosterTree.js:164
+msgid "The group already exists!"
+msgstr "The group already exists!"
 
-#: Setup/Initialize.php:64
-#: Setup/Update/Release5.php:190
-msgid "Ms"
-msgstr "Ms"
+#: Messenger/js/RosterTree.js:178
+msgid "Delete Group"
+msgstr "Delete Group"
 
-#: Setup/Initialize.php:134
-#: Setup/Update/Release3.php:37
-msgid "All contacts I have read grants for"
-msgstr "All contacts I have read grants for"
+#: Messenger/js/RosterTree.js:216
+#: Messenger/js/RosterTree.js:288
+#: Messenger/js/RosterTree.js:473
+msgid "Subscription"
+msgstr "Subscription"
 
-#: Setup/Initialize.php:139
-msgid "My company"
-msgstr "My company"
+#: Messenger/js/ConfigWindow.js:8
+msgid "Preferences"
+msgstr "Preferences"
 
-#: Setup/Initialize.php:140
-msgid "All coworkers in my company"
-msgstr "All coworkers in my company"
+#: Messenger/js/ConfigWindow.js:22
+msgid "Notifications"
+msgstr "Notifications"
 
-#: Setup/Initialize.php:153
-msgid "My contacts"
-msgstr "My contacts"
+#: Messenger/js/ConfigWindow.js:28
+msgid "Show notifications"
+msgstr "Show notifications"
 
-#: Setup/Initialize.php:154
-msgid "All contacts in my Addressbooks"
-msgstr "All contacts in my Addressbooks"
+#: Messenger/js/ConfigWindow.js:39
+msgid "History"
+msgstr "History"
 
-#: Setup/Initialize.php:166
-msgid "Last modified by me"
-msgstr "Last modified by me"
+#: Messenger/js/ConfigWindow.js:69
+msgid "Custom Name"
+msgstr "Custom Name"
 
-#: Setup/Initialize.php:167
-msgid "All contacts that I have last modified"
-msgstr "All contacts that I have last modified"
+#: Messenger/js/ConfigWindow.js:75
+msgid "Login"
+msgstr "Login"
 
-#: Setup/setup.xml:648
-msgid "Internal Contacts"
-msgstr "Internal Contacts"
+#: Messenger/js/ConfigWindow.js:88
+msgid "Save"
+msgstr "Save"
 
+#: Messenger/js/ConfigWindow.js:92
+msgid "Cancel"
+msgstr "Cancel"
+
+#: Messenger/js/RosterHandler.js:50
+#: Messenger/js/RosterHandler.js:357
+msgid "was successfully removed"
+msgstr "was successfully removed"
+
+#: Messenger/js/RosterHandler.js:300
+#: Messenger/js/RosterHandler.js:356
+msgid "Successful"
+msgstr "Successful"
+
+#: Messenger/js/RosterHandler.js:301
+#: Messenger/js/RosterHandler.js:357
+#: Messenger/js/RosterHandler.js:361
+msgid "The group"
+msgstr "The group"
+
+#: Messenger/js/RosterHandler.js:301
+msgid "was successfully renamed to"
+msgstr "was successfully renamed to"
+
+#: Messenger/js/RosterHandler.js:306
+msgid " already exist. It was not renamed."
+msgstr " already exist. It was not renamed."
+
+#: Messenger/js/RosterHandler.js:361
+msgid "was not removed"
+msgstr "was not removed"
+
+#: Messenger/js/Chat.js:22
+msgid "Options"
+msgstr "Options"
+
+#: Messenger/js/Chat.js:39
+msgid "Start video chat"
+msgstr "Start video chat"
+
+#~ msgid "manage shared addressbooks"
+#~ msgstr "manage shared addressbooks"
+
+#~ msgid "Create new shared addressbook folders"
+#~ msgstr "Create new shared addressbook folders"
+
+#~ msgid "manage shared addressbook favorites"
+#~ msgstr "manage shared addressbook favorites"
+
+#~ msgid "Create or update shared addressbook favorites"
+#~ msgstr "Create or update shared addressbook favorites"
+
+#~ msgid "Contact duplicate check fields"
+#~ msgstr "Contact duplicate check fields"
+
+#~ msgid ""
+#~ "These fields are checked when a new contact is created. If a record with "
+#~ "the same data in the fields is found, a duplicate exception is thrown."
+#~ msgstr ""
+#~ "These fields are checked when a new contact is created. If a record with "
+#~ "the same data in the fields is found, a duplicate exception is thrown."
+
+#~ msgid "Contact salutations available"
+#~ msgstr "Contact salutations available"
+
+#~ msgid ""
+#~ "Possible contact salutations. Please note that additional values might "
+#~ "impact other Addressbook systems on export or syncronisation."
+#~ msgstr ""
+#~ "Possible contact salutations. Please note that additional values might "
+#~ "impact other Addressbook systems on export or syncronisation."
+
+#~ msgid "Parsing rules for addresses"
+#~ msgstr "Parsing rules for addresses"
+
+#~ msgid "Path to a XML file with address parsing rules."
+#~ msgstr "Path to a XML file with address parsing rules."
+
+#~ msgid "%s's personal addressbook"
+#~ msgstr "%s's personal addressbook"
+
+#~ msgid "Business Contact Data"
+#~ msgstr "Business Contact Data"
+
+#~ msgid "Organisation / Unit"
+#~ msgstr "Organisation / Unit"
+
+#~ msgid "Business Address"
+#~ msgstr "Business Address"
+
+#~ msgid "Email"
+#~ msgstr "Email"
+
+#~ msgid "Telephone Work"
+#~ msgstr "Telephone Work"
+
+#~ msgid "Telephone Cellphone"
+#~ msgstr "Telephone Cellphone"
+
+#~ msgid "Telephone Car"
+#~ msgstr "Telephone Car"
+
+#~ msgid "Telephone Fax"
+#~ msgstr "Telephone Fax"
+
+#~ msgid "Telephone Page"
+#~ msgstr "Telephone Page"
+
+#~ msgid "URL"
+#~ msgstr "URL"
+
+#~ msgid "Assistant"
+#~ msgstr "Assistant"
+
+#~ msgid "Assistant Telephone"
+#~ msgstr "Assistant Telephone"
+
+#~ msgid "Private Contact Data"
+#~ msgstr "Private Contact Data"
+
+#~ msgid "Private Address"
+#~ msgstr "Private Address"
+
+#~ msgid "Email Home"
+#~ msgstr "Email Home"
+
+#~ msgid "Telephone Home"
+#~ msgstr "Telephone Home"
+
+#~ msgid "Telephone Cellphone Private"
+#~ msgstr "Telephone Cellphone Private"
+
+#~ msgid "Telephone Fax Home"
+#~ msgstr "Telephone Fax Home"
+
+#~ msgid "URL Home"
+#~ msgstr "URL Home"
+
+#~ msgid "Other Data"
+#~ msgstr "Other Data"
+
+#~ msgid "Birthday"
+#~ msgstr "Birthday"
+
+#~ msgid "Job Title"
+#~ msgstr "Job Title"
+
+#~ msgid "Contact import from Google address book"
+#~ msgstr "Contact import from Google address book"
+
+#~ msgid "Contact VCARD import"
+#~ msgstr "Contact VCARD import"
+
+#~ msgid "Contact CSV import from mac address book"
+#~ msgstr "Contact CSV import from mac address book"
+
+#~ msgid "CSV Outlook 2007 German"
+#~ msgstr "CSV Outlook 2007 German"
+
+#~ msgid "Contact CSV import from Outlook address book"
+#~ msgstr "Contact CSV import from Outlook address book"
+
+#~ msgid "Contact CSV import"
+#~ msgstr "Contact CSV import"
+
+#~ msgid "Import list (###CURRENTDATE###)"
+#~ msgstr "Import list (###CURRENTDATE###)"
+
+#~ msgid ""
+#~ "Contacts imported on ###CURRENTDATE### at ###CURRENTTIME### by "
+#~ "###USERFULLNAME###"
+#~ msgstr ""
+#~ "Contacts imported on ###CURRENTDATE### at ###CURRENTTIME### by "
+#~ "###USERFULLNAME###"
+
+#~ msgid "New Contact"
+#~ msgstr "New Contact"
+
+#~ msgid "Addressbook"
+
+#~ msgid_plural "Addressbooks"
+#~ msgstr[0] "Addressbook"
+#~ msgstr[1] "Addressbooks"
+
+#~ msgid "CardDAV URL"
+#~ msgstr "CardDAV URL"
+
+#~ msgid "Map"
+#~ msgstr "Map"
+
+#~ msgid "Personal Information"
+#~ msgstr "Personal Information"
+
+#~ msgid "Salutation"
+#~ msgstr "Salutation"
+
+#~ msgid "Title"
+#~ msgstr "Title"
+
+#~ msgid "First Name"
+#~ msgstr "First Name"
+
+#~ msgid "Middle Name"
+#~ msgstr "Middle Name"
+
+#~ msgid "Company"
+#~ msgstr "Company"
+
+#~ msgid "Unit"
+#~ msgstr "Unit"
+
+#~ msgid "Display Name"
+#~ msgstr "Display Name"
+
+#~ msgid "Suffix"
+#~ msgstr "Suffix"
+
+#~ msgid "Job Role"
+#~ msgstr "Job Role"
+
+#~ msgid "Contact Information"
+#~ msgstr "Contact Information"
+
+#~ msgid "Phone"
+#~ msgstr "Phone"
+
+#~ msgid "Mobile"
+#~ msgstr "Mobile"
+
+#~ msgid "Fax"
+#~ msgstr "Fax"
+
+#~ msgid "Phone (private)"
+#~ msgstr "Phone (private)"
+
+#~ msgid "Mobile (private)"
+#~ msgstr "Mobile (private)"
+
+#~ msgid "Fax (private)"
+#~ msgstr "Fax (private)"
+
+#~ msgid "E-Mail"
+#~ msgstr "E-Mail"
+
+#~ msgid "E-Mail (private)"
+#~ msgstr "E-Mail (private)"
+
+#~ msgid "Web"
+#~ msgstr "Web"
+
+#~ msgid "Company Address"
+#~ msgstr "Company Address"
+
+#~ msgid "Street"
+#~ msgstr "Street"
+
+#~ msgid "Street 2"
+#~ msgstr "Street 2"
+
+#~ msgid "Region"
+#~ msgstr "Region"
+
+#~ msgid "Postal Code"
+#~ msgstr "Postal Code"
+
+#~ msgid "City"
+#~ msgstr "City"
+
+#~ msgid "Country"
+#~ msgstr "Country"
+
+#~ msgid "Enter description"
+#~ msgstr "Enter description"
+
+#~ msgid "Export as pdf"
+#~ msgstr "Export as pdf"
+
+#~ msgid "Parse address"
+#~ msgstr "Parse address"
+
+#~ msgid "Either {0} or {1} must be given"
+#~ msgstr "Either {0} or {1} must be given"
+
+#~ msgid "Paste address"
+#~ msgstr "Paste address"
+
+#~ msgid "Please paste an address that should be parsed:"
+#~ msgstr "Please paste an address that should be parsed:"
+
+#~ msgid "End token mode"
+#~ msgstr "End token mode"
+
+#~ msgid "Type"
+#~ msgstr "Type"
+
+#~ msgid "Tags"
+#~ msgstr "Tags"
+
+#~ msgid "Full Name"
+#~ msgstr "Full Name"
+
+#~ msgid "Postalcode"
+#~ msgstr "Postalcode"
+
+#~ msgid "Street (private)"
+#~ msgstr "Street (private)"
+
+#~ msgid "City (private)"
+#~ msgstr "City (private)"
+
+#~ msgid "Region (private)"
+#~ msgstr "Region (private)"
+
+#~ msgid "Postalcode (private)"
+#~ msgstr "Postalcode (private)"
+
+#~ msgid "Country (private)"
+#~ msgstr "Country (private)"
+
+#~ msgid "Car phone"
+#~ msgstr "Car phone"
+
+#~ msgid "Pager"
+#~ msgstr "Pager"
+
+#~ msgid "Email (private)"
+#~ msgstr "Email (private)"
+
+#~ msgid "URL (private)"
+#~ msgstr "URL (private)"
+
+#~ msgid "Timezone"
+#~ msgstr "Timezone"
+
+#~ msgid "Geo"
+#~ msgstr "Geo"
+
+#~ msgid "Export Contact"
+#~ msgstr "Export Contact"
+
+#~ msgid "Export {0}"
+
+#~ msgid_plural "Export {0}"
+#~ msgstr[0] "Export {0}"
+#~ msgstr[1] "Export {0}"
+
+#~ msgid "Export as PDF"
+#~ msgstr "Export as PDF"
+
+#~ msgid "Export as CSV"
+#~ msgstr "Export as CSV"
+
+#~ msgid "Export as ODS"
+#~ msgstr "Export as ODS"
+
+#~ msgid "Export as XLS"
+#~ msgstr "Export as XLS"
+
+#~ msgid "Export as ..."
+#~ msgstr "Export as ..."
+
+#~ msgid "Import contacts"
+#~ msgstr "Import contacts"
+
+#~ msgid "Internal Contact"
+#~ msgstr "Internal Contact"
+
+#~ msgid "Contacts"
+#~ msgstr "Contacts"
+
+#~ msgid "Private"
+#~ msgstr "Private"
+
+#~ msgid "Insecure link"
+#~ msgstr "Insecure link"
+
+#~ msgid "Please review this link in edit dialog."
+#~ msgstr "Please review this link in edit dialog."
+
+#~ msgid "Member of List"
+#~ msgstr "Member of List"
+
+#~ msgid "Company address"
+#~ msgstr "Company address"
+
+#~ msgid "Private address"
+#~ msgstr "Private address"
+
+#~ msgid "Street (Company Address)"
+#~ msgstr "Street (Company Address)"
+
+#~ msgid "Street 2 (Company Address)"
+#~ msgstr "Street 2 (Company Address)"
+
+#~ msgid "City (Company Address)"
+#~ msgstr "City (Company Address)"
+
+#~ msgid "Region (Company Address)"
+#~ msgstr "Region (Company Address)"
+
+#~ msgid "Postal Code (Company Address)"
+#~ msgstr "Postal Code (Company Address)"
+
+#~ msgid "Country (Company Address)"
+#~ msgstr "Country (Company Address)"
+
+#~ msgid "Street (Private Address)"
+#~ msgstr "Street (Private Address)"
+
+#~ msgid "Street 2 (Private Address)"
+#~ msgstr "Street 2 (Private Address)"
+
+#~ msgid "City (Private Address)"
+#~ msgstr "City (Private Address)"
+
+#~ msgid "Region (Private Address)"
+#~ msgstr "Region (Private Address)"
+
+#~ msgid "Postal Code (Private Address)"
+#~ msgstr "Postal Code (Private Address)"
+
+#~ msgid "Country (Private Address)"
+#~ msgstr "Country (Private Address)"
+
+#~ msgid "Company Communication"
+#~ msgstr "Company Communication"
+
+#~ msgid "Private Communication"
+#~ msgstr "Private Communication"
+
+#~ msgid "Web (private)"
+#~ msgstr "Web (private)"
+
+#~ msgid "Addressbooks"
+#~ msgstr "Addressbooks"
+
+#~ msgid "User Account"
+#~ msgstr "User Account"
+
+#~ msgid "Quick search"
+#~ msgstr "Quick search"
+
+#~ msgid "Last modified"
+#~ msgstr "Last modified"
+
+#~ msgid "Last modifier"
+#~ msgstr "Last modifier"
+
+#~ msgid "Creation Time"
+#~ msgstr "Creation Time"
+
+#~ msgid "Creator"
+#~ msgstr "Creator"
+
+#~ msgid "List"
+
+#~ msgid_plural "Lists"
+#~ msgstr[0] "List"
+#~ msgstr[1] "Lists"
+
+#~ msgid "Lists"
+#~ msgstr "Lists"
+
+#~ msgid "All contacts"
+#~ msgstr "All contacts"
+
+#~ msgid "Default Addressbook"
+#~ msgstr "Default Addressbook"
+
+#~ msgid "The default addressbook for new contacts"
+#~ msgstr "The default addressbook for new contacts"
+
+#~ msgid "Default Favorite"
+#~ msgstr "Default Favorite"
+
+#~ msgid "The default favorite which is loaded on addressbook startup"
+#~ msgstr "The default favorite which is loaded on addressbook startup"
+
+#~ msgid "Mr"
+#~ msgstr "Mr"
+
+#~ msgid "Ms"
+#~ msgstr "Ms"
+
+#~ msgid "All contacts I have read grants for"
+#~ msgstr "All contacts I have read grants for"
+
+#~ msgid "My company"
+#~ msgstr "My company"
+
+#~ msgid "All coworkers in my company"
+#~ msgstr "All coworkers in my company"
+
+#~ msgid "My contacts"
+#~ msgstr "My contacts"
+
+#~ msgid "All contacts in my Addressbooks"
+#~ msgstr "All contacts in my Addressbooks"
+
+#~ msgid "Last modified by me"
+#~ msgstr "Last modified by me"
+
+#~ msgid "All contacts that I have last modified"
+#~ msgstr "All contacts that I have last modified"
+
+#~ msgid "Internal Contacts"
+#~ msgstr "Internal Contacts"
