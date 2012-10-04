@@ -83,7 +83,6 @@ background-image: url(../images/expresso/button/s-arrow-noline.gif) !important;
 }
 .x-btn-tl, .x-btn-tr, .x-btn-tc, .x-btn-ml, .x-btn-mr, .x-btn-mc, .x-btn-bl, .x-btn-br, .x-btn-bc {
 background-image: url(../images/expresso/button/btn.gif);
-background-image: none;
 }
 .tb-login-panel table.x-btn-noicon {
 background: url(../images/expresso/bt_entrar.png) no-repeat left top !important; height: 28px;
