@@ -273,7 +273,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
             if (strtolower($folder[$folderDecoded['globalName']]['parent']) === 'inbox')
             {
                 $systemFolders = in_array(strtolower($folder[$folderDecoded['globalName']]['localName']), 
-                                                       Felamimail_Controller_Folder::getInstance()->getSystemFolders());
+                                                       Felamimail_Controller_Folder::getInstance()->getSystemFolders($folderDecoded['accountId']));
             }
             
             
