@@ -30,6 +30,11 @@ class Zend_Auth_Adapter_ModSsl implements Zend_Auth_Adapter_Interface
             
             if ($certificate instanceof Expresso_Security_Certificate_ICPBrasil)
             {
+                if(!$certificate->isValid())
+                {
+                    header("Location: ./sslalert.html");
+                   return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, '????', $certificate->getStatusErrors());
+                }
                 $config = (object)Tinebase_Config::getInstance()->getConfig('digital_certificate')->value;
                 if (class_exists($config->username_callback))
                 {
