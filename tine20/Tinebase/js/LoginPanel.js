@@ -193,7 +193,7 @@ Tine.Tinebase.LoginPanel = Ext.extend(Ext.Panel, {
                 border: false,
                 defaults: {xtype: 'label'},
                 items: [{
-                    html: '<span>' + _('Powered by:') + ' <a target="_blank" href="' + Tine.weburl + 'border="0">Tine 2.0</a></span>'
+                    html: '<span>' + _('Powered by:') + ' <a target="_blank" href="' + Tine.weburl + '" border="0">Tine 2.0</a></span>'
                 }]
             });
         }
