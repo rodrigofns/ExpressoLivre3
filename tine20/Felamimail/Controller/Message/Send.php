@@ -324,18 +324,31 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message_A
     protected function _setMailBody(Tinebase_Mail $_mail, Felamimail_Model_Message $_message)
     {
         if ($_message->content_type == Felamimail_Model_Message::CONTENT_TYPE_HTML) {
+            // checking embedded images
             $embeddedImages = $_mail->processEmbeddedImagesInHtmlBody($_message->body);
+            // now checking embedded signature base64 image
+            $base64Images = $_mail->processEmbeddedImageSignatureInHtmlBody($_message->body);
             if(count($embeddedImages)>0){
-                    $_message->body = str_ireplace('src="index.php?method=Felamimail.showTempImage&amp;tempImageId=','src="cid:', $_message->body);
+                $_message->body = str_ireplace('src="index.php?method=Felamimail.showTempImage&amp;tempImageId=','src="cid:', $_message->body);
+            }
+            if(count($base64Images)>0){
+                // there should be only one image in the signature
+                $signature_cid = $_mail->createCid($base64Images[0][1]);
+                $_message->body = preg_replace('/<img id="user-signature-image" alt="[^\"]+" src="data:image\/jpeg;base64,[^"]+">/','<img id="user-signature-image" src="cid:'.$signature_cid.'"/>', $_message->body);
             }
             $_mail->setBodyHtml(Felamimail_Message::addHtmlMarkup($_message->body));
             if(count($embeddedImages)>0){
-                    foreach($embeddedImages as $embeddedImage ){
-                           $file = Tinebase_Core::getTempDir().'/'.$embeddedImage[1];
-                           $image = file_get_contents($file);
-                           $_mail->createHtmlRelatedAttachment($image,$embeddedImage[1],'image/jpg',Zend_Mime::DISPOSITION_INLINE,Zend_Mime::ENCODING_BASE64,$embeddedImage[0]);
-                    }
+                foreach($embeddedImages as $embeddedImage ){
+                    $file = Tinebase_Core::getTempDir().'/'.$embeddedImage[1];
+                    $image = file_get_contents($file);
+                    $_mail->createHtmlRelatedAttachment($image,$embeddedImage[1],'image/jpg',Zend_Mime::DISPOSITION_INLINE,Zend_Mime::ENCODING_BASE64,$embeddedImage[0]);
                 }
+            }
+            if(count($base64Images)>0){
+                // again, there should be only one image in the signature
+                $image = base64_decode($base64Images[0][1]);
+                $_mail->createHtmlRelatedAttachment($image,$signature_cid,'image/jpg',Zend_Mime::DISPOSITION_INLINE,Zend_Mime::ENCODING_BASE64,$base64Images[0][0]);
+            }
 
             if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $_mail->getBodyHtml(TRUE));
         }

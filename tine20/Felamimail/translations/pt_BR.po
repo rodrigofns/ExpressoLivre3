@@ -1233,7 +1233,12 @@ msgstr "Muitos resultados na consulta, por favor refine seu filtro!"
 #: 194
 msgid "perhaps it already exists."
 msgstr "talvez ela já exista."
-=======
+
 #: js/Felamimail.js:906
 msgid "IMAP Backend Warning"
 msgstr "Aviso de IMAP"
+
+#:js/AccountEditDialog:
+#: 84
+msgid "Signature image size cannot exceed 16384 bytes."
+msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."

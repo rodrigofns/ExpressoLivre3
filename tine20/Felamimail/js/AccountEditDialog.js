@@ -71,6 +71,38 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
             }, this);
         }
     },    
+	
+    /**
+     * uploadsuccess event for UploadImage plugin of HtmlEditor
+     * 
+     */
+    onUploadSuccess : function(dialog, filename, resp_data, record) {
+        if (resp_data.size > 16384) {
+            // exceeded maximum image size for the signature
+            Ext.Msg.show({
+                title:   _('Error'),
+                msg:     _('Signature image size cannot exceed 16384 bytes.'),
+                icon:    Ext.MessageBox.ERROR,
+                buttons: Ext.Msg.OK
+            }); 
+        }
+        else {
+            var cmp = dialog.cmp;
+            var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
+            var img = '<img id="user-signature-image" alt="'+fileName+'" src="data:image/jpeg;base64,'+resp_data.base64+'" />';
+            var loc = /<img id="user-signature-image" alt="([^\"]+)" src="data:image\/jpeg;base64,([^"]+)">/;
+            // search for an image in the signature
+            var pos = cmp.getValue().search(loc); 
+            if (pos>=0) {
+                // replace existing image with new one
+                cmp.setValue(cmp.getValue().replace(loc, img));
+            }
+            else {
+                // insert an image in the signature
+                cmp.append(img);   
+            }
+        }
+    },
     
     /**
      * returns dialog
@@ -90,6 +122,11 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 return markup;
             },
             plugins: [
+                Ext.apply(new Ext.ux.form.HtmlEditor.UploadImage(),
+                    {
+                        base64: 'yes', 
+                        uploadsuccess: this.onUploadSuccess
+                    }), 
                 new Ext.ux.form.HtmlEditor.RemoveFormat()
             ]
         });
@@ -350,8 +387,8 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
  */
  Tine.Felamimail.AccountEditDialog.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
-        width: 580,
-        height: 500,
+        width: 620,
+        height: 550,
         name: Tine.Felamimail.AccountEditDialog.prototype.windowNamePrefix + Ext.id(),
         contentPanelConstructor: 'Tine.Felamimail.AccountEditDialog',
         contentPanelConstructorConfig: config
