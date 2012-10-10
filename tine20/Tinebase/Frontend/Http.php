@@ -200,6 +200,10 @@ class Tinebase_Frontend_Http extends Tinebase_Frontend_Http_Abstract
             return;
         }
         
+        // If Login with ModSsl we'll have Zend_Auth::getInstance()->hasIdentity() == true
+        // Try verify ModSsl Login
+        Tinebase_Controller::getInstance()->login(null, null);
+        
         // check if setup/update required
         $setupController = Setup_Controller::getInstance();
         $applications = Tinebase_Application::getInstance()->getApplications();

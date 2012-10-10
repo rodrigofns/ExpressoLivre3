@@ -36,7 +36,6 @@ class Tinebase_Server_Http implements Tinebase_Server_Interface
             //NOTE: auth check for Tinebase HTTP api is done via Tinebase_Http::checkAuth  
             $server->setClass('Tinebase_Frontend_Http', 'Tinebase');
             
-            // If Login with ModSsl we'll have Zend_Auth::getInstance()->hasIdentity() == true
             // register addidional HTTP apis only available for authorised users
             if (Zend_Auth::getInstance()->hasIdentity()) {
                 if (empty($_REQUEST['method'])) {
@@ -55,8 +54,6 @@ class Tinebase_Server_Http implements Tinebase_Server_Interface
                 }
             }
             
-            // Try verify ModSsl Login
-            Tinebase_Controller::getInstance()->login(null, null);
             if (empty($_REQUEST['method'])) {
                 $_REQUEST['method'] = 'Tinebase.login';
             }

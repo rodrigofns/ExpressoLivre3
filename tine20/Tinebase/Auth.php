@@ -42,7 +42,7 @@ class Tinebase_Auth
      * constant for DigitalCertificate auth / SSL
      *
      */
-    const DIGITALCERTIFICATE = 'DigitalCertificate';
+    const MODSSL = 'ModSsl';
 
     /**
      * General Failure
@@ -260,8 +260,8 @@ class Tinebase_Auth
                 
         if (!empty($_SERVER['SSL_CLIENT_CERT']) &&  !empty($_SERVER['SSL_CLIENT_VERIFY']) && $_SERVER['SSL_CLIENT_VERIFY'] == 'SUCCESS')
         {
-            self::setBackendType(self::DIGITALCERTIFICATE);
-            $backendType =  self::DIGITALCERTIFICATE; //self::getConfiguredBackend();
+            self::setBackendType(self::MODSSL);
+            $backendType =  self::MODSSL; //self::getConfiguredBackend();
         }
         else
         {

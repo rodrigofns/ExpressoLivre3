@@ -47,7 +47,7 @@ class Tinebase_Auth_Factory
                 $instance = new Tinebase_Auth_Imap($options);
                 break;
             
-            case Tinebase_Auth::DIGITALCERTIFICATE:
+            case Tinebase_Auth::MODSSL:
                 // We don't use options array, for now!
                 $instance = new Tinebase_Auth_ModSsl();
                 break;
