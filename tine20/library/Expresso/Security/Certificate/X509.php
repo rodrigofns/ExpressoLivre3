@@ -17,9 +17,9 @@
 
 class Expresso_Security_Certificate_X509
 {
-    
     protected $certificate;
-    
+    protected $casfile;
+    protected $crlspath;
     protected $serialNumber = null;
     protected $version = null;
     protected $subject = null;
@@ -36,9 +36,14 @@ class Expresso_Security_Certificate_X509
     protected $authorityKeyIdentifier = null;
     protected $crlDistributionPoints = null;
     protected $authorityInfoAccess = null;
+    protected $status =  array();
     
     public function __construct($certificate)
     {
+        $config = (object)Tinebase_Config::getInstance()->getConfig('digital_certificate')->value;
+        $this->status = array('isValid' => true,'errors' => array());
+        $this->casfile = $config->CASFILE;
+        $this->crlspath = $config->CRLSPATH;
         $this->certificate = $certificate;
         $c = openssl_x509_parse($certificate);
         
@@ -54,7 +59,8 @@ class Expresso_Security_Certificate_X509
         $this->validTo = new Tinebase_DateTime($c['validTo_time_t']);
         $this->_parsePurpose($c['purposes']);
         $this->_parseExtensions($c['extensions']);
-        
+        $this->_validityCheck();
+        if(strtolower($this->crlspath) != 'skip') $this->_testRevoked(); // skip test ?
     }
     
     protected function _parseExtensions($extensions)
@@ -119,6 +125,114 @@ class Expresso_Security_Certificate_X509
         }
     }
     
+    protected function _validityCheck() 
+    {
+        if(!is_file($this->casfile))
+        {
+            $this->status['errors'][] = 'Invalid Certificate .(CA-01)';  //'CAs file not found.';
+            $this->status['isValid'] = false;
+            return;
+        }
+	$erros_ssl = array();
+        $temporary_files = array();
+        $certTempFile = self::generateTempFilename($temporary_files, Tinebase_Core::getTempDir());
+        self::writeTo($certTempFile,$this->certificate);
+        // Get serialnumber  by comand line ...
+        $saida = array();
+        $w = exec('openssl x509 -inform PEM -in ' . $certTempFile . ' -noout -serial',$saida);
+        $aux = explode('serial=',$saida[0]);
+        
+        if(isset($aux[1])) 
+        {
+            $this->serialNumber = $aux[1];
+        }
+        else
+        {
+            $this->serialNumber = null;
+        }
+    
+        $saida = array();
+        // certificate verify ...
+	$w = exec('openssl verify -CAfile '.$this->casfile.' '.$certTempFile,$saida);
+        self::removeTempFiles($temporary_files);
+        $aux = explode(' ',$w);
+        if(isset($aux[1]))
+        {
+            if($aux[1] != 'OK')  
+            {
+                foreach($saida as $item)
+                {
+                    $aux = explode(':',$item);
+                    if(isset($aux[1]))
+                    {
+                        $this->status['errors'][] = trim($aux[1]);
+                        $this->status['isValid'] = false;
+                    }
+                }			
+                return;
+            }
+        }
+        else
+        {
+            $this->status['errors'][] = (isset($aux[1]) ? trim($aux[1]) : 'Couldn\'t verify if certificate was revoked.(CD-01)');
+            $this->status['isValid'] = false;
+        }
+       
+    }
+
+    protected function _testRevoked()
+    {
+        if(!is_dir($this->crlspath))
+        {
+            $this->status['errors'][] = 'Couldn\'t verify if certificate was revoked.(CD-02)';  // CRL path not found.';
+            $this->status['isValid'] = false;
+            return;
+        }
+        
+        if(!isset($this->crlDistributionPoints[0]))
+        {
+            # nao localizou crl no certificado.....
+            $this->status['errors'][] = 'Couldn\'t verify if certificate was revoked.(CD-03)';  // Crl file not found;
+            $this->status['isValid'] = false;
+            return;
+        }
+        
+        $aux = explode('/',$this->crlDistributionPoints[0]);
+        $crl = file_get_contents($this->crlspath . '/' . $aux[count($aux)-1],true);
+        $saida = array();
+        $w = exec('openssl crl -in ' . $this->crlspath . '/' . $aux[count($aux)-1] . ' -inform DER -noout -text',$saida);
+
+        if(strpos($saida[5],'        Next Update: ') === false)
+        {
+            $this->status['errors'][] = 'Couldn\'t verify if certificate was revoked.(CD-04)';  // Invalid crl file found.';
+            $this->status['isValid'] = false;
+            return;
+        }
+        else
+        {
+            // - verify expired crl...
+            $a1 = explode(' Update: ',$saida[5]);
+            $a2 = date_create($a1[1]);
+            if($a2->date < date('Y-m-d H:i:s'))
+            {
+                $this->status['errors'][] = 'Couldn\'t verify if certificate was revoked.(CD-05)';   // Invalid crl file found.';
+                $this->status['isValid'] = false;
+                return;
+            }
+        }
+
+        $aux = array_search('    Serial Number: ' . $this->serialNumber, $saida);
+        
+        if($aux)
+        {
+            // cert revoked...
+            $this->status['isValid'] = false;
+            $a1 = explode('Date: ',$saida[$aux+1]);
+            $this->status['errors'][] = 'REVOKED Certificate at: ' . $a1[1];
+            return;
+        }
+    }
+
     public static function xBase128($ab,$q,$flag)
     {
         $abc = $ab;
@@ -226,7 +340,7 @@ class Expresso_Security_Certificate_X509
     public function getValidTo() {
         return $this->validTo;
     }
-
+      
     public function isCanSign() {
         return $this->canSign;
     }
@@ -243,6 +357,10 @@ class Expresso_Security_Certificate_X509
         return $this->ca;
     }
 
+    public function isValid() {
+        return $this->status['isValid'];
+    }
+    
     public function getAuthorityKeyIdentifier() {
         return $this->authorityKeyIdentifier;
     }
@@ -254,5 +372,35 @@ class Expresso_Security_Certificate_X509
     public function getAuthorityInfoAccess() {
         return $this->authorityInfoAccess;
     }
+
+    public function getStatusErrors() {
+        return $this->status['errors'];
+    }
     
+    public static function generateTempFilename(&$tab_arqs, $path)
+    {
+
+        $list = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $N = $list[rand(0,count($list)-1)].date('U').$list[rand(0,count($list)-1)].RAND(12345,9999999999).$list[rand(0,count($list)-1)].$list[rand(0,count($list)-1)].RAND(12345,9999999999).'.tmp';
+        $aux = $path.'/'.$N;
+        array_push($tab_arqs ,$aux);
+        return  $aux;
+    }
+    
+    private static function removeTempFiles($tab_arqs)
+    {
+        foreach($tab_arqs as $arquivo )
+        {
+            if(file_exists($arquivo))
+            {
+                unlink($arquivo);
+            }
+        }
+    }
+    
+    public static function writeTo($file, $content)
+    {
+        return file_put_contents($file, $content);   
+    }
+
 }
