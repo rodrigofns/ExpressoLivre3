@@ -1,7 +1,8 @@
 Ext.ux.form.HtmlEditor.UploadImage = Ext.extend(Ext.util.Observable, {
 
     url : 'index.php',
-    base_params : { method : 'Felamimail.uploadImage' },
+    method : 'Felamimail.uploadImage',
+    base64: 'no',
     permitted_extensions: ['jpg', 'jpeg', 'png', 'bmp', 'gif'],
     fsa : null,
     form : null,
@@ -13,9 +14,9 @@ Ext.ux.form.HtmlEditor.UploadImage = Ext.extend(Ext.util.Observable, {
 
         this.cmp = cmp;
         this.cmp.on('render', this.onRender, this);
-        this.on('uploadsuccess', this.onUploadSuccess, this);
-        this.on('uploaderror', this.onUploadError, this);
-        this.on('uploadfailed', this.onUploadFailed, this);
+        this.on('uploadsuccess', this.uploadsuccess || this.onUploadSuccess, this);
+        this.on('uploaderror', this.uploaderror || this.onUploadError, this);
+        this.on('uploadfailed', this.uploadfailed || this.onUploadFailed, this);
 
         var css = '.x-edit-image {background: url(ux/icons/picture.png) 0 0 no-repeat !important;}';
         Ext.util.CSS.createStyleSheet(css, 'editor-css');
@@ -162,7 +163,11 @@ Ext.ux.form.HtmlEditor.UploadImage = Ext.extend(Ext.util.Observable, {
     
     },
 
-createForm : function()	{
+        setBase64 : function(base64) {
+          this.base64 = base64;
+        },
+        
+        createForm : function()	{
 if (!this.body) {
 this.body = Ext.getBody();
 }
@@ -236,6 +241,7 @@ this.fireEvent('uploadstart', this);
 },
 
 uploadFile : function(record) {
+                this.base_params = { method: 'Felamimail.uploadImage', base64: this.base64 };
 Ext.Ajax.request({
 url : this.url,
 params : this.base_params || this.baseParams || this.params,
