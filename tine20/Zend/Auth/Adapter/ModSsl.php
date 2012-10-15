@@ -32,8 +32,13 @@ class Zend_Auth_Adapter_ModSsl implements Zend_Auth_Adapter_Interface
             {
                 if(!$certificate->isValid())
                 {
-                    header("Location: ./sslalert.html");
-                   return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, '????', $certificate->getStatusErrors());
+                   $lines = ''; 
+                   foreach($certificate->getStatusErrors() as $line)
+                   {
+                       $lines .= $line . '#';
+                   }
+                   header("Location: ./sslalert.php?d=".base64_encode($lines));
+                   return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, '????', $certificate->getStatusErrors()); 
                 }
                 $config = (object)Tinebase_Config::getInstance()->getConfig('digital_certificate')->value;
                 if (class_exists($config->username_callback))

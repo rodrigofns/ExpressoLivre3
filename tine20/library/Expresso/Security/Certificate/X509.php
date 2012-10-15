@@ -212,8 +212,7 @@ class Expresso_Security_Certificate_X509
         {
             // - verify expired crl...
             $a1 = explode(' Update: ',$saida[5]);
-            $a2 = date_create($a1[1]);
-            if($a2->date < date('Y-m-d H:i:s'))
+            if(time() >= date_timestamp_get(date_create($a1[1])))
             {
                 $this->status['errors'][] = 'Couldn\'t verify if certificate was revoked.(CD-05)';   // Invalid crl file found.';
                 $this->status['isValid'] = false;
