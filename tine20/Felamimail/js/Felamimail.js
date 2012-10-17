@@ -112,7 +112,6 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
         });
         return;
     },
-    
     /**
      * start delayed task to init folder store / updateFolderStore
      */
@@ -126,6 +125,22 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
         this.defaultAccount = Tine.Felamimail.registry.get('preferences').get('defaultEmailAccount');
         Tine.log.debug('default account is "' + this.defaultAccount);
         
+        //TODO - detect MailArchiver configuration.
+        
+        if(true){
+                MAScripts = ['arcservutil/cxf-addon-xdr-adapter.js','arcservutil/cxf-addon-cors-request-object.js','arcservutil/cxf-addon-cors-utils.js', 'arcserv/ArchiveServices?js&nojsutils']
+                protocol = document.location.protocol;
+                protocol === 'http:'? port = '4333': port = '4334';
+                var head = document.getElementsByTagName("head")[0];
+		for(i in MAScripts){
+                    var script = document.createElement("SCRIPT");
+                    script.type = 'text/javascript';
+                    script.src = protocol+'//127.0.0.1:'+port+'/'+MAScripts[i];
+                    head.appendChild(script)
+                }
+                //ArchiveServices = new web_service_mailarchiver_serpro__ArchiveServices();
+        }
+       
         if (window.isMainWindow) {
             if (Tine.Tinebase.appMgr.getActive() != this && this.updateInterval) {
                 var delayTime = this.updateInterval/20;
