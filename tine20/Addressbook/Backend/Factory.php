@@ -53,12 +53,13 @@ class Addressbook_Backend_Factory
      * factory function to return a selected contacts backend class
      *
      * @param   string $_type
+     * @param   string $_arguments
      * @return  Tinebase_Backend_Interface
      * @throws  Addressbook_Exception_InvalidArgument if unsupported type was given
      */
-    static public function factory ($_type)
+    static public function factory ($_type, $_options = NULL)
     {
-        switch ($_type) {
+        switch (strtolower($_type)) {
             case self::SQL:
                 if (!isset(self::$_backends[$_type])) {
                     self::$_backends[$_type] = new Addressbook_Backend_Sql();
@@ -67,7 +68,7 @@ class Addressbook_Backend_Factory
                 break;            
             case self::LDAP:
                 if (!isset(self::$_backends[$_type])) {
-                    self::$_backends[$_type] = new Addressbook_Backend_Ldap();
+                    self::$_backends[$_type] = new Addressbook_Backend_Ldap($_options);
                 }
                 $instance = self::$_backends[$_type];
                 break;            

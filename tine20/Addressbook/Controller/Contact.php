@@ -33,7 +33,7 @@ class Addressbook_Controller_Contact extends Tinebase_Controller_Record_Abstract
     private function __construct() {
         $this->_applicationName = 'Addressbook';
         $this->_modelName = 'Addressbook_Model_Contact';
-        $this->_backend = Addressbook_Backend_Factory::factory(Addressbook_Backend_Factory::SQL);
+        $this->_backend = Addressbook_Backend_AddressbookProxy::getInstance();
         $this->_currentAccount = Tinebase_Core::getUser();
         $this->_purgeRecords = FALSE;
         $this->_resolveCustomFields = TRUE;
