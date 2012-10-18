@@ -33,4 +33,4 @@ header('Content-type: application/json');
 echo json_encode(array(
     'login_name' => $user_access->login_name,
     'ip'         => $user_access->ip
-));//test
+));
