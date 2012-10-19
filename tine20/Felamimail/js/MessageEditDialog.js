@@ -603,6 +603,11 @@ Ext.namespace('Tine.Felamimail');
             this.to = this.to.concat(this.replyTo.get('to'));
             this.cc = this.replyTo.get('cc');
             
+            if(this.cc == null)
+            {
+                this.cc = [];
+            }
+            
             // remove own email and all non-email strings/objects from to/cc
             var account = Tine.Tinebase.appMgr.get('Felamimail').getAccountStore().getById(this.record.get('account_id')),
                 ownEmailRegexp = new RegExp(account.get('email'));
