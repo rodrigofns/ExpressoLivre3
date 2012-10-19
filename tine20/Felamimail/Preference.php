@@ -52,6 +52,13 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
      * @todo add this to more apps?
      */
     const CONFIRM_DELETE = 'confirmDelete';
+    
+     /**
+     * Use if the MailArchiver sollution is instaled.
+     *
+     */
+    const MAIL_ARCHIVER = 'mailArchiver';
+    
 
     /**
      * show Use Trash option
@@ -100,7 +107,8 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
             self::AUTOATTACHNOTE,
             self::CONFIRM_DELETE,
             self::MOVEDELETED_TOTRASH,
-            self::DELETE_FROMTRASH,            
+            self::DELETE_FROMTRASH,
+            self::MAIL_ARCHIVER,
         );
             
         return $allPrefs;
@@ -143,7 +151,11 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
             self::DELETE_FROMTRASH  => array(
                 'label'         => $translate->_('Delete trash messages after how many days'),
                 'description'   => $translate->_('Choose a number of days'),
-            ),            
+            ),
+            self::MAIL_ARCHIVER  => array(
+                'label'         => $translate->_('Use local archived menssages'),
+                'description'   => $translate->_('Use if you have the MailArchiver service instaled'),
+            ),   
         );
         
         return $prefDescriptions;
@@ -214,7 +226,14 @@ class Felamimail_Preference extends Tinebase_Preference_Abstract
                     </option>';
                 }
                 $preference->options    .= '</options>';
-                break;            
+                break;
+            case self::MAIL_ARCHIVER:
+                $preference->value      = 0;
+                $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
+                    <options>
+                        <special>' . Tinebase_Preference_Abstract::YES_NO_OPTIONS . '</special>
+                    </options>';
+                break;
             default:
                 throw new Tinebase_Exception_NotFound('Default preference with name ' . $_preferenceName . ' not found.');
         }
