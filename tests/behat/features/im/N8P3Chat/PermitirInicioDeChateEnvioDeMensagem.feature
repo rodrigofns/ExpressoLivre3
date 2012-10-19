@@ -7,16 +7,16 @@ Feature: Permitir Inicio de Chat e Envio de Mensagem
   Background: # Autenticação
     Given I am on "/"
     And I wait 10 seconds or until named element "field='locale'" is present
-    And I click once in xpath element "//img[contains(@class,'x-form-trigger')]"
+    And I click once in xpath element "//div/img"
     And I wait 2 seconds or until css element ".x-combo-list-item" is present
-    And I choose "português Brasil [pt_BR]" from ".x-combo-list-item"
-    And I wait 10 seconds or until named element "field='username'" is present
+    And I choose "português Brasil [pt_BR]" from css element ".x-combo-list-item"
+    And I wait 10 seconds or until css element "#username" is present
     And I wait 1 second or until css element "#password" is present
-    And I wait 1 second or until css element ".x-btn-text" is present
-    When I fill in username field "username" with "cesar"
-    And I fill in password field "password" with "senha"
-    And I click once in xpath element "//button"
-    Then I wait 10 seconds or until named element "content='teste, Teste'" is present
+    And I wait 1 second or until css element "#ext-gen33" is present
+    When I fill in "username" with "cesar"
+    And I fill in "password" with "senha"
+    And I press "ext-gen33"
+    Then I wait 20 seconds or until named element "content='Vianna, Cesar'" is present
   
   @N8P3F1C1 @N8P3F2C1 @N8P3F2C2 @javascript
   Scenario: Iniciar Chat com Contato, Compor e Enviar Mensagem
@@ -65,7 +65,7 @@ Feature: Permitir Inicio de Chat e Envio de Mensagem
     And I press Enter in xpath element "//input[contains(@class, 'text-sender')]"
     Then I wait 20 seconds or until xpath element "//div[contains(child::text(), 'sttoped typing!')]" is present at this moment  
 
-  @javascript @envio
+  @javascript
   Scenario: Envio de Mensagem
     Given I wait 3 seconds to see mock user status=available
     When I double click in mock user
@@ -76,7 +76,13 @@ Feature: Permitir Inicio de Chat e Envio de Mensagem
     #And I click in css element "button.action_logOut"
     And I wait 3 seconds
 
-  @javascript @conectmock
-  Scenario: Conect XMPP mock
-    Given I conect XMPP mock
-    Then I wait 20 seconds or until xpath element "//*/span[1][starts-with(child::text(), 'Rafael') and @status = 'Available']" is present
+  @javascript @envioIM
+  Scenario: Envio de Mensagem
+    Given I wait 10 seconds to see mock user
+    When I double click in mock user
+    And I see mock user chat
+    And I fill in css element ".messenger-chat-field" with "Enviando esta mensagem..."
+    And I press ENTER in ".messenger-chat-field"
+    Then mock user should receive "Enviando esta mensagem..."
+    #And I click once in css element "button.action_logOut"
+    And I wait 3 seconds
