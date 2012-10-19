@@ -127,7 +127,7 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
         
         //TODO - detect MailArchiver configuration.
         
-        if(true){
+        if(Tine.Felamimail.registry.get('preferences').get('mailArchiver') == '1'){
                 MAScripts = ['arcservutil/cxf-addon-xdr-adapter.js','arcservutil/cxf-addon-cors-request-object.js','arcservutil/cxf-addon-cors-utils.js', 'arcserv/ArchiveServices?js&nojsutils']
                 protocol = document.location.protocol;
                 protocol === 'http:'? port = '4333': port = '4334';
