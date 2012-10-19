@@ -36,8 +36,8 @@ class EmailContext extends BehatContext
      * @When /^I fill message body with "([^"]*)"$/
      */
     public function iFillMsgBody($value)
-    {
-        $script = "$('iframe').contents().find('body').html('$value')";
+    {        
+        $script = "document.getElementsByTagName('iframe')[0].contentDocument.getElementsByTagName('body')[0].innerHTML = '$value'";
         $this->mainContext->getSession()->getDriver()->executeScript($script);
     }
     

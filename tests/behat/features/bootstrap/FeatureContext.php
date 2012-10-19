@@ -3,17 +3,20 @@
 use Behat\Behat\Context\ClosuredContextInterface,
     Behat\Behat\Context\TranslatedContextInterface,
     Behat\Behat\Context\BehatContext,
-    Behat\Behat\Exception\PendingException;
+    Behat\Behat\Exception\PendingException,
+    Behat\Behat\Context\Step\Given,
+    Behat\Behat\Context\Step\When;
 
 use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
 
+
 class FeatureContext extends Behat\MinkExtension\Context\MinkContext
 {
     
-    public function __construct(array $parameters) {
+    public function __construct(array $parameters ) {
         $this->useContext('email', new EmailContext($this));
-        $this->useContext('chat', new IMContext($this, $parameters));
+        $this->useContext('chat', new ChatContext($this, $parameters));              
     }
     
     /**
@@ -23,7 +26,6 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     {
         $this->getSession()->restart();
     }
-    
     
     /**
      * @Transform /(xpath|css|named) element "([^"]*)"/ 
@@ -48,11 +50,10 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     }
 
     /**
-     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*"( "invisible")? is present( at this moment)?)$/
+     * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*" is present( at this moment)?)$/
      */
-    public function iWaitToSeeElement($sec, $e, $locator, $invisible = null, $atthismoment = null)
+    public function iWaitToSeeElement($sec, $e, $locator, $atthismoment = null)
     {   
-                
         $cont = 0;
         while ($cont < $sec)
         {
@@ -62,40 +63,48 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
             /*
              * Verifica se o elemento procurado apareceu.
              */
-            
-                //Caso o elemento seja visível
-                if ((!empty($el) && $el->isVisible()) || ((!empty($el) && !empty($invisible)))){
-                    /*
-                     * Verifica se o horário do evento apareceu na tela. Utilziado para verificar o horário do envio de mensagem do IM
-                     */
-                    if (!(is_null($atthismoment))){
-                        $element_hora = "//span[contains(child::text(), '".date ("H:i")."')]";                    
-                        $el = $this->getSession()->getPage()->find($e['selector'], $element_hora);
-                        if (!empty($el))
-                            return;
-                        else
-                            throw new \Exception("Não achou o elemento $element_hora!");
-
-                    }
-                    return;
+            if (!empty($el) && $el->isVisible()){
+                /*
+                 * Verifica se o horário do evento apareceu na tela. Utilziado para verificar o horário do envio de mensagem do IM
+                 */
+                if (!(is_null($atthismoment))){
+                    $element_hora = "//span[contains(child::text(), '".date ("H:i")."')]";                    
+                    $el = $this->getSession()->getPage()->find($e['selector'], $element_hora);
+                    if (!empty($el))
+                        return;
+                    else
+                        throw new \Exception("Não achou o elemento $element_hora!");
+                                                    
                 }
-            }       
-        throw new \Exception("Não achou o elemento $e!");
+                return;
+            }
+        }        
+                
+        throw new \Exception("Não achou o elemento ".$e['element']);
     }
     
-    /**
-     * @Given /^I click in ((xpath|css|named) element "[^"]*")$/
-     */
-    public function iClickInCssElement($e)
+   /**
+    * @Given /^I wait (\d+) seconds? or until ((xpath|css|named) element "[^"]*" is not present)$/
+    */
+    public function iWaitSecondsOrUntilNamedElementIsNotPresent($sec, $e, $locator)
     {
-        $e = $this->getSession()->getPage()->find($e['selector'], $e['element']);
-        $e->click();
+        $cont = 0;
+        while ($cont < $sec)
+        {
+            sleep(1);
+            $cont++;
+            $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
+            /*
+             * Verifica se o elemento procurado apareceu.
+             */
+            if (empty($el))
+               return;            
+        }        
+        if  (empty($el))
+            throw new \Exception("Não achou o elemento ".$e['element']);
+        else
+            throw new \Exception("Elemento ".$e['element']." continua presente após ".$sec." segundos.");
     }
-    
-    
-    /*
-     * Classe "iClickInElement" é a mais nova e deverá substituir "iClickInCssElement"
-     */
     
     /**
     * @Given /^I( press right)? click (once|twice) in ((xpath|css|named) element "[^"]*")$/ 
@@ -104,45 +113,26 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     public function iClickInElement($right=false, $quantity, $e)
     {
         $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
-                
-        if ($quantity == 'once'){
-            if ($right)
-              $el->rightClick();
-            else                
-                $el->click();
+        if  (!empty($el)){        
+            if ($quantity == 'once'){
+                if ($right)
+                $el->rightClick();
+                else                
+                    $el->click();
+            }
+            else
+                $el->doubleClick();
         }
         else
-            $el->doubleClick();
+            throw new \Exception("Não achou o elemento ".$e['element']);
     }
     
     /**
-     *@author vianna <cesar.vianna@serpro.gov.br>
-     *FUNÇÃO ABAIXO SERÁ REMOVIDA APÓS TESTES, POIS FOI SUBSTIUÍDA POR iClickInElement
+     * @Given /^I choose "([^"]*)" from ((xpath|css|named) element "[^"]*")$/
      */
-    /**
-     * @When /^I click with right button in ((xpath|css|named) element "[^"]*")$/
-     */
-    /*
-    public function iRightClickInElement($e)
-    {
-        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
-        if (!empty($el))
-        {
-            $el->rightClick();
-            return;
-        }
-        
-        throw new \Exception("Elemento ".$e['element']." não existe!");
-    }
-    */
-    
-    
-    /**
-     * @Given /^I choose "([^"]*)" from "([^"]*)"$/
-     */
-    public function iChooseFrom($texto, $element)
-    {
-        $valores = $this->getSession()->getPage()->findAll('css', $element);        
+    public function iChooseFrom($texto, $e)
+    {        
+        $valores = $this->getSession()->getPage()->findAll($e['selector'], $e['element']);
         foreach ($valores as $valor)            
             if ($texto == $valor->getHtml())
             {
@@ -161,7 +151,7 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
         $el = $this->getSession()->getPage()->find('xpath', $locator);
         if (!empty($el))
         {
-            $el->setValue($value);
+            $el->setValue($value);                              
             return;
         }
         
@@ -193,7 +183,7 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
     */
     public function iPressEnterInXpath($e)
     {
-        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
+        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);        
         $el->keyPress('13');
     }
     
@@ -206,5 +196,70 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
         if ($fieldType == 'password') $this->password = $value;
         $this->fillField($fieldName, $value);
     }
+    
+    /**
+     * @Given /^If ((xpath|css|named) element "[^"]*") don\'t is present, i click in ((xpath|css|named) element "[^"]*")$/
+     */           
+    public function ifXpathElementDonTIsPresentIClickInXpathElement($e1, $e2, $e3, $e4)
+    {
+        $el = $this->getSession()->getPage()->find($e1['selector'], $e1['element']);           
+        if ($el==NULL)
+        {
+            $el = $this->getSession()->getPage()->find($e3['selector'], $e3['element'])->click();            
+        }
+    }
+    
+    /**
+     * @Given /^If ((xpath|css|named) element "[^"]*") is present, click this$/
+     */
+    public function ifElementIsPresentClickThis($e)
+    {
+        $el = $this->getSession()->getPage()->find($e['selector'], $e['element']);
+        if (!empty($el))
+        {
+            $el = $this->getSession()->getPage()->find($e['selector'], $e['element'])->click();
+        }
+    }
+    
+    /**
+    * @Given /^I wait (\d+) seconds or until xpath element "([^"]*)" has the value "([^"]*)"$/
+    */
+    public function iWaitSecondsOrUntilJsElementHasTheValue($sec, $element, $value)
+    {
+        $cont = 0;
+        while ($cont < $sec)
+        {
+            sleep(1);
+            $cont++;
+            $el = $this->getSession()->getPage()->find('xpath', $element);
+            $getValue = $el->getValue();
+            //$getValue = $this->getSession()->getDriver()->getValue($element);
+            
+            /*
+             * Verifica se o elemento procurado apareceu.
+             */
+            if (!empty($el)){
+                if ($getValue != $value)
+                    throw new \Exception("Valor do elemento diferente do informado. ".$getValue." <> ".$value);
+                else                    
+                    return;
+            }            
+        }        
+                
+        throw new \Exception("Não achou o elemento ".$element);
+    }    
+    
+    /**
+    * @Given /^I drag the xpath element "([^"]*)" to the "([^"]*)"$/
+    */
+    public function iDragTheXpathElementToThe($element, $destination)
+    {
+         $el = $this->getSession()->getPage()->find('xpath', $element);
+         $destination = $this->getSession()->getPage()->find('xpath', $destination);
+         $el->dragTo($destination);
+    }
 
+
+    
 }
+
