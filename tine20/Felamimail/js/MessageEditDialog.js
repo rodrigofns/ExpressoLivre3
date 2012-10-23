@@ -195,7 +195,7 @@ Ext.namespace('Tine.Felamimail');
             enableToggle: true
         });
         this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
-            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain')
+            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain.')
         });
 
         this.action_toggleMarkAsImportant = new Ext.Action({
@@ -219,7 +219,7 @@ Ext.namespace('Tine.Felamimail');
             enableToggle: true
         });
         this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
-            tooltip: this.app.i18n._('Activate this toggle button to send this message as text/plain.')
+            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain.')
         });
 
         this.tbar = new Ext.Toolbar({
