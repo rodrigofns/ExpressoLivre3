@@ -691,7 +691,13 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             
         result += '/';
         if (folder) {
-            result += folder.get('globalname');
+            var aux1 = folder.get('globalname').split("/");
+            var aux2 = "";
+            for(var i = 0; i < aux1.length; i++)
+                {
+                    aux2 += this.app.i18n._(aux1[i]) + "/";
+                }
+            result += aux2.substring(0,aux2.length-1);
         } else {
             result += folderId;
         }
