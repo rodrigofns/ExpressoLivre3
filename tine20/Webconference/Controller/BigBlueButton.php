@@ -15,6 +15,10 @@ define('ATTENDEE_PW', 'attendeepw');
 class Webconference_Controller_BigBlueButton {
 
     protected $_backend;
+    
+    const MODERATOR = "M";
+    const ATTENDEE = "A";
+    const OWNER = "O";
 
     /**
      * the constructor
@@ -43,92 +47,120 @@ class Webconference_Controller_BigBlueButton {
         }
         return self::$_instance;
     }
-
-    /**
-     * create room name
-     * 
-     * @return String room name 
-     */
-    private function _createRoomName() {
-        $metings = $this->getMeetings();
-        $user = Tinebase_Core::getUser()->accountLoginName;
-        if ($metings) {
-            foreach ($metings as $meting){
-                $metingId = (String)$meting["meetingID"];
-                $hasBeenForciblyEnded = (String)$meting["hasBeenForciblyEnded"];
-                if ($hasBeenForciblyEnded == "true"){
-                    continue;
-                }
-                if (strstr($metingId, $user)){
-                    return $metingId;
-                }
-            }
-        }
-        return $user."_".time();
+    
+    private function _joinURL($roomId, $accountsId, $userName, $userEmail, $role){	
+	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+	
+	switch ($role){
+	    case "OWNER":
+		$password = MODERATOR_PW;
+		$conferenceRole = self::OWNER;
+		break;
+	    case "MODERATOR":
+		$password = MODERATOR_PW;
+		$conferenceRole = self::MODERATOR;
+		break;
+	    case "ATTENDEE":
+		$password = MODERATOR_PW;
+		$conferenceRole = self::MODERATOR;
+		break;
+	}
+	
+	$roomURL = $this->_backend->joinURL($room->room_name, $userName, $password, $config->salt, $config->url);
+	
+	// save data table webconference_room_user
+	$data = array("webconference_room_id" => $roomId,
+		      "accounts_id" => $accountsId,
+                      "user_email" => $userEmail,
+		      "user_name" => $userName,
+		      "room_url" => $roomURL,
+                      "conference_role" => $conferenceRole,
+		      "call_date" => time() );
+	$record =  new Webconference_Model_WebconferenceRoomUser($data);
+	Webconference_Controller_WebconferenceRoomUser::getInstance()->create($record);
+	return $roomURL;
     }
 
-    private function _joinUrl($roomName, $username, $mPW, $salt, $url) {
-        return (object) array(
-                    bbbUrl => $this->_backend->joinURL($roomName, $username, $mPW, $salt, $url),
-                    roomName => $roomName
-        );
-    }
- 
-    /**
-     * This method creates a meeting
-     * 
-     * @param username
-     * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
-     * @param welcomeString -- the welcome message to be displayed when a user logs in to the meeting
-     * @param mPW -- the moderator password of the meeting
-     * @param aPW -- the attendee password of the meeting
-     * @param SALT -- the security salt of the bigbluebutton server
-     * @param URL -- the url of the bigbluebutton server
-     * @param logoutURL -- the url the user should be redirected to when they logout of bigbluebutton
-     * @return String -- URL of the meeting
-     */
-    private function _createRoom($username, $roomName, $welcomeString, $mPW, $aPW, $salt, $url, $logoutUrl) {
-        $translation = Tinebase_Translation::getTranslation('Webconference');
-
-        $ret = $this->_backend->createMeetingArray($username, $roomName, $welcomeString, $mPW, $aPW, $salt, $url, $logoutUrl);
-
-        if (!$ret) {
-            throw new Tinebase_Exception_NotFound($translation->_('ERROR (the webconference server is unreachable)'));
-        }
-        $ret = (object) $ret;
-        if ($ret->returncode == 'FAILED') {
-            throw new Tinebase_Exception_NotFound(sprintf($translation->_("ERROR (%s): %s"), $ret->messageKey, $ret->message));
-        }
-        return $this->_joinURL($roomName, $username, $mPW, $salt, $url);
-    }
-
-    private function _getBigBlueButtonConfig() {
-        return Webconference_Controller_WebconferenceConfig::getInstance()->loadWebconferenceConfig();
-    }
+    private function _getBigBlueButtonConfigBalance() {
+	$data = Webconference_Controller_WebconferenceConfig::getInstance()->getAll();
+	$quant = -1;
+	$bbb = null;
+	foreach ($data as $conf){
+	    $meetings = (object) $this->_backend->getMeetingsArray($conf->url, $conf->salt);
+	    if ($meetings->returncode == 'SUCCESS' || $meetings->messageKey == 'noMeetings'){
+		return $conf;
+	    }   
+	    $meetingsId = array();
+	    if ($meetings) {
+		foreach ($meetings as $meeting){
+		    $meetingId = (String)$meeting["meetingID"];
+		    $hasBeenForciblyEnded = (String)$meeting["hasBeenForciblyEnded"];
+		    if ($hasBeenForciblyEnded == "true"){
+			continue;
+		    } 
+		    array_push($meetingsId, $meetingId);
+		}
+	    }
+	    $perc = ( count($meetingsId) / $conf->limit_room);
+	    if ($perc < 1 || $perc < $quant){
+		$quant = $perc;
+		$bbb = $conf;
+	    }
+	}
+        return $bbb;
+    }    
+    
 
     /**
      * This method creates a new meeting
      * 
      * @return String -- URL of the meeting
      */
-    public function createRoom() {
+    public function createRoom($title) {
         $translation = Tinebase_Translation::getTranslation('Webconference');
-
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-
-        $salt = $config->salt;
-        $url = $config->url;
-        $mPW = MODERATOR_PW;
-        $aPW = ATTENDEE_PW;
         $logoutUrl = $this->getLogoutUrl();
         $welcomeString = sprintf($translation->_("Welcome to the Webconference by %s"), Tinebase_Core::getUser()->accountFullName);
-        $username = Tinebase_Core::getUser()->accountFullName;       
-        $roomName = $this->_createRoomName();
+        $userName = Tinebase_Core::getUser()->accountFullName;       
+	$userEmail = Tinebase_Core::getUser()->accountEmailAddress;
+	$roomName = Tinebase_Core::getUser()->accountLoginName.'_'.time();
+	
+	$config = $this->_getBigBlueButtonConfigBalance();
 
-        return $this->_createRoom($username, $roomName, $welcomeString, $mPW, $aPW, $salt, $url, $logoutUrl);
+	if ($config == null){
+	    throw new Tinebase_Exception_NotFound($translation->_('ERROR (the webconference server is unreachable)'));
+	}
+
+	$ret = $this->_backend->createMeetingArray($userName, $roomName, $welcomeString, MODERATOR_PW, ATTENDEE_PW, $config->salt, $config->url, $logoutUrl);
+	if (!$ret) {
+            throw new Tinebase_Exception_NotFound($translation->_('ERROR (the webconference server is unreachable)'));
+        }
+        $ret = (object) $ret;
+        if ($ret->returncode == 'FAILED') {
+            throw new Tinebase_Exception_NotFound(sprintf($translation->_("ERROR (%s): %s"), $ret->messageKey, $ret->message));
+        }
+	// save data table webconference_room
+	$data = array("title" => $title,
+		      "room_name" => $roomName,
+                      "create_date" => time(),
+		      "status" => "A",
+		      "webconference_config_id" => $config->id );
+
+	$record =  new Webconference_Model_WebconferenceRoom($data);
+	$roomRecord = Webconference_Controller_WebconferenceRoom::getInstance()->create($record);	
+	
+	$roomURL = $this->_joinURL($roomRecord->id, Tinebase_Core::getUser()->getId(), $userName, $userEmail, "OWNER");	
+	return $roomURL;
     }
 
+    private function _getAccountId($_email){
+	try{
+	    return Tinebase_User::getInstance()->getUserByProperty('accountEmailAddress', $_email)->accountId;
+	} catch (Exception $e){
+	    return null;
+	}
+    }     
+    
     /**
      * Join the room meeting
      * 
@@ -137,23 +169,21 @@ class Webconference_Controller_BigBlueButton {
      * @param Boolean $moderator -- is moderator in meeting
      * @return String -- URL of the meeting
      */
-    public function joinRoom($roomName, $moderator, $userName = null) {
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-        $salt = $config->salt;
-        $url = $config->url;
-        if (is_null($userName)) {
-            $userName = Tinebase_Core::getUser()->accountFullName;
-        }
+    public function joinRoom($roomId, $moderator, $userName, $userEmail) {
+	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
         if ($moderator) {
-            $pw = MODERATOR_PW;
+            $role = "MODERATOR";
         } else {
-            $pw = ATTENDEE_PW;
+            $role = "ATTENDEE";
         }
-        //Tinebase_Core::getSession()->webconferenceRoomName = $roomName;
+	$accountsId = $this->_getAccountId($userEmail);
+	$bbbUrl = $this->_joinURL($roomId, $accountsId, $userName, $userEmail, $role);
+ 
+	//Tinebase_Core::getSession()->webconferenceRoomName = $roomName;
         return (object) array(
-                    bbbUrl => $this->_joinURL($roomName, $userName, $pw, $salt, $url),
-                    roomName => $roomName
+                    bbbUrl => $bbbUrl,
+                    roomName => $room->room_name,
+		    roomId=>$room->id
         );
     }
 
@@ -167,11 +197,17 @@ class Webconference_Controller_BigBlueButton {
       moderatorPW, attendeePW, hasBeenForciblyEnded, running.
      */
     public function getMeetings() {
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-        $salt = $config->salt;
-        $url = $config->url;
-        return $this->_backend->getMeetingsArray($url, $salt);
+        $servers =  Webconference_Controller_WebconferenceConfig::getInstance()->getAll();	
+	$data = array();
+	foreach ($servers as $server){
+	    try {
+		$dataTemp = $this->_backend->getMeetingsArray($server->url, $server->salt);
+	    } catch (Exception $exc) {
+		$dataTemp = array("ERROR"=>$exc->getMessage());
+	    }
+	    array_push($data, array($server->url=>$dataTemp));
+	}
+        return $data;
     }
 
     //------------------------------------------------Other Methods------------------------------------
@@ -184,15 +220,10 @@ class Webconference_Controller_BigBlueButton {
      * 	- Null if the server is unreachable
      * 	- An array containing a returncode, messageKey, message.
      */
-    public function endMeeting($roomName, $moderatorPassword) {
-        if ($moderatorPassword == null) {
-            $moderatorPassword = MODERATOR_PW;
-        }
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-        $salt = $config->salt;
-        $url = $config->url;
-        return $this->_backend->endMeeting($roomName, $moderatorPassword, $url, $salt);
+    public function endMeeting($roomId) {
+	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+        return $this->_backend->endMeeting($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
 
     /**
@@ -205,15 +236,10 @@ class Webconference_Controller_BigBlueButton {
      * 	- If FAILED, returns an array containing a returncode, messageKey, message.
      * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
      */
-    public function getUsers($roomName, $moderatorPassword) {
-        if ($moderatorPassword == null) {
-            $moderatorPassword = MODERATOR_PW;
-        }
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-        $salt = $config->salt;
-        $url = $config->url;
-        return $this->_backend->getUsersArray($roomName, $moderatorPassword, $url, $salt);
+    public function getUsers($roomId) {
+	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+        return $this->_backend->getUsersArray($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
     
     
@@ -223,13 +249,11 @@ class Webconference_Controller_BigBlueButton {
     *
     *@return A boolean of true if the meeting is running and false if it is not running
     */
-    public function isMeetingActive($_roomName)
+    public function isMeetingActive($roomId)
     {
-        $config = $this->_getBigBlueButtonConfig();
-        $config = (object) $config;
-        $salt = $config->salt;
-        $url = $config->url;
-        return $this->_backend->getMeetingIsActive($_roomName, MODERATOR_PW, $url, $salt);
+	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+        return $this->_backend->getMeetingIsActive($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
 
     /**
@@ -267,15 +291,19 @@ class Webconference_Controller_BigBlueButton {
         return $online;
     }
 
-    public function inviteUsersToJoin($users, $moderator, $roomName) {
+    public function inviteUsersToJoin($roomId, $users, $moderator) {
         $translate = Tinebase_Translation::getTranslation('Webconference');
 
         $fullUser = Tinebase_Core::getUser();
         $recipients = array();
         foreach ($users as $user) {
-            $userName = $user[n_fn];
-
-            $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
+            //$userName = $user[n_fn];
+	    
+	    $addressbook = new Addressbook_Model_Contact($user);
+	    $userEmail = $addressbook->getPreferedEmailAddress();
+	    $userName = $addressbook->n_fn;
+	    
+	    $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomId, $moderator, $userName, $userEmail)->bbbUrl->bbbUrl;
             $subject = $translate->_("Invite User To Join Webconference");
             $messagePlain = null;
 
@@ -289,17 +317,17 @@ class Webconference_Controller_BigBlueButton {
             $_messageHtml .= "</span>";
             $_messageHtml .= "</div>";
 
-            $recipient = array(new Addressbook_Model_Contact($user));
+            $recipient = array($addressbook);
             Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, $messagePlain, $_messageHtml);
             array_push($recipients, $user);
         }
         return array('message' => $translate->_('Users invited successfully') . '!');
     }
 
-    public function inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email) {
+    public function inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email) {
         $translation = Tinebase_Translation::getTranslation('Webconference');
         $defaultEmailAccount = Tinebase_Core::getPreference("Felamimail")->{Felamimail_Preference::DEFAULTACCOUNT};
-        $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator, $userName)->bbbUrl->bbbUrl;
+        $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomId, $moderator, $userName, $email)->bbbUrl->bbbUrl;
         $accountFullName = Tinebase_Core::getUser()->accountFullName;
         $messageHtml = sprintf($translation->_("The user %s is inviting you to a Webconference"), $accountFullName);
         $messageHtml .= "<br/><br/>";
@@ -355,5 +383,18 @@ class Webconference_Controller_BigBlueButton {
         // $_SERVER["SERVER_NAME"] :shows the server name
 
     }
-
+    
+    public function getRoom(){
+	$data = array("status"=>"E");
+	$filter = new Webconference_Model_WebconferenceRoomFilter($data);
+	$controller = Webconference_Controller_WebconferenceRoom::getInstance();
+	return $rooms = $controller->search($filter, NULL, TRUE)->toArray();
+	foreach ($rooms as $room) {
+	    if ($this->isMeetingActive($room->id) == false){
+		$room->status = "E";
+		$controller->update($room);
+	    }
+	}
+	return Webconference_Controller_WebconferenceRoom::getInstance()->search($filter)->toArray();
+    }
 }

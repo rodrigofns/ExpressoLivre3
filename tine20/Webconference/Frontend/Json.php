@@ -44,7 +44,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
     public function searchWebconferenceConfig($filter, $paging) {
         return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
     }
-
+   
     /**
      * Return a single record
      *
@@ -61,8 +61,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * @param  array $recordData
      * @return array created/updated record
      */
-    public function saveWebconferenceConfig($recordData) {
-        return $this->_controller->saveWebconferenceConfig($recordData);
+    public function saveWebconferenceConfig($recordData, $duplicateCheck = TRUE) {
+        return $this->_save($recordData, Webconference_Controller_WebconferenceConfig::getInstance(), 'WebconferenceConfig', 'id', array($duplicateCheck));
     }
 
     /**
@@ -99,20 +99,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * 
      * @return String -- URL of the meeting 
      */
-    public function createRoom() {
-        return Webconference_Controller_BigBlueButton::getInstance()->createRoom();
-    }
-
-    /**
-     * Join the room meeting
-     * Joins automatically a user to the meeting specified in the roomName parameter.
-     * 
-     * @param String $roomName
-     * @param String $moderator
-     * @return String -- URL of the meeting  
-     */
-    public function joinRoom($roomName, $moderator = false) {
-        return Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomName, $moderator);
+    public function createRoom($title) {
+        return Webconference_Controller_BigBlueButton::getInstance()->createRoom($title);
     }
 
     /**
@@ -128,65 +116,22 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
         return Webconference_Controller_BigBlueButton::getInstance()->getMeetings();
     }
 
-    /**
-     * This method calls end meeting on the specified meeting in the bigbluebutton server.
-     *
-     * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
-     * @param moderatorPassword -- the moderator password of the meeting
-     * @return
-     * 	- Null if the server is unreachable
-     * 	- An array containing a returncode, messageKey, message.
-     */
-    public function endMeeting($roomName, $moderatorPassword = null) {
-        return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomName, $moderatorPassword);
-    }
-
-    /**
-     * This method returns an array of the attendees in the specified meeting.
-     *
-     * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
-     * @param moderatorPassword -- the moderator password of the meeting
-     * @return
-     * 	- Null if the server is unreachable.
-     * 	- If FAILED, returns an array containing a returncode, messageKey, message.
-     * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
-     */
-    public function getUsers($roomName, $moderatorPassword = null) {
-        return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
-    }
-
-    public function getJoinInvites() {
-
-        //if(hasInvitesToMe)
-        //{
-        return array(
-            'type' => 'event',
-            'name' => 'joinInvite',
-            'data' => 'Successfully polled at: ' . date('g:i:s a')
-        );
-//        }
-//        else
-//        {
-//            return null;
-//        }
-    }
-
-    public function inviteUsersToJoin($users, $moderator, $roomName) 
+    public function inviteUsersToJoin($users, $moderator, $roomId) 
     {
-        return Webconference_Controller_EventNotifications::getInstance()->sendNotificationToAttender($users, $moderator, $roomName);
-        //return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($users, $moderator, $roomName);
+        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($roomId, $users, $moderator);
     }
     
     
-    public function inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email)
+    public function inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email)
     {
-        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomName, $moderator, $userName, $email);
-    }
+        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email);
+    }   
     
-    public function isMeetingActive($roomName, $url){
+    public function isMeetingActive($roomId, $url)
+    {
         $translate = Tinebase_Translation::getTranslation('Webconference');
         
-        $active = Webconference_Controller_BigBlueButton::getInstance()->isMeetingActive($roomName);
+        $active = Webconference_Controller_BigBlueButton::getInstance()->isMeetingActive($roomId);
         if($active){
             return array(
                 'active' => true,
@@ -208,78 +153,49 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
                 );
             }
         }
-        
         return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
+    } 
+
+    /**
+     * This method calls end meeting on the specified meeting in the bigbluebutton server.
+     *
+     * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
+     * @param moderatorPassword -- the moderator password of the meeting
+     * @return
+     * 	- Null if the server is unreachable
+     * 	- An array containing a returncode, messageKey, message.
+     */
+    public function endMeeting($roomName, $moderatorPassword = null) {
+        return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomName, $moderatorPassword);
+    }
+    /*
+    public function endMeeting($roomId) {
+        return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomId);
+    }    
+    */
+    
+    /**
+     * This method returns an array of the attendees in the specified meeting.
+     *
+     * @param roomName -- the unique meeting identifier used to store the meeting in the bigbluebutton server
+     * @param moderatorPassword -- the moderator password of the meeting
+     * @return
+     * 	- Null if the server is unreachable.
+     * 	- If FAILED, returns an array containing a returncode, messageKey, message.
+     * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
+     */
+  /*  public function getUsers($roomId) {
+        return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomId);
+    }    
+*/
+    public function getUsers($roomName, $moderatorPassword = null) 
+    {
+        return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
     }
     
-//    public function checkUrl($url){
-//       return Webconference_Controller_BigBlueButton::getInstance()->checkUrl($url);
-//    }
-
+    public function getAccountId()
+    {
+        return Webconference_Controller_BigBlueButton::getInstance()->getRoom();
+    }    
     
-    /**
-     * Search for records matching given arguments
-     *
-     * @param  array $filter
-     * @param  array $paging
-     * @return array
-     */
-    /*    public function searchExampleRecords($filter, $paging)
-      {
-      return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_ExampleRecordFilter', TRUE);
-      }
-     */
-
-    /**
-     * Return a single record
-     *
-     * @param   string $id
-     * @return  array record data
-     */
-    /*    public function getExampleRecord($id)
-      {
-      return $this->_get($id, $this->_controller);
-      }
-     */
-
-    /**
-     * creates/updates a record
-     *
-     * @param  array $recordData
-     * @return array created/updated record
-     */
-    /*
-      public function saveExampleRecord($recordData)
-      {
-      return $this->_save($recordData, $this->_controller, 'ExampleRecord');
-      }
-     */
-
-    /**
-     * deletes existing records
-     *
-     * @param  array  $ids 
-     * @return string
-     */
-    /*
-      public function deleteExampleRecords($ids)
-      {
-      return $this->_delete($ids, $this->_controller);
-      }
-     */
-
-    /**
-     * Returns registry data
-     * 
-     * @return array
-     */
-//    public function getRegistryData()
-//    {   
-//        $defaultContainerArray = Tinebase_Container::getInstance()->getDefaultContainer(Tinebase_Core::getUser()->getId(), $this->_applicationName)->toArray();
-//        $defaultContainerArray['account_grants'] = Tinebase_Container::getInstance()->getGrantsOfAccount(Tinebase_Core::getUser(), $defaultContainerArray['id'])->toArray();
-//    
-//        return array(
-//            'defaultContainer' => $defaultContainerArray
-//        );
-//    }
 }

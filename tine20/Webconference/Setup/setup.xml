@@ -15,77 +15,7 @@
         <application>Admin</application>
     </depends>    
     <tables>
-        <table>
-            <name>example_application_record</name>
-            <version>1</version>
-            <declaration>
-                <field>
-                    <name>id</name>
-                    <type>text</type>
-                    <length>40</length>
-                    <notnull>true</notnull>
-                </field>
-                <field>
-                    <name>container_id</name>
-                    <type>integer</type>
-                    <notnull>false</notnull>
-                </field>
-                <field>
-                    <name>name</name>
-                    <type>text</type>
-                    <length>255</length>
-                    <notnull>true</notnull>
-                </field>
-                <!-- add more fields here -->
-                <!-- defaults for tine system -->
-                <field>
-                    <name>created_by</name>
-                    <type>text</type>
-                    <length>40</length>
-                </field>
-                <field>
-                    <name>creation_time</name>
-                    <type>datetime</type>
-                </field> 
-                <field>
-                    <name>last_modified_by</name>
-                    <type>text</type>
-                    <length>40</length>
-                </field>
-                <field>
-                    <name>last_modified_time</name>
-                    <type>datetime</type>
-                </field>
-                <field>
-                    <name>is_deleted</name>
-                    <type>boolean</type>
-                    <default>false</default>
-                </field>
-                <field>
-                    <name>deleted_by</name>
-                    <type>text</type>
-                    <length>40</length>
-                </field>            
-                <field>
-                    <name>deleted_time</name>
-                    <type>datetime</type>
-                </field>
-                <index>
-                    <name>id</name>
-                    <primary>true</primary>
-                    <field>
-                        <name>id</name>
-                    </field>
-                </index>
-                <index>
-                    <name>container_id</name>
-                    <field>
-                        <name>container_id</name>
-                    </field>
-                </index>
-            </declaration>
-        </table>
-                <!-- Table Webconference Config -->
+       <!-- Table Webconference Config -->
         <table>
             <name>webconference_config</name>
             <version>1</version>
@@ -149,6 +79,11 @@
                     <length>255</length>
                     <notnull>true</notnull>
                 </field>
+                <field>
+                    <name>limit_room</name>
+                    <type>integer</type>
+                    <notnull>true</notnull>
+                </field>		
                 <!-- fim -->
                 <index>
                     <name>id</name>
@@ -183,5 +118,261 @@
             </declaration>
         </table>        
         <!-- Table Webconference Config  end -->
+	
+	<table>
+	    <name>webconference_room</name>
+	    <version>1</version>
+	    <declaration>
+                <field>
+                    <name>id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+		<field>
+		    <name>title</name>
+		    <type>text</type>
+		    <lenght>50</lenght>
+		    <notnull>true</notnull>
+		</field>
+		<field>
+		    <name>room_name</name>
+		    <type>text</type>
+		    <lenght>50</lenght>
+		    <notnull>true</notnull>
+		</field>
+		<field>
+		    <name>create_date</name>
+		    <type>datetime</type>
+		</field>
+		<field>
+		    <name>status</name>
+		    <type>text</type>
+		    <lenght>1</lenght>
+		</field>
+
+		<field>
+		    <name>webconference_config_id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+
+		<!-- defaults for tine system -->
+		<field>
+                    <name>created_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>
+                <field>
+                    <name>creation_time</name>
+                    <type>datetime</type>
+                </field> 
+                <field>
+                    <name>last_modified_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>
+                <field>
+                    <name>last_modified_time</name>
+                    <type>datetime</type>
+                </field>
+                <field>
+                    <name>is_deleted</name>
+                    <type>boolean</type>
+                    <default>false</default>
+                </field>
+                <field>
+                    <name>deleted_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>            
+                <field>
+                    <name>deleted_time</name>
+                    <type>datetime</type>
+                </field>
+		<field>
+                    <name>container_id</name>
+                    <type>integer</type>
+                </field>
+		<!-- end defaults for tine system -->
+                <index>
+                    <name>id</name>
+                    <primary>true</primary>
+                    <unique>true</unique>
+                    <field>
+                        <name>id</name>
+                    </field>
+                </index>
+                <index>
+                    <name>webconference_room::container_id--container::id</name>
+                    <field>
+                        <name>container_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>container</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>		
+                <index>
+                    <name>webconference_room::webconference_config_id--webconference_config::id</name>
+                    <field>
+                        <name>webconference_config_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>webconference_config</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>		
+	    </declaration>
+	</table>
+	
+	<table>
+	    <name>webconference_room_user</name>
+	    <version>1</version>
+	    <declaration>
+	       <field>
+                    <name>id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+		<field>
+                    <name>webconference_room_id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+		
+		<field>
+                    <name>accounts_id</name>
+		    <type>text</type>
+		    <lenght>40</lenght>
+		    <notnull>false</notnull>
+                </field>
+		<field>
+                    <name>user_email</name>
+		    <type>text</type>
+		    <lenght>255</lenght>
+		    <notnull>true</notnull>
+                </field>
+		<field>
+                    <name>user_name</name>
+		    <type>text</type>
+		    <lenght>255</lenght>
+		    <notnull>false</notnull>
+                </field>
+		<field>
+                    <name>room_url</name>
+		    <type>text</type>
+		    <lenght>255</lenght>
+		    <notnull>true</notnull>
+                </field>
+		<field>
+		    <name>conference_role</name>
+		    <type>text</type>
+		    <lenght>1</lenght>
+		    <notnull>true</notnull>
+		</field>
+		<field>
+		    <name>call_date</name>
+		    <type>datetime</type>
+		</field>
+
+		<!-- defaults for tine system -->
+		<field>
+                    <name>created_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>
+                <field>
+                    <name>creation_time</name>
+                    <type>datetime</type>
+                </field> 
+                <field>
+                    <name>last_modified_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>
+                <field>
+                    <name>last_modified_time</name>
+                    <type>datetime</type>
+                </field>
+                <field>
+                    <name>is_deleted</name>
+                    <type>boolean</type>
+                    <default>false</default>
+                </field>
+                <field>
+                    <name>deleted_by</name>
+                    <type>text</type>
+                    <length>40</length>
+                </field>            
+                <field>
+                    <name>deleted_time</name>
+                    <type>datetime</type>
+                </field>
+		<field>
+                    <name>container_id</name>
+                    <type>integer</type>
+                </field>
+		<!-- end defaults for tine system -->
+                <index>
+                    <name>id</name>
+                    <primary>true</primary>
+                    <unique>true</unique>
+                    <field>
+                        <name>id</name>
+                    </field>
+                </index>
+                <index>
+                    <name>webconference_room_user::container_id--container::id</name>
+                    <field>
+                        <name>container_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>container</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>
+		<!-- end defaults for tine system -->
+                <index>
+                    <name>webconference_room_user::accounts_id--accounts::id</name>
+                    <field>
+                        <name>accounts_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>accounts</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>
+                <index>
+                    <name>webconference_room_user::webconferece_room_id--webconference_room::id</name>
+                    <field>
+                        <name>webconference_room_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>webconference_room</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>
+	    </declaration>
+	</table>	
+	
     </tables>
 </application>
