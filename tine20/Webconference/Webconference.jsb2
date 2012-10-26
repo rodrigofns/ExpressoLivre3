@@ -34,6 +34,10 @@
         {
           "text": "EmailDetailsPanel.js",
           "path": "js/"
+        },
+	{
+          "text": "MainScreenCenterPanel.js",
+          "path": "js/"
         }
       ]
     },

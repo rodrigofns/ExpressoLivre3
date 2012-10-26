@@ -36,3 +36,11 @@ span:hover.tinebase-webconference-link {
 .x-btn-large .action_terminate {
     background-image:url(../../images/oxygen/32x32/actions/application-exit.png) !important;
 }
+
+
+.tb-webconference-big-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: gray;
+    line-height: 35px;
+}
