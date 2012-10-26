@@ -1,23 +1,17 @@
+/*
+ * Tine 2.0
+ * 
+ * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @copyright   Copyright (c) 2007-2010 Metaways Infosystems GmbH (http://www.metaways.de)
+ */
 Ext.ns('Tine.Webconference.Model');
 
 /**
-* contact grid panel
-*
-* @namespace Tine.Webconference.Model
-* @class Tine.Webconference.Model.Configuration
-*
-*
-* <p>Tinebase Webconference Model Configuration</p>
-* <p><pre>
-* </pre></p>
-*
-* @license http://www.gnu.org/licenses/agpl.html AGPL Version 3
-* @author Edgar de Lucca <edgar.lucca@serpro.gov.br>, Marcelo Teixeira <marcelo.teixeira@serpro.gov.br>
-* @copyright Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
-*
-* Create a new Tine.Webconference.Model.Configuration
-*
-*/
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.Configuration
+ * @extends     Tine.Tinebase.data.Record
+ * Configuration Record Definition
+ */
 Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
     {name: 'id'},
     {name: 'name'},
@@ -37,7 +31,13 @@ Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.T
     containerProperty: null
 });
 
-Tine.Webconference.Model.iMIP = Tine.Tinebase.data.Record.create([
+/**
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.WCInvite
+ * @extends     Tine.Tinebase.data.Record
+ * WCInvite Record Definition
+ */
+Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},
     {name: 'roomName'},
@@ -47,6 +47,6 @@ Tine.Webconference.Model.iMIP = Tine.Tinebase.data.Record.create([
     
 ], {
     appName: 'Webconference',
-    modelName: 'iMIP',
+    modelName: 'WCInvite',
     idProperty: 'id'
 });
