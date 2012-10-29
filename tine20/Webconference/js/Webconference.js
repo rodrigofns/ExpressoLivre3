@@ -58,6 +58,11 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
     roomName: '',
     
     /**
+     * The room Id.
+     */
+    roomId: '',
+    
+    /**
      * The webconference application origin (where the user started the application from).
      */
     origin: null,
@@ -195,7 +200,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
      * If the room with the meetingId (roomName) exists, it activates the webconference module and join the user.
      *
      */
-    onJoinWebconferenceFromEmail: function(url, moderator, roomName){
+    onJoinWebconferenceFromEmail: function(url, moderator, roomId, roomName){
         
         var loadMask = new Ext.LoadMask(Tine.Tinebase.appMgr.getActive().getMainScreen().getCenterPanel().getEl(), {
             msg: String.format(_('Please wait'))
@@ -203,7 +208,8 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
         loadMask.show();
         
         var app = Tine.Tinebase.appMgr.get('Webconference');
-        Tine.Webconference.isMeetingActive(roomName, url,  function(response) {
+		
+        Tine.Webconference.isMeetingActive(roomId, url,  function(response) {
             if(response.active){
                 
                 if(Tine.Tinebase.appMgr.get('Webconference').roomActive){
@@ -214,6 +220,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
                             Tine.Tinebase.appMgr.get('Webconference').origin = WebconferenceOrigin.EMAIL;
                             Tine.Tinebase.appMgr.get('Webconference').bbbUrl = url;
                             Tine.Tinebase.appMgr.get('Webconference').roomName = roomName;
+			    Tine.Tinebase.appMgr.get('Webconference').roomId = roomId;
                             Tine.Tinebase.appMgr.get('Webconference').moderator = moderator;
                             Ext.get('webconference-iframe').dom.src = Tine.Tinebase.appMgr.get('Webconference').bbbUrl;
                             
@@ -254,11 +261,12 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
        
     },
 
-    createRoom: function(){
+    createRoom: function(title){
         
         Ext.Ajax.request({
             params: {
-                method: 'Webconference.createRoom'
+                method: 'Webconference.createRoom',
+		title: title
                 
             },
             scope: this,
@@ -266,6 +274,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
                 var result = Ext.util.JSON.decode(_result.responseText);
                 this.bbbUrl = result.bbbUrl;
                 this.roomName = result.roomName;
+		this.roomId = result.roomId;
                 this.roomActive = true;
             
 		if(!this.onMainScreen){
@@ -329,7 +338,7 @@ Tine.Webconference.Application = Ext.extend(Tine.Tinebase.Application, {
 	app.getMainScreen().show();
 	
 	app.loadMask.show();
-	app.createRoom();
+	app.createRoom(title);
 	
 	
 	

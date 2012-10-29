@@ -35,6 +35,8 @@ Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},
     {name: 'roomName'},
+    {name: 'roomId'},
+    {name: 'roomTitle'},
     {name: 'moderator'},
     {name: 'createdBy'},
     {name: 'to'}
