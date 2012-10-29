@@ -150,7 +150,12 @@ class Webconference_Controller_BigBlueButton {
 	$roomRecord = Webconference_Controller_WebconferenceRoom::getInstance()->create($record);	
 	
 	$roomURL = $this->_joinURL($roomRecord->id, Tinebase_Core::getUser()->getId(), $userName, $userEmail, "OWNER");	
-	return $roomURL;
+	
+	return (object) array(
+                    bbbUrl => $roomURL,
+                    roomName => $roomName,
+		    roomId=>$roomRecord->id
+        );
     }
 
     private function _getAccountId($_email){
@@ -183,7 +188,8 @@ class Webconference_Controller_BigBlueButton {
         return (object) array(
                     bbbUrl => $bbbUrl,
                     roomName => $room->room_name,
-		    roomId=>$room->id
+		    roomId=>$room->id,
+		    roomTitle =>$room->title
         );
     }
 
@@ -290,79 +296,83 @@ class Webconference_Controller_BigBlueButton {
 
         return $online;
     }
-
-    public function inviteUsersToJoin($roomId, $users, $moderator) {
+    
+    /**
+     * send notification to a set of users
+     * 
+     * @param Array	$users
+     * @param Boolean	$moderator
+     * @param Boolean	$roomId
+     * @return void
+     */
+    public function inviteUsersToJoin($users, $moderator, $roomId)
+    {
         $translate = Tinebase_Translation::getTranslation('Webconference');
-
-        $fullUser = Tinebase_Core::getUser();
-        $recipients = array();
-        foreach ($users as $user) {
-            //$userName = $user[n_fn];
-	    
-	    $addressbook = new Addressbook_Model_Contact($user);
-	    $userEmail = $addressbook->getPreferedEmailAddress();
-	    $userName = $addressbook->n_fn;
-	    
-	    $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomId, $moderator, $userName, $userEmail)->bbbUrl->bbbUrl;
-            $subject = $translate->_("Invite User To Join Webconference");
-            $messagePlain = null;
-
-            $_messageHtml = sprintf($translate->_("The user %s is inviting you to a Webconference"), Tinebase_Core::getUser()->accountFullName);
-            $_messageHtml .= "<br/><br/>";
-            $_messageHtml .= "<div>";
-            $_messageHtml .= "<span class=\"$url\" />";
-            $_messageHtml .= "<span class=\"tinebase-webconference-link\">";
-
-            $_messageHtml .= $translate->_("Log in to Webconference");
-            $_messageHtml .= "</span>";
-            $_messageHtml .= "</div>";
-
-            $recipient = array($addressbook);
-            Tinebase_Notification::getInstance()->send($fullUser, $recipient, $subject, $messagePlain, $_messageHtml);
-            array_push($recipients, $user);
-        }
-        return array('message' => $translate->_('Users invited successfully') . '!');
-    }
-
-    public function inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email) {
-        $translation = Tinebase_Translation::getTranslation('Webconference');
-        $defaultEmailAccount = Tinebase_Core::getPreference("Felamimail")->{Felamimail_Preference::DEFAULTACCOUNT};
-        $url = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomId, $moderator, $userName, $email)->bbbUrl->bbbUrl;
-        $accountFullName = Tinebase_Core::getUser()->accountFullName;
-        $messageHtml = sprintf($translation->_("The user %s is inviting you to a Webconference"), $accountFullName);
-        $messageHtml .= "<br/><br/>";
-        $messageHtml .= "<div>";
-        $messageHtml .= "<span class=\"$url\" />";
-        $messageHtml .= "<span class=\"tinebase-webconference-link\">";
-
-        $messageHtml .= $translation->_("Log in to Webconference");
-        $messageHtml .= "</span>";
-        $messageHtml .= "</div>";
-
-        $recordData = Array("note" => null,
-            "content_type" => "text/html",
-            "account_id" => $defaultEmailAccount,
-            "to" => Array($email),
-            "cc" => Array(),
-            "bcc" => Array(),
-            "subject" => $translation->_("Invite User To Join Webconference"),
-            "body" => $messageHtml,
-            "attachments" => Array(),
-            "from_email" => Tinebase_Core::getUser()->accountEmailAddress,
-            "customfields" => Array()
-        );
-
-        $message = new Felamimail_Model_Message();
-        $message->setFromArray($recordData);
-
         try {
-            $result = Felamimail_Controller_Message_Send::getInstance()->sendMessage($message);
-            $result = $this->_recordToJson($result);
-        } catch (Zend_Mail_Protocol_Exception $zmpe) {
-            Tinebase_Core::getLogger()->warn(__METHOD__ . '::' . __LINE__ . ' Could not send message: ' . $zmpe->getMessage());
-            throw $zmpe;
+        
+            
+            $fullUser = Tinebase_Core::getUser();
+            foreach ($users as $user) {
+                
+		$contact = new Addressbook_Model_Contact($user);
+		$userEmail = $contact->getPreferedEmailAddress();
+		$userName = $contact->n_fn;
+		
+                $room = Webconference_Controller_BigBlueButton::getInstance()->joinRoom($roomId, $moderator, $userName, $userEmail);
+		
+		
+                //$webconfMail = new Webconference_Model_Invite($url, $roomName, $moderator, $fullUser, $userName); 
+                $webconfMail = new Webconference_Model_Invite(
+                        array(
+                                'url'=>$room->bbbUrl, 
+                                'roomId'=>$roomId, 
+				'roomTitle'=>$room->roomTitle,
+                                'moderator'=>$moderator,
+                                'createdBy'=>$fullUser, 
+                                'to'=>$userName
+                            ),
+                        true
+                        ); 
+		
+                $messageSubject = $translate->_("Webconference Invite");
+
+                $view = new Zend_View();
+                $view->setScriptPath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views');
+
+                $view->translate    = $translate;
+                //$view->timezone     = $timezone;
+
+                $view->url        = $url;
+                $view->fullUser   = $fullUser;
+
+                $method = 'Webconference';
+                $messageBody = $view->render('eventNotification.php');
+                
+                
+                $mailPart           = new Zend_Mime_Part(serialize($webconfMail));
+                $mailPart->charset  = 'UTF-8';
+                $mailPart->type     = 'text/webconference; method=' . $method;
+                $mailPart->encoding = Zend_Mime::ENCODING_QUOTEDPRINTABLE;
+                
+               
+                $attachments = null;
+                $sender = $fullUser;
+                
+                $result = Tinebase_Notification::getInstance()->send($sender, array($contact), $messageSubject, $messageBody, $mailPart, $attachments);
+                
+            }
+        } catch (Exception $e) {
+            Tinebase_Core::getLogger()->WARN(__METHOD__ . '::' . __LINE__ . " could not send notification :" . $e);
+            return array(
+                'message' => $e->getMessage(),
+                'result' => $translate->_('An error has occured inviting users') 
+                );
         }
-        return $result;
+        
+        return array(
+            'success'   => TRUE,
+            'message' => $translate->_('Users invited successfully').'!'
+            );
     }
 
     public function getLogoutUrl() {

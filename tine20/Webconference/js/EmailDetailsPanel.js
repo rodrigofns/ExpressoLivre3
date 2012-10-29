@@ -75,7 +75,8 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         var url = this.WCInviteRecord.get('url');
         var moderator = this.WCInviteRecord.get('moderator');
         var roomName = this.WCInviteRecord.get('roomName');
-        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url, moderator, roomName);
+	var roomId = this.WCInviteRecord.get('roomId');
+        Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url, moderator, roomId, roomName);
         
         
     },
@@ -193,8 +194,8 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
                             items: [
                                 {
                                     xtype: 'ux.displayfield',
-                                    name: 'roomName',
-                                    fieldLabel: this.app.i18n._('Room name')
+                                    name: 'roomTitle',
+                                    fieldLabel: this.app.i18n._('Room Title')
                                 },
                                 {
                                     xtype: 'ux.displayfield',

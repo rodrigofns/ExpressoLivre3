@@ -209,7 +209,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
                 selected.push(item.data);
             });        
 
-            Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomName,  function(response) {
+            Tine.Webconference.inviteUsersToJoin(selected, type, Tine.Tinebase.appMgr.get('Webconference').roomId,  function(response) {
 
                 loadMask.hide();
 

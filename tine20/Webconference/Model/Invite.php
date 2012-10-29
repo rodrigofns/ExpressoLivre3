@@ -31,6 +31,8 @@ class Webconference_Model_Invite extends Tinebase_Record_Abstract{
         'id'                   => array('allowEmpty' => true,         ), 
         'url'                  => array('allowEmpty' => true          ),
         'roomName'             => array('allowEmpty' => true,         ),
+	'roomTitle'            => array('allowEmpty' => true,         ),
+	'roomId'               => array('allowEmpty' => true,         ),
         'moderator'            => array('allowEmpty' => true,         ), 
         'createdBy'            => array('allowEmpty' => true,         ),
         'to'                   => array('allowEmpty' => true,         )
