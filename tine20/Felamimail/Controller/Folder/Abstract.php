@@ -48,13 +48,6 @@ abstract class Felamimail_Controller_Folder_Abstract extends Tinebase_Controller
      */
     protected $_backend = NULL;
     
-    /**
-     * cache controller
-     *
-     * @var Felamimail_Controller_Cache_Folder
-     */
-    protected $_cacheController = NULL;
-
     /************************************* public functions *************************************/
     
     /**
@@ -81,7 +74,7 @@ abstract class Felamimail_Controller_Folder_Abstract extends Tinebase_Controller
         $result = $this->_backend->search($filter);
         if (count($result) == 0) {
             // try to get folders from imap server
-            $result = $this->_cacheController->update($filterValues['account_id'], $filterValues['globalname']);            
+            $result = $this->updateCacheFolder($filterValues['account_id'], $filterValues['globalname']);            
         }
 
         Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' folder search result count: ' . count($result) );        
@@ -201,11 +194,11 @@ abstract class Felamimail_Controller_Folder_Abstract extends Tinebase_Controller
             if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Could not create new folder: ' . $globalname . ' (' . $zmse->getMessage() . ')');
             
             // reload folder cache of parent
-            $parentSubs = $this->_cacheController->update($account, $_parentFolder);
-            $folder = $parentSubs->filter('globalname', $globalname)->getFirstRecord();
-            if ($folder === NULL) {
+//            $parentSubs = $this->_cacheController->update($account, $_parentFolder);
+//            $folder = $parentSubs->filter('globalname', $globalname)->getFirstRecord();
+//            if ($folder === NULL) {
                 throw new Felamimail_Exception_IMAPServiceUnavailable($zmse->getMessage());
-            }
+//            }
         }
         
         // update parent (has_children)
