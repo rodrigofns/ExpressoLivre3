@@ -13,8 +13,11 @@
  * ExampleRecord filter Class
  * @package     Webconference
  */
-class Webconference_Model_WebconferenceConfigFilter extends Tinebase_Model_Filter_FilterGroup 
+class Webconference_Model_ConfigFilter extends Tinebase_Model_Filter_FilterGroup 
 {
+    
+    protected $_className = 'Webconference_Model_ConfigFilter';
+    
     /**
      * @var string application of this filter group
      */
@@ -23,19 +26,16 @@ class Webconference_Model_WebconferenceConfigFilter extends Tinebase_Model_Filte
     /**
      * @var string name of model this filter group is designed for
      */
-    protected $_modelName = 'Webconference_Model_WebconferenceConfig';
+    protected $_modelName = 'Webconference_Model_Config';
     
     /**
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'query'          => array('filter' => 'Tinebase_Model_Filter_Query', 'options' => array('fields' => array('name', /*'...'*/))),
+        'query'          => array('filter' => 'Tinebase_Model_Filter_Query', 'options' => array('fields' => array('description', /*'...'*/))),
         'container_id'   => array('filter' => 'Tinebase_Model_Filter_Container', 'options' => array('applicationName' => 'Webconference')),
         'id'             => array('filter' => 'Tinebase_Model_Filter_Id'),
-        'tag'            => array('filter' => 'Tinebase_Model_Filter_Tag', 'options' => array(
-            'idProperty' => 'webconference_config.id',
-            'applicationName' => 'Webconference',
-        )),
+        
         
         // @todo add filters
         /*

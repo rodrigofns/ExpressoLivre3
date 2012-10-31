@@ -17,7 +17,7 @@
  * @package     Webconference
  * @subpackage  Controller
  */
-class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_Record_Abstract {
+class Webconference_Controller_Config extends Tinebase_Controller_Record_Abstract {
 
     /**
      * the constructor
@@ -26,8 +26,8 @@ class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_R
      */
     private function __construct() {
         $this->_applicationName = 'Webconference';
-        $this->_modelName = 'Webconference_Model_WebconferenceConfig';
-        $this->_backend = new Webconference_Backend_WebconferenceConfig();
+        $this->_modelName = 'Webconference_Model_Config';
+        $this->_backend = new Webconference_Backend_Config();
         $this->_currentAccount = Tinebase_Core::getUser();
         $this->_purgeRecords = FALSE;
         // activate this if you want to use containers
@@ -48,7 +48,7 @@ class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_R
      */
     public static function getInstance() {
         if (self::$_instance === NULL) {
-            self::$_instance = new Webconference_Controller_WebconferenceConfig();
+            self::$_instance = new Webconference_Controller_Config();
         }
         return self::$_instance;
     }
@@ -59,7 +59,7 @@ class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_R
      * @param  array $recordData
      * @return array created/updated record
      */
-    public function saveWebconferenceConfig($recordData) {
+    public function saveConfig($recordData) {
         $recordData = (object) $recordData;
 
         $configArray = $this->_backend->getAll();
@@ -72,7 +72,7 @@ class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_R
 
             return $this->update($config);
         } else {
-            $config = new Webconference_Model_WebconferenceConfig(
+            $config = new Webconference_Model_Config(
                             array(
                                 'url' => $recordData->url,
                                 'salt' => $recordData->salt,
@@ -88,12 +88,12 @@ class Webconference_Controller_WebconferenceConfig extends Tinebase_Controller_R
      * 
      * @return array -- record data  
      */
-    public function loadWebconferenceConfig() {
+    public function loadConfig() {
         $configArray = $this->_backend->getAll()->toArray();
         if (count($configArray) > 0) {
             return $configArray[0];
         } else {
-            $config = new Webconference_Model_WebconferenceConfig(
+            $config = new Webconference_Model_Config(
                             array(
                                 'url' => '',
                                 'salt' => '',

@@ -6,32 +6,15 @@
  */
 Ext.ns('Tine.Webconference.Model');
 
+
+
 /**
  * @namespace   Tine.Webconference.Model
- * @class       Tine.Webconference.Model.Configuration
+ * @class       Tine.Webconference.Model.Invite
  * @extends     Tine.Tinebase.data.Record
- * Configuration Record Definition
+ * Invite Record Definition
  */
-Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
-    {name: 'id'},
-    {name: 'name'},
-    {name: 'description'},
-    {name: 'email'},
-    
-    {name: 'tags'},
-    {name: 'notes'}
-]), {
-    appName: 'Webconference',
-    modelName: 'Configuration',
-    idProperty: 'id',
-    titleProperty: 'name',
-    // ngettext('Resource', 'Resources', n); gettext('Resources');
-    recordName: 'Configuration',
-    recordsName: 'Configurations',
-    containerProperty: null
-});
-
-Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
+Tine.Webconference.Model.Invite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},
     {name: 'roomName'},
@@ -43,6 +26,106 @@ Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     
 ], {
     appName: 'Webconference',
-    modelName: 'WCInvite',
+    modelName: 'Invite',
     idProperty: 'id'
+});
+
+
+/**
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.Config
+ * @extends     Tine.Tinebase.data.Record
+ * Config Record Definition
+ */
+Tine.Webconference.Model.Config = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
+    { name: 'id' },
+    { name: 'url' },
+    { name: 'salt' },
+    { name: 'limit_room' },
+    { name: 'description' }
+]), {
+    appName: 'Webconference',
+    modelName: 'Config',
+    idProperty: 'id',
+    titleProperty: 'description',
+    
+    recordName: 'server',
+    recordsName: 'servers',
+    containerProperty: 'container_id',
+    
+    containerName: 'server list',
+    containersName: 'server lists'
+});
+
+Tine.Webconference.Model.Config.getFilterModel = function() {
+    var app = Tine.Tinebase.appMgr.get('Webconference');
+    
+    return [
+        {filtertype: 'tine.widget.container.filtermodel', app: app, recordClass: Tine.Webconference.Model.Config}
+    ];
+};
+
+Tine.Webconference.Model.Config.getDefaultData = function() { 
+    return {};
+};
+
+/**
+ * Config record backend
+ */
+Tine.Webconference.configRecordBackend = new Tine.Tinebase.data.RecordProxy({
+    appName: 'Webconference',
+    modelName: 'Config',
+    recordClass: Tine.Webconference.Model.Config
+});
+
+
+/**
+ * @namespace   Tine.Webconference.Model
+ * @class       Tine.Webconference.Model.Room
+ * @extends     Tine.Tinebase.data.Record
+ * Room Record Definition
+ */
+Tine.Webconference.Model.Room = Tine.Tinebase.data.Record.create(Tine.Tinebase.Model.genericFields.concat([
+    { name: 'id' },
+    { name: 'title' },
+    { name: 'room_name' },
+    { name: 'conference_role' },
+    { name: 'creation_time'},
+    { name: 'create_date'},
+    { name: 'status'},
+    { name: 'room_url'},
+    { name: 'call_date'},
+    { name: 'user_email'},
+    { name: 'user_name'}
+    
+    
+    
+]), {
+    appName: 'Webconference',
+    modelName: 'Room',
+    idProperty: 'id',
+    titleProperty: 'title',
+    
+    recordName: 'room',
+    recordsName: 'rooms',
+    containerProperty: 'container_id',
+    
+    containerName: 'room list',
+    containersName: 'room lists'
+});
+
+Tine.Webconference.Model.Room.getFilterModel = function() {
+    var app = Tine.Tinebase.appMgr.get('Webconference');
+    
+    return [
+        {filtertype: 'tine.widget.container.filtermodel', app: app, recordClass: Tine.Webconference.Model.Room}
+    ];
+};
+/**
+ * Room record backend
+ */
+Tine.Webconference.roomRecordBackend = new Tine.Tinebase.data.RecordProxy({
+    appName: 'Webconference',
+    modelName: 'Room',
+    recordClass: Tine.Webconference.Model.Room
 });

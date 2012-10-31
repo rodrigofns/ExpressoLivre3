@@ -50,7 +50,7 @@ class Webconference_Controller_BigBlueButton {
     
     private function _joinURL($roomId, $accountsId, $userName, $userEmail, $role){	
 	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
-	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
 	
 	switch ($role){
 	    case "OWNER":
@@ -83,7 +83,7 @@ class Webconference_Controller_BigBlueButton {
     }
 
     private function _getBigBlueButtonConfigBalance() {
-	$data = Webconference_Controller_WebconferenceConfig::getInstance()->getAll();
+	$data = Webconference_Controller_Config::getInstance()->getAll();
 	$quant = -1;
 	$bbb = null;
 	foreach ($data as $conf){
@@ -203,7 +203,7 @@ class Webconference_Controller_BigBlueButton {
       moderatorPW, attendeePW, hasBeenForciblyEnded, running.
      */
     public function getMeetings() {
-        $servers =  Webconference_Controller_WebconferenceConfig::getInstance()->getAll();	
+        $servers =  Webconference_Controller_Config::getInstance()->getAll();	
 	$data = array();
 	foreach ($servers as $server){
 	    try {
@@ -228,7 +228,7 @@ class Webconference_Controller_BigBlueButton {
      */
     public function endMeeting($roomId) {
 	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
-	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->endMeeting($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
 
@@ -244,7 +244,7 @@ class Webconference_Controller_BigBlueButton {
      */
     public function getUsers($roomId) {
 	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
-	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->getUsersArray($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
     
@@ -258,7 +258,7 @@ class Webconference_Controller_BigBlueButton {
     public function isMeetingActive($roomId)
     {
 	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
-	$config = Webconference_Controller_WebconferenceConfig::getInstance()->get($room->webconference_config_id);
+	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->getMeetingIsActive($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
 
