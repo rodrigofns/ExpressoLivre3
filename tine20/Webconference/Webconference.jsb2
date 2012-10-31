@@ -38,6 +38,14 @@
 	{
           "text": "MainScreenCenterPanel.js",
           "path": "js/"
+        },
+	{
+          "text": "ConfigGridPanel.js",
+          "path": "js/"
+        },
+	{
+          "text": "ConfigEditDialog.js",
+          "path": "js/"
         }
       ]
     },

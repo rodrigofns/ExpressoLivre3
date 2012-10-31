@@ -9,7 +9,7 @@
  * 
  */
 
-class Webconference_Model_WebconferenceConfig extends Tinebase_Record_Abstract
+class Webconference_Model_Config extends Tinebase_Record_Abstract
 {  
     /**
      * key in $_validators/$_properties array for the filed which 

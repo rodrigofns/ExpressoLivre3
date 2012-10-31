@@ -9,7 +9,7 @@
  * @copyright   Copyright (c) 2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
-class Webconference_Backend_WebconferenceConfig extends Tinebase_Backend_Sql_Abstract
+class Webconference_Backend_Config extends Tinebase_Backend_Sql_Abstract
 {
     /**
      * Table name without prefix
@@ -23,7 +23,7 @@ class Webconference_Backend_WebconferenceConfig extends Tinebase_Backend_Sql_Abs
      *
      * @var string
      */
-    protected $_modelName = 'Webconference_Model_WebconferenceConfig';
+    protected $_modelName = 'Webconference_Model_Config';
 
     /**
      * if modlog is active, we add 'is_deleted = 0' to select object in _getSelect()

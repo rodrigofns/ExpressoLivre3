@@ -31,7 +31,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      */
     public function __construct() {
         $this->_applicationName = 'Webconference';
-        $this->_controller = Webconference_Controller_WebconferenceConfig::getInstance();
+        $this->_controller = Webconference_Controller_Config::getInstance();
     }
 
     /**
@@ -41,8 +41,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * @param  array $paging
      * @return array
      */
-    public function searchWebconferenceConfig($filter, $paging) {
-        return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_WebconferenceConfigFilter', TRUE);
+    public function searchConfigs($filter, $paging) {
+        return $this->_search($filter, $paging, $this->_controller, 'Webconference_Model_ConfigFilter');
     }
    
     /**
@@ -51,7 +51,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * @param   string $id
      * @return  array record data
      */
-    public function getWebconferenceConfig($id) {
+    public function getConfig($id) {
         return $this->_get($id, $this->_controller);
     }
 
@@ -61,8 +61,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * @param  array $recordData
      * @return array created/updated record
      */
-    public function saveWebconferenceConfig($recordData, $duplicateCheck = TRUE) {
-        return $this->_save($recordData, Webconference_Controller_WebconferenceConfig::getInstance(), 'WebconferenceConfig', 'id', array($duplicateCheck));
+    public function saveConfig($recordData) {
+        return $this->_save($recordData, Webconference_Controller_Config::getInstance(), 'Config');
     }
 
     /**
@@ -70,8 +70,8 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * 
      * @return array -- record data  
      */
-    public function loadWebconferenceConfig() {
-        return $this->_controller->loadWebconferenceConfig();
+    public function loadConfig() {
+        return $this->_controller->loadConfig();
     }
 
     /**
@@ -80,7 +80,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * @param  array  $ids 
      * @return string
      */
-    public function deleteWebconferenceConfig($ids) {
+    public function deleteConfigs($ids) {
         return $this->_delete($ids, $this->_controller);
     }
 
