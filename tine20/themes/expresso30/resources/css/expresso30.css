@@ -482,3 +482,14 @@ background: transparent url(../images/expresso/logo-expresso-comunidade-small.pn
 .tb-about-img > a > img { 
 visibility: hidden; 
 }
+
+#tine-viewport-maincardpanel>.x-panel>.x-panel-bwrap>.x-panel-tbar
+{
+background-color: #bebebe;
+}
+
+#tine-viewport-maincardpanel>.x-panel>.x-panel-bwrap>div.x-panel-body>.x-panel
+{
+background-color: #fff;
+padding: 0 5px;
+}
