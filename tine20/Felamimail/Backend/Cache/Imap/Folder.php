@@ -257,6 +257,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                 $folder = $imap->getFolders('',$folderDecoded['globalName']);
                 $counter = $imap->examineFolder($folderDecoded['globalName']);
                 $status = $imap->getFolderStatus($folderDecoded['globalName']);
+                $quota = $imap->getQuota($folderDecoded['globalName']);
             }
             $globalName = $folderDecoded['globalName'];
             if($globalName == 'INBOX' || $globalName == 'user')
@@ -300,7 +301,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                     'cache_job_lowestuid' => 0,
                     'cache_job_startuid' => 0,
                     'cache_job_actions_est' => 0,
-                    'cache_job_actions_done' => 0
+                    'cache_job_actions_done' => 0,
+                    'quota_usage'   => $quota['STORAGE']['usage'],
+                    'quota_limit'   => $quota['STORAGE']['limit']
                 ));
     }
     
