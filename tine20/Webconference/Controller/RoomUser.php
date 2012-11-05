@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WebconferenceConfig controller for Webconference application
+ * RoomUser controller for Webconference application
  * 
  * @package     Webconference
  * @subpackage  Controller
@@ -12,12 +12,12 @@
  */
 
 /**
- * WebconferenceConfig controller class for WebconferenceRomm record
+ * RoomUser controller class for RoomUser record
  * 
  * @package     Webconference
  * @subpackage  Controller
  */
-class Webconference_Controller_WebconferenceRoomUser extends Tinebase_Controller_Record_Abstract {
+class Webconference_Controller_RoomUser extends Tinebase_Controller_Record_Abstract {
 
     /**
      * the constructor
@@ -26,8 +26,8 @@ class Webconference_Controller_WebconferenceRoomUser extends Tinebase_Controller
      */
     private function __construct() {
         $this->_applicationName = 'Webconference';
-        $this->_modelName = 'Webconference_Model_WebconferenceRoomUser';
-        $this->_backend = new Webconference_Backend_WebconferenceRoomUser();
+        $this->_modelName = 'Webconference_Model_RoomUser';
+        $this->_backend = new Webconference_Backend_RoomUser();
         $this->_currentAccount = Tinebase_Core::getUser();
         $this->_purgeRecords = FALSE;
         // activate this if you want to use containers
@@ -37,18 +37,18 @@ class Webconference_Controller_WebconferenceRoomUser extends Tinebase_Controller
     /**
      * holds the instance of the singleton
      *
-     * @var Webconference_Controller_WebconferenceRoom
+     * @var Webconference_Controller_RoomUser
      */
     private static $_instance = NULL;
 
     /**
      * the singleton pattern
      *
-     * @return Webconference_Controller_WebconferenceRoom
+     * @return Webconference_Controller_RoomUser
      */
     public static function getInstance() {
         if (self::$_instance === NULL) {
-            self::$_instance = new Webconference_Controller_WebconferenceRoomUser();
+            self::$_instance = new Webconference_Controller_RoomUser();
         }
         return self::$_instance;
     }

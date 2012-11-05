@@ -193,9 +193,9 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
         return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
     }
     
-    public function getAccountId()
+    public function getRooms()
     {
-        return Webconference_Controller_BigBlueButton::getInstance()->getRoom();
+        return Webconference_Controller_BigBlueButton::getInstance()->getRooms();
     }    
     
 }

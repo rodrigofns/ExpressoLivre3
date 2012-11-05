@@ -1,6 +1,6 @@
 <?php
 /**
- * class to hold ExampleRecord data
+ * class to hold RoomUser data
  * 
  * @package     Webconference
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -9,7 +9,7 @@
  * 
  */
 
-class Webconference_Model_WebconferenceRoom extends Tinebase_Record_Abstract
+class Webconference_Model_RoomUser extends Tinebase_Record_Abstract
 {  
     /**
      * key in $_validators/$_properties array for the filed which 
@@ -17,7 +17,8 @@ class Webconference_Model_WebconferenceRoom extends Tinebase_Record_Abstract
      * 
      * @var string
      */    
-    protected $_identifier = 'id';    
+    //protected $_identifier = Array('webconference_room_id','accounts_id');
+    protected $_identifier = 'id';
     
     /**
      * application the record belongs to
@@ -34,8 +35,10 @@ class Webconference_Model_WebconferenceRoom extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_validators = array(
-        'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+	'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'container_id'          => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'webconference_room_id' => array(Zend_Filter_Input::ALLOW_EMPTY => false),
+        'accounts_id'           => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     // @todo add more fields
     // modlog information
         'created_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
@@ -45,12 +48,14 @@ class Webconference_Model_WebconferenceRoom extends Tinebase_Record_Abstract
         'is_deleted'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'deleted_time'          => array(Zend_Filter_Input::ALLOW_EMPTY => true),
         'deleted_by'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
-
-	'title'			=> array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
-        'room_name'             => array(Zend_Filter_Input::ALLOW_EMPTY => false),    
-        'create_date'           => array(Zend_Filter_Input::ALLOW_EMPTY => false),
-	'status'		=> array(Zend_Filter_Input::ALLOW_EMPTY => false),
-	'webconference_config_id'=> array(Zend_Filter_Input::ALLOW_EMPTY => false),
+    // relations (linked ExampleApplication_Model_ExampleRecord records) and other metadata
+    //'relations'             => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
+	
+        'conference_role'       => array(Zend_Filter_Input::ALLOW_EMPTY => false),    
+        'call_date'             => array(Zend_Filter_Input::ALLOW_EMPTY => false),
+	'user_email'		=> array(Zend_Filter_Input::ALLOW_EMPTY => false),
+	'user_name'		=> array(Zend_Filter_Input::ALLOW_EMPTY => false),
+	'room_url'		=> array(Zend_Filter_Input::ALLOW_EMPTY => false),
     );
 
     /**
@@ -62,7 +67,7 @@ class Webconference_Model_WebconferenceRoom extends Tinebase_Record_Abstract
         'creation_time',
         'last_modified_time',
         'deleted_time',
-	'create_date'
+	'call_date'
     );
     
     /**

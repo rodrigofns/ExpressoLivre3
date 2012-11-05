@@ -11,19 +11,19 @@
 
 
 /**
- * WebconferenceRoom filter Class
+ * Room filter Class
  * 
  * @package     Sales
  * @subpackage  Filter
  */
-class Webconference_Model_WebconferenceRoomFilter extends Tinebase_Model_Filter_FilterGroup
+class Webconference_Model_RoomFilter extends Tinebase_Model_Filter_FilterGroup
 {
     /**
      * @var string class name of this filter group
      *      this is needed to overcome the static late binding
      *      limitation in php < 5.3
      */
-    protected $_className = 'Webconference_Model_WebconferenceRoomFilter';
+    protected $_className = 'Webconference_Model_RoomFilter';
     
     /**
      * @var string application of this filter group
@@ -33,13 +33,13 @@ class Webconference_Model_WebconferenceRoomFilter extends Tinebase_Model_Filter_
     /**
      * @var string name of model this filter group is designed for
      */
-    protected $_modelName = 'Webconference_Model_WebconferenceRoom';
+    protected $_modelName = 'Webconference_Model_Room';
     
     /**
      * @var array filter model fieldName => definition
      */
     protected $_filterModel = array(
-        'id'                    => array('filter' => 'Tinebase_Model_Filter_Id', 'options' => array('modelName' => 'Webconference_Model_WebconferenceRoom')),
+        'id'                    => array('filter' => 'Tinebase_Model_Filter_Id', 'options' => array('modelName' => 'Webconference_Model_Room')),
         'query'                 => array(
             'filter' => 'Tinebase_Model_Filter_Query', 
             'options' => array('fields' => array('status', 'room_name', 'title', 'webconference_config_id'))
