@@ -983,7 +983,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
                             rowspan: 2,
                             iconAlign: 'top'
                         }),
-                        Ext.apply(new Ext.Button(this.action_print), {
+                        Ext.apply(new Ext.Button(this.actions_print), {
                             scale: 'medium',
                             rowspan: 2,
                             iconAlign: 'top'
