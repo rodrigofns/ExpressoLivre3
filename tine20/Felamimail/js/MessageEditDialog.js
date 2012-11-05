@@ -186,18 +186,6 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
         });
 
-        this.action_toggleSendAsPlain = new Ext.Action({
-            text: this.app.i18n._('Send As Plain'),
-            handler: this.onToggleSendAsPlain,
-            iconCls: 'notes_noteIcon',
-            disabled: false,
-            scope: this,
-            enableToggle: true
-        });
-        this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
-            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain.')
-        });
-
         this.action_toggleMarkAsImportant = new Ext.Action({
             text: this.app.i18n._('Mark as Important'),
             handler: this.onToggleMarkAsImportant,
@@ -226,7 +214,7 @@ Ext.namespace('Tine.Felamimail');
             defaults: {height: 55},
             items: [{
                 xtype: 'buttongroup',
-                columns: 7,
+                columns: 6,
                 items: [
                     Ext.apply(new Ext.Button(this.action_send), {
                         scale: 'medium',
@@ -242,10 +230,9 @@ Ext.namespace('Tine.Felamimail');
                     this.action_saveAsDraft,
                     this.button_saveEmailNote,
                     this.action_saveAsTemplate,
-                    this.button_toggleReadingConfirmation,
-                    this.button_toggleSendAsPlain,
                     this.button_toggleMarkAsImportant,
-                    this.button_toggleSendAsPlain,
+                    this.button_toggleReadingConfirmation,
+                    this.button_toggleSendAsPlain
                 ]
             }]
         });
