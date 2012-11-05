@@ -49,7 +49,7 @@ class Webconference_Controller_BigBlueButton {
     }
     
     private function _joinURL($roomId, $accountsId, $userName, $userEmail, $role){	
-	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$room = Webconference_Controller_Room::getInstance()->get($roomId);
 	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
 	
 	switch ($role){
@@ -77,18 +77,18 @@ class Webconference_Controller_BigBlueButton {
 		      "room_url" => $roomURL,
                       "conference_role" => $conferenceRole,
 		      "call_date" => time() );
-	$record =  new Webconference_Model_WebconferenceRoomUser($data);
-	Webconference_Controller_WebconferenceRoomUser::getInstance()->create($record);
+	$record =  new Webconference_Model_RoomUser($data);
+	Webconference_Controller_RoomUser::getInstance()->create($record);
 	return $roomURL;
     }
 
     private function _getBigBlueButtonConfigBalance() {
 	$data = Webconference_Controller_Config::getInstance()->getAll();
-	$quant = -1;
+	$quant = 1;
 	$bbb = null;
 	foreach ($data as $conf){
 	    $meetings = (object) $this->_backend->getMeetingsArray($conf->url, $conf->salt);
-	    if ($meetings->returncode == 'SUCCESS' || $meetings->messageKey == 'noMeetings'){
+	    if ($meetings->returncode == 'SUCCESS' && $meetings->messageKey == 'noMeetings'){
 		return $conf;
 	    }   
 	    $meetingsId = array();
@@ -98,12 +98,12 @@ class Webconference_Controller_BigBlueButton {
 		    $hasBeenForciblyEnded = (String)$meeting["hasBeenForciblyEnded"];
 		    if ($hasBeenForciblyEnded == "true"){
 			continue;
-		    } 
+		    }
 		    array_push($meetingsId, $meetingId);
 		}
 	    }
 	    $perc = ( count($meetingsId) / $conf->limit_room);
-	    if ($perc < 1 || $perc < $quant){
+	    if ($perc < 1 && $perc < $quant){
 		$quant = $perc;
 		$bbb = $conf;
 	    }
@@ -146,8 +146,8 @@ class Webconference_Controller_BigBlueButton {
 		      "status" => "A",
 		      "webconference_config_id" => $config->id );
 
-	$record =  new Webconference_Model_WebconferenceRoom($data);
-	$roomRecord = Webconference_Controller_WebconferenceRoom::getInstance()->create($record);	
+	$record =  new Webconference_Model_Room($data);
+	$roomRecord = Webconference_Controller_Room::getInstance()->create($record);	
 	
 	$roomURL = $this->_joinURL($roomRecord->id, Tinebase_Core::getUser()->getId(), $userName, $userEmail, "OWNER");	
 	
@@ -175,7 +175,7 @@ class Webconference_Controller_BigBlueButton {
      * @return String -- URL of the meeting
      */
     public function joinRoom($roomId, $moderator, $userName, $userEmail) {
-	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$room = Webconference_Controller_Room::getInstance()->get($roomId);
         if ($moderator) {
             $role = "MODERATOR";
         } else {
@@ -184,7 +184,7 @@ class Webconference_Controller_BigBlueButton {
 	$accountsId = $this->_getAccountId($userEmail);
 	$bbbUrl = $this->_joinURL($roomId, $accountsId, $userName, $userEmail, $role);
  
-	//Tinebase_Core::getSession()->webconferenceRoomName = $roomName;
+	//Tinebase_Core::getSession()->RoomName = $roomName;
         return (object) array(
                     bbbUrl => $bbbUrl,
                     roomName => $room->room_name,
@@ -227,7 +227,7 @@ class Webconference_Controller_BigBlueButton {
      * 	- An array containing a returncode, messageKey, message.
      */
     public function endMeeting($roomId) {
-	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$room = Webconference_Controller_Room::getInstance()->get($roomId);
 	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->endMeeting($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
@@ -243,7 +243,7 @@ class Webconference_Controller_BigBlueButton {
      * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
      */
     public function getUsers($roomId) {
-	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$room = Webconference_Controller_Room::getInstance()->get($roomId);
 	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->getUsersArray($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
@@ -257,7 +257,7 @@ class Webconference_Controller_BigBlueButton {
     */
     public function isMeetingActive($roomId)
     {
-	$room = Webconference_Controller_WebconferenceRoom::getInstance()->get($roomId);
+	$room = Webconference_Controller_Room::getInstance()->get($roomId);
 	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->getMeetingIsActive($room->room_name, MODERATOR_PW, $config->url, $config->salt);
     }
@@ -395,16 +395,18 @@ class Webconference_Controller_BigBlueButton {
     }
     
     public function getRoom(){
-	$data = array("status"=>"E");
-	$filter = new Webconference_Model_WebconferenceRoomFilter($data);
-	$controller = Webconference_Controller_WebconferenceRoom::getInstance();
-	return $rooms = $controller->search($filter, NULL, TRUE)->toArray();
+	$data = array("status"=>"A");
+	$filter = new Webconference_Model_RoomFilter($data);
+	$controller = Webconference_Controller_Room::getInstance();
+	$rooms = $controller->search($filter, NULL, FALSE);
 	foreach ($rooms as $room) {
 	    if ($this->isMeetingActive($room->id) == false){
 		$room->status = "E";
 		$controller->update($room);
 	    }
 	}
-	return Webconference_Controller_WebconferenceRoom::getInstance()->search($filter)->toArray();
+	$_accountId = Tinebase_Core::getUser()->getId();
+	$webconference_Backend_Sql = new Webconference_Backend_Sql();
+	return $webconference_Backend_Sql->getRoom($_accountId);
     }
 }
