@@ -382,7 +382,24 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             }
             else if ($filter instanceof Tinebase_Model_Filter_Id)
             {
-                $return['filters'] = 'Id';
+                if ($filter->getField() == 'folder_id')
+                {
+                    $apaths = $this->_getAllFolders();
+                    $i = $filter->getvalue();
+                    foreach ($apaths as $value) 
+                    {
+                        $a1 = explode('/',$value);
+                        if($i == $a1[count($a1)-1])
+                        {
+                            $return['paths'] = $this->_getFoldersInfo(array($value));
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $return['filters'] = 'Id'; 
+                }                
             }
             else if ($filter instanceof Tinebase_Model_Filter_Abstract)
             {
