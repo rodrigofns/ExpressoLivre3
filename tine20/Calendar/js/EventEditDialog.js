@@ -309,7 +309,7 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                     // activities and tags
                     region: 'south',
                     layout: 'form',
-                    height: 150,
+                    height: 100,
                     split: true,
                     header: false,
                     //collapsed: (this.record.bodyIsFetched() && (! this.record.get('attachments') || this.record.get('attachments').length == 0)),
