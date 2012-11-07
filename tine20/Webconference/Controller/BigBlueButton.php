@@ -242,7 +242,7 @@ class Webconference_Controller_BigBlueButton {
      * 	- If FAILED, returns an array containing a returncode, messageKey, message.
      * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
      */
-    public function getUsers($roomId) {
+    public function getRoomUsers($roomId) {
 	$room = Webconference_Controller_Room::getInstance()->get($roomId);
 	$config = Webconference_Controller_Config::getInstance()->get($room->webconference_config_id);
         return $this->_backend->getUsersArray($room->room_name, MODERATOR_PW, $config->url, $config->salt);
