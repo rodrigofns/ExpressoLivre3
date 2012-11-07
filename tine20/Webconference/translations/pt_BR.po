@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-09-10 14:14-0300\n"
-"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-11-05 16:00-0300\n"
+"Last-Translator: marcelo <a@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -95,6 +95,9 @@ msgstr "Participante"
 msgid "Moderator"
 msgstr "Moderador"
 
+msgid "Owner"
+msgstr "Dono"
+
 #: js/ContactGrid.js:117
 msgid "Add as Attendee"
 msgstr "Adicionar como Participante"
@@ -156,14 +159,35 @@ msgstr "Use o link abaixo para acessar a webconferência"
 msgid "ERROR (the webconference server is unreachable)"
 msgstr "ERRO  (o servidor de webconferência está inacessível)"
 
+#: js/MainScreenCenterPanel:187
+msgid "Available Webconference Rooms"
+msgstr "Salas de Webconferência disponíveis"
+
+#: js/ConfigEditDialog:91
+msgid "Room Limit"
+msgstr "Limite de salas"
+
+#: js/MainScreenCenterPanel:65
+msgid "Title"
+msgstr "Título"
+
+#: js/MainScreenCenterPanel:51
+msgid "New Webconference"
+msgstr "Nova Webconferência"
+
+#: js/MainScreenCenterPanel:71
+msgid "Create"
+msgstr "Criar"
+
+msgid "Webconference Role"
+msgstr "Papel na Webconferência"
+
 #~ msgid "Cancel active webconference"
 #~ msgstr "Cancelar webconferência ativa"
 #~ msgid "Quick search"
 #~ msgstr "Quick search"
 #~ msgid "Name"
 #~ msgstr "Name"
-#~ msgid "Title"
-#~ msgstr "Title"
 #~ msgid "Status"
 #~ msgstr "Status"
 #~ msgid "Budget"

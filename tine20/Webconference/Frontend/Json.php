@@ -65,14 +65,6 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
         return $this->_save($recordData, Webconference_Controller_Config::getInstance(), 'Config');
     }
 
-    /**
-     * load Webconference configuration
-     * 
-     * @return array -- record data  
-     */
-    public function loadConfig() {
-        return $this->_controller->loadConfig();
-    }
 
     /**
      * deletes existing records Webconference configuration
@@ -121,12 +113,6 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
 	return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoin($users, $moderator, $roomId);
     }
     
-    
-//    public function inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email)
-//    {
-//        return Webconference_Controller_BigBlueButton::getInstance()->inviteUsersToJoinToFelamimail($roomId, $moderator, $userName, $email);
-//    }   
-    
     public function isMeetingActive($roomId, $url)
     {
         $translate = Tinebase_Translation::getTranslation('Webconference');
@@ -165,14 +151,11 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * 	- Null if the server is unreachable
      * 	- An array containing a returncode, messageKey, message.
      */
-    public function endMeeting($roomName, $moderatorPassword = null) {
-        return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomName, $moderatorPassword);
-    }
-    /*
-    public function endMeeting($roomId) {
+    
+    public function endMeeting($roomId, $moderatorPassword = null) {
         return Webconference_Controller_BigBlueButton::getInstance()->endMeeting($roomId);
-    }    
-    */
+    }
+    
     
     /**
      * This method returns an array of the attendees in the specified meeting.
@@ -184,18 +167,15 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * 	- If FAILED, returns an array containing a returncode, messageKey, message.
      * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
      */
-  /*  public function getUsers($roomId) {
+    public function getUsers($roomId) {
         return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomId);
     }    
-*/
-    public function getUsers($roomName, $moderatorPassword = null) 
-    {
-        return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomName, $moderatorPassword);
-    }
     
-    public function getRooms()
+    public function searchRooms($filter, $paging)
     {
         return Webconference_Controller_BigBlueButton::getInstance()->getRooms();
+	
+	//return $this->_search($filter, $paging, Webconference_Controller_Room::getInstance(), 'Webconference_Model_RoomFilter');
     }    
     
 }

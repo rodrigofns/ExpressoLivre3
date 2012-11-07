@@ -62,8 +62,8 @@ class Webconference_Controller_BigBlueButton {
 		$conferenceRole = self::MODERATOR;
 		break;
 	    case "ATTENDEE":
-		$password = MODERATOR_PW;
-		$conferenceRole = self::MODERATOR;
+		$password = ATTENDEE_PW;
+		$conferenceRole = self::ATTENDEE;
 		break;
 	}
 	
@@ -394,7 +394,23 @@ class Webconference_Controller_BigBlueButton {
 
     }
     
-    public function getRoom(){
+    public function getRooms(){
+	$this->_updateRoomStatus();
+	
+	$_accountId = Tinebase_Core::getUser()->getId();
+	$webconference_Backend_Sql = new Webconference_Backend_Sql();
+	
+	$result = $webconference_Backend_Sql->getRooms($_accountId);
+	
+	return array(
+            'results'       => $result,
+            'totalcount'    => count($result)
+        );
+	
+	
+    }
+    
+    private function _updateRoomStatus(){
 	$data = array("status"=>"A");
 	$filter = new Webconference_Model_RoomFilter($data);
 	$controller = Webconference_Controller_Room::getInstance();
@@ -405,8 +421,5 @@ class Webconference_Controller_BigBlueButton {
 		$controller->update($room);
 	    }
 	}
-	$_accountId = Tinebase_Core::getUser()->getId();
-	$webconference_Backend_Sql = new Webconference_Backend_Sql();
-	return $webconference_Backend_Sql->getRoom($_accountId);
     }
 }

@@ -99,7 +99,7 @@ class Webconference_Backend_Sql extends Tinebase_Backend_Sql_Abstract
 	$select = $this->_db->select()
             ->from($this->_tablePrefix . 'webconference_room', array('*'))
 	    ->join($this->_tablePrefix . 'webconference_room_user', 
-		    ($this->_tablePrefix . 'webconference_room_user.webconference_room_id = '.$this->_tablePrefix . 'webconference_room.id'), array('*'))
+		    ($this->_tablePrefix . 'webconference_room_user.webconference_room_id = '.$this->_tablePrefix . 'webconference_room.id'), array('user_email','user_name','conference_role','room_url','call_date'))
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('accounts_id'). ' = ? ', $_accountId))
 	    ->where($this->_db->quoteInto($this->_db->quoteIdentifier('status'). ' = ? ', 'A'))	
 	    ->limit();
@@ -111,9 +111,6 @@ class Webconference_Backend_Sql extends Tinebase_Backend_Sql_Abstract
         $queryResult = $stmt->fetchAll();
         $stmt->closeCursor();
                 
-        if (!$queryResult) {
-            throw new Webconference_Exception_NotFound('Conference with account id ' . $_accountId . ' not found.');
-        }
         $rowsRoom = $this->_rawDataToRecordSet($queryResult);
         return $rowsRoom->toArray();
     }

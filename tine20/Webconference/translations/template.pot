@@ -81,6 +81,8 @@ msgstr ""
 msgid "Moderator"
 msgstr ""
 
+msgid "Owner"
+msgstr ""
 
 #: js/ContactGrid.js:117
 msgid "Add as Attendee"
@@ -141,4 +143,27 @@ msgstr ""
 
 #: Controller/BigBlueButton.php:96
 msgid "ERROR (the webconference server is unreachable)"
+msgstr ""
+
+#: js/MainScreenCenterPanel:187
+msgid "Available Webconference Rooms"
+msgstr ""
+
+#: js/ConfigEditDialog:91
+msgid "Room Limit"
+msgstr ""
+
+#: js/MainScreenCenterPanel:65
+msgid "Title"
+msgstr ""
+
+#: js/MainScreenCenterPanel:51
+msgid "New Webconference"
+msgstr ""
+
+#: js/MainScreenCenterPanel:71
+msgid "Create"
+msgstr ""
+
+msgid "Webconference Role"
 msgstr ""

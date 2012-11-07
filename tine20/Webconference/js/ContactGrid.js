@@ -204,7 +204,7 @@ Tine.Webconference.ContactGridPanel = Ext.extend(Tine.Addressbook.ContactGridPan
             });
             loadMask.show();
         
-            selected = [];
+            var selected = [];
             Ext.each(contacts, function (item) {
                 selected.push(item.data);
             });        
