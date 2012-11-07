@@ -167,9 +167,12 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
      * 	- If FAILED, returns an array containing a returncode, messageKey, message.
      * 	- If SUCCESS, returns an array of array containing the userID, fullName, role of each attendee
      */
-    public function getUsers($roomId) {
-        return Webconference_Controller_BigBlueButton::getInstance()->getUsers($roomId);
-    }    
+//    public function getRoomUsers($roomId) {
+//        return Webconference_Controller_BigBlueButton::getInstance()->getRoomUsers($roomId);
+//    }    
+
+
+ 
     
     public function searchRooms($filter, $paging)
     {
