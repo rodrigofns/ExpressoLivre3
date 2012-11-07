@@ -52,4 +52,12 @@ class Webconference_Controller_Room extends Tinebase_Controller_Record_Abstract 
         }
         return self::$_instance;
     }
+    
+    public function search(Tinebase_Model_Filter_FilterGroup $_filter = NULL, Tinebase_Record_Interface $_pagination = NULL, $_getRelations = FALSE, $_onlyIds = FALSE, $_action = 'get') {
+	
+	
+	$result = parent::search($_filter, $_pagination, $_getRelations, $_onlyIds, $_action);
+	
+	return $result;
+    }
 }

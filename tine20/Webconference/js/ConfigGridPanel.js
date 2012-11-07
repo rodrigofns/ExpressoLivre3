@@ -39,7 +39,7 @@ Tine.Webconference.ConfigGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
      * eval grants
      * @cfg {Boolean} evalGrants
      */
-    evalGrants: true,
+    evalGrants: false,
     
     /**
      * grid specific
@@ -58,14 +58,22 @@ Tine.Webconference.ConfigGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
 	this.app = Tine.Tinebase.appMgr.get('Webconference');
 	
         this.recordProxy = Tine.Webconference.configRecordBackend;
-        
+        this.gridConfig = {
+        };
         this.gridConfig.cm = this.getColumnModel();
         
-	//this.filterToolbar = this.filterToolbar || this.getFilterToolbar();
-        //this.plugins = this.plugins || [];
-        //this.plugins.push(this.filterToolbar);
-        
         Tine.Webconference.ConfigGridPanel.superclass.initComponent.call(this);
+    },
+    
+    initLayout: function() {
+        this.supr().initLayout.call(this);
+        
+        this.items.push({
+            region : 'north',
+            height : 55,
+            border : false,
+            items  : this.actionToolbar
+        });
     },
     
     /**

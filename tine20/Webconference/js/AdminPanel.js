@@ -41,20 +41,14 @@ Tine.Webconference.AdminPanel = Ext.extend(Ext.Panel, { // TODO: extend some kin
     initComponent: function () {
 	this.app = Tine.Tinebase.appMgr.get('Webconference');
 	this.title = this.app.i18n._('Webconference Configuration');
-        
-	var grid = new Tine.Webconference.ConfigGridPanel();
-	
+
 	this.items = [ 
-	    {
-		region: 'top',
-		items: [grid.getActionToolbar()] 
-	    },
 	    {
 		region: 'botton',
 		layout: 'fit',
 		autoScroll: true,
-		items: [grid],
-		height: 350,
+		items: [new Tine.Webconference.ConfigGridPanel()],
+		height: 450,
 		forceFit: true
 	    }
 	]; 
@@ -64,7 +58,7 @@ Tine.Webconference.AdminPanel = Ext.extend(Ext.Panel, { // TODO: extend some kin
     
     afterRender: function () {
 	this.supr().afterRender.apply(this, arguments);
-        
+	
     }
     
     

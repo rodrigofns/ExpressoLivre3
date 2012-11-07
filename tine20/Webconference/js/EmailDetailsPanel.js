@@ -34,10 +34,10 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
     actionToolbar: null,
     
     /**
-     * @property WCInviteRecord
-     * @type Tine.Webconference.Model.WCInvite
+     * @property InviteRecord
+     * @type Tine.Webconference.Model.Invite
      */
-    WCInviteRecord: null,
+    InviteRecord: null,
     
     /**
      * @property statusActions
@@ -52,11 +52,11 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         
         this.app = Tine.Tinebase.appMgr.get('Webconference');
 
-        this.WCInviteRecord = new Tine.Webconference.Model.WCInvite(this.preparedPart.preparedData);
+        this.InviteRecord = new Tine.Webconference.Model.Invite(this.preparedPart.preparedData);
         
-        this.initWCInviteToolbar();
+        this.initInviteToolbar();
 
-        this.on('afterrender', this.showWCInvite, this);
+        this.on('afterrender', this.showInvite, this);
 
         Tine.Webconference.EmailDetailsPanel.superclass.initComponent.call(this);
     },
@@ -66,25 +66,25 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
     
     
     /**
-     * process WCInvite
+     * process Invite
      * 
      * @param {String} status
      */
     processEmail: function(status, range) {
         
-        var url = this.WCInviteRecord.get('url');
-        var moderator = this.WCInviteRecord.get('moderator');
-        var roomName = this.WCInviteRecord.get('roomName');
-	var roomId = this.WCInviteRecord.get('roomId');
+        var url = this.InviteRecord.get('url');
+        var moderator = this.InviteRecord.get('moderator');
+        var roomName = this.InviteRecord.get('roomName');
+	var roomId = this.InviteRecord.get('roomId');
         Tine.Tinebase.appMgr.get('Webconference').onJoinWebconferenceFromEmail(url, moderator, roomId, roomName);
         
         
     },
     
     /**
-     * WCInvite action toolbar
+     * Invite action toolbar
      */
-    initWCInviteToolbar: function() {
+    initInviteToolbar: function() {
         var singleRecordPanel = this.getSingleRecordPanel();
         
         this.actions = [];
@@ -100,7 +100,7 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         
         // add more actions here (no spam / apply / crush / send event / ...)
         
-        this.WCInviteClause = new Ext.Toolbar.TextItem({
+        this.InviteClause = new Ext.Toolbar.TextItem({
             text: ''
         });
         this.tbar = this.actionToolbar = new Ext.Toolbar({
@@ -111,22 +111,22 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
                 height: 16,
                 style: 'margin: 3px 5px 2px 5px;'
             },
-            this.WCInviteClause,
+            this.InviteClause,
             '->'
             ].concat(this.actions)
         });
     },
     
     /**
-     * show/layout WCInvite panel
+     * show/layout Invite panel
      */
-    showWCInvite: function() {
+    showInvite: function() {
         
         
         var singleRecordPanel = this.getSingleRecordPanel(),
         
-        method = this.WCInviteRecord.get('method'),
-        url = this.WCInviteRecord.get('url');
+        method = this.InviteRecord.get('method'),
+        url = this.InviteRecord.get('url');
                    
         // reset actions
         Ext.each(this.actions, function(action) {
@@ -134,7 +134,7 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         });
         
         
-        this.WCInviteClause.setText(this.app.i18n._('You received an webconference invitation.'));
+        this.InviteClause.setText(this.app.i18n._('You received an webconference invitation.'));
         Ext.each(this.statusActions, function(action) {
             action.setHidden(false)
         });
@@ -143,8 +143,8 @@ Tine.Webconference.EmailDetailsPanel = Ext.extend(Tine.widgets.grid.DetailsPanel
         this.getLoadMask().hide();
         singleRecordPanel.setVisible(true);
         singleRecordPanel.setHeight(150);
-        this.record = this.WCInviteRecord;
-        singleRecordPanel.loadRecord(this.WCInviteRecord);
+        this.record = this.InviteRecord;
+        singleRecordPanel.loadRecord(this.InviteRecord);
     },
     /**
      * main event details panel
