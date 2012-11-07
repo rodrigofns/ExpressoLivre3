@@ -629,7 +629,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
         $charset = $this->_appendCharsetFilter($_bodyPart, $_partStructure);
             
         // need to set error handler because stream_get_contents just throws a E_WARNING
-        set_error_handler('Felamimail_Controller_Message::decodingErrorHandler', E_WARNING);
+        set_error_handler('Felamimail_Controller_Message_Abstract::decodingErrorHandler', E_WARNING);
         try {
             $body = $_bodyPart->getDecodedContent();
             restore_error_handler();
@@ -645,7 +645,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
             } else {
                 if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Try again with fallback encoding.');
                 $_bodyPart->appendDecodeFilter($this->_getDecodeFilter());
-                set_error_handler('Felamimail_Controller_Message::decodingErrorHandler', E_WARNING);
+                set_error_handler('Felamimail_Controller_Message_Abstract::decodingErrorHandler', E_WARNING);
                 try {
                     $body = $_bodyPart->getDecodedContent();
                     restore_error_handler();
