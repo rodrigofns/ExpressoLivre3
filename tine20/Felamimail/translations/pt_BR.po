@@ -1219,3 +1219,17 @@ msgstr "Compartilhadas"
 msgid "Do you really want to send a message with an empty subject?"
 msgstr "Você realmente deseja enviar esta mensagem com o Assunto vazio?"
 
+#:js/AccountEditDialog:
+#: 84
+msgid "Signature image size cannot exceed 16384 bytes."
+msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."
+
+#: Backend/Imap.php:
+#: 194
+msgid "cannot create folder"
+msgstr "Não foi possível criar a pasta"
+
+#: Backend/Imap.php:
+#: 194
+msgid "perhaps it already exists."
+msgstr "talvez ela já exista."
