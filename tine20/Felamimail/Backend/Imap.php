@@ -185,13 +185,15 @@ class Felamimail_Backend_Imap extends Zend_Mail_Storage_Imap
         } else {
             $folder = $name;
         }
+        
+        $translate = Tinebase_Translation::getTranslation('Felamimail');
 
         if (!$this->_protocol->create($folder)) {
             /**
              * @see Zend_Mail_Storage_Exception
              */
             require_once 'Zend/Mail/Storage/Exception.php';
-            throw new Zend_Mail_Storage_Exception('cannot create folder ' . $folder . ', perhaps it already exists.');
+            throw new Zend_Mail_Storage_Exception($translate->_('cannot create folder') . ' ' . $folder . ', ' . $translate->_('perhaps it already exists.'));
         }
     }
     
