@@ -62,7 +62,7 @@ Ext.ux.form.HtmlEditor.SpellChecker = Ext.extend(Ext.util.Observable, {
             },
             overflowText: this.langTitle
         });
-        this.spellchecker = new Ext.GoogieSpell("library/ExtJS/plugins/googiespell/", "sendReq.php?lang=");
+        this.spellchecker = new Ext.GoogieSpell("library/ExtJS/plugins/googiespell/", "library/ExtJS/plugins/googiespell/sendReq.php?lang=");
 
 				this.spellchecker.custom_no_spelling_error = function(){
 					Ext.getCmp('spellchecker_button').toggle();
