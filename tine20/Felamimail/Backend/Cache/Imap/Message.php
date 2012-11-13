@@ -151,7 +151,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                 $return = array_merge($this->_getAllFoldersByAccountId($folder->account_id, 
                     $folder->globalname, $_parent.self::IMAPDELIMITER. $folder->id), $return);                
             }
-            $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            
+            // TODO: verify if this test isn't too specific for Cyrus Imapd.
+            if ($folder->globalname !== 'user')
+            {
+                $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            }
         }
         
         return $return;
