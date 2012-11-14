@@ -92,6 +92,7 @@ Tine.Messenger.ClientDialog = function(args){
                 id: 'status-container',
                 height: 27,
                 cls: 'messenger-client-tbar',
+                layout: 'hbox',
                 items: [{   
                         id: 'messenger-change-status-button',
                         icon: '/images/messenger/user_offline.png',
@@ -99,14 +100,14 @@ Tine.Messenger.ClientDialog = function(args){
                             click: function (field, ev) {
                                 statusMenu(this);
                             }
-                        }
+                        },
+                        flex: 1
                     },
                     {xtype: 'tbspacer', width: 5},
                     {
                         xtype:'textfield',
 //                        store: Tine.Messenger.factory.statusStore,
                         displayField:'text',
-                        width: 175,
                         valueField:'value',
                         typeAhead: true,
                         name:'message',
@@ -122,7 +123,8 @@ Tine.Messenger.ClientDialog = function(args){
                                     changeStateText(this);
                                 }
                             }
-                        }
+                        },
+                        flex: 9
                     }
                 ]
             }

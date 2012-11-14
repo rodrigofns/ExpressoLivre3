@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 Messenger\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-15 16:27-0300\n"
-"PO-Revision-Date: 2012-11-09 13:25-0300\n"
-"Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
+"POT-Creation-Date: 2012-11-14 15:06-0300\n"
+"PO-Revision-Date: 2012-11-14 15:06-0300\n"
+"Last-Translator: Marcio Albuquerque <marcio.lima.albuquerque@gmail.com>\n"
 "Language-Team: SERPRO Salvador <marcio.albuquerque@serpro.gov.br>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-Language: pt_BR\n"
 "X-Poedit-Country: BRAZIL\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-KeywordsList: _\n"
+"X-Poedit-KeywordsList: _;app.i18n._\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-SearchPath-0: Messenger\n"
 
@@ -154,6 +154,7 @@ msgstr "Não autorizado!"
 msgid "Error sending: "
 msgstr "Envio de erro:"
 
+<<<<<<< HEAD
 #: Messenger/js/LogHandler.js:201
 #: Messenger/js/ChatHandler.js:95
 #: Messenger/js/ChatHandler.js:104
@@ -161,6 +162,15 @@ msgstr "Envio de erro:"
 #: Messenger/js/Application.js:296
 #: Messenger/js/RosterHandler.js:306
 #: Messenger/js/RosterHandler.js:360
+=======
+#: Messenger/js/LogHandler.js:204
+#: Messenger/js/ChatHandler.js:100
+#: Messenger/js/ChatHandler.js:109
+#: Messenger/js/Messenger.js:210
+#: Messenger/js/Messenger.js:297
+#: Messenger/js/RosterHandler.js:307
+#: Messenger/js/RosterHandler.js:362
+>>>>>>> d401e9c... Bugs corrigidos: 3731, 3722, 3546, 3767, 3678, 3680, 3681, 3612, 3223
 msgid "Error"
 msgstr "Erro"
 
@@ -215,31 +225,43 @@ msgstr "Erro no download do Histórico do Chat"
 msgid "Your messages will be sent offline"
 msgstr "Sua mensagem será enviada offline"
 
+#: Messenger/js/ChatHandler.js:233
+msgid " stopped typing!"
+msgstr " parou de digitar!"
+
+#: Messenger/js/ChatHandler.js:235
+msgid " is typing..."
+msgstr " está digitando..."
+
 #: Messenger/js/Window.js:18
 msgid "Group created successfully"
 msgstr "Grupo criado com sucesso"
 
 #: Messenger/js/Window.js:21
 #: Messenger/js/Layout.js:46
+<<<<<<< HEAD
 #: Messenger/js/Layout.js:270
 #: Messenger/js/Layout.js:697
+=======
+#: Messenger/js/Layout.js:430
+>>>>>>> d401e9c... Bugs corrigidos: 3731, 3722, 3546, 3767, 3678, 3680, 3681, 3612, 3223
 msgid "Add Group"
 msgstr "Adicionar Grupo"
 
-#: Messenger/js/Window.js:21
+#: Messenger/js/Window.js:22
 msgid "The group already exists"
 msgstr "O grupo criado já existe"
 
-#: Messenger/js/Window.js:53
-#: Messenger/js/Window.js:58
+#: Messenger/js/Window.js:54
+#: Messenger/js/Window.js:59
 msgid "Added successfuly"
 msgstr "Adicionado com sucesso"
 
-#: Messenger/js/Window.js:60
+#: Messenger/js/Window.js:61
 msgid "Add Buddy"
 msgstr "Adicionar Contato"
 
-#: Messenger/js/Window.js:60
+#: Messenger/js/Window.js:62
 msgid "Buddy not added"
 msgstr "Contato não adicionado"
 
@@ -279,8 +301,12 @@ msgid "Actions"
 msgstr "Ações"
 
 #: Messenger/js/Layout.js:38
+<<<<<<< HEAD
 #: Messenger/js/Layout.js:262
 #: Messenger/js/Layout.js:621
+=======
+#: Messenger/js/Layout.js:354
+>>>>>>> d401e9c... Bugs corrigidos: 3731, 3722, 3546, 3767, 3678, 3680, 3681, 3612, 3223
 msgid "Add Contact"
 msgstr "Adicionar Contato"
 
@@ -289,6 +315,7 @@ msgstr "Adicionar Contato"
 msgid "Logout"
 msgstr "Sair"
 
+<<<<<<< HEAD
 #: Messenger/js/Layout.js:116
 #: Messenger/js/Layout.js:384
 msgid "your Status"
@@ -366,6 +393,79 @@ msgid "Password"
 msgstr "Senha"
 
 #: Messenger/js/Layout.js:778
+=======
+#: Messenger/js/Layout.js:117
+msgid "your Status"
+msgstr "seu Status"
+
+#: Messenger/js/Layout.js:118
+msgid "press ENTER after"
+msgstr "pressione ENTER depois"
+
+#: Messenger/js/Layout.js:148
+msgid "Online"
+msgstr "Disponível"
+
+#: Messenger/js/Layout.js:149
+msgid "Away"
+msgstr "Ausente"
+
+#: Messenger/js/Layout.js:150
+msgid "Do Not Disturb"
+msgstr "Não Perturbe"
+
+#: Messenger/js/Layout.js:151
+msgid "Unavailable"
+msgstr "Indisponível"
+
+#: Messenger/js/Layout.js:372
+msgid "JID"
+msgstr "JID"
+
+#: Messenger/js/Layout.js:379
+#: Messenger/js/Layout.js:438
+msgid "Name"
+msgstr "Nome"
+
+#: Messenger/js/Layout.js:384
+msgid "Group"
+msgstr "Grupo"
+
+#: Messenger/js/Layout.js:390
+msgid "Select a group"
+msgstr "Selecione um grupo"
+
+#: Messenger/js/Layout.js:400
+#: Messenger/js/Layout.js:443
+msgid "Add"
+msgstr "Incluir"
+
+#: Messenger/js/Layout.js:476
+msgid "Join Groupchat"
+msgstr "Entrar em Sala de Bate-papo"
+
+#: Messenger/js/Layout.js:485
+msgid "Identity"
+msgstr "Identidade"
+
+#: Messenger/js/Layout.js:491
+msgid "Host"
+msgstr "Anfitrião"
+
+#: Messenger/js/Layout.js:496
+msgid "Room"
+msgstr "Sala"
+
+#: Messenger/js/Layout.js:501
+msgid "Nickname"
+msgstr "Apelido"
+
+#: Messenger/js/Layout.js:507
+msgid "Password"
+msgstr "Senha"
+
+#: Messenger/js/Layout.js:511
+>>>>>>> d401e9c... Bugs corrigidos: 3731, 3722, 3546, 3767, 3678, 3680, 3681, 3612, 3223
 msgid "Join"
 msgstr "Entrar"
 
@@ -445,9 +545,15 @@ msgstr "Um nome é obrigatório"
 msgid "Delete Contact"
 msgstr "Excluir Contato"
 
+<<<<<<< HEAD
 #: Messenger/js/RosterTree.js:79
 #: Messenger/js/RosterTree.js:178
 msgid "Are you sure to delete "
+=======
+#: Messenger/js/RosterTree.js:80
+#: Messenger/js/RosterTree.js:179
+msgid "Are you sure you want to delete "
+>>>>>>> d401e9c... Bugs corrigidos: 3731, 3722, 3546, 3767, 3678, 3680, 3681, 3612, 3223
 msgstr "Tem certeza que deseja excluir "
 
 #: Messenger/js/RosterTree.js:114
@@ -517,30 +623,30 @@ msgstr[0] "Conta de E-mail"
 msgstr[1] "Contas de E-mail"
 
 #: Messenger/js/RosterHandler.js:50
-#: Messenger/js/RosterHandler.js:357
+#: Messenger/js/RosterHandler.js:359
 msgid "was successfully removed"
 msgstr "foi excluído com sucesso"
 
 #: Messenger/js/RosterHandler.js:300
-#: Messenger/js/RosterHandler.js:356
+#: Messenger/js/RosterHandler.js:357
 msgid "Successful"
 msgstr "Com sucesso"
 
 #: Messenger/js/RosterHandler.js:301
-#: Messenger/js/RosterHandler.js:357
-#: Messenger/js/RosterHandler.js:361
+#: Messenger/js/RosterHandler.js:358
+#: Messenger/js/RosterHandler.js:363
 msgid "The group"
 msgstr "O grupo"
 
-#: Messenger/js/RosterHandler.js:301
+#: Messenger/js/RosterHandler.js:302
 msgid "was successfully renamed to"
 msgstr " foi renomeado com sucesso "
 
-#: Messenger/js/RosterHandler.js:306
+#: Messenger/js/RosterHandler.js:307
 msgid " already exist. It was not renamed."
 msgstr " já existe. Não foi renomeado."
 
-#: Messenger/js/RosterHandler.js:361
+#: Messenger/js/RosterHandler.js:364
 msgid "was not removed"
 msgstr " não foi excluído"
 

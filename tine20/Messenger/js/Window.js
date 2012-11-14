@@ -15,10 +15,11 @@ Tine.Messenger.Window._addGroupAction = function(name){
     if(name){
         if(!Tine.Messenger.RosterTree().groupExist(name)){
             Tine.Messenger.RosterTree().addGroup(name);
-            Tine.Messenger.LogHandler.status(name, _('Group created successfully')+'!');
+            Tine.Messenger.LogHandler.status(name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Group created successfully')+'!');
             return true;
         } else {
-            Ext.Msg.alert(_('Add Group'),_('The group already exists')+'!');
+            Ext.Msg.alert(Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Group'),
+                          Tine.Tinebase.appMgr.get('Messenger').i18n._('The group already exists') + '!');
         }
     }
     return false;
@@ -50,14 +51,15 @@ Tine.Messenger.Window._addBuddyAction = function(jid, name, group){
     var buddy = Tine.Messenger.RosterHandler.getContactElement(jid);
     if(buddy){
         Tine.Messenger.RosterHandler.renameContact(jid, name, group);
-        Tine.Messenger.LogHandler.status(jid || name, _('Added successfuly')+'!');
+        Tine.Messenger.LogHandler.status(jid || name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Added successfuly')+'!');
         return true;
     } else {
         if(jid){
             if(Tine.Messenger.RosterHandler.addContact(jid, name, group)){
-                Tine.Messenger.LogHandler.status(jid || name, _('Added successfuly')+'!');
+                Tine.Messenger.LogHandler.status(jid || name, Tine.Tinebase.appMgr.get('Messenger').i18n._('Added successfuly')+'!');
             } else {
-                Ext.Msg.alert(_('Add Buddy'),_('Buddy not added')+'!')
+                Ext.Msg.alert(Tine.Tinebase.appMgr.get('Messenger').i18n._('Add Buddy'),
+                              Tine.Tinebase.appMgr.get('Messenger').i18n._('Buddy not added')+'!')
             }
             return true;
         }
