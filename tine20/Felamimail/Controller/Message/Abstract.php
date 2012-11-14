@@ -70,6 +70,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
     protected $_supportedForeignContentTypes = array(
         'Calendar'     => Felamimail_Model_Message::CONTENT_TYPE_CALENDAR,
         'Addressbook'  => Felamimail_Model_Message::CONTENT_TYPE_VCARD,
+        'Webconference'=> Felamimail_Model_Message::CONTENT_TYPE_WEBCONFERENCE,
     );
     
     /**
@@ -312,7 +313,10 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
                     'originator'     => $_message->from_email,
                     'userAgent'      => $userAgent,
                 ));
-                break;
+                break;                
+           case Felamimail_Model_Message::CONTENT_TYPE_WEBCONFERENCE:
+               $partData = unserialize($decodedContent)->toArray();
+               break;                
             default:
                 if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Could not create iMIP of content type ' . $part->type);
                 $partData = NULL;
