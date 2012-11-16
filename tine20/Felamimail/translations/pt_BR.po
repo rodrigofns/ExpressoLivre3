@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-11-08 14:56-0300\n"
-"Last-Translator: Antonio Carlos da Silva <antonio-carlos.silva@serpro.gov.br>\n"
+"PO-Revision-Date: 2012-11-16 16:17-0300\n"
+"Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -317,9 +317,9 @@ msgstr "Erro nas credenciais IMAP"
 msgid "Your email credentials are wrong. Please contact your administrator"
 msgstr "Suas credenciais de email estão erradas. Por favor contate seu administrador."
 
-#: js/Felamimail.js:762
-msgid "One of your folders was deleted or renamed by another client. Please update the folder list of this account."
-msgstr "Uma de suas pastas foi excluída ou renomeada por outro cliente. Por favor atualize a lista de pastas desta conta."
+#: js/Felamimail.js:851
+msgid "One of your folders was deleted or renamed by another client. Please update the folder list of this account. If the problem persists contact an administrator."
+msgstr "Uma de suas pastas foi excluída ou renomeada por outro cliente. Por favor atualize a lista de pastas desta conta. Se o problema persistir contate um administrador."
 
 #: js/Felamimail.js:791
 msgid "SMTP Error"

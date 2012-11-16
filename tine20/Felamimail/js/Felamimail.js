@@ -849,7 +849,8 @@ Tine.Felamimail.handleRequestException = function(exception) {
         case 913: // Felamimail_Exception_IMAPFolderNotFound
             Ext.Msg.show({
                title:   app.i18n._('IMAP Error'),
-               msg:     app.i18n._('One of your folders was deleted or renamed by another client. Please update the folder list of this account.'),
+               // Message changed to show more information
+               msg:     app.i18n._('One of your folders was deleted or renamed by another client. Please update the folder list of this account. If the problem persists contact an administrator.'),
                icon:    Ext.MessageBox.ERROR,
                buttons: Ext.Msg.OK
             });
