@@ -41,6 +41,13 @@ interface Tinebase_Backend_Sql_Command_Interface
       * @return string
       */
 	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);
+        
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @return string
+     */
+    public static function getLike($adapter);
 
     /**
      * 
