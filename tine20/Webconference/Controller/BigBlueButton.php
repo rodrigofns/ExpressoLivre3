@@ -125,6 +125,11 @@ class Webconference_Controller_BigBlueButton {
 	$userEmail = Tinebase_Core::getUser()->accountEmailAddress;
 	$roomName = Tinebase_Core::getUser()->accountLoginName.'_'.time();
 	
+	if ((!isset($title)) || (trim($title) == ""))
+	{
+	    $title = $userName . date(" H:i:s d/m/Y");
+	}
+	
 	$config = $this->_getBigBlueButtonConfigBalance();
 
 	if ($config == null){

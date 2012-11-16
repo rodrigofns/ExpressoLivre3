@@ -373,6 +373,73 @@
                 </index>
 	    </declaration>
 	</table>	
+
+	<table>
+	    <name>webconference_access</name>
+	    <version>1</version>
+	    <declaration>
+                <field>
+                    <name>id</name>
+                    <type>integer</type>
+                    <autoincrement>true</autoincrement>
+                </field>
+		<field>
+                    <name>accounts_id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+		<field>
+                    <name>webconference_room_id</name>
+		    <type>text</type>
+		    <lenght>40</lenght>
+		    <notnull>false</notnull>
+                </field>
+		<field>
+                    <name>login</name>
+		    <type>datetime</type>
+		    <notnull>true</notnull>
+                </field>
+		<field>
+                    <name>logout</name>
+		    <type>datetime</type>
+		    <notnull>false</notnull>
+                </field>
+                <index>
+                    <name>id</name>
+                    <primary>true</primary>
+                    <field>
+                        <name>id</name>
+                    </field>
+                </index>
+                <index>
+                    <name>webconference_access::accounts_id--accounts::id</name>
+                    <field>
+                        <name>accounts_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>accounts</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>		
+                <index>
+                    <name>webconference_access::webconferece_room_id--webconference_room::id</name>
+                    <field>
+                        <name>webconference_room_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>webconference_room</table>
+                        <field>id</field>
+                        <ondelete>CASCADE</ondelete>
+                        <onupdate>CASCADE</onupdate>
+                    </reference>
+                </index>
+	    </declaration>
+	</table>	
 	
     </tables>
 </application>
