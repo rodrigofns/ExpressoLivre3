@@ -617,9 +617,21 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         $supportedFlags = Felamimail_Controller_Message_Flags::getInstance()->getSupportedFlags();
         $extraSenderAccounts = array();
-        
         foreach($accounts['results'] as $key => $account){
-             $extraSenderAccounts = Felamimail_Controller_Folder::getInstance()->getUsersWithSendAsAcl($account['id']);
+            try
+            {
+                $extraSenderAccounts = Felamimail_Controller_Folder::getInstance()->getUsersWithSendAsAcl($account['id']);
+            }
+            catch (Felamimail_Exception_IMAPFolderNotFound $ex)
+            {
+                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__
+                    . $ex->getMessage());
+                // Ignore this exception here, it happens when INBOX folder is unaccessible.
+            }
+            catch (Felamimail_Exception_IMAPServiceUnavailable $ex)
+            {
+                // Ignoring this Exception here.
+            }
              unset($account['host']);
              unset($account['port']);
              unset($account['ssl']);

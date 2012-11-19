@@ -816,7 +816,7 @@ Tine.Felamimail.handleRequestException = function(exception) {
         case 911: // Felamimail_Exception_IMAPServiceUnavailable
             Ext.Msg.show({
                title:   app.i18n._('IMAP Error'),
-               msg:     exception.message ? exception.message : app.i18n._('No connection to IMAP server.'),
+               msg:     exception.message ? String.format(app.i18n._('No connection to IMAP server: {0}'), exception.message) : app.i18n._('No connection to IMAP server.'),
                icon:    Ext.MessageBox.ERROR,
                buttons: Ext.Msg.OK
             });

@@ -301,9 +301,13 @@ msgstr "Credenciais"
 msgid "IMAP Error"
 msgstr "Erro de IMAP"
 
-#: js/Felamimail.js:729
+#: js/Felamimail.js:817
 msgid "No connection to IMAP server."
 msgstr "Sem conexão com o servidor IMAP."
+
+#: js/Felamimail.js:817
+msgid "No connection to IMAP server: {0}"
+msgstr "Sem conexão com o servidor IMAP: {0}"
 
 #: js/Felamimail.js:745
 msgid "IMAP Credentials Error"
