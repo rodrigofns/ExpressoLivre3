@@ -327,9 +327,9 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
             if (! attender.get('user_id')) {
                 return;
             }
-			if (attender.get('user_id').account_id && Tine.Tinebase.registry.get('currentAccount').accountId==attender.get('user_id').account_id) {
-				attender.set('status_authkey', 1);
-			}
+            if (attender.get('user_id').account_id && Tine.Tinebase.registry.get('currentAccount').accountId==attender.get('user_id').account_id) {
+                    attender.set('status_authkey', 1);
+            }
 
             this.ctxMenu = new Ext.menu.Menu({
                 items: [{
@@ -436,8 +436,8 @@ Tine.Calendar.AttendeeGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                 scope: this,
                 update: function (eventJson) {
                     var o = Tine.Calendar.backend.recordReader({responseText: eventJson}).get('attendee')[0];
-                    //o.dirty = true;
-                    //o.modified = {};
+                    o.dirty = true;
+                    o.modified = {};
 		            this.store.each(function(attender) {
 						if (attender.get('status_authkey')) {
 			                var row = this.getView().getRow(this.store.indexOf(attender));
