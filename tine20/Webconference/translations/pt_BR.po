@@ -159,6 +159,10 @@ msgstr "Use o link abaixo para acessar a webconferência"
 msgid "ERROR (the webconference server is unreachable)"
 msgstr "ERRO  (o servidor de webconferência está inacessível)"
 
+#: Controller/BigBlueButton.php:131
+msgid "ERROR (no webconference server available or the room limit has been reached)"
+msgstr "ERRO  (não há servidor de webconferência disponível ou o limite de salas foi alcançado)"
+
 #: js/MainScreenCenterPanel:187
 msgid "Available Webconference Rooms"
 msgstr "Salas de Webconferência disponíveis"
@@ -179,8 +183,33 @@ msgstr "Nova Webconferência"
 msgid "Create"
 msgstr "Criar"
 
+#: js/MainScreenCenterPanel:103
+msgid "Do you want to join the room {0} with title {1}"
+msgstr "Você deseja entrar na sala {0} com o título {1}"
+
+#: js/MainScreenCenterPanel:119
+msgid "Click to join"
+msgstr "Clique para acessar"
+
+#: js/Model.js:109
+msgid "room"
+msgid_plural "rooms"
+msgstr[0] "sala"
+msgstr[1] "salas"
+
+#: js/Model.js:113
+msgid "room list"
+msgid_plural "room lists"
+msgstr[0] "Lista de salas"
+msgstr[1] "Listas de salas"
+
+#: js/MainScreenCenterPanel:151
 msgid "Webconference Role"
 msgstr "Papel na Webconferência"
+
+#: js/Webconference.js:350
+msgid "Do you want to create a new webconference room with title: {0}"
+msgstr "Você deseja criar uma nova sala de webconferência com o título: {0}"
 
 #~ msgid "Cancel active webconference"
 #~ msgstr "Cancelar webconferência ativa"

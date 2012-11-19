@@ -145,6 +145,10 @@ msgstr ""
 msgid "ERROR (the webconference server is unreachable)"
 msgstr ""
 
+#: Controller/BigBlueButton.php:131
+msgid "ERROR (no webconference server available or the room limit has been reached)"
+msgstr ""
+
 #: js/MainScreenCenterPanel:187
 msgid "Available Webconference Rooms"
 msgstr ""
@@ -165,5 +169,32 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+#: js/MainScreenCenterPanel:103
+msgid "Do you want to join the room {0} with title {1}"
+msgstr ""
+
+#: js/MainScreenCenterPanel:119
+msgid "Click to join"
+msgstr ""
+
+#: js/Model.js:109
+msgid "room"
+msgid_plural "rooms"
+msgstr[0] ""
+msgstr[1] ""
+
+
+#: js/Model.js:113
+msgid "room list"
+msgid_plural "room lists"
+msgstr[0] ""
+msgstr[1] ""
+
+
+#: js/MainScreenCenterPanel:151
 msgid "Webconference Role"
+msgstr ""
+
+#: js/Webconference.js:350
+msgid "Do you want to create a new webconference room with title: {0}"
 msgstr ""

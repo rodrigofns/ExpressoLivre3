@@ -186,10 +186,6 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
 	return Webconference_Controller_AccessLog::getInstance()->logAccessLogin($roomId);
     }   
 
-    public function logAccessLogoff($roomId) 
-    {
-	return Webconference_Controller_AccessLog::getInstance()->logAccessLogoff($roomId);
-    }   
 
     public function regLogoff($idAccess) 
     {
