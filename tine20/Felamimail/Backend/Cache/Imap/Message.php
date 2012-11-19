@@ -536,7 +536,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                     break;
                 case 'received' :
                     $sort = $_pagination->dir === 'ASC' ?
-                         array('ARRIVAL') : array('REVERSE DATE');
+                         array('ARRIVAL') : array('REVERSE ARRIVAL');
                     break;
                 case 'sent' :
                     $sort = $_pagination->dir === 'ASC' ?
