@@ -133,7 +133,7 @@ class Webconference_Controller_BigBlueButton {
 	$config = $this->_getBigBlueButtonConfigBalance();
 
 	if ($config == null){
-	    throw new Tinebase_Exception_NotFound($translation->_('ERROR (the webconference server is unreachable)'));
+	    throw new Tinebase_Exception_NotFound($translation->_('ERROR (no webconference server available or the room limit has been reached)'));
 	}
 
 	$ret = $this->_backend->createMeetingArray($userName, $roomName, $welcomeString, MODERATOR_PW, ATTENDEE_PW, $config->salt, $config->url, $logoutUrl);

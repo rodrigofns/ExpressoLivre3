@@ -34,7 +34,7 @@ class Webconference_Backend_AccessLog extends Tinebase_Backend_Sql_Abstract
                       "login" => time(),
 		      );
 	$record =  new Webconference_Model_AccessLog($data);
-        return $this->create($record);
+        return $this->create($record)->getId();
     }
 
     public function regLogoff($_roomId){

@@ -100,7 +100,7 @@ Tine.Webconference.RoomsGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
 	//console.debug(record);
 	
 	Ext.MessageBox.confirm('', 
-                    String.format(this.app.i18n._('Do you want to join the room "{0}" with title "{1}"'), 
+                    String.format(this.app.i18n._('Do you want to join the room {0} with title {1}'), 
 			record.room_name, record.title)+ ' ?', 
 		    function(btn) {
                         if(btn == 'yes') { 
