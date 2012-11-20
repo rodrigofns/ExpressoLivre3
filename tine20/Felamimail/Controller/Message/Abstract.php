@@ -226,10 +226,9 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
             ));
         
             $message->parseHeaders($headers);
-            $message->parseSmime($message->structure);
-        
             $structure = array_key_exists('messageStructure', $structure) ? $structure['messageStructure'] : $structure;
             $message->parseStructure($structure);
+            $message->parseSmime($message->structure);
         }
         
         $message->sendReadingConfirmation();
