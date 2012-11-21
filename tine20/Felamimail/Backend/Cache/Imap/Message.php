@@ -639,10 +639,13 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
         
         // TODO: do pagination on $ids and return after getMultiple
-        if($imapFilters['filters'] == 'Id'){
+         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
-            $ids = $this->_doPagination($ids, $_pagination);
-            return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
+            $ids = $this->_doPagination((Array)$ids, $pagination);
+            if($_cols === TRUE)
+                return empty($ids) ? array() : $ids;
+            else
+                return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
         }else{
             
             $ids = $this->_getIds($imapFilters, $_pagination);
