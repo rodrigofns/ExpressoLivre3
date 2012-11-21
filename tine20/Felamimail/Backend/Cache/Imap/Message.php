@@ -179,6 +179,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      *
      * @param type $paths
      * @return type 
+     * 
+     * @todo Get all folders when path is in form /accountID
      */
     protected function _getFoldersInfo($paths)
     {
@@ -209,8 +211,6 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param array $_pathFilters
      * @return array
      * 
-     * @todo implement not in
-     * @todo what happens when path is empty???? is the same as /allinboxes???
      */
     protected function _processPathFilters($_pathFilters)
     {
@@ -221,7 +221,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             {
                 $pathFilter['value'] = $this->_getAllFolders();
             }
-            else if ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) // get all INBOX from all accounts
+            else if ($this->_searchNestedArray((Array)$pathFilter['value'], Felamimail_Model_MessageFilter::PATH_ALLINBOXES)) // get all INBOX from all accounts
             {
                 $pathFilter['value'] = $this->_getAllInboxes();
             }
@@ -233,7 +233,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             $paths = array_merge($paths,  $pathFilter['value']);
         }
         
-        return $this->_getFoldersInfo($paths);
+        return $this->_getFoldersInfo(array_unique($paths));
     }
     
     /**
