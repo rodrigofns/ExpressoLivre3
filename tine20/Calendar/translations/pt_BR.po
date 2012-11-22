@@ -265,7 +265,7 @@ msgstr "Hora Inicial"
 
 #: js/DaysView.js:93
 msgid "{0}, the {1}. of {2}"
-msgstr "{0}, o {1}. de {2}"
+msgstr "{0}, {1} de {2}"
 
 #: js/DaysView.js:674
 msgid "The summary must not be longer than 255 characters."
