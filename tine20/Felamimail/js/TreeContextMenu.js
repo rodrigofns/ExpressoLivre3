@@ -303,7 +303,7 @@ Tine.Felamimail.setTreeContextMenus = function() {
 
     // mutual config options
     var config = {
-        nodeName: this.app.i18n.n_('Folder', 'Folders', 1),
+        nodeName: this.app.i18n._('Folder', 'Folders', 1),
         scope: this,
         backend: 'Felamimail',
         backendModel: 'Folder'
