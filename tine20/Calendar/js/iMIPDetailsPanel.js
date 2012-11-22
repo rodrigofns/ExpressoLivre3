@@ -229,7 +229,10 @@ Tine.Calendar.iMIPDetailsPanel = Ext.extend(Tine.Calendar.EventDetailsPanel, {
             
         Tine.Calendar.backend.saveRecord(event, {
             scope: this, 
-			success: this.prepareIMIP(),
+            success: function(){        
+                this.getLoadMask().show();
+                this.prepareIMIP();
+            },
 			failure: this.onProxyFail.createDelegate(this, [event], true)
         }, {
             checkBusyConflicts: 1
