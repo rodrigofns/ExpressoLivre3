@@ -575,15 +575,19 @@ msgstr "Ativar botão para enviar a mensagem como texto plano."
 msgid "Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s)."
 msgstr "Ativar botão para salvar texto da mensagem como uma nota anexada ao(s) destinatário(s) no seu Catálogo de Endereços."
 
-#: js/MessageEditDialog.js:192
+#: js/MessageEditDialog.js:240
 msgid "Click to search for and add recipients from the Addressbook."
 msgstr "Clique para buscar e adicionar destinatário(s) do Catálogo de Endereços."
 
-#: js/MessageEditDialog.js:270
+#: js/MessageEditDialog.js:272
+msgid "Checking Contacts"
+msgstr "Verificando Contatos"
+
+#: js/MessageEditDialog.js:444
 msgid "On {0}, {1} wrote"
 msgstr "Em {0}, {1} escreveu"
 
-#: js/MessageEditDialog.js:276
+#: js/MessageEditDialog.js:464
 msgid "Original message"
 msgstr "Mensagem original"
 
