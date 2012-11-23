@@ -903,6 +903,15 @@ Tine.Felamimail.handleRequestException = function(exception) {
                buttons: Ext.Msg.OK
             });
             break;
+            
+        case 932: // Felamimail_Exception_IMAPCacheTooMuchResults
+            Ext.Msg.show({
+               title:   app.i18n._('IMAP Backend Warning'),
+               msg:     app.i18n._(exception.message),
+               icon:    Ext.MessageBox.WARNING,
+               buttons: Ext.Msg.OK
+            });
+            break;
 
         default:
             Tine.Tinebase.ExceptionHandler.handleRequestException(exception);

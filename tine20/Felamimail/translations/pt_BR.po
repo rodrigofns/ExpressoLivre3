@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-04-03 11:11-0300\n"
+"PO-Revision-Date: 2012-11-23 11:27-0300\n"
 "Last-Translator: Mário César Kolling <mario.kolling@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -1196,6 +1196,7 @@ msgstr "Ative este botão para marcar esta mensagem como importante."
 msgid "Empty subject"
 msgstr "Assunto vazio"
 
+#:js/AccountEditDialog:
 #: 84
 msgid "Signature image size cannot exceed 16384 bytes."
 msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."
@@ -1224,12 +1225,15 @@ msgstr "Você realmente deseja enviar esta mensagem com o Assunto vazio?"
 msgid "Signature image size cannot exceed 16384 bytes."
 msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."
 
-#: Backend/Imap.php:
-#: 194
-msgid "cannot create folder"
-msgstr "Não foi possível criar a pasta"
+#: js/Felamimail.js.js:907
+msgid "Too much results, please refine your filter!"
+msgstr "Muitos resultados na consulta, por favor refine seu filtro!"
 
 #: Backend/Imap.php:
 #: 194
 msgid "perhaps it already exists."
 msgstr "talvez ela já exista."
+=======
+#: js/Felamimail.js:906
+msgid "IMAP Backend Warning"
+msgstr "Aviso de IMAP"
