@@ -4,6 +4,8 @@ Tine.Messenger.FileTransfer = {
     
     resource: null,
     
+    tmpPath: '/tmp/messenger/',
+    
     sendRequest: function (item) {
         var app = Tine.Tinebase.appMgr.get('Messenger');
         var to = typeof item == 'string' ? item : item.node.attributes.jid,
@@ -43,7 +45,7 @@ Tine.Messenger.FileTransfer = {
                             } else {
                                 info.attrs({'type': 'chat'})
                                     .c("body")
-                                    .t(_('File sent') + ' :  ' +
+                                    .t(app.i18n._('File sent') + ' :  ' +
                                        Tine.Messenger.FileTransfer.downloadURL(uploadResponse.fileName)
                                     );
                             }
@@ -63,6 +65,12 @@ Tine.Messenger.FileTransfer = {
                 } else {
                     Ext.Msg.show({
                         title: app.i18n._('File Transfer Error'),
+                        /**
+                         * _('File too big - must be less then 2MB')
+                         * _('File partially uploaded')
+                         * _('File was not uploaded')
+                         * _('File transfer error')
+                         */
                         msg: app.i18n._(uploadResponse.status) + '!',
                         buttons: Ext.Msg.OK,
                         icon: Ext.MessageBox.ERROR,
@@ -163,11 +171,11 @@ Tine.Messenger.FileTransfer = {
         var protocol = window.location.protocol,
             host = window.location.hostname,
             port = window.location.port != 80 ? ':' + window.location.port : '',
-            filePath = '/download/' + fileName;
+            filePath = '/download.php?download=yes&file=' + Tine.Messenger.FileTransfer.tmpPath + fileName;
             
         return protocol + '//' + host + port + filePath;
     },
-    
+
     downloadHandler: function(file, download, window) {
         window.close()
         var filePath = file.attr('path') + file.attr('name');

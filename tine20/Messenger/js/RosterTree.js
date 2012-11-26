@@ -218,7 +218,7 @@ Tine.Messenger.RosterTree = function(iq){
 
                     _buddy.on("dblclick", Tine.Messenger.RosterHandler.openChat);
                     _buddy.on("contextmenu", buddyContext);
-                    
+
                     if($(this).children("group").text().trim().length > 0){
                         var i=0;
                         $(this).children("group").each(function(g){
@@ -320,7 +320,7 @@ Tine.Messenger.RosterTree = function(iq){
                 parentNode.appendChild(node);
             }
         }
-        
+
     }
     
     var removeBuddyClasses = function(buddy){
@@ -480,4 +480,4 @@ Tine.Messenger.RosterTree = function(iq){
             }
         }
     }
-};
+}

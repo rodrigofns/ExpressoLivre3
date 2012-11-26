@@ -84,4 +84,4 @@ Tine.Messenger.Window._onMoveWindowAction = function (_dialog){
 
     if(pos_X != new_X || pos_Y != new_Y)
         _dialog.setPagePosition(new_X, new_Y);
-};
+}
