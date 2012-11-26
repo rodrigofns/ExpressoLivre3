@@ -2,8 +2,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Webconference\n"
 "POT-Creation-Date: \n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2012-11-26 15:36-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
+=======
+"PO-Revision-Date: 2012-11-20 08:27-0300\n"
+"Last-Translator: Edgar De Lucca <edgar.lucca@serpro.gov.br>\n"
+>>>>>>> Task#3930 - Added translation and method of registration login and logoff users.
 "Language-Team: Tine 2.0 Translators\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,8 +24,8 @@ msgid "ERROR (%s): %s"
 msgstr "ERRO (%s): %s"
 
 #: Controler/BigBlueButton.php:119
-msgid "Welcome to the Webconference by %s"
-msgstr "Bem-vindo a Webconferência criada por %s"
+msgid "Welcome to the Webconference %s by %s"
+msgstr "Bem-vindo a Webconferência %s criada por %s "
 
 #: Controler/BigBlueButton.php:247
 msgid "Webconference Invite"

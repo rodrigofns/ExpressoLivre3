@@ -44,44 +44,6 @@ class Webconference_Backend_Sql extends Tinebase_Backend_Sql_Abstract
      * @var boolean
      */
     protected $_getDisabledContacts = FALSE;
-
-    /**
-     * foreign tables (key => tablename)
-     *
-     * @var array
-     */
-//    protected $_foreignTables = array(
-	/*
-	'jpegphoto'    => array(
-            'table'         => 'addressbook_image',
-            'joinOn'        => 'contact_id',
-            'select'        => array('jpegphoto' => null),
-            'singleValue'   => TRUE,
-            'preserve'      => TRUE,
-        ),
-        'account_id'    => array(
-            'table'         => 'accounts',
-            'joinOn'        => 'contact_id',
-            'singleValue'   => TRUE,
-        ),*/
-	
-	/*
-	
-	'room_url'    => array(
-            'table'         => 'webconference_room_user',
-            'joinOn'        => 'webconference_room_id',
-            //'select'        => array('room_url' => null),
-            'singleValue'   => TRUE,
-            'preserve'      => TRUE,
-        ),
-        'webconference_room_id'    => array(
-            'table'         => 'webconference_room',
-            'joinOn'        => 'id',
-            'singleValue'   => TRUE,
-        ),
-	*/
-  //  );     
-
     
     public function __construct($_dbAdapter=null, array $_options = array())
     {

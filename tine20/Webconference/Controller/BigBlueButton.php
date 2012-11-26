@@ -118,18 +118,19 @@ class Webconference_Controller_BigBlueButton {
      * @return String -- URL of the meeting
      */
     public function createRoom($title) {
-        $translation = Tinebase_Translation::getTranslation('Webconference');
-        $logoutUrl = $this->getLogoutUrl();
-        $welcomeString = sprintf($translation->_("Welcome to the Webconference by %s"), Tinebase_Core::getUser()->accountFullName);
-        $userName = Tinebase_Core::getUser()->accountFullName;       
-	$userEmail = Tinebase_Core::getUser()->accountEmailAddress;
-	$roomName = Tinebase_Core::getUser()->accountLoginName.'_'.time();
+	$userName = Tinebase_Core::getUser()->accountFullName; 
 	
-	if ((!isset($title)) || (trim($title) == ""))
+        if ((!isset($title)) || (trim($title) == ""))
 	{
 	    $title = $userName . date(" H:i:s d/m/Y");
 	}
-	
+
+	$translation = Tinebase_Translation::getTranslation('Webconference');
+        $logoutUrl = $this->getLogoutUrl();
+        $welcomeString = sprintf($translation->_("Welcome to the Webconference %s by %s"), $title, Tinebase_Core::getUser()->accountFullName);      
+	$userEmail = Tinebase_Core::getUser()->accountEmailAddress;
+	$roomName = Tinebase_Core::getUser()->accountLoginName.'_'.time();
+		
 	$config = $this->_getBigBlueButtonConfigBalance();
 
 	if ($config == null){
@@ -381,22 +382,10 @@ class Webconference_Controller_BigBlueButton {
     }
 
     public function getLogoutUrl() {
-        
-//        $B = substr(__FILE__, 0, strrpos(__FILE__, '/'));
-//        $A = substr($_SERVER['DOCUMENT_ROOT'], strrpos($_SERVER['DOCUMENT_ROOT'], $_SERVER['PHP_SELF']));
-//        $C = substr($B, strlen($A));
-//        $posconf = strlen($C) - $conflen - 1;
-//        $D = substr($C, 1, $posconf);
-//        $host = $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $D;
-//        return 'http://'.$host . '/../views/logoutPage.html';
-        
-
         $protocol =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'];
         $base = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
         return $protocol.'://'.$host.$base.'/Webconference/views/logoutPage.html';
-        // $_SERVER["SERVER_NAME"] :shows the server name
-
     }
     
     public function getRooms(){

@@ -177,7 +177,7 @@ class Webconference_Frontend_Json extends Tinebase_Frontend_Json_Abstract {
     public function searchRooms($filter, $paging)
     {
         return Webconference_Controller_BigBlueButton::getInstance()->getRooms();
-	
+
 	//return $this->_search($filter, $paging, Webconference_Controller_Room::getInstance(), 'Webconference_Model_RoomFilter');
     }    
     
