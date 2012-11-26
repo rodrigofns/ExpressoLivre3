@@ -32,10 +32,11 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
     recordClass: Tine.Addressbook.Model.Contact,
     showContainerSelector: true,
     multipleEdit: true,
-	mailContacts: '',
-	contact_count: 0,
-	bulkInvalid: false,
-	validOk: false, 
+    mailContacts: '',
+    contact_count: 0,
+    contact_index: 0,
+    bulkInvalid: false,
+    validOk: false, 
     
     getFormItems: function () {
 		if (this.mailContacts) {
@@ -76,7 +77,7 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
      */
     initActions: function() {
 		this.supr().initActions.apply(this, arguments);   
- 
+
 		this.action_saveAndClose = new Ext.Action({
 			requiredGrant: this.editGrant,
 			text: (this.saveAndCloseButtonText != '') ? this.app.i18n._(this.saveAndCloseButtonText) : _('Ok'),
@@ -84,7 +85,7 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
 			ref: '../btnSaveAndClose',
 			scope: this,
 			handler: function() { 
-				this.bulkSaveContacts.defer(500, this) 
+				this.bulkSaveContacts.defer(100, this) 
 			},
 			iconCls: 'action_saveAndClose'
 		});
@@ -156,39 +157,52 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
 		
         
         // you need to fill in one of: n_given n_family org_name
-		var s_index = '_'+this.contact_count.toString();
-	    if (form.findField('n_family'+s_index).getValue() === '' && form.findField('org_name'+s_index).getValue() === '') {
-	        var invalidString = String.format(this.app.i18n._('Either {0} or {1} must be given'), this.app.i18n._('Last Name'), this.app.i18n._('Company'));
-	        
-	        form.findField('n_family'+s_index).markInvalid(invalidString);
-	        form.findField('org_name'+s_index).markInvalid(invalidString);
-	        
-	        isValid = false;
-	    }
-        
+        var s_index = '_'+this.contact_count.toString();
+        if (form.findField('n_family'+s_index).getValue() === '' && form.findField('org_name'+s_index).getValue() === '') {
+            var invalidString = String.format(this.app.i18n._('Either {0} or {1} must be given'), this.app.i18n._('Last Name'), this.app.i18n._('Company'));
+
+            form.findField('n_family'+s_index).markInvalid(invalidString);
+            form.findField('org_name'+s_index).markInvalid(invalidString);
+
+            isValid = false;
+        }
+
         this.validOk = (isValid && Tine.Addressbook.DynamicContactsDialog.superclass.isValid.apply(this, arguments));
 
-		if (!this.validOk) {     
-			this.bulkInvalid = !this.validOk;
-		}
+        if (!this.validOk) {     
+            this.bulkInvalid = !this.validOk;
+        }
 
-		return this.validOk;
+        return this.validOk;
     },
     
     /**
      * onAddCheck
      */
     onAddCheck: function (el) {
-		var el_div = this.find('id',el.name.replace('add_contact','contact_data'));
-		if (el.checked) {
-			el_div[0].enable();
-		}
-		else {
-			el_div[0].disable();
-		}
+        var el_div = this.find('id',el.name.replace('add_contact','contact_data'));
+        if (el.checked) {
+            el_div[0].enable();
+        }
+        else {
+            el_div[0].disable();
+        }
 		
     },
+    
+    /**
+     * onRequestSuccess (onApplyChanges success handler)
+     */
+    onRequestSuccess: function(record) {
+        this.supr().onRequestSuccess.apply(this, arguments);
+        this.contact_index = this.contact_index + 1;
 
+        if (!this.bulkInvalid && this.mailContacts.length==this.contact_index) {
+            // all contacts where added successfully
+            this.window.close();
+        }
+    },
+    
     /**
      * saveContact
      */
@@ -196,33 +210,32 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
 		// loops through the contacts and adds each one to addressbook
 		
         var form = this.getForm();
-		var all_emails = this.mailContacts;
-		this.contact_count = 0;
-		this.bulkInvalid = false;
+        var all_emails = this.mailContacts;
+        this.contact_count = 0;
+        this.contact_index = 0;
+        this.bulkInvalid = false;
 
-		Ext.each(all_emails, function(email) {
-			this.contact_count = this.contact_count + 1;
-			var s_index = '_'+this.contact_count.toString();
-			if (form.findField('add_contact'+s_index).getValue() && !this.find('id','dynamic_contact'+s_index)[0].hidden) {
-				var new_contact = new Tine.Addressbook.Model.Contact(Tine.Addressbook.Model.Contact.getDefaultData(),'new-'+Ext.id() );
-				new_contact.set('email', form.findField('email'+s_index).getValue());
-				new_contact.set('n_family', form.findField('n_family'+s_index).getValue());
-				new_contact.set('n_given', form.findField('n_given'+s_index).getValue());
-				new_contact.set('org_name', form.findField('org_name'+s_index).getValue());
-				this.record = new_contact;
-				this.onApplyChanges(button, event, false);
-				if (this.validOk) {
-					// contact was added, now row must be hidden
-					this.find('id','dynamic_contact'+s_index)[0].hide();
-				}
-			}
-		}, this);
+        Ext.each(all_emails, function(email) {
+            this.contact_count = this.contact_count + 1;
+            var s_index = '_'+this.contact_count.toString();
+            if (form.findField('add_contact'+s_index).getValue() && !this.find('id','dynamic_contact'+s_index)[0].hidden) {
+                var new_contact = new Tine.Addressbook.Model.Contact(Tine.Addressbook.Model.Contact.getDefaultData(),'new-'+Ext.id() );
+                new_contact.set('email', form.findField('email'+s_index).getValue());
+                new_contact.set('n_family', form.findField('n_family'+s_index).getValue());
+                new_contact.set('n_given', form.findField('n_given'+s_index).getValue());
+                new_contact.set('org_name', form.findField('org_name'+s_index).getValue());
+                this.record = new_contact;
+                this.onApplyChanges(button, event, false);
+                if (this.validOk) {
+                    // contact was added, now row must be hidden
+                    this.find('id','dynamic_contact'+s_index)[0].hide();
+                }
+            }
+            else {
+                this.contact_index = this.contact_index + 1;
+            }
+        }, this);
 
-		if (!this.bulkInvalid) {
-			// all contacts where added successfully
-	        this.window.close();
-		}
-        
     },
 
     /**
@@ -248,13 +261,13 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
             }
             
         }
-        
-		if (!this.bulkInvalid) {
-	        this.supr().onRecordLoad.apply(this, arguments);
-		}
-		else {
-			this.loadMask.hide();
-		}
+
+        if (!this.bulkInvalid) {
+            this.supr().onRecordLoad.apply(this, arguments);
+        }
+        else {
+            this.loadMask.hide();
+        }
         
     }
 });

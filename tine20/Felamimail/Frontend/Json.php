@@ -618,8 +618,16 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         $supportedFlags = Felamimail_Controller_Message_Flags::getInstance()->getSupportedFlags();
         $extraSenderAccounts = array();
         
-        foreach($accounts['results'] as $account){
+        foreach($accounts['results'] as $key => $account){
              $extraSenderAccounts = Felamimail_Controller_Folder::getInstance()->getUsersWithSendAsAcl($account['id']);
+             unset($account['host']);
+             unset($account['port']);
+             unset($account['ssl']);
+             unset($account['smtp_hostname']);
+             unset($account['smtp_port']);
+             unset($account['smtp_ssl']);
+             unset($account['smtp_auth']);
+             $accounts['results'][$key] = $account;
         }
         
         $result = array(
@@ -636,10 +644,11 @@ class Felamimail_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         
         // remove sensitive data
         unset($defaults['user']);
+        unset($defaults['host']);
+        unset($defaults['port']);
         unset($defaults['password']);
-        unset($defaults['smtp']['username']);
-        unset($defaults['smtp']['password']);
-        
+        unset($defaults['smtp']);
+       
         $result['defaults'] = $defaults;
         
         return $result; 

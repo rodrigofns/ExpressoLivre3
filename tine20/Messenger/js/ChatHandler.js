@@ -67,7 +67,7 @@ Tine.Messenger.ChatHandler = {
                         chat_text += chat_lines[i].body.dom.innerHTML + '<br style="clear: both;"/>';
 
                     chat_text = chat_text.replace(/src\=\"/gi, 'src="' + protocol + '//' + host);
-                    $.ajax('/history', {
+                    $.ajax('/savehistory.php', {
                         dataType: 'json',
                         type: 'POST',
                         data: {
@@ -230,11 +230,9 @@ Tine.Messenger.ChatHandler = {
 
         // Typing events
         if (paused.length > 0) {
-//            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.PAUSED_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, name + app.i18n._(' stopped typing!'));
         } else if (composing.length > 0) {
-//            Tine.Messenger.Log.debug(_(Tine.Messenger.ChatHandler.COMPOSING_STATE));
-            Tine.Messenger.ChatHandler.setChatState(jid, app.i18n._(Tine.Messenger.ChatHandler.COMPOSING_STATE));
+            Tine.Messenger.ChatHandler.setChatState(jid, name + app.i18n._(' is typing...'));
         } else if (body.length > 0){
             // Shows the specific chat window
             Tine.Messenger.ChatHandler.showChatWindow(jid, name, type);

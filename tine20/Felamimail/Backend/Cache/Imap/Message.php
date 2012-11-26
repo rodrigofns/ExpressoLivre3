@@ -151,7 +151,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                 $return = array_merge($this->_getAllFoldersByAccountId($folder->account_id, 
                     $folder->globalname, $_parent.self::IMAPDELIMITER. $folder->id), $return);                
             }
-            $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            
+            // TODO: verify if this test isn't too specific for Cyrus Imapd.
+            if ($folder->globalname !== 'user')
+            {
+                $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            }
         }
         
         return $return;
@@ -382,7 +387,24 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             }
             else if ($filter instanceof Tinebase_Model_Filter_Id)
             {
-                $return['filters'] = 'Id';
+                if ($filter->getField() == 'folder_id')
+                {
+                    $apaths = $this->_getAllFolders();
+                    $i = $filter->getvalue();
+                    foreach ($apaths as $value) 
+                    {
+                        $a1 = explode('/',$value);
+                        if($i == $a1[count($a1)-1])
+                        {
+                            $return['paths'] = $this->_getFoldersInfo(array($value));
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $return['filters'] = 'Id'; 
+                }                
             }
             else if ($filter instanceof Tinebase_Model_Filter_Abstract)
             {
@@ -540,8 +562,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     protected function _getIds(array $_imapFilters, Tinebase_Model_Pagination $_pagination = NULL)
     {
         $messages = array();
+        if (empty($_imapFilters['paths']))
+        {
+            $paths = $this->_getAllFolders();
+            $_imapFilters['paths'] = $this->_getFoldersInfo($paths);
+        }
         $sort = $this->_getImapSortParams($_pagination);
-        
         
         // do a search for each path on $imapFilters
         foreach ($_imapFilters['paths'] as $folderId => $path)
@@ -618,11 +644,6 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
             $ids = $this->_doPagination($ids, $_pagination);
             return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
         }else{
-            if (empty($imapFilters['paths']))
-            {
-                $paths = $this->_getAllFolders();
-                $imapFilters['paths'] = $this->_getFoldersInfo($paths);
-            }
             
             $ids = $this->_getIds($imapFilters, $_pagination);
 

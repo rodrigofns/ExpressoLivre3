@@ -513,27 +513,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
                 this.fireEvent('save');
                 this.recordProxy.saveRecord(this.record, {
                     scope: this,
-                    success: function(record) {
-                        // override record with returned data
-                        this.record = record;
-                        
-                        if (! (closeWindow && typeof this.window.cascade == 'function')) {
-                            // update form with this new data
-                            // NOTE: We update the form also when window should be closed,
-                            //       cause sometimes security restrictions might prevent
-                            //       closing of native windows
-                            this.onRecordLoad();
-                        }
-                        this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
-                        
-                        // free 0 namespace if record got created
-                        this.window.rename(this.windowNamePrefix + this.record.id);
-                        
-                        if (closeWindow) {
-                            this.purgeListeners();
-                            this.window.close();
-                        }
-                    },
+                    success: function(record){this.onRequestSuccess(record,closeWindow)},
                     failure: this.onRequestFailed,
                     timeout: 300000 // 5 minutes
                 }, {
@@ -589,6 +569,33 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
         });
     },
     
+    /**
+     * generic request success handler
+     * 
+     * @param {Object} record
+     */
+    onRequestSuccess: function(record, closeWindow) {
+        // override record with returned data
+        this.record = record;
+
+        if (! (closeWindow && typeof this.window.cascade == 'function')) {
+            // update form with this new data
+            // NOTE: We update the form also when window should be closed,
+            //       cause sometimes security restrictions might prevent
+            //       closing of native windows
+            this.onRecordLoad();
+        }
+        this.fireEvent('update', Ext.util.JSON.encode(this.record.data), this.mode);
+
+        // free 0 namespace if record got created
+        this.window.rename(this.windowNamePrefix + this.record.id);
+
+        if (closeWindow) {
+            this.purgeListeners();
+            this.window.close();
+        }
+    },
+
     /**
      * doublicate(s) found exception handler
      * 

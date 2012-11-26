@@ -150,9 +150,9 @@ Tine.Addressbook.ContactGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     initActions: function() {
         this.actions_exportContact = new Ext.Action({
             requiredGrant: 'exportGrant',
-            text: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 50), this.i18nRecordsName),
-            singularText: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.i18nRecordName),
-            pluralText:  String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.i18nRecordsName),
+            text: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 50), this.app.i18n._(this.i18nRecordName)),
+            singularText: String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.app.i18n._(this.i18nRecordName)),
+            pluralText:  String.format(this.app.i18n.ngettext('Export {0}', 'Export {0}', 1), this.app.i18n._(this.i18nRecordsName)),
             translationObject: this.app.i18n,
             iconCls: 'action_export',
             scope: this,

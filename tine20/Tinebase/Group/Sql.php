@@ -347,9 +347,9 @@ class Tinebase_Group_Sql extends Tinebase_Group_Abstract
      */
     public function addGroup(Tinebase_Model_Group $_group)
     {
-        if($this instanceof Tinebase_Group_Interface_SyncAble) {
+        if(($this instanceof Tinebase_Group_Interface_SyncAble) && (! $this->_isReadOnlyBackend)) {
             $groupFromSyncBackend = $this->addGroupInSyncBackend($_group);
-            $_group->setId($groupFromSyncBackend->getId());
+            $_group->setId($groupFromSyncBackend->getId());                              
         }
         
         return $this->addGroupInSqlBackend($_group);

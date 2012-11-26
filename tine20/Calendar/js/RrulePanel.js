@@ -315,15 +315,19 @@ Tine.Calendar.RrulePanel.AbstractCard = Ext.extend(Ext.Panel, {
                         '<table><tr>' +
                             '<td width="65" id="' + this.limitId + 'untilRadio"></td>' +
                             '<td width="100" id="' + this.limitId + 'until"></td>' +
-                        '</tr></table>' +
-                    '</div>' +
-                    '<div style="position: relative;">' +
-                        '<table><tr>' +
-                            '<td width="65" id="' + this.limitId + 'countRadio"></td>' +
+                            '<td width="40"></td>' +
+                            '<td width="55" id="' + this.limitId + 'countRadio"></td>' +
                             '<td width="40" id="' + this.limitId + 'count"></td>' +
                             '<td width="40" style="padding-left: 5px" >' + countAfterString + '</td>' +
-                         '</tr></table>' +
+                        '</tr></table>' +
                     '</div>' +
+//                    '<div style="position: relative;">' +
+//                        '<table><tr>' +
+//                            '<td width="65" id="' + this.limitId + 'countRadio"></td>' +
+//                            '<td width="40" id="' + this.limitId + 'count"></td>' +
+//                            '<td width="40" style="padding-left: 5px" >' + countAfterString + '</td>' +
+//                         '</tr></table>' +
+//                    '</div>' +
                 '</div>',
                 listeners: {
                    scope: this,

@@ -32,6 +32,7 @@ class Addressbook_Setup_Initialize extends Setup_Initialize
      */
     protected function _initialize(Tinebase_Model_Application $_application, $_options = null)
     {
+        parent::_initialize($_application, $_options);
         $initialAdminUserOptions = $this->_parseInitialAdminUserOptions($_options);
         
         if(Tinebase_User::getInstance() instanceof Tinebase_User_Interface_SyncAble) {

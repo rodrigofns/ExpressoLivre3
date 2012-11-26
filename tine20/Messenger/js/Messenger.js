@@ -402,16 +402,26 @@ Tine.Messenger.Util = {
 
         return first_name.toLowerCase() + '.' + last_name.toLowerCase();
     },
-    
+
     jidToId: function (jid) {
-        return jid.replace(/@/g, "_").replace(/\./g, "-").replace(/\//g, "__");
+        var atpos = jid.indexOf('@'),
+            name = jid.substr(0, atpos),
+            server = jid.substr(atpos);
+        console.log(name.replace(/\./g, "_") + server.replace(/@/g, "__").replace(/\./g, "-").replace(/\//g, "_"));
+        return name.replace(/\./g, "_") +
+               server.replace(/@/g, "__").replace(/\./g, "-").replace(/\//g, "_");
     },
-    
+
     idToJid: function (id) {
         var clean = (id.indexOf(MESSENGER_CHAT_ID_PREFIX) >= 0) ?
             id.substring(MESSENGER_CHAT_ID_PREFIX.length) :
             id;
-        return clean.replace(/\__/g, "/").replace(/\-/g, ".").replace(/_/g, "@");
+        var seppos = clean.indexOf('__'),
+            name = clean.substr(0, seppos),
+            server = clean.substr(seppos);
+        console.log(name.replace(/_/g, ".") + server.replace(/__/g, "@").replace(/\-/g, ".").replace(/_/g, "/"));
+        return name.replace(/_/g, ".") +
+               server.replace(/__/g, "@").replace(/\-/g, ".").replace(/_/g, "/");
     },
     
     getStatusClass: function(status){

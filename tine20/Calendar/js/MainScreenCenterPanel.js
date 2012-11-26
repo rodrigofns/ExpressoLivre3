@@ -156,6 +156,7 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
         this.showSheetView = new Ext.Button({
             pressed: String(this.activeView).match(/sheet$/i),
             scale: 'medium',
+            minWidth: 60,
             rowspan: 2,
             iconAlign: 'top',
             requiredGrant: 'readGrant',
@@ -170,6 +171,7 @@ Tine.Calendar.MainScreenCenterPanel = Ext.extend(Ext.Panel, {
         this.showGridView = new Ext.Button({
             pressed: String(this.activeView).match(/grid$/i),
             scale: 'medium',
+            minWidth: 60,
             rowspan: 2,
             iconAlign: 'top',
             requiredGrant: 'readGrant',

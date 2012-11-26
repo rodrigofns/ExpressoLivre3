@@ -489,17 +489,21 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
                 ? array_merge(array_keys($this->_foreignTables), array($this->_defaultCountCol)) : '*';
             
             $select = $this->_getSelect($subselectCols);
+            
+            $this->_traitGroup($select);          
             $this->_addFilter($select, $_filter);
+
             $countSelect = $this->_db->select()->from($select, $searchCountCols);
             
         } else {
             $countSelect = $this->_getSelect($searchCountCols);
             $this->_addFilter($countSelect, $_filter);
         }
+
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
         
-        $this->_traitGroup($countSelect);
+        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' SELECT_COUNT ' . $countSelect);
+        
         if (! empty($this->_additionalSearchCountCols)) {     	
             $result = $this->_db->fetchRow($countSelect);
         } else {
@@ -1247,7 +1251,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     {
     	$group = $select->getPart(Zend_Db_Select::GROUP);
     
-    	if (empty($group)) return;
+    	//if (empty($group)) return;
     
     	$order = $select->getPart(Zend_Db_Select::ORDER);
     

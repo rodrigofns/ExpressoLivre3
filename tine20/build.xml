@@ -37,7 +37,7 @@
         <foreach param="name" absparam="path" target="build-module">
             <fileset dir=".">
                 <type type="dir" />
-                <!--<include name="ActiveSync" />-->
+                <include name="ActiveSync" />
                 <include name="Addressbook" />
                 <include name="Admin" />
                 <include name="Calendar" />
@@ -52,7 +52,7 @@
                 <include name="Setup" />
                 <!--<include name="SimpleFAQ" />-->
                 <!--<include name="Sipgate" />-->
-                <!--<include name="Tasks" />-->
+                <include name="Tasks" />
                 <!--<include name="Timetracker" />-->
                 <include name="Tinebase" />
                 <!--<include name="Voipmanager" />-->

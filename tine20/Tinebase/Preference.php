@@ -133,7 +133,7 @@ class Tinebase_Preference extends Tinebase_Preference_Abstract
                 $preference->options    = '<?xml version="1.0" encoding="UTF-8"?>
                     <options>
                         <option>
-                            <label>ExtJs style (experimental)</label>
+                            <label>Modal Windows</label>
                             <value>Ext</value>
                         </option>
                         <option>

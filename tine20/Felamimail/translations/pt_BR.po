@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-09-10 14:11-0300\n"
+"PO-Revision-Date: 2012-11-16 14:41-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +98,18 @@ msgstr "Nome de Usuário (De)"
 #: js/AccountEditDialog.js:129
 msgid "Organization"
 msgstr "Organização"
+
+#: js/AccountEditDialog.js:134
+msgid "Signature position"
+msgstr "Posição da assinatura"
+
+#: js/AccountEditDialog.js:145
+msgid "Above the quote"
+msgstr "Acima do texto da msg original"
+
+#: js/AccountEditDialog.js:146
+msgid "Below the quote"
+msgstr "Abaixo do texto da msg original"
 
 #: js/AccountEditDialog.js:134
 msgid "IMAP"
@@ -242,6 +254,10 @@ msgstr "Remover dos destinatários"
 #: js/MessageEditDialog.js:454
 msgid "Loading Mail Addresses"
 msgstr "Carregando endereços de correio"
+
+#: js/MessageEditDialog.js:1139
+msgid "Do you really want to send a message with an empty subject?"
+msgstr "Você realmente quer enviar esta mensagem com o assunto vazio?"
 
 #: js/Felamimail.js:33
 msgid "New Mail"
@@ -542,6 +558,14 @@ msgstr "Salvar como template"
 #: js/MessageEditDialog.js:166
 msgid "Save Email Note"
 msgstr "Salvar nota de email"
+
+#: js/MessageEditDialog.js:190,214
+msgid "Send as Plain"
+msgstr "Enviar como texto"
+
+#: js/MessageEditDialog.js:198,222
+msgid "Activate this toggle button to send the message as text/plain."
+msgstr "Ativar botão para enviar a mensagem como texto plano."
 
 #: js/MessageEditDialog.js:174
 msgid "Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s)."
@@ -1162,4 +1186,27 @@ msgstr "Marcar como Importante"
 #: 198
 msgid "Activate this toggle button to mark this message as important."
 msgstr "Ative este botão para marcar esta mensagem como importante."
+
+#: js/MessageEditDialog.js:
+#: 1133
+msgid "Empty subject"
+msgstr "Assunto vazio"
+
+#: 84
+msgid "Signature image size cannot exceed 16384 bytes."
+msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."
+
+#: Backend/Imap.php:
+#: 194
+msgid "cannot create folder"
+msgstr "Não foi possível criar a pasta"
+
+#: Backend/Imap.php:
+#: 194
+msgid "perhaps it already exists."
+msgstr "talvez ela já exista."
+
+#: Backend/Cache/Imap/Folder.php:252
+msgid "Shared Folders"
+msgstr "Compartilhadas"
 

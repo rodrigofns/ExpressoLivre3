@@ -3,7 +3,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n !=1;\n"
 "Project-Id-Version: Tine 2.0\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-09-10 14:14-0300\n"
+"PO-Revision-Date: 2012-11-16 14:55-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team:  <mario.kolling@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -469,6 +469,9 @@ msgid "Service Unavailable"
 msgstr "Serviço Indisponível"
 
 #: js/ExceptionHandler.js:186
+msgid "The server is currently unable to handle the request due to a temporary overloading, maintenance or misconfiguration of the server. Please try again or contact your administrator."
+msgstr "O servidor está momentaneamente impossibilitado de tratar a requisição devido à uma sobrecarga temporária ou manutenção. Por favor, tente novamente ou contate o administrador."
+
 msgid "The server is currently unable to handle the request due to a temporary overloading or maintenance of the server. Please try again or contact your administrator."
 msgstr "O servidor está momentaneamente impossibilitado de tratar a requisição devido à uma sobrecarga temporária ou manutenção. Por favor, tente novamente ou contate o administrador."
 
@@ -2081,7 +2084,7 @@ msgstr "Não é possível excluir todas as páginas de uma só vez"
 #: js/widgets/grid/GridPanel.js:1468
 msgid "Do you really want to delete the selected record ({0})?"
 msgid_plural "Do you really want to delete the selected records ({0})?"
-msgstr[0] "Você realmente que excluir o registro selecionado ({0})?"
+msgstr[0] "Você realmente quer excluir o registro selecionado ({0})?"
 msgstr[1] "Você realmente quer excluir os registros selecionados ({0})?"
 
 #: js/widgets/grid/GridPanel.js:1503
@@ -2251,7 +2254,7 @@ msgstr "Atribuindo etiqueta"
 
 #: js/widgets/tags/TagsMassDetachAction.js:18
 msgid "Detach tag(s)"
-msgstr "Retirando etiqueta(s)"
+msgstr "Retirar etiquetas"
 
 #: js/widgets/tags/TagsMassDetachAction.js:84
 msgid "Select Tag(s) to detach"

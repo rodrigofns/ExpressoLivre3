@@ -70,6 +70,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
     protected $_supportedForeignContentTypes = array(
         'Calendar'     => Felamimail_Model_Message::CONTENT_TYPE_CALENDAR,
         'Addressbook'  => Felamimail_Model_Message::CONTENT_TYPE_VCARD,
+        'Webconference'=> Felamimail_Model_Message::CONTENT_TYPE_WEBCONFERENCE,
     );
     
     /**
@@ -312,7 +313,10 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
                     'originator'     => $_message->from_email,
                     'userAgent'      => $userAgent,
                 ));
-                break;
+                break;                
+           case Felamimail_Model_Message::CONTENT_TYPE_WEBCONFERENCE:
+               $partData = unserialize($decodedContent)->toArray();
+               break;                
             default:
                 if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Could not create iMIP of content type ' . $part->type);
                 $partData = NULL;
@@ -595,6 +599,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
             $body = $this->_getDecodedBodyContent($bodyPart, $partStructure);
             
             if ($partStructure['contentType'] != Zend_Mime::TYPE_TEXT) {
+                $body = $this->_getDecodedBodyImages($_message->getId(), $body);
                 $body = $this->_purifyBodyContent($body);
             }
             
@@ -628,7 +633,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
         $charset = $this->_appendCharsetFilter($_bodyPart, $_partStructure);
             
         // need to set error handler because stream_get_contents just throws a E_WARNING
-        set_error_handler('Felamimail_Controller_Message::decodingErrorHandler', E_WARNING);
+        set_error_handler('Felamimail_Controller_Message_Abstract::decodingErrorHandler', E_WARNING);
         try {
             $body = $_bodyPart->getDecodedContent();
             restore_error_handler();
@@ -644,7 +649,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
             } else {
                 if (Tinebase_Core::isLogLevel(Zend_Log::NOTICE)) Tinebase_Core::getLogger()->notice(__METHOD__ . '::' . __LINE__ . ' Try again with fallback encoding.');
                 $_bodyPart->appendDecodeFilter($this->_getDecodeFilter());
-                set_error_handler('Felamimail_Controller_Message::decodingErrorHandler', E_WARNING);
+                set_error_handler('Felamimail_Controller_Message_Abstract::decodingErrorHandler', E_WARNING);
                 try {
                     $body = $_bodyPart->getDecodedContent();
                     restore_error_handler();
@@ -749,6 +754,8 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
         $config = HTMLPurifier_Config::createDefault();
         $config->set('HTML.DefinitionID', 'purify message body contents'); 
         $config->set('HTML.DefinitionRev', 1);
+        $config->set('CSS.AllowTricky', 1);
+        $config->set('CSS.AllowedProperties', array('overflow','height'));
         $config->set('Cache.SerializerPath', $path);
         
         if (in_array('images', $this->_purifyElements)) {
@@ -767,6 +774,34 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
         
         return $content;
     }
+    
+    /**
+     * convert image cids to download image links
+     *
+     * @param string $_content
+     * @return string
+     */
+    protected function _getDecodedBodyImages($_messageId, $_content)
+    {
+        $found = preg_match_all('/<img.[^>]*src=[\"|\']cid:(.[^>\"\']*).[^>]*>/',$_content,$matches,PREG_SET_ORDER);
+        if ($found) {
+            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . ' Replacing cids from multipart messages with images');
+            foreach ($matches as $match) {
+                $pid = '';
+                foreach ($this->_attachments as $attachment) {
+                    if ($attachment['cid']==='<'.$match[1].'>') {
+                        $pid = $attachment['partId'];
+                        break;
+                    }
+                }
+                $src = "index.php?method=Felamimail.downloadAttachment&amp;messageId=".$_messageId."&amp;partId=".$pid;
+                $_content = preg_replace("/cid:$match[1]/",$src,$_content);
+            }
+        }
+
+        return $_content;
+    }
+
     
     /**
      * get message headers
