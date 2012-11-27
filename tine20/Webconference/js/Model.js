@@ -31,12 +31,6 @@ Tine.Webconference.Model.Configuration = Tine.Tinebase.data.Record.create(Tine.T
     containerProperty: null
 });
 
-/**
- * @namespace   Tine.Webconference.Model
- * @class       Tine.Webconference.Model.WCInvite
- * @extends     Tine.Tinebase.data.Record
- * WCInvite Record Definition
- */
 Tine.Webconference.Model.WCInvite = Tine.Tinebase.data.Record.create([
     {name: 'id'},
     {name: 'url'},
