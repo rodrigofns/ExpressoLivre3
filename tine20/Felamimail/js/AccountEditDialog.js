@@ -71,6 +71,38 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
             }, this);
         }
     },    
+	
+    /**
+     * uploadsuccess event for UploadImage plugin of HtmlEditor
+     * 
+     */
+    onUploadSuccess : function(dialog, filename, resp_data, record) {
+        if (resp_data.size > 16384) {
+            // exceeded maximum image size for the signature
+            Ext.Msg.show({
+                title:   _('Error'),
+                msg:     _('Signature image size cannot exceed 16384 bytes.'),
+                icon:    Ext.MessageBox.ERROR,
+                buttons: Ext.Msg.OK
+            }); 
+        }
+        else {
+            var cmp = dialog.cmp;
+            var fileName = filename.replace(/[a-zA-Z]:[\\\/]fakepath[\\\/]/, '');
+            var img = '<img id="user-signature-image" alt="'+fileName+'" src="data:image/jpeg;base64,'+resp_data.base64+'" />';
+            var loc = /<img id="user-signature-image" alt="([^\"]+)" src="data:image\/jpeg;base64,([^"]+)">/;
+            // search for an image in the signature
+            var pos = cmp.getValue().search(loc); 
+            if (pos>=0) {
+                // replace existing image with new one
+                cmp.setValue(cmp.getValue().replace(loc, img));
+            }
+            else {
+                // insert an image in the signature
+                cmp.append(img);   
+            }
+        }
+    },
     
     /**
      * returns dialog
@@ -90,6 +122,11 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                 return markup;
             },
             plugins: [
+                Ext.apply(new Ext.ux.form.HtmlEditor.UploadImage(),
+                    {
+                        base64: 'yes', 
+                        uploadsuccess: this.onUploadSuccess
+                    }), 
                 new Ext.ux.form.HtmlEditor.RemoveFormat()
             ]
         });
@@ -147,186 +184,189 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
                     ]
                 }
                 ]]
-            }, {
-                title: this.app.i18n._('IMAP'),
-                autoScroll: true,
-                border: false,
-                frame: true,
-                xtype: 'columnform',
-                formDefaults: commonFormDefaults,
-                items: [[{
-                    fieldLabel: this.app.i18n._('Host'),
-                    name: 'host',
-                    allowBlank: false
-                }, {
-                    fieldLabel: this.app.i18n._('Port (Default: 143 / SSL: 993)'),
-                    name: 'port',
-                    allowBlank: false,
-                    maxLength: 5,
-                    xtype: 'numberfield'
-                }, {
-                    fieldLabel: this.app.i18n._('Secure Connection'),
-                    name: 'ssl',
-                    typeAhead     : false,
-                    triggerAction : 'all',
-                    lazyRender    : true,
-                    editable      : false,
-                    mode          : 'local',
-                    forceSelection: true,
-                    value: 'none',
-                    xtype: 'combo',
-                    store: [
-                        ['none', this.app.i18n._('None')],
-                        ['tls',  this.app.i18n._('TLS')],
-                        ['ssl',  this.app.i18n._('SSL')]
-                    ]
-                },{
-                    fieldLabel: this.app.i18n._('Username'),
-                    name: 'user',
-                    allowBlank: false
-                }, {
-                    fieldLabel: this.app.i18n._('Password'),
-                    name: 'password',
-                    emptyText: 'password',
-                    inputType: 'password'
-                }]]
-            }, {               
-                title: this.app.i18n._('SMTP'),
-                autoScroll: true,
-                border: false,
-                frame: true,
-                xtype: 'columnform',
-                formDefaults: commonFormDefaults,
-                items: [[ {
-                    fieldLabel: this.app.i18n._('Host'),
-                    name: 'smtp_hostname'
-                }, {
-                    fieldLabel: this.app.i18n._('Port (Default: 25)'),
-                    name: 'smtp_port',
-                    maxLength: 5,
-                    xtype:'numberfield',
-                    allowBlank: false
-                }, {
-                    fieldLabel: this.app.i18n._('Secure Connection'),
-                    name: 'smtp_ssl',
-                    typeAhead     : false,
-                    triggerAction : 'all',
-                    lazyRender    : true,
-                    editable      : false,
-                    mode          : 'local',
-                    value: 'none',
-                    xtype: 'combo',
-                    store: [
-                        ['none', this.app.i18n._('None')],
-                        ['tls',  this.app.i18n._('TLS')],
-                        ['ssl',  this.app.i18n._('SSL')]
-                    ]
-                }, {
-                    fieldLabel: this.app.i18n._('Authentication'),
-                    name: 'smtp_auth',
-                    typeAhead     : false,
-                    triggerAction : 'all',
-                    lazyRender    : true,
-                    editable      : false,
-                    mode          : 'local',
-                    xtype: 'combo',
-                    value: 'login',
-                    store: [
-                        ['none',    this.app.i18n._('None')],
-                        ['login',   this.app.i18n._('Login')],
-                        ['plain',   this.app.i18n._('Plain')]
-                    ]
-                },{
-                    fieldLabel: this.app.i18n._('Username (optional)'),
-                    name: 'smtp_user'
-                }, {
-                    fieldLabel: this.app.i18n._('Password (optional)'),
-                    name: 'smtp_password',
-                    emptyText: 'password',
-                    inputType: 'password'
-                }]]
-            }, {
-                title: this.app.i18n._('Sieve'),
-                autoScroll: true,
-                border: false,
-                frame: true,
-                xtype: 'columnform',
-                formDefaults: commonFormDefaults,
-                items: [[{
-                    fieldLabel: this.app.i18n._('Host'),
-                    name: 'sieve_hostname',
-                    maxLength: 64
-                }, {
-                    fieldLabel: this.app.i18n._('Port (Default: 2000)'),
-                    name: 'sieve_port',
-                    maxLength: 5,
-                    xtype:'numberfield'
-                }, {
-                    fieldLabel: this.app.i18n._('Secure Connection'),
-                    name: 'sieve_ssl',
-                    typeAhead     : false,
-                    triggerAction : 'all',
-                    lazyRender    : true,
-                    editable      : false,
-                    mode          : 'local',
-                    value: 'none',
-                    xtype: 'combo',
-                    store: [
-                        ['none', this.app.i18n._('None')],
-                        ['tls',  this.app.i18n._('TLS')]
-                    ]
-                }]]
-            }, {
-                title: this.app.i18n._('Other Settings'),
-                autoScroll: true,
-                border: false,
-                frame: true,
-                xtype: 'columnform',
-                formDefaults: commonFormDefaults,
-                items: [[{
-                    fieldLabel: this.app.i18n._('Sent Folder Name'),
-                    name: 'sent_folder',
-                    xtype: 'felamimailfolderselect',
-                    account: this.record,
-                    maxLength: 64
-                }, {
-                    fieldLabel: this.app.i18n._('Trash Folder Name'),
-                    name: 'trash_folder',
-                    xtype: 'felamimailfolderselect',
-                    account: this.record,
-                    maxLength: 64
-                }, {
-                    fieldLabel: this.app.i18n._('Drafts Folder Name'),
-                    name: 'drafts_folder',
-                    xtype: 'felamimailfolderselect',
-                    account: this.record,
-                    maxLength: 64
-                }, {
-                    fieldLabel: this.app.i18n._('Templates Folder Name'),
-                    name: 'templates_folder',
-                    xtype: 'felamimailfolderselect',
-                    account: this.record,
-                    maxLength: 64
-                }, {
-                    fieldLabel: this.app.i18n._('Display Format'),
-                    name: 'display_format',
-                    typeAhead     : false,
-                    triggerAction : 'all',
-                    lazyRender    : true,
-                    editable      : false,
-                    mode          : 'local',
-                    forceSelection: true,
-                    value: 'html',
-                    xtype: 'combo',
-                    store: [
-                        ['html', this.app.i18n._('HTML')],
-                        ['plain',  this.app.i18n._('Plain Text')],
-                        ['content_type',  this.app.i18n._('Depending on content type (experimental)')]
-                    ]
-                }]]
-            }]
+            }
+            //, {
+            
+//                title: this.app.i18n._('IMAP'),
+//                autoScroll: true,
+//                border: false,
+//                frame: true,
+//                xtype: 'columnform',
+//                formDefaults: commonFormDefaults,
+//                items: [[{
+//                    fieldLabel: this.app.i18n._('Host'),
+//                    name: 'host',
+//                    allowBlank: false
+//                }, {
+//                    fieldLabel: this.app.i18n._('Port (Default: 143 / SSL: 993)'),
+//                    name: 'port',
+//                    allowBlank: false,
+//                    maxLength: 5,
+//                    xtype: 'numberfield'
+//                }, {
+//                    fieldLabel: this.app.i18n._('Secure Connection'),
+//                    name: 'ssl',
+//                    typeAhead     : false,
+//                    triggerAction : 'all',
+//                    lazyRender    : true,
+//                    editable      : false,
+//                    mode          : 'local',
+//                    forceSelection: true,
+//                    value: 'none',
+//                    xtype: 'combo',
+//                    store: [
+//                        ['none', this.app.i18n._('None')],
+//                        ['tls',  this.app.i18n._('TLS')],
+//                        ['ssl',  this.app.i18n._('SSL')]
+//                    ]
+//                },{
+//                    fieldLabel: this.app.i18n._('Username'),
+//                    name: 'user',
+//                    allowBlank: false
+//                }, {
+//                    fieldLabel: this.app.i18n._('Password'),
+//                    name: 'password',
+//                    emptyText: 'password',
+//                    inputType: 'password'
+//                }]]
+//            }, {               
+//                title: this.app.i18n._('SMTP'),
+//                autoScroll: true,
+//                border: false,
+//                frame: true,
+//                xtype: 'columnform',
+//                formDefaults: commonFormDefaults,
+//                items: [[ {
+//                    fieldLabel: this.app.i18n._('Host'),
+//                    name: 'smtp_hostname'
+//                }, {
+//                    fieldLabel: this.app.i18n._('Port (Default: 25)'),
+//                    name: 'smtp_port',
+//                    maxLength: 5,
+//                    xtype:'numberfield',
+//                    allowBlank: false
+//                }, {
+//                    fieldLabel: this.app.i18n._('Secure Connection'),
+//                    name: 'smtp_ssl',
+//                    typeAhead     : false,
+//                    triggerAction : 'all',
+//                    lazyRender    : true,
+//                    editable      : false,
+//                    mode          : 'local',
+//                    value: 'none',
+//                    xtype: 'combo',
+//                    store: [
+//                        ['none', this.app.i18n._('None')],
+//                        ['tls',  this.app.i18n._('TLS')],
+//                        ['ssl',  this.app.i18n._('SSL')]
+//                    ]
+//                }, {
+//                    fieldLabel: this.app.i18n._('Authentication'),
+//                    name: 'smtp_auth',
+//                    typeAhead     : false,
+//                    triggerAction : 'all',
+//                    lazyRender    : true,
+//                    editable      : false,
+//                    mode          : 'local',
+//                    xtype: 'combo',
+//                    value: 'login',
+//                    store: [
+//                        ['none',    this.app.i18n._('None')],
+//                        ['login',   this.app.i18n._('Login')],
+//                        ['plain',   this.app.i18n._('Plain')]
+//                    ]
+//                },{
+//                    fieldLabel: this.app.i18n._('Username (optional)'),
+//                    name: 'smtp_user'
+//                }, {
+//                    fieldLabel: this.app.i18n._('Password (optional)'),
+//                    name: 'smtp_password',
+//                    emptyText: 'password',
+//                    inputType: 'password'
+//                }]]
+//            }, {
+//                title: this.app.i18n._('Sieve'),
+//                autoScroll: true,
+//                border: false,
+//                frame: true,
+//                xtype: 'columnform',
+//                formDefaults: commonFormDefaults,
+//                items: [[{
+//                    fieldLabel: this.app.i18n._('Host'),
+//                    name: 'sieve_hostname',
+//                    maxLength: 64
+//                }, {
+//                    fieldLabel: this.app.i18n._('Port (Default: 2000)'),
+//                    name: 'sieve_port',
+//                    maxLength: 5,
+//                    xtype:'numberfield'
+//                }, {
+//                    fieldLabel: this.app.i18n._('Secure Connection'),
+//                    name: 'sieve_ssl',
+//                    typeAhead     : false,
+//                    triggerAction : 'all',
+//                    lazyRender    : true,
+//                    editable      : false,
+//                    mode          : 'local',
+//                    value: 'none',
+//                    xtype: 'combo',
+//                    store: [
+//                        ['none', this.app.i18n._('None')],
+//                        ['tls',  this.app.i18n._('TLS')]
+//                    ]
+//                }]]
+//            }, {
+//                title: this.app.i18n._('Other Settings'),
+//                autoScroll: true,
+//                border: false,
+//                frame: true,
+//                xtype: 'columnform',
+//                formDefaults: commonFormDefaults,
+//                items: [[{
+//                    fieldLabel: this.app.i18n._('Sent Folder Name'),
+//                    name: 'sent_folder',
+//                    xtype: 'felamimailfolderselect',
+//                    account: this.record,
+//                    maxLength: 64
+//                }, {
+//                    fieldLabel: this.app.i18n._('Trash Folder Name'),
+//                    name: 'trash_folder',
+//                    xtype: 'felamimailfolderselect',
+//                    account: this.record,
+//                    maxLength: 64
+//                }, {
+//                    fieldLabel: this.app.i18n._('Drafts Folder Name'),
+//                    name: 'drafts_folder',
+//                    xtype: 'felamimailfolderselect',
+//                    account: this.record,
+//                    maxLength: 64
+//                }, {
+//                    fieldLabel: this.app.i18n._('Templates Folder Name'),
+//                    name: 'templates_folder',
+//                    xtype: 'felamimailfolderselect',
+//                    account: this.record,
+//                    maxLength: 64
+//                }, {
+//                    fieldLabel: this.app.i18n._('Display Format'),
+//                    name: 'display_format',
+//                    typeAhead     : false,
+//                    triggerAction : 'all',
+//                    lazyRender    : true,
+//                    editable      : false,
+//                    mode          : 'local',
+//                    forceSelection: true,
+//                    value: 'html',
+//                    xtype: 'combo',
+//                    store: [
+//                        ['html', this.app.i18n._('HTML')],
+//                        ['plain',  this.app.i18n._('Plain Text')],
+//                        ['content_type',  this.app.i18n._('Depending on content type (experimental)')]
+//                    ]
+//                }]]
+//            }
+        ]
         };
-    },
+            },
     
     /**
      * generic request exception handler
@@ -347,8 +387,8 @@ Tine.Felamimail.AccountEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
  */
  Tine.Felamimail.AccountEditDialog.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
-        width: 580,
-        height: 500,
+        width: 620,
+        height: 550,
         name: Tine.Felamimail.AccountEditDialog.prototype.windowNamePrefix + Ext.id(),
         contentPanelConstructor: 'Tine.Felamimail.AccountEditDialog',
         contentPanelConstructorConfig: config

@@ -13,13 +13,18 @@
  *
  * @package     ActiveSync
  */
-class ActiveSync_Command_FolderUpdate extends ActiveSync_Command_Wbxml 
+class Syncope_Command_FolderUpdate extends Syncope_Command_Wbxml 
 {        
     protected $_defaultNameSpace    = 'uri:FolderHierarchy';
     protected $_documentElement     = 'FolderUpdate';
-    
-    protected $_classes             = array('Contacts', 'Tasks', 'Email');
-    
+
+    protected $_classes             = array(
+    		Syncope_Data_Factory::CLASS_CALENDAR,
+    		Syncope_Data_Factory::CLASS_CONTACTS,
+    		Syncope_Data_Factory::CLASS_EMAIL,
+    		Syncope_Data_Factory::CLASS_TASKS
+    );
+     
     /**
      * synckey sent from client
      *
@@ -29,37 +34,7 @@ class ActiveSync_Command_FolderUpdate extends ActiveSync_Command_Wbxml
     protected $_parentId;
     protected $_displayName;
     protected $_serverId;
-    
-    /**
-     * the folderState sql backend
-     *
-     * @var ActiveSync_Backend_FolderState
-     */
-    protected $_folderStateBackend;
-    
-    /**
-     * instance of ActiveSync_Controller
-     *
-     * @var ActiveSync_Controller
-     */
-    protected $_controller;
-    
-    /**
-     * the constructor
-     *
-     * @param  mixed                    $_requestBody
-     * @param  ActiveSync_Model_Device  $_device
-     * @param  string                   $_policyKey
-     */
-    public function __construct($_requestBody, ActiveSync_Model_Device $_device = null, $_policyKey = null)
-    {
-        parent::__construct($_requestBody, $_device, $_policyKey);
-        
-        $this->_folderStateBackend   = new ActiveSync_Backend_FolderState();
-        $this->_controller           = ActiveSync_Controller::getInstance();
-
-    }
-    
+  
     /**
      * parse FolderUpdate request
      *
@@ -73,31 +48,53 @@ class ActiveSync_Command_FolderUpdate extends ActiveSync_Command_Wbxml
         $this->_displayName = (string)$xml->DisplayName;
         $this->_serverId    = (string)$xml->ServerId;
         
-        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " synckey is $this->_syncKey parentId $this->_parentId name $this->_displayName");        
+        if ($this->_logger instanceof Zend_Log)
+        	$this->_logger->debug(__METHOD__ . '::' . __LINE__ . " synckey is $this->_syncKey parentId $this->_parentId name $this->_displayName");
+ 
+        $defaultAccountId = Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT};
+        $this->_syncState = $this->_syncStateBackend->validate($this->_device, 'FolderSync', $this->_syncKey);
+        
+        try {
+        	$this->_folder = $this->_folderBackend->getFolder($this->_device, $this->_serverId);
+        	$dataController = Syncope_Data_Factory::factory($this->_folder->class, $this->_device, $this->_syncTimeStamp);
+        	$felamimail_model_folder = Felamimail_Controller_Folder::getInstance()->get($this->_folder->folderid);
+        	
+        	$dataController->updateFolder($defaultAccountId, trim($this->_displayName), $felamimail_model_folder['globalname']);
+        	$this->_folderBackend->update($this->_folder);
+        
+        } catch (Syncope_Exception_NotFound $senf) {
+        	if ($this->_logger instanceof Zend_Log)
+        		$this->_logger->debug(__METHOD__ . '::' . __LINE__ . " " . $senf->getMessage());
+        }
     }
     
     /**
      * generate FolderUpdate response
      *
-     * @todo currently we support only the main folder which contains all contacts/tasks/events/notes per class
      */
     public function getResponse($_keepSession = FALSE)
     {
         $folderUpdate = $this->_outputDom->documentElement;
         
-        if($this->_syncKey > '0' && $this->_controller->validateSyncKey($this->_device, $this->_syncKey, 'FolderSync') === false) {
-            Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " INVALID synckey");
-            $folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', ActiveSync_Command_FolderSync::STATUS_INVALID_SYNC_KEY));
+        if($this->_syncState == false) {
+        	if ($this->_logger instanceof Zend_Log)
+        		$this->_logger->info(__METHOD__ . '::' . __LINE__ . " INVALID synckey");
+        	$folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', Syncope_Command_FolderSync::STATUS_INVALID_SYNC_KEY));
         } else {
-            $newSyncKey = $this->_syncKey + 1;
-            
-            // create xml output
-            $folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', ActiveSync_Command_FolderSync::STATUS_SUCCESS));
-            $folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'SyncKey', $newSyncKey));
-
-            $this->_controller->updateSyncKey($this->_device, $newSyncKey, $this->_syncTimeStamp, 'FolderSync');
-        }
+        	if ($this->_folder instanceof Syncope_Model_IFolder) {
+        		$this->_syncState->counter++;
         
+        		// create xml output
+        		$folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', Syncope_Command_FolderSync::STATUS_SUCCESS));
+        		$folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'SyncKey', $this->_syncState->counter));
+        
+        		$this->_syncStateBackend->update($this->_syncState);
+        	} else {
+        		// create xml output
+        		$folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'Status', Syncope_Command_FolderSync::STATUS_FOLDER_NOT_FOUND));
+        		$folderUpdate->appendChild($this->_outputDom->createElementNS('uri:FolderHierarchy', 'SyncKey', $this->_syncState->counter));
+        	}
+        }
         return $this->_outputDom;
     }    
 }

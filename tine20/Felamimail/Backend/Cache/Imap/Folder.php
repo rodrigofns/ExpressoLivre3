@@ -68,7 +68,7 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         foreach ($accountId as $id)
         {
             $account = Felamimail_Controller_Account::getInstance()->get($id);
-
+            
             if($parent === true){
                 $folders = $this->_getFoldersFromIMAP($account, $globalName);
                 foreach($folders as $folder)
@@ -80,7 +80,7 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
                 $resultArray[] = $this->get(self::encodeFolderUid(Felamimail_Model_Folder::encodeFolderName($globalName),$id));
             }
         }
-        
+                    
         $result = new Tinebase_Record_RecordSet('Felamimail_Model_Folder', $resultArray, true);
         
         return $result;
@@ -164,10 +164,11 @@ class Felamimail_Backend_Cache_Imap_Folder extends Felamimail_Backend_Cache_Imap
         
         try {
             if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
-                . ' trying to get subfolders of ' . $_folderName . $this->_delimiter);
+                . ' trying to get subfolders of ' . $_folderName . self::IMAPDELIMITER);
 
             $imap = Felamimail_Backend_ImapFactory::factory($_account);
-            $result = $imap->getFolders(Felamimail_Model_Folder::encodeFolderName($_folderName) . '/', '%');
+            $result = $imap->getFolders(
+                                   Felamimail_Model_Folder::encodeFolderName($_folderName) . self::IMAPDELIMITER , '%');
             
             // remove folder if self
             if (in_array($_folderName, array_keys($result))) {
@@ -229,14 +230,27 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
     public function get($_id, $_getDeleted = FALSE) 
     {
             $folderDecoded = self::decodeFolderUid($_id);
-
-            if($folderDecoded['globalName'] == 'user'){
-                   return new Felamimail_Model_Folder(array(
+   
+            try {
+                $imap = Felamimail_Backend_ImapFactory::factory($folderDecoded['accountId']);
+                $folder = $imap->getFolders('',$folderDecoded['globalName']);
+                $counter = $imap->examineFolder($folderDecoded['globalName']);
+                $status = $imap->getFolderStatus($folderDecoded['globalName']);
+                $quota = $imap->getQuota($folderDecoded['globalName']);
+            }
+            catch (Zend_Mail_Storage_Exception $ex)
+            {
+                // we can not access folder, create Model as unselectable
+                $globalname = $folderDecoded['globalName'];
+                $localname = array_pop(explode(self::IMAPDELIMITER, $globalname));
+                $translate = Tinebase_Translation::getTranslation("Felamimail");
+                
+                return new Felamimail_Model_Folder(array(
                     'id' => $_id,
                     'account_id' => Tinebase_Core::getPreference('Felamimail')->{Felamimail_Preference::DEFAULTACCOUNT},
-                    'localname' => "Compartilhadas",
+                    'localname' => ($localname == 'user') ? $translate->_("Shared Folders") : $localname,
                     'globalname' => $folderDecoded['globalName'],
-                    'parent' => '',
+                    'parent' => $globalname === 'user' ? '' : substr($globalname,0 , strrpos($globalname,self::IMAPDELIMITER)),
                     'delimiter' => self::IMAPDELIMITER,
                     'is_selectable' => 0,
                     'has_children' => 1,
@@ -250,13 +264,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                     'cache_job_actions_est' => 0,
                     'cache_job_actions_done' => 0
                 ));
-                
-            }else{
-                $imap = Felamimail_Backend_ImapFactory::factory($folderDecoded['accountId']);
-                $folder = $imap->getFolders('',$folderDecoded['globalName']);
-                $counter = $imap->examineFolder($folderDecoded['globalName']);
-                $status = $imap->getFolderStatus($folderDecoded['globalName']);
+
+                if (Tinebase_Core::isLogLevel(Zend_Log::INFO)) Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ 
+                    . $ex->getMessage());
             }
+            
             $globalName = $folderDecoded['globalName'];
             if($globalName == 'INBOX' || $globalName == 'user')
             {
@@ -273,7 +285,7 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
             if (strtolower($folder[$folderDecoded['globalName']]['parent']) === 'inbox')
             {
                 $systemFolders = in_array(strtolower($folder[$folderDecoded['globalName']]['localName']), 
-                                                       Felamimail_Controller_Folder::getInstance()->getSystemFolders());
+                                                       Felamimail_Controller_Folder::getInstance()->getSystemFolders($folderDecoded['accountId']));
             }
             
             
@@ -299,7 +311,9 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
                     'cache_job_lowestuid' => 0,
                     'cache_job_startuid' => 0,
                     'cache_job_actions_est' => 0,
-                    'cache_job_actions_done' => 0
+                    'cache_job_actions_done' => 0,
+                    'quota_usage'   => $quota['STORAGE']['usage'],
+                    'quota_limit'   => $quota['STORAGE']['limit']
                 ));
     }
     

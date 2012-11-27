@@ -186,18 +186,6 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
         });
 
-        this.action_toggleSendAsPlain = new Ext.Action({
-            text: this.app.i18n._('Send As Plain'),
-            handler: this.onToggleSendAsPlain,
-            iconCls: 'notes_noteIcon',
-            disabled: false,
-            scope: this,
-            enableToggle: true
-        });
-        this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
-            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain')
-        });
-
         this.action_toggleMarkAsImportant = new Ext.Action({
             text: this.app.i18n._('Mark as Important'),
             handler: this.onToggleMarkAsImportant,
@@ -219,14 +207,14 @@ Ext.namespace('Tine.Felamimail');
             enableToggle: true
         });
         this.button_toggleSendAsPlain = Ext.apply(new Ext.Button(this.action_toggleSendAsPlain), {
-            tooltip: this.app.i18n._('Activate this toggle button to send this message as text/plain.')
+            tooltip: this.app.i18n._('Activate this toggle button to send the message as text/plain.')
         });
 
         this.tbar = new Ext.Toolbar({
             defaults: {height: 55},
             items: [{
                 xtype: 'buttongroup',
-                columns: 7,
+                columns: 6,
                 items: [
                     Ext.apply(new Ext.Button(this.action_send), {
                         scale: 'medium',
@@ -242,10 +230,9 @@ Ext.namespace('Tine.Felamimail');
                     this.action_saveAsDraft,
                     this.button_saveEmailNote,
                     this.action_saveAsTemplate,
-                    this.button_toggleReadingConfirmation,
-                    this.button_toggleSendAsPlain,
                     this.button_toggleMarkAsImportant,
-                    this.button_toggleSendAsPlain,
+                    this.button_toggleReadingConfirmation,
+                    this.button_toggleSendAsPlain
                 ]
             }]
         });
@@ -254,9 +241,7 @@ Ext.namespace('Tine.Felamimail');
     /**
      * onSaveAndClose
      */
-	onSaveAndClose: function() {
-
-        this.supr().onSaveAndClose.apply(this, arguments);    
+    onSaveAndClose: function() {
 
 		this.checkUnknownContacts();
 		
@@ -267,26 +252,35 @@ Ext.namespace('Tine.Felamimail');
      */
     checkUnknownContacts: function() {
 
+        // depends on window style
+        try {
+            this['ContactsCheckMask'] = new Ext.LoadMask(this.ownerCt.body, {msg: this.app.i18n._('Checking Contacts')});
+        }
+        catch (e) {
+            this['ContactsCheckMask'] = new Ext.LoadMask(Ext.getBody(), {msg: this.app.i18n._('Checking Contacts')});
+        }
+        this['ContactsCheckMask'].show();
+
         var emailRecipients = this.record.get('to');
         emailRecipients.concat(this.record.get('cc'));
         emailRecipients.concat(this.record.get('bcc'));
 
-		this.contacts = [];
+        this.contacts = [];
         
-		var filterValue = [], emailRegExp = /<([^>]*)>/;
+        var emailRegExp = /<([^>]*)>/;
+
         Ext.each(emailRecipients, function(email) {
             if (emailRegExp.exec(email)) {
-		        if (RegExp.$1 != '') {
-		            filterValue.push(RegExp.$1);
-		        }
-			}
-			else {
-				this.contacts.push(email);
-			}
+                if (RegExp.$1 != '') {
+                    this.contacts.push(RegExp.$1);
+                }
+            }
+            else {
+                    this.contacts.push(email);
+            }
         }, this);
-		this.contacts.concat(filterValue);
 
-        var filter = [{field: 'email_query', operator: 'in', value: filterValue}];
+        var filter = [{field: 'email_query', operator: 'in', value: this.contacts}];
 		
 	    Tine.Addressbook.searchContacts(filter, null, function(response) {
 	        var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
@@ -299,6 +293,12 @@ Ext.namespace('Tine.Felamimail');
 			if (this.contacts.length > 0) {
 				this.addDynamicContacts();
 			}
+            else {
+                this['ContactsCheckMask'].hide();
+                this.supr().onSaveAndClose.apply(this, arguments);
+
+            }
+
 	    }, this);
 
     },
@@ -312,15 +312,16 @@ Ext.namespace('Tine.Felamimail');
 			mailContacts: this.contacts,
             listeners: {
                 scope: this,
-				mailTo: this.record.get('to'),
-                'load': function(editdlg) {
-                    //editdlg.record.set('email', all_emails);
-					editdlg.mailContacts = this.contacts;
+                'cancel' : function() {
+                    this['ContactsCheckMask'].hide();
+                    this.supr().onSaveAndClose.apply(this, arguments);
+                }, 
+                'close' : function() {
+                    this['ContactsCheckMask'].hide();
+                    this.supr().onSaveAndClose.apply(this, arguments);
                 }
             }
         }, this);
-
-		this.window.close();
 
 	},
 
@@ -602,6 +603,11 @@ Ext.namespace('Tine.Felamimail');
             }
             this.to = this.to.concat(this.replyTo.get('to'));
             this.cc = this.replyTo.get('cc');
+            
+            if(this.cc == null)
+            {
+                this.cc = [];
+            }
             
             // remove own email and all non-email strings/objects from to/cc
             var account = Tine.Tinebase.appMgr.get('Felamimail').getAccountStore().getById(this.record.get('account_id')),

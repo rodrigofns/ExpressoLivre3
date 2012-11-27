@@ -691,7 +691,13 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             
         result += '/';
         if (folder) {
-            result += folder.get('globalname');
+            var aux1 = folder.get('globalname').split("/");
+            var aux2 = "";
+            for(var i = 0; i < aux1.length; i++)
+                {
+                    aux2 += this.app.i18n._(aux1[i]) + "/";
+                }
+            result += aux2.substring(0,aux2.length-1);
         } else {
             result += folderId;
         }
@@ -1286,7 +1292,10 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         for (var i = 0; i < filter.length; i++) {
             if (filter[i].field == 'path' && filter[i].operator == 'in') {
                 for (var j = 0; j < filter[i].value.length; j++) {
-                    accountIdMatch = filter[i].value[j].match(/^\/([a-z0-9]*)/i);
+                        accountIdMatch = typeof(filter[i].value[j]) == 'object' && filter[i].value[j].path ? 
+                            filter[i].value[j].path.match(/^\/([a-z0-9]*)/i) :
+                            filter[i].value[j].match(/^\/([a-z0-9]*)/i);
+                    
                     if (accountIdMatch) {
                         filterAccountId = accountIdMatch[1];
                         if (accountId && accountId != filterAccountId) {

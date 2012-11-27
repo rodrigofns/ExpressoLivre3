@@ -797,6 +797,15 @@ span:hover.tinebase-addtocontacts-link {
     color: #4444ff;
 }
 
+.tinebase-addsievefilter-link{
+    cursor: pointer;
+    color: red;
+}
+
+span:hover.tinebase-addsievefilter-link {
+    color: #ff4444;
+}
+
 .tinebase-showheaders-link{
     cursor: pointer;
     color: blue;

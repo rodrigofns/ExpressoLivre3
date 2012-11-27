@@ -44,24 +44,42 @@ class Messenger_Controller extends Tinebase_Controller_Event
      */
     public function getLocalServerInfo($_login)
     {
-//        $pdo = new PDO('mysql:host=localhost;dbname=expresso', 'root', '12345');
-//        $sql = "SELECT sessionid, ip
-//                FROM tine20_access_log
-//                WHERE login_name = :login and
-//                      date(li) = date(now()) and lo is null";
-//        $st = $pdo->prepare($sql);
-//        $st->bindParam(':login', $_login, PDO::PARAM_STR);
-//        $st->execute();
-//        $user_session = $st->fetch(PDO::FETCH_OBJ);
-//        
-//        return array(
-//            'pwd' => $user_session->sessionid,
-//            'ip'  => $user_session->ip
-//        );
+        return array(
+            'ip' => $_SERVER['SERVER_ADDR']
+        );
+    }
+    
+    /**
+     *
+     * @return JSON_Array
+     */
+    public function getEmoticons($_chatID)
+    {
+        $emoticons_path = '/images/messenger/emoticons';
+        $path = dirname(__FILE__) . '/..' . $emoticons_path;
+        $xml = file_get_contents($path . '/emoticons.xml');
+        $emoticons_translations = new SimpleXMLElement($xml);
+        
+        $emoticons = array();
+        $archives = new DirectoryIterator($path);
+        foreach ($archives as $archive)
+        {
+            if ($archive->isFile() && $archive->getExtension() == 'png')
+            {
+                $name = $archive->getBasename('.' . $archive->getExtension());
+                $text = $emoticons_translations->xpath("//emoticon[@file='" . $name . "']");
+                $text = (string)$text[0]->string[0];
+                $emoticons[] = array(
+                    'name' => $name,
+                    'file' => $emoticons_path . '/' . $archive->getBasename(),
+                    'text' => $text
+                );
+            }
+        }
         
         return array(
-            'pwd' => 'm!nh4$3nh4',
-            'ip'  => '0.0.0.0'
+            'chatID'    => $_chatID,
+            'emoticons' => $emoticons
         );
     }
     

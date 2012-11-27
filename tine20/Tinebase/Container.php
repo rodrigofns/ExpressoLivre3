@@ -1065,7 +1065,22 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         $this->addGrantsSql($select, $accountId, '*');
                 
         $stmt = $this->_db->query($select);
-        $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
+        $arr = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
+        
+        // check array for duplicate entries of container_id
+        $rows = Array();
+        $last_arr = Array();
+        foreach ($arr as $row) {
+            if ($last_arr['container_id'] === $row['container_id']) {
+                $row['account_grants'] = $last_arr['account_grants'] . ',' . $row['account_grants'];
+                end($rows);
+                $rows[key($rows)] = $row;
+            }
+            else {
+                array_push($rows, $row);
+            }
+            $last_arr = $row;
+        }
         
         // add results to container ids and get grants array
         foreach ($rows as $row) {

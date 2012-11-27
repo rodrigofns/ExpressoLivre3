@@ -27,7 +27,6 @@ Tine.Messenger.RosterHandler = {
     },
     
     _onRosterUpdate: function (iq) {
-        console.log('======> CHEGOU EM _onRosterUpdate');
         try {
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]');
 
@@ -47,7 +46,7 @@ Tine.Messenger.RosterHandler = {
 //                                Tine.Messenger.RosterHandler.removeContactElement(jid);
                                 if(contact.remove()){
                                     var label = contact.text || jid;
-                                    Tine.Messenger.LogHandler.status(label, _('was successfully removed')+'!', 'INFO');
+                                    Tine.Messenger.LogHandler.status(label, Tine.Tinebase.appMgr.get('Messenger').i18n._('was successfully removed')+'!', 'INFO');
                                     var chat = Ext.getCmp(Tine.Messenger.ChatHandler.formatChatId(jid));
                                     if(chat){
                                         chat.close();
@@ -297,8 +296,9 @@ Tine.Messenger.RosterHandler = {
             }
             Tine.Messenger.RosterHandler.modifyBuddys(buddys);
 //            grpNode.setText(n_gname);
-            Tine.Messenger.LogHandler.status(_('Successful'),
-                                                _('The group') + ' ' + gname + ' ' + _('was successfully renamed to') + ' ' + n_gname, 
+            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('Successful'),
+                                                Tine.Tinebase.appMgr.get('Messenger').i18n._('The group') +
+                                                ' ' + gname + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('was successfully renamed to') + ' ' + n_gname, 
                                                 'INFO');
             
             return true;
@@ -353,18 +353,19 @@ Tine.Messenger.RosterHandler = {
         }
         Tine.Messenger.RosterHandler.modifyBuddys(buddys);
         if(grpNode.remove()){
-            Tine.Messenger.LogHandler.status(_('Successful'), 
-                                                _('The group') + ' ' + gname + ' ' + _('was successfully removed') + '!', 
+            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('Successful'), 
+                                                Tine.Tinebase.appMgr.get('Messenger').i18n._('The group') +
+                                                ' ' + gname + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('was successfully removed') + '!', 
                                                 'INFO');
         } else {
-            Tine.Messenger.LogHandler.status(_('Error'), 
-                                                _('The group') + ' ' + gname + ' ' + _('was not removed') + '!', 
+            Tine.Messenger.LogHandler.status(Tine.Tinebase.appMgr.get('Messenger').i18n._('Error'), 
+                                                Tine.Tinebase.appMgr.get('Messenger').i18n._('The group') +
+                                                ' ' + gname + ' ' + Tine.Tinebase.appMgr.get('Messenger').i18n._('was not removed') + '!', 
                                                 'INFO');
         }
     },
     
     _onRosterResult: function(iq){
-        
         var from = $(iq).attr("from"),
             to = $(iq).attr("to"),
             xmlns = $(iq).attr("xmlns");
@@ -379,20 +380,20 @@ Tine.Messenger.RosterHandler = {
 
             $(iq).find("item").each(function(){
                 var jid = $(this).attr("jid");
-                if($(this).attr("subscription") == "none"){
-//                        if($(this).attr("ask") == 'subscribe'){
-//                            Tine.Messenger.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
-//                        } else {
-                        Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
-//                        }
-                }else  if($(this).attr("subscription") == "from"){
+                if($(this).attr("subscription") == "none") {
+                    Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
+                } else if($(this).attr("subscription") == "from") {
                     Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_FROM);
-                }else  if($(this).attr("subscription") == "to"){
+                } else if($(this).attr("subscription") == "to") {
                     Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_SUBSCRIBE);
                 }
             });
         }
+        
+        // Hide loading indicator (Layout.js:82,91)
+        Ext.getCmp('connectloading').hide();
+        
         return true;
     }
     
-};
+}

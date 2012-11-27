@@ -56,6 +56,16 @@ class Tinebase_Backend_Sql_Command_Pgsql implements Tinebase_Backend_Sql_Command
     }    
     
     /**
+      * 
+      * @param Zend_Db_Adapter_Abstract $adapter
+      * @return string
+      */
+    public static function getLike($adapter)
+    {
+        return 'iLIKE';
+    }
+    
+    /**
      *
      * @param Zend_Db_Adapter_Abstract $adapter
      * @param string $date

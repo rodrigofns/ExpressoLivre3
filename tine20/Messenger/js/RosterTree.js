@@ -77,7 +77,7 @@ Tine.Messenger.RosterTree = function(iq){
         Ext.Msg.buttonText.no = app.i18n._('No');
         Ext.Msg.minWidth = 300;
         Ext.Msg.confirm(app.i18n._('Delete Contact') + ' - ' + jid,
-                            app.i18n._('Are you sure to delete ' + name + '?'),
+                            app.i18n._('Are you sure you want to delete ') + name + '?',
                             function (id) {
                                 if (id == 'yes') {
                                     Tine.Messenger.RosterHandler.removeContact(jid);
@@ -176,7 +176,7 @@ Tine.Messenger.RosterTree = function(iq){
         Ext.Msg.buttonText.no = app.i18n._('No');
         Ext.Msg.minWidth = 300;
         Ext.Msg.confirm(app.i18n._('Delete Group') + ' - ' + grp_name,
-                            app.i18n._('Are you sure to delete ' + grp_name + '?'),
+                            app.i18n._('Are you sure you want to delete ') + grp_name + '?',
                             function (id) {
                                 if (id == 'yes') {
                                     Tine.Messenger.RosterHandler.removeGroup(grp_name);
@@ -218,7 +218,7 @@ Tine.Messenger.RosterTree = function(iq){
 
                     _buddy.on("dblclick", Tine.Messenger.RosterHandler.openChat);
                     _buddy.on("contextmenu", buddyContext);
-                    
+
                     if($(this).children("group").text().trim().length > 0){
                         var i=0;
                         $(this).children("group").each(function(g){
@@ -320,7 +320,7 @@ Tine.Messenger.RosterTree = function(iq){
                 parentNode.appendChild(node);
             }
         }
-        
+
     }
     
     var removeBuddyClasses = function(buddy){
@@ -480,4 +480,4 @@ Tine.Messenger.RosterTree = function(iq){
             }
         }
     }
-};
+}

@@ -427,6 +427,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             $sendNotifications = $this->sendNotifications(FALSE);
             
             $event = $this->get($_record->getId());
+
             if ($this->_doContainerACLChecks === FALSE || $event->hasGrant(Tinebase_Model_Grants::GRANT_EDIT)) {
                 Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " updating event: {$_record->id} ");
                 
@@ -451,12 +452,25 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
                 $this->_saveAttendee($_record, $_record->isRescheduled($event));
                 
             } else if ($_record->attendee instanceof Tinebase_Record_RecordSet) {
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " user has no editGrant for event: {$_record->id}, updating attendee status with valid authKey only");
-                foreach ($_record->attendee as $attender) {
-                    if ($attender->status_authkey) {
-                        $this->attenderStatusUpdate($event, $attender, $attender->status_authkey);
-                    }
+                //check if user is delegating attendance to another attendee
+                $attendee = $this->__getAttendeeIds($_record->attendee) ;
+                $previous = $this->__getAttendeeIds($event->__get('attendee')) ;
+                $new_attender = array_values(array_diff($attendee,$previous));
+                $old_attender = array_values(array_diff($previous,$attendee));
+                $userId = $this->_currentAccount->__get('contact_id');
+                if (count($new_attender)==1 && count($old_attender)==1 && $old_attender[0] === $userId) {
+                    $delegated = true;
+                    $this->_saveAttendee($_record, $_record->isRescheduled($event));
                 }
+
+                if (!$delegated) {
+                    if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . " user has no editGrant for event: {$_record->id}, updating attendee status with valid authKey only");
+                    foreach ($_record->attendee as $attender) {
+                        if ($attender->status_authkey) {
+                            $this->attenderStatusUpdate($event, $attender, $attender->status_authkey);
+                        }
+                    }
+                }            
             }
             
             Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
@@ -466,7 +480,14 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             throw $e;
         }
         
-        $updatedEvent = $this->get($event->getId());
+        if (!$delegated) {
+            $updatedEvent = $this->get($event->getId());
+        } else {
+            $containerACLChecks = $this->_doContainerACLChecks;
+            $this->_doContainerACLChecks = FALSE;
+            $updatedEvent = $this->get($event->getId());
+            $this->_doContainerACLChecks = $containerACLChecks;
+        }
         
         // send notifications
         $this->sendNotifications($sendNotifications);
@@ -474,6 +495,20 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             $this->doSendNotifications($updatedEvent, $this->_currentAccount, 'changed', $event);
         }
         return $updatedEvent;
+    }
+    
+    /**
+     * get only the attendee contact ids
+     */
+    private function __getAttendeeIds($attendee) 
+    {
+        $ids = array();
+        foreach ($attendee as $attender) {
+            if ($attender->__get('user_id')) {
+                array_push($ids, $attender->__get('user_id'));
+            }
+        }
+        return $ids;
     }
     
     /**

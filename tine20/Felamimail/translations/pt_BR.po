@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-09-10 14:11-0300\n"
+"PO-Revision-Date: 2012-11-26 15:35-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +98,18 @@ msgstr "Nome de Usuário (De)"
 #: js/AccountEditDialog.js:129
 msgid "Organization"
 msgstr "Organização"
+
+#: js/AccountEditDialog.js:134
+msgid "Signature position"
+msgstr "Posição da assinatura"
+
+#: js/AccountEditDialog.js:145
+msgid "Above the quote"
+msgstr "Acima do texto da msg original"
+
+#: js/AccountEditDialog.js:146
+msgid "Below the quote"
+msgstr "Abaixo do texto da msg original"
 
 #: js/AccountEditDialog.js:134
 msgid "IMAP"
@@ -243,6 +255,10 @@ msgstr "Remover dos destinatários"
 msgid "Loading Mail Addresses"
 msgstr "Carregando endereços de correio"
 
+#: js/MessageEditDialog.js:1139
+msgid "Do you really want to send a message with an empty subject?"
+msgstr "Você realmente quer enviar esta mensagem com o assunto vazio?"
+
 #: js/Felamimail.js:33
 msgid "New Mail"
 msgstr "Nova mensagem"
@@ -285,9 +301,13 @@ msgstr "Credenciais"
 msgid "IMAP Error"
 msgstr "Erro de IMAP"
 
-#: js/Felamimail.js:729
+#: js/Felamimail.js:817
 msgid "No connection to IMAP server."
 msgstr "Sem conexão com o servidor IMAP."
+
+#: js/Felamimail.js:817
+msgid "No connection to IMAP server: {0}"
+msgstr "Sem conexão com o servidor IMAP: {0}"
 
 #: js/Felamimail.js:745
 msgid "IMAP Credentials Error"
@@ -297,9 +317,9 @@ msgstr "Erro nas credenciais IMAP"
 msgid "Your email credentials are wrong. Please contact your administrator"
 msgstr "Suas credenciais de email estão erradas. Por favor contate seu administrador."
 
-#: js/Felamimail.js:762
-msgid "One of your folders was deleted or renamed by another client. Please update the folder list of this account."
-msgstr "Uma de suas pastas foi excluída ou renomeada por outro cliente. Por favor atualize a lista de pastas desta conta."
+#: js/Felamimail.js:851
+msgid "One of your folders was deleted or renamed by another client. Please update the folder list of this account. If the problem persists contact an administrator."
+msgstr "Uma de suas pastas foi excluída ou renomeada por outro cliente. Por favor atualize a lista de pastas desta conta. Se o problema persistir contate um administrador."
 
 #: js/Felamimail.js:791
 msgid "SMTP Error"
@@ -543,19 +563,31 @@ msgstr "Salvar como template"
 msgid "Save Email Note"
 msgstr "Salvar nota de email"
 
+#: js/MessageEditDialog.js:190,214
+msgid "Send as Plain"
+msgstr "Enviar como texto"
+
+#: js/MessageEditDialog.js:198,222
+msgid "Activate this toggle button to send the message as text/plain."
+msgstr "Ativar botão para enviar a mensagem como texto plano."
+
 #: js/MessageEditDialog.js:174
 msgid "Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s)."
 msgstr "Ativar botão para salvar texto da mensagem como uma nota anexada ao(s) destinatário(s) no seu Catálogo de Endereços."
 
-#: js/MessageEditDialog.js:192
+#: js/MessageEditDialog.js:240
 msgid "Click to search for and add recipients from the Addressbook."
 msgstr "Clique para buscar e adicionar destinatário(s) do Catálogo de Endereços."
 
-#: js/MessageEditDialog.js:270
+#: js/MessageEditDialog.js:272
+msgid "Checking Contacts"
+msgstr "Verificando Contatos"
+
+#: js/MessageEditDialog.js:444
 msgid "On {0}, {1} wrote"
 msgstr "Em {0}, {1} escreveu"
 
-#: js/MessageEditDialog.js:276
+#: js/MessageEditDialog.js:464
 msgid "Original message"
 msgstr "Mensagem original"
 
@@ -1162,4 +1194,35 @@ msgstr "Marcar como Importante"
 #: 198
 msgid "Activate this toggle button to mark this message as important."
 msgstr "Ative este botão para marcar esta mensagem como importante."
+
+#: js/MessageEditDialog.js:
+#: 1133
+msgid "Empty subject"
+msgstr "Assunto vazio"
+
+#: 84
+msgid "Signature image size cannot exceed 16384 bytes."
+msgstr "O tamanho da imagem da assinatura não pode exceder 16384 bytes."
+
+#: Backend/Imap.php:
+#: 194
+msgid "cannot create folder"
+msgstr "Não foi possível criar a pasta"
+
+#: Backend/Imap.php:
+#: 194
+msgid "perhaps it already exists."
+msgstr "talvez ela já exista."
+
+#: Backend/Cache/Imap/Folder.php:252
+msgid "Shared Folders"
+msgstr "Compartilhadas"
+
+#: js/Felamimail.js.js:907
+msgid "Too much results, please refine your filter!"
+msgstr "Muitos resultados na consulta, por favor refine seu filtro!"
+
+#: js/Felamimail.js:906
+msgid "IMAP Backend Warning"
+msgstr "Aviso de IMAP"
 

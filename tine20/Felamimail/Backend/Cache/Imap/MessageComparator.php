@@ -82,6 +82,7 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
             case 'folder_id' : // Strings
                 
                 $folders = array();
+                $translate = Tinebase_Translation::getTranslation('Felamimail');
                 foreach (array($msg1, $msg2) as $msg)
                 {
                     $folder = Felamimail_Backend_Cache_Imap_Folder::decodeFolderUid($msg[$this->_pagination->sort]);
@@ -91,8 +92,13 @@ final class Felamimail_Backend_Cache_Imap_MessageComparator
                         $this->_accountMap[$folder['accountId']] :
                         ($this->_accountMap[$folder['accountId']] =
                                 Felamimail_Controller_Account::getInstance()->get($folder['accountId']));
-
-                    $folders[] = $account->name . '/' . $folder['globalName'];
+                    $aux1 = explode('/',$folder['globalName']);
+                    $aux2 = '';
+                    foreach ($aux1 as $value) 
+                    {   
+                        $aux2 .= $translate->_($value) . '/';
+                    }
+                    $folders[] = $account->name . '/' . substr($aux2,0,strlen($aux2)-1);
                 }
 
                 list($value1, $value2) = $folders;

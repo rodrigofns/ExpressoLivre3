@@ -210,7 +210,7 @@ class Tinebase_Mail extends Zend_Mail
         return $this;
     }
     
-        /**
+    /**
      * Find and process Embedded imagens in HTML body.
      *
      * @param  string|Zend_Mime_Part    $html
@@ -220,6 +220,28 @@ class Tinebase_Mail extends Zend_Mail
     {
    //todo achar tudo no formato <img alt="'+data.name+'" src="index.php?method=Felamimail.showTempImage&tempImageId='+data.url+'"/>, criar as partes multipart/related e substituir o src por CID:cid
         $expImages = '/<img alt="([^\"]+)" src="index.php\?method=Felamimail\.showTempImage&amp;tempImageId=([a-z0-9A-Z]+)">/';
+       //a-z0-9A-Z. _-
+        preg_match_all($expImages, $html, $result);
+        $return = array();
+        foreach($result[0] as $key => $embeddedImage){
+            $return[$key][0] = $result[1][$key];
+            $return[$key][1] = $result[2][$key];
+        }
+        
+        return $return;
+    }
+    
+    /**
+     * Find and process Embedded imagens in HTML body.
+     *
+     * @param  string|Zend_Mime_Part    $html
+     * @return array
+     */
+    public function processEmbeddedImageSignatureInHtmlBody($html)
+    {
+
+        // also treats base64 signatures
+        $expImages = '/<img id="user-signature-image" alt="([^\"]+)" src="data:image\/jpeg;base64,([^"]+)">/';
        //a-z0-9A-Z. _-
         preg_match_all($expImages, $html, $result);
         $return = array();
@@ -343,8 +365,7 @@ class Tinebase_Mail extends Zend_Mail
     {
 
         if (null === $cid) {
-            static $unique = 0;
-            $cid = md5($body . ($unique++));
+            $cid = $this->createCid($body);
         }
         $mp = new Zend_Mime_Part($body);
         $mp->id = $cid;
@@ -356,6 +377,17 @@ class Tinebase_Mail extends Zend_Mail
         $this->addHtmlRelatedAttachment($mp);
 
         return $mp;
+    }
+
+    /**
+     * Generates and returns a new cid
+     *
+     * @return 
+     */
+    public function createCid($body)
+    {
+        static $unique = 0;
+        return md5($body . ($unique++));
     }
 
     /**

@@ -73,7 +73,7 @@ Tine.Calendar.SearchCombo = Ext.extend(Ext.form.ComboBox, {
         this.displayField = this.recordClass.getMeta('titleProperty');
         this.valueField = this.recordClass.getMeta('idProperty');
 
-        this.fieldLabel = this.app.i18n._('Event'),
+        this.fieldLabel = this.app.i18n._('Events'),
         this.emptyText = this.app.i18n._('Search Event'),
 
         this.store = new Tine.Tinebase.data.RecordStore(Ext.copyTo({

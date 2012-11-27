@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-09-10 14:11-0300\n"
+"PO-Revision-Date: 2012-11-26 15:31-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -170,6 +170,10 @@ msgstr "Este é o calendário onde o participante salvou o evento"
 msgid "Type"
 msgstr "Tipo"
 
+#: js/AttendeeGridPanel.js:345
+msgid "Delegate Attendance"
+msgstr "Delegar"
+
 #: js/AttendeeGridPanel.js:168
 msgid "User"
 msgstr "Usuário"
@@ -261,7 +265,7 @@ msgstr "Hora Inicial"
 
 #: js/DaysView.js:93
 msgid "{0}, the {1}. of {2}"
-msgstr "{0}, o {1}. de {2}"
+msgstr "{0}, {1} de {2}"
 
 #: js/DaysView.js:674
 msgid "The summary must not be longer than 255 characters."
@@ -465,7 +469,7 @@ msgstr "Mes"
 
 #: js/MainScreenCenterPanel.js:433
 msgid "Set my response"
-msgstr "Set my response"
+msgstr "Definir minha resposta"
 
 #: js/MainScreenCenterPanel.js:472
 msgid "Updating event in the past"
@@ -485,7 +489,7 @@ msgstr "Criando um evento no passado"
 
 #: js/MainScreenCenterPanel.js:479
 msgid "Create this event"
-msgstr "Criando este evento"
+msgstr "Criar este evento"
 
 #: js/MainScreenCenterPanel.js:480
 msgid "Do not create this event"
@@ -966,4 +970,8 @@ msgstr "\"%2$s\" resposta de %1$s"
 #: views/eventNotification.php:63
 msgid "Event details"
 msgstr "Detalhes do Evento"
+
+#: js/iMIPDetailsPanel.js:407
+msgid "Open/Delegate"
+msgstr "Abrir/Delegar"
 

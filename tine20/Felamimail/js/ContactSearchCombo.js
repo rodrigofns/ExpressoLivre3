@@ -89,6 +89,7 @@ Tine.Felamimail.ContactSearchCombo = Ext.extend(Tine.Addressbook.SearchCombo, {
     onStoreLoad: function(store, records, options) {
         this.addAlternativeEmail(store, records);
         this.removeDuplicates(store);
+        store.sort('email','ASC');
     },
     
     /**

@@ -151,7 +151,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                 $return = array_merge($this->_getAllFoldersByAccountId($folder->account_id, 
                     $folder->globalname, $_parent.self::IMAPDELIMITER. $folder->id), $return);                
             }
-            $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            
+            // TODO: verify if this test isn't too specific for Cyrus Imapd.
+            if ($folder->globalname !== 'user')
+            {
+                $return = array_merge(array($_parent.self::IMAPDELIMITER.$folder->id), $return);
+            }
         }
         
         return $return;
@@ -174,6 +179,8 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      *
      * @param type $paths
      * @return type 
+     * 
+     * @todo Get all folders when path is in form /accountID
      */
     protected function _getFoldersInfo($paths)
     {
@@ -204,31 +211,31 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
      * @param array $_pathFilters
      * @return array
      * 
-     * @todo implement not in
-     * @todo what happens when path is empty???? is the same as /allinboxes???
      */
     protected function _processPathFilters($_pathFilters)
-    {
+    {   
         $paths = array();
         foreach ($_pathFilters as $pathFilter)
         {
-            if (empty($pathFilter['value'])) // get allfolders from all accounts
+//            if (empty($pathFilter['value']) || (is_array($pathFilter['value']) && empty($pathFilter['value'][0]))) // get allfolders from all accounts
+//            {
+//                $pathFilter['value'] = $this->_getAllFolders();
+//            }
+            if ($this->_searchNestedArray((Array)$pathFilter['value'], Felamimail_Model_MessageFilter::PATH_ALLINBOXES)) // get all INBOX from all accounts
             {
-                $pathFilter['value'] = $this->_getAllFolders();
-            }
-            else if ($pathFilter['value'] ===  Felamimail_Model_MessageFilter::PATH_ALLINBOXES) // get all INBOX from all accounts
-            {
-                $pathFilter['value'] = $this->_getAllInboxes();
+                $paths = $this->_getAllInboxes();
             }
             else if (($pathFilter['operator'] === 'notin'))
             {
-                $pathFilter['value'] = array_diff($this->_getAllFolders(), $pathFilter['value']);
+                $paths = array_diff($this->_getAllFolders(), $pathFilter['value']);
             }
-            
-            $paths = array_merge($paths,  $pathFilter['value']);
+            else if (($pathFilter['operator'] === 'in') && !empty($pathFilter['value'][0]))
+            {
+                $paths = $pathFilter['value'];
+            }
         }
         
-        return $this->_getFoldersInfo($paths);
+        return $this->_getFoldersInfo(array_unique($paths));
     }
     
     /**
@@ -382,7 +389,24 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
             }
             else if ($filter instanceof Tinebase_Model_Filter_Id)
             {
-                $return['filters'] = 'Id';
+                if ($filter->getField() == 'folder_id')
+                {
+                    $apaths = $this->_getAllFolders();
+                    $i = $filter->getvalue();
+                    foreach ($apaths as $value) 
+                    {
+                        $a1 = explode('/',$value);
+                        if($i == $a1[count($a1)-1])
+                        {
+                            $return['paths'] = $this->_getFoldersInfo(array($value));
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $return['filters'] = 'Id'; 
+                }                
             }
             else if ($filter instanceof Tinebase_Model_Filter_Abstract)
             {
@@ -514,7 +538,7 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
                     break;
                 case 'received' :
                     $sort = $_pagination->dir === 'ASC' ?
-                         array('ARRIVAL') : array('REVERSE DATE');
+                         array('ARRIVAL') : array('REVERSE ARRIVAL');
                     break;
                 case 'sent' :
                     $sort = $_pagination->dir === 'ASC' ?
@@ -540,8 +564,12 @@ class Felamimail_Backend_Cache_Imap_Message extends Felamimail_Backend_Cache_Ima
     protected function _getIds(array $_imapFilters, Tinebase_Model_Pagination $_pagination = NULL)
     {
         $messages = array();
+        if (empty($_imapFilters['paths']))
+        {
+            $paths = $this->_getAllFolders();
+            $_imapFilters['paths'] = $this->_getFoldersInfo($paths);
+        }
         $sort = $this->_getImapSortParams($_pagination);
-        
         
         // do a search for each path on $imapFilters
         foreach ($_imapFilters['paths'] as $folderId => $path)
@@ -612,17 +640,21 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
         $imapFilters = $this->_parseFilterGroup($_filter, $_pagination);
         $pagination = !$_pagination ? new Tinebase_Model_Pagination(NULL, TRUE) : $_pagination;
         
+        if (empty($imapFilters['paths']))
+        {
+            $paths = $this->_getAllFolders();
+            $imapFilters['paths'] = $this->_getFoldersInfo($paths);
+        }
+        
         // TODO: do pagination on $ids and return after getMultiple
-        if($imapFilters['filters'] == 'Id'){
+         if($imapFilters['filters'] == 'Id'){
             $ids = $filterObjects[0]->getValue();
-            $ids = $this->_doPagination($ids, $_pagination);
-            return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
+            $ids = $this->_doPagination((Array)$ids, $pagination);
+            if($_cols === TRUE)
+                return empty($ids) ? array() : $ids;
+            else
+                return empty($ids) ? $this->_rawDataToRecordSet(array()) : $this->getMultiple($ids);
         }else{
-            if (empty($imapFilters['paths']))
-            {
-                $paths = $this->_getAllFolders();
-                $imapFilters['paths'] = $this->_getFoldersInfo($paths);
-            }
             
             $ids = $this->_getIds($imapFilters, $_pagination);
 
@@ -650,6 +682,12 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Mes
                 }
                 
                 $messages = array_merge($messages, $messagesInFolder);
+                
+                if (count($ids) !== 1 && count($messages) > 1000) // when searching more than one folder, break on 1000 records
+                {
+                    throw new Felamimail_Exception_IMAPCacheTooMuchResults();
+                }
+                
             }
             
             if ((count($ids) === 1 && !in_array($pagination->sort, $this->_imapSortParams)) ||
