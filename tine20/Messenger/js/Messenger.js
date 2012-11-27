@@ -24,7 +24,7 @@ Tine.Messenger.Credential = {
         return '';
     }
   , myNick: function(){
-        return 'ME';
+        return Tine.Tinebase.appMgr.get('Messenger').i18n._('ME');
     }
   , myAvatar: function(){
         return '/images/empty_photo_male.png';
@@ -70,21 +70,6 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
     // Upload XML emoticons information
     xml_raw: null,
     
-    getTitle: function () {
-        return this.i18n.ngettext('Messenger', 'Messengers', 1);
-    },
-    
-    init: function () {
-        // Shows IM window and starts communication
-        this.showMessengerDelayedTask = new Ext.util.DelayedTask(this.showMessenger, this);
-        this.showMessengerDelayedTask.delay(500);
-        this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
-        this.startMessengerDelayedTask.delay(500);
-        
-        // Sets Messenger config panel
-        
-    },
-    
     debugFunction: function () {
         Tine.Messenger.Application.connection.xmlInput = function (xml) {
             console.log('\\/ |\\/| |     |  |\\ |');
@@ -108,20 +93,34 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         };
     },
     
-    showMessenger: function () {
+    getTitle: function () {
+        return this.i18n.ngettext('Messenger', 'Messengers', 1);
+    },
+    
+    init: function () {
+        // Shows IM window and starts communication
+        this.initMessengerDelayedTask = new Ext.util.DelayedTask(this.initMessenger, this);
+        this.initMessengerDelayedTask.delay(500);
+        if (Tine.Messenger.registry.get('preferences').get('messengerStart') == 'loading') {
+            this.startMessengerDelayedTask = new Ext.util.DelayedTask(this.startMessenger, this);
+            this.startMessengerDelayedTask.delay(1000);
+        }
+    },
+    
+    initMessenger: function () {
+        new Tine.Messenger.ClientDialog();
         Tine.Tinebase.MainScreen.getMainMenu().insert(2, {
             xtype: 'button',
             html: '<span id="messenger">Messenger</span>',
             cls: 'messenger-icon-off',
             listeners: {
                 click: function () {
-                      if(!Ext.getCmp("ClientDialog")){
-                        new Tine.Messenger.ClientDialog();
-                      }
-                      else{
-                        Ext.getCmp("ClientDialog").show();
-                      }
-                }
+                    Ext.getCmp("ClientDialog").show();
+                    if (Tine.Messenger.registry.get('preferences').get('messengerStart') == 'clicking') {
+                        this.startMessenger();
+                    }
+                },
+                scope: this
             }
         });
         Tine.Tinebase.MainScreen.getMainMenu().doLayout();
@@ -139,23 +138,28 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         });
     },
     
+    startMessenger: function (status, statusText) {
+        Tine.Messenger.Log.debug("Starting Messenger...");
+        // Loading Messenger
+        Ext.getCmp('connectloading').show();
+        
+        this.getPasswordForJabber();
+        
+        Ext.getCmp("ClientDialog").show();
+
+        Ext.getCmp('ClientDialog').status = (status != null) ? status : IMConst.ST_AVAILABLE.id;
+        
+        // Setting the system button (on/off)
+        Tine.Messenger.IM.changeSystemLogonButton(['shutdown', 'Logout']);
+        Ext.getCmp('messenger-logout').systemOn = true;
+    },
+    
     stopMessenger: function (reason) {
         reason = (reason == null) ? "" : ': ' + reason;
         Tine.Messenger.Log.debug("Stopping Messenger...");
         Tine.Tinebase.appMgr.get('Messenger').getConnection().disconnect('Leaving Messenger' + reason);
         Tine.Messenger.Log.debug("Messenger Stopped!");
-    },
-
-    startMessenger: function (status, statusText) {
-        Tine.Messenger.Log.debug("Starting Messenger...");
-        
-        this.getPasswordForJabber();
-        
-        if(!Ext.getCmp("ClientDialog")){
-            new Tine.Messenger.ClientDialog().show();
-        }
-        Ext.getCmp('ClientDialog').status = (status != null) ? status : IMConst.ST_AVAILABLE.id;
-//        Ext.getCmp('ClientDialog').statusText = (statusText != null) ? statusText : Ext.getCmp('ClientDialog').statusText;
+        Tine.Messenger.IM.changeSystemLogonButton(['run', 'Login']);
     },
     
     getConnection: function () {
@@ -198,8 +202,8 @@ Tine.Messenger.Application = Ext.extend(Tine.Tinebase.Application, {
         if (status === Strophe.Status.CONNECTING) {
             Tine.Messenger.Log.debug("Connecting...");
             // When connecting OK, take off the line below
-            Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connecting')+'...').disable();
-            $('.messenger-connect-display img').css('display','block');
+            //Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connecting')+'...').disable();
+            //$('.messenger-connect-display img').css('display','block');
             
         } else if (status === Strophe.Status.CONNFAIL) {
             Tine.Messenger.RosterHandler.clearRoster();
@@ -323,9 +327,10 @@ Tine.Messenger.IM = {
         // Enable action Add Group
         Ext.getCmp('messenger-group-mngt-add').enable();
         
-        Ext.getCmp('messenger-connect-display').hide();
-        
-        Ext.getCmp('messenger-logout').enable();
+        // Enable Show/Hide offline contacts
+        Ext.getCmp('messenger-show-offline-contacts').enable();
+        var delayed = new Ext.util.DelayedTask(Tine.Messenger.IM.verifyOfflineContactsDisplay, this);
+        delayed.delay(500);        
     },
     disableOnDisconnect: function(){
         // Change IM icon
@@ -338,9 +343,11 @@ Tine.Messenger.IM = {
         // Disable action Add Group
         Ext.getCmp('messenger-group-mngt-add').disable();
         Ext.getCmp('messenger-contact-add').disable();
-        Ext.getCmp('messenger-logout').disable();
         Ext.getCmp('messenger-change-status-button')
             .setIcon('/images/messenger/user_unavailable.png');
+            
+        // Enable Show/Hide offline contacts
+        Ext.getCmp('messenger-show-offline-contacts').disable();
             
         // Close all chats
         var chats = Ext.query('.messenger-chat-window');
@@ -349,8 +356,48 @@ Tine.Messenger.IM = {
         });
         
         Ext.getCmp('messenger-connect-display').show();
-        Ext.getCmp('messenger-connect-cmd').setText(IM.i18n()._('Connect')).enable();
-        $('.messenger-connect-display img').css('display','none');
+    },
+    changeOfflineContactsDisplay: function () {
+        // Change the display based on the button
+        var displayBt = Ext.getCmp('messenger-show-offline-contacts');
+        var i18n = Tine.Tinebase.appMgr.get('Messenger').i18n;
+        
+        if (displayBt.showOffline) {
+            $('div.unavailable').hide();
+            displayBt.setTooltip(i18n._('Show offline contacts'));
+            displayBt.setIcon('images/messenger/icon_unavailable.png');
+        } else {
+            $('div.unavailable').show();
+            displayBt.setTooltip(i18n._('Hide offline contacts'));
+            displayBt.setIcon('images/messenger/hidden_icon_unavailable.png');
+        }
+    },
+    verifyOfflineContactsDisplay: function () {
+        // Verify if is showing or hiding
+        var displayBt = Ext.getCmp('messenger-show-offline-contacts');
+        var i18n = Tine.Tinebase.appMgr.get('Messenger').i18n;
+        console.log('CHEGOU AQUI!!!');
+        //if (displayBt.showOffline) {
+        if (Tine.Messenger.registry.get('preferences').get('offlineContacts') == 'show') {
+            console.log('MOSTRANDO...');
+            $('div.unavailable').show();
+            displayBt.setTooltip(i18n._('Hide offline contacts'));
+            displayBt.setIcon('images/messenger/hidden_icon_unavailable.png');
+            displayBt.showOffline = true;
+        } else {
+            console.log('ESCONDENDO...');
+            $('div.unavailable').hide();
+            displayBt.setTooltip(i18n._('Show offline contacts'));
+            displayBt.setIcon('images/messenger/icon_unavailable.png');
+            displayBt.showOffline = false;
+        }
+    },
+    changeSystemLogonButton: function (texts) {
+        var pn = Ext.getCmp('messenger-logout'),
+            i18n = Tine.Tinebase.appMgr.get('Messenger').i18n;
+        
+        pn.setIcon('images/oxygen/16x16/actions/system-' + texts[0] + '.png');
+        pn.setTooltip(i18n._(texts[1]));
     }
 };
 
@@ -521,5 +568,23 @@ Tine.Messenger.Util = {
             return t[1] - TZ + ":" + t[2] + ":" + t[3];
         }
         return Date().match(/\d{2}\:\d{2}\:\d{2}/)[0];
+    },
+    
+    insertAtCursor: function (myField, myValue) {
+        myField = myField.el.dom;
+        if (document.selection) {
+            myField.focus();
+            var sel = document.selection.createRange();
+            sel.text = myValue;
+        } else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            myField.value = myField.value.substring(0, startPos)
+                          + myValue
+                          + myField.value.substring(endPos, myField.value.length);
+
+        } else {
+            myField.value += myValue;
+        }
     }
-};
+}

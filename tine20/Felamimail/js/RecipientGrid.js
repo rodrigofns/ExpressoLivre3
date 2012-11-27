@@ -179,6 +179,8 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
                 scope: this,
                 specialkey: this.onSearchComboSpecialkey,
                 blur: function(combo) {
+                    this.getView().el.select('.x-grid3-td-address-editing').removeClass('x-grid3-td-address-editing');
+                    
                     // need to update record because we relay blur event and it might not be updated otherwise
                     if (this.activeEditor) {
                         var value = combo.getValue();
@@ -201,17 +203,17 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
                 header: 'type',
                 renderer: function(value) {
                     var result = '',
-                        qtip = app.i18n._('Click here to set To/CC/BCC.');
+                        qtip = Ext.util.Format.htmlEncode(app.i18n._('Click here to set To/CC/BCC.'));
 
                     switch(value) {
                         case 'to':
-                            result = app.i18n._('To:');
+                            result = Ext.util.Format.htmlEncode(app.i18n._('To:'));
                             break;
                         case 'cc':
-                            result = app.i18n._('Cc:');
+                            result = Ext.util.Format.htmlEncode(app.i18n._('Cc:'));
                             break;
                         case 'bcc':
-                            result = app.i18n._('Bcc:');
+                            result = Ext.util.Format.htmlEncode(app.i18n._('Bcc:'));
                             break;
                     }
                     
@@ -300,6 +302,8 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
             this.fireEvent('specialkey', combo, e);
             if (this.activeEditor.row == 0) {
                 return false;
+            } else {
+                this.getView().el.select('.x-grid3-td-address-editing').removeClass('x-grid3-td-address-editing');
             }
         }
     },
@@ -351,6 +355,9 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
      */
     afterRender: function() {
         Tine.Felamimail.RecipientGrid.superclass.afterRender.call(this);
+        
+        // kill x-scrollers
+        this.el.child('div[class=x-grid3-scroller]').setStyle('overflow-x', 'hidden');
         
         if (this.autoStartEditing && this.store.getCount() == 1) {
             this.startEditing.defer(200, this, [0, 1]);
@@ -495,6 +502,7 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
      */
     onAfterEdit: function(o) {
         if (o.field == 'address') {
+            Ext.fly(this.getView().getCell(o.row, o.column)).removeClass('x-grid3-td-address-editing');
             if (o.value != '' && (o.originalValue == '' || this.store.findExact('address', '') === -1)) {
                 // use selected type to create new row with empty address and start editing
                 this.addRowAndDoLayout(o.record);
@@ -526,6 +534,7 @@ Tine.Felamimail.RecipientGrid = Ext.extend(Ext.grid.EditorGridPanel, {
      * @param {} o
      */
     onBeforeEdit: function(o) {
+        this.getView().el.select('.x-grid3-td-address-editing').removeClass('x-grid3-td-address-editing');
         Ext.fly(this.getView().getCell(o.row, o.column)).addClass('x-grid3-td-address-editing');
     },
     

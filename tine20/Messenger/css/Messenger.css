@@ -77,7 +77,7 @@
     font-size: 12px;
     margin-bottom: 5px;
     background-repeat: no-repeat;
-    background-position-x: 15px;
+    background-position: 15px 0;
     font-weight: bold;
 }
 
@@ -167,17 +167,17 @@
     background-image: none;
 }
 
-.x-tree-lines .x-tree-elbow {
+.x-tree-lines .messenger-contact .x-tree-elbow {
     background-image: none !important;
     width: 0 !important;
 }
 
-.x-tree-lines .x-tree-elbow-end {
+.x-tree-lines .messenger-contact .x-tree-elbow-end {
     background-image: none !important;
     width: 0 !important;
 }
 
-.x-tree-node-leaf .x-tree-node-icon {
+.messenger-contact .x-tree-node-icon {
     background-image: none !important;
 }
 
@@ -186,6 +186,7 @@
     min-height: 25px;
     background-color: #444;
     -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
     border-radius: 10px;
     opacity: 0.9;
     float: left;
@@ -292,6 +293,7 @@
 /*    white-space: nowrap;*/
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
+    border-radius: 10px;
 }
 .chat-user-timestamp {
     font-size: 90%;
@@ -302,38 +304,38 @@
     float: left;
     max-width: 70%;
     background-repeat: no-repeat;
-    background-position-y: 6px;
+    background-position: 0 6px;
     margin-top: 6px;
     background-image: url("/images/messenger/balloon-pointer.png");
 }
 
 .color-1 .chat-user-msg { background-color: #8fb1e8 }
 .color-1 .chat-user, .color-1 .x-tree-node-anchor span { color: #8fb1e8!important}
-.color-1 .chat-user-balloon { background-position-x: 0 }
+.color-1 .chat-user-balloon { background-position: 0 6px }
 
 .color-2 .chat-user-msg { background-color: #98d96c }
 .color-2 .chat-user, .color-2 .x-tree-node-anchor span  { color: #98d96c!important}
-.color-2 .chat-user-balloon { background-position-x: -15px }
+.color-2 .chat-user-balloon { background-position: -15px 6px }
 
 .color-3 .chat-user-msg { background-color: #fff }
 .color-3 .chat-user, .color-3 .x-tree-node-anchor span  { color: #fff!important}
-.color-3 .chat-user-balloon { background-position-x: -30px }
+.color-3 .chat-user-balloon { background-position: -30px 6px }
 
 .color-4 .chat-user-msg { background-color: #ffb380 }
 .color-4 .chat-user, .color-4 .x-tree-node-anchor span  { color: #ffb380!important}
-.color-4 .chat-user-balloon { background-position-x: -45px }
+.color-4 .chat-user-balloon { background-position: -45px 6px }
 
 .color-5 .chat-user-msg { background-color: #ffe680 }
 .color-5 .chat-user, .color-5 .x-tree-node-anchor span  { color: #ffe680!important}
-.color-5 .chat-user-balloon { background-position-x: -60px }
+.color-5 .chat-user-balloon { background-position: -60px 6px }
 
 .color-6 .chat-user-msg { background-color: #ff8080 }
 .color-6 .chat-user, .color-6 .x-tree-node-anchor span  { color: #ff8080!important}
-.color-6 .chat-user-balloon { background-position-x: -75px }
+.color-6 .chat-user-balloon { background-position: -75px 6px }
 
 .color-7 .chat-user-msg { background-color: #ac9393 }
 .color-7 .chat-user, .color-7 .x-tree-node-anchor span  { color: #ac9393!important}
-.color-7 .chat-user-balloon { background-position-x: -90px }
+.color-7 .chat-user-balloon { background-position: -90px 0 }
 
 .messenger-chat-window {
     padding: 3px

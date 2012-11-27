@@ -27,7 +27,6 @@ Tine.Messenger.RosterHandler = {
     },
     
     _onRosterUpdate: function (iq) {
-        console.log('======> CHEGOU EM _onRosterUpdate');
         try {
             var query = $(iq).find('query[xmlns="jabber:iq:roster"]');
 
@@ -367,7 +366,6 @@ Tine.Messenger.RosterHandler = {
     },
     
     _onRosterResult: function(iq){
-        
         var from = $(iq).attr("from"),
             to = $(iq).attr("to"),
             xmlns = $(iq).attr("xmlns");
@@ -382,20 +380,20 @@ Tine.Messenger.RosterHandler = {
 
             $(iq).find("item").each(function(){
                 var jid = $(this).attr("jid");
-                if($(this).attr("subscription") == "none"){
-//                        if($(this).attr("ask") == 'subscribe'){
-//                            Tine.Messenger.RosterTree().updateBuddy(jid, ST_UNAVAILABLE, SB_SUBSCRIBE);
-//                        } else {
-                        Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
-//                        }
-                }else  if($(this).attr("subscription") == "from"){
+                if($(this).attr("subscription") == "none") {
+                    Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_NONE);
+                } else if($(this).attr("subscription") == "from") {
                     Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_FROM);
-                }else  if($(this).attr("subscription") == "to"){
+                } else if($(this).attr("subscription") == "to") {
                     Tine.Messenger.RosterTree().updateBuddy(jid, IMConst.ST_UNAVAILABLE, IMConst.SB_SUBSCRIBE);
                 }
             });
         }
+        
+        // Hide loading indicator (Layout.js:82,91)
+        Ext.getCmp('connectloading').hide();
+        
         return true;
     }
     
-};
+}

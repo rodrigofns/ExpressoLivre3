@@ -440,7 +440,9 @@ Tine.Felamimail.Application = Ext.extend(Tine.Tinebase.Application, {
         var accountId   = currentRequestFolder.get('account_id'),
             account     = accountId ? this.getAccountStore().getById(accountId): null,
             imapStatus  = account ? account.get('imap_status') : null;
-            
+        if(exception.code < 900  )
+            Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
+                
         if (exception.code == 913) {
             // folder not found -> remove folder from store and tree panel
             var treePanel = this.getMainScreen().getTreePanel(),
@@ -814,7 +816,7 @@ Tine.Felamimail.handleRequestException = function(exception) {
         case 911: // Felamimail_Exception_IMAPServiceUnavailable
             Ext.Msg.show({
                title:   app.i18n._('IMAP Error'),
-               msg:     exception.message ? exception.message : app.i18n._('No connection to IMAP server.'),
+               msg:     exception.message ? String.format(app.i18n._('No connection to IMAP server: {0}'), exception.message) : app.i18n._('No connection to IMAP server.'),
                icon:    Ext.MessageBox.ERROR,
                buttons: Ext.Msg.OK
             });
@@ -847,7 +849,8 @@ Tine.Felamimail.handleRequestException = function(exception) {
         case 913: // Felamimail_Exception_IMAPFolderNotFound
             Ext.Msg.show({
                title:   app.i18n._('IMAP Error'),
-               msg:     app.i18n._('One of your folders was deleted or renamed by another client. Please update the folder list of this account.'),
+               // Message changed to show more information
+               msg:     app.i18n._('One of your folders was deleted or renamed by another client. Please update the folder list of this account. If the problem persists contact an administrator.'),
                icon:    Ext.MessageBox.ERROR,
                buttons: Ext.Msg.OK
             });
@@ -897,6 +900,15 @@ Tine.Felamimail.handleRequestException = function(exception) {
                title:   app.i18n._('Save Sieve Script Error'),
                msg:     app.i18n._('Could not save script on Sieve server.') + (exception.message ? ' (' + exception.message + ')' : ''),
                icon:    Ext.MessageBox.ERROR,
+               buttons: Ext.Msg.OK
+            });
+            break;
+            
+        case 932: // Felamimail_Exception_IMAPCacheTooMuchResults
+            Ext.Msg.show({
+               title:   app.i18n._('IMAP Backend Warning'),
+               msg:     app.i18n._(exception.message),
+               icon:    Ext.MessageBox.WARNING,
                buttons: Ext.Msg.OK
             });
             break;

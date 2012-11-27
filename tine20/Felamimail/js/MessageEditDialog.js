@@ -243,16 +243,23 @@ Ext.namespace('Tine.Felamimail');
      */
     onSaveAndClose: function() {
 
-        this.supr().onSaveAndClose.apply(this, arguments);    
-
-        this.checkUnknownContacts();
-
-    },
+		this.checkUnknownContacts();
+		
+	},
 
     /**
      * checkUnknownEmails
      */
     checkUnknownContacts: function() {
+
+        // depends on window style
+        try {
+            this['ContactsCheckMask'] = new Ext.LoadMask(this.ownerCt.body, {msg: this.app.i18n._('Checking Contacts')});
+        }
+        catch (e) {
+            this['ContactsCheckMask'] = new Ext.LoadMask(Ext.getBody(), {msg: this.app.i18n._('Checking Contacts')});
+        }
+        this['ContactsCheckMask'].show();
 
         var emailRecipients = this.record.get('to');
         emailRecipients.concat(this.record.get('cc'));
@@ -275,18 +282,24 @@ Ext.namespace('Tine.Felamimail');
 
         var filter = [{field: 'email_query', operator: 'in', value: this.contacts}];
 		
-        Tine.Addressbook.searchContacts(filter, null, function(response) {
-            var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
-            Ext.each(knownEmails, function(email) {
-                var pos = this.contacts.indexOf(email);
-                if (pos >= 0) {
-                        this.contacts.splice(pos,1);
-                }
-            }, this);
-            if (this.contacts.length > 0) {
-                this.addDynamicContacts();
+	    Tine.Addressbook.searchContacts(filter, null, function(response) {
+	        var knownEmails = Tine.Felamimail.AddressbookGridPanelHook.prototype.getMailAddresses(response.results);
+			Ext.each(knownEmails, function(email) {
+				var pos = this.contacts.indexOf(email);
+				if (pos >= 0) {
+					this.contacts.splice(pos,1);
+				}
+			}, this);
+			if (this.contacts.length > 0) {
+				this.addDynamicContacts();
+			}
+            else {
+                this['ContactsCheckMask'].hide();
+                this.supr().onSaveAndClose.apply(this, arguments);
+
             }
-        }, this);
+
+	    }, this);
 
     },
     
@@ -299,15 +312,16 @@ Ext.namespace('Tine.Felamimail');
 			mailContacts: this.contacts,
             listeners: {
                 scope: this,
-				mailTo: this.record.get('to'),
-                'load': function(editdlg) {
-                    //editdlg.record.set('email', all_emails);
-					editdlg.mailContacts = this.contacts;
+                'cancel' : function() {
+                    this['ContactsCheckMask'].hide();
+                    this.supr().onSaveAndClose.apply(this, arguments);
+                }, 
+                'close' : function() {
+                    this['ContactsCheckMask'].hide();
+                    this.supr().onSaveAndClose.apply(this, arguments);
                 }
             }
         }, this);
-
-		this.window.close();
 
 	},
 

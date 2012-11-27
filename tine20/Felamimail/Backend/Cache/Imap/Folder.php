@@ -232,12 +232,11 @@ Tinebase_Core::getLogger()->alert(__METHOD__ . '#####::#####' . __LINE__ . ' Fol
             $folderDecoded = self::decodeFolderUid($_id);
    
             try {
-
                 $imap = Felamimail_Backend_ImapFactory::factory($folderDecoded['accountId']);
                 $folder = $imap->getFolders('',$folderDecoded['globalName']);
                 $counter = $imap->examineFolder($folderDecoded['globalName']);
                 $status = $imap->getFolderStatus($folderDecoded['globalName']);
-
+                $quota = $imap->getQuota($folderDecoded['globalName']);
             }
             catch (Zend_Mail_Storage_Exception $ex)
             {

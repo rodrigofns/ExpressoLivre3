@@ -199,6 +199,7 @@ Tine.Addressbook.DynamicContactsDialog = Ext.extend(Tine.widgets.dialog.EditDial
 
         if (!this.bulkInvalid && this.mailContacts.length==this.contact_index) {
             // all contacts where added successfully
+            this.fireEvent('close');
             this.window.close();
         }
     },

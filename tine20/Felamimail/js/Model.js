@@ -784,6 +784,29 @@ Tine.Felamimail.rulesBackend = new Tine.Tinebase.data.RecordProxy({
     },
 
     /**
+     * retrieve sieve rules
+     *
+     * @param   {String}     accountId
+     * @param   {Object}     options
+     * @return  {Object}     Ext.Ajax transaction results
+     */
+    getRules: function(accountId, options)
+    {
+        options = options || {};
+        options.params = options.params || {};
+        
+        var p = options.params;
+        
+        p.method = this.appName + '.getRules';
+        p.accountId = accountId;
+        p.part = options.parts;
+        
+        options.timeout = 3000;
+        
+        return this.doXHTTPRequest(options);
+    },
+    
+    /**
      * saves a single record
      * 
      * NOTE: Single rule records can't be saved

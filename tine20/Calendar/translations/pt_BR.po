@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tine 2.0 - Felamimail\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-11-16 14:41-0300\n"
+"PO-Revision-Date: 2012-11-26 15:31-0300\n"
 "Last-Translator: Cassiano Dal Pizzol <cassiano@dalpizzol@serpro.gov.br>\n"
 "Language-Team: Tine 2.0 Translators <rommel.cysne@serpro.gov.br>\n"
 "MIME-Version: 1.0\n"
@@ -265,7 +265,7 @@ msgstr "Hora Inicial"
 
 #: js/DaysView.js:93
 msgid "{0}, the {1}. of {2}"
-msgstr "{0}, o {1}. de {2}"
+msgstr "{0}, {1} de {2}"
 
 #: js/DaysView.js:674
 msgid "The summary must not be longer than 255 characters."
@@ -970,4 +970,8 @@ msgstr "\"%2$s\" resposta de %1$s"
 #: views/eventNotification.php:63
 msgid "Event details"
 msgstr "Detalhes do Evento"
+
+#: js/iMIPDetailsPanel.js:407
+msgid "Open/Delegate"
+msgstr "Abrir/Delegar"
 

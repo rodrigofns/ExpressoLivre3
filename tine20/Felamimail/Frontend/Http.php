@@ -19,17 +19,44 @@ class Felamimail_Frontend_Http extends Tinebase_Frontend_Http_Abstract
      */
     protected $_applicationName = 'Felamimail';
 
-	/**
-	 * upload image
-	 */
-    public function uploadImage(){
+    /**
+     * upload image
+     *
+     * @param  string  $base64
+     */
+    public function uploadImage($base64 = 'no')
+    {
         $tmpFile = tempnam(Tinebase_Core::getTempDir(), '');
-        if(move_uploaded_file($_FILES['upload']['tmp_name'], $tmpFile))
-                echo '{"success":true , "id":"' . str_replace(Tinebase_Core::getTempDir().'/','',$tmpFile) . '", "size":"' . filesize($tmpFile) . '"}';
-        else
-                echo '{"success":false}';
+
+        if(move_uploaded_file($_FILES['upload']['tmp_name'], $tmpFile)) {
+            $image_id = str_replace(Tinebase_Core::getTempDir().'/','',$tmpFile);
+            $image_size = filesize($tmpFile);
+            if($base64==='yes') {
+                // converts image to base64
+                try {
+                    $image = file_get_contents($tmpFile);
+                    $encoded_data = base64_encode($image);
+                    echo '{"success":true , "id":"' . $image_id . '", "size":"' . $image_size . '", "base64":"' . $encoded_data . '"}';
+                }
+                catch (Exception $e) {
+                    echo '{"success":false, "error":' . $e.description . '}';
+                }
+            }
+            else {
+                echo '{"success":true , "id":"' . $image_id . '", "size":"' . $image_size . '"}';
+            }
+        }
+        else {
+            echo '{"success":false}';
+        }
+            
     }
     
+    /**
+     * show temporary image
+     *
+     * @param  string  $tempImageId
+     */
     public function showTempImage($tempImageId){
         
         header("Content-Type: image/jpeg");

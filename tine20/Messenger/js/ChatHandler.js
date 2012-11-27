@@ -85,9 +85,9 @@ Tine.Messenger.ChatHandler = {
                                             app.i18n._('Do you want to download this chat') + '?',
                                             function (id) {
                                                 if (id == 'yes')
-                                                    $('#iframe-history').attr('src', '/download/' + response.fileName);
+                                                    $('#iframe-history').attr('src', '/download.php?download=yes&file=' + Tine.Messenger.FileTransfer.tmpPath + response.fileName);
                                                 else
-                                                    $('#iframe-history').attr('src', '/nodownload/' + response.fileName);
+                                                    $('#iframe-history').attr('src', '/download.php?download=no&file=' + Tine.Messenger.FileTransfer.tmpPath + response.fileName);
                                             }
                                         );
                                         break;
@@ -245,6 +245,7 @@ Tine.Messenger.ChatHandler = {
     },
     
     setChatState: function (id, state) {
+        var app = Tine.Tinebase.appMgr.get('Messenger');
         var chat_id = Tine.Messenger.ChatHandler.formatChatId(id),
             chat = Ext.getCmp(chat_id);
        
@@ -255,17 +256,11 @@ Tine.Messenger.ChatHandler = {
                     html = '',
                     type = '';
 
-                if(state == Tine.Messenger.ChatHandler.COMPOSING_STATE){
-                    message = state;
-                } else if(state == Tine.Messenger.ChatHandler.PAUSED_STATE){
-                    message = state;
-                } else {
-                    message = state;
-                }
                 html = Tine.Messenger.ChatHandler.formatChatStateMessage(message, type);
                 node.body.dom.innerHTML = html;
                 node.show();
-                if (state == Tine.Messenger.ChatHandler.PAUSED_STATE) {
+
+                if (app.i18n._(state).search(app.i18n._(Tine.Messenger.ChatHandler.PAUSED_STATE)) >= 0) {
                     Tine.Messenger.ChatHandler.clearPausedStateMessage = setTimeout(
                         function () {
                             node.hide();
@@ -343,13 +338,15 @@ Tine.Messenger.ChatHandler = {
         var key = '',
             img = '',
             $xml = $(Tine.Messenger.Application.xml_raw.responseText),
-            $emoticons = $xml.find("emoticon");
+            $emoticons = $xml.find("emoticon"),
+            regexp;
         
         $emoticons.each(function(){ 
             $(this).find("string").each(function(){
                 key = $(this).text().trim();
                 img = $(this).parent().attr("file").trim();
-                message = message.replace(key, "<img src='/images/messenger/emoticons/"+img+".png' alt='"+img+"' />");
+                regexp = new RegExp(key.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), 'g');
+                message = message.replace(regexp, "<img src='/images/messenger/emoticons/"+img+".png' alt='"+img+"' />");
             });
         });
         return message;

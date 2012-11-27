@@ -226,10 +226,9 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
             ));
         
             $message->parseHeaders($headers);
-            $message->parseSmime($message->structure);
-        
             $structure = array_key_exists('messageStructure', $structure) ? $structure['messageStructure'] : $structure;
             $message->parseStructure($structure);
+            $message->parseSmime($message->structure);
         }
         
         $message->sendReadingConfirmation();
@@ -755,6 +754,7 @@ abstract class Felamimail_Controller_Message_Abstract extends Tinebase_Controlle
         $config->set('HTML.DefinitionID', 'purify message body contents'); 
         $config->set('HTML.DefinitionRev', 1);
         $config->set('CSS.AllowTricky', 1);
+        $config->set('CSS.ForbiddenProperties', array());
         $config->set('CSS.AllowedProperties', array('overflow','height'));
         $config->set('Cache.SerializerPath', $path);
         

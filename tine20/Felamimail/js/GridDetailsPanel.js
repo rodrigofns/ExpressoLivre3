@@ -41,6 +41,10 @@ Ext.ns('Tine.Felamimail');
     
     fetchBodyTransactionId: null,
     
+    // model generics
+    recordClass: Tine.Felamimail.Model.Rule,
+    recordProxy: Tine.Felamimail.rulesBackend,
+    
     /**
      * init
      * @private
@@ -278,6 +282,7 @@ Ext.ns('Tine.Felamimail');
                 
                 id += Ext.util.Format.htmlEncode(':' + Ext.util.Format.trim(firstname) + ':' + Ext.util.Format.trim(lastname));
                 result += ' <span ext:qtip="' + qtip + '" id="' + id + '" class="tinebase-addtocontacts-link">[+]</span>';
+                result += ' <span ext:qtip="Bloquear remetente" id="' + id + '" class="tinebase-addsievefilter-link">[x]</span>';
                 return result;
             },
             
@@ -359,6 +364,70 @@ Ext.ns('Tine.Felamimail');
         });
     },
     
+    blockSender: function(){
+        
+        var transResponse = Ext.util.JSON.decode(this.recordProxy.transId.conn.response);
+
+        var resultCount = transResponse.result.totalcount;
+
+        var defaultRule = [],
+            result = [],
+            condition,
+            rules = [];
+            
+        for (i = 0; i < resultCount; i++ )
+        {
+            var idTmp = i + 1;
+            transResponse.result.results[i].id = String(idTmp);
+            rules.push(transResponse.result.results[i]);
+            
+//            rules[i].set('id', String(idTmp));
+            
+        }
+        
+        var defaultRule = new Tine.Felamimail.Model.Rule( Tine.Felamimail.Model.Rule.getDefaultData(),Ext.id() );
+
+        defaultRule.set('action_type', 'discard');
+
+        defaultRule.set('account_id', '');
+        defaultRule.set('container_id', '');
+        defaultRule.set('created_by', '');
+        defaultRule.set('creation_time', '');
+        defaultRule.set('deleted_by', '');
+        defaultRule.set('deleted_time', '');
+        
+        var id = resultCount + 1;
+        defaultRule.set('id', String(id));
+        defaultRule.set('last_modified_by', '');
+        defaultRule.set('last_modified_time', '');
+
+        //var result = [], condition;
+        condition = {
+            test: 'address',
+            header: 'from',
+            comperator: 'contains',
+            key: this.record.json.from_email
+        };
+
+        result.push(condition);
+
+        defaultRule.set('conditions', result);
+
+        //var rules = [];
+        rules.push(defaultRule.data);
+
+        Tine.Felamimail.rulesBackend.saveRules(this.record.json.account_id, rules, {
+            scope: this,
+            success: function(record) {
+                    this.purgeListeners();
+            },
+            failure: Tine.Felamimail.handleRequestException.createSequence(function() {
+                this.loadMask.hide();
+            }, this),
+            timeout: 150000
+        });
+    },
+    
     /**
      * on click for attachment download / compose dlg / edit contact dlg
      * 
@@ -370,7 +439,8 @@ Ext.ns('Tine.Felamimail');
             'span[class=tinebase-download-link]',
             'a[class=tinebase-email-link]',
             'span[class=tinebase-addtocontacts-link]',
-            'span[class=tinebase-showheaders-link]'
+            'span[class=tinebase-showheaders-link]',
+            'span[class=tinebase-addsievefilter-link]'
         ];
         
         // find the correct target
@@ -455,6 +525,31 @@ Ext.ns('Tine.Felamimail');
                             editdlg.record.set('n_family', parts[3]);
                         }
                     }
+                });
+                
+                break;
+                
+            case 'span[class=tinebase-addsievefilter-link]':
+            
+                var id = Ext.util.Format.htmlDecode(target.id);
+                var parts = id.split(':');
+                
+                var account = this.app.getActiveAccount();
+                
+                //var id = Ext.id() + ':' + email;
+                
+                Tine.Felamimail.rulesBackend.getRules(account.id, {
+                    scope: this,
+                    success: function(record) {
+                            this.blockSender();
+                            this.purgeListeners();
+                    },
+                    failure: Tine.Felamimail.handleRequestException.createSequence(function() {
+                        this.loadMask.hide();
+                    }, this),
+                    timeout: 6000,
+                    parts: parts[1]
+                    
                 });
                 
                 break;

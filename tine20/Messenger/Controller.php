@@ -49,4 +49,38 @@ class Messenger_Controller extends Tinebase_Controller_Event
         );
     }
     
+    /**
+     *
+     * @return JSON_Array
+     */
+    public function getEmoticons($_chatID)
+    {
+        $emoticons_path = '/images/messenger/emoticons';
+        $path = dirname(__FILE__) . '/..' . $emoticons_path;
+        $xml = file_get_contents($path . '/emoticons.xml');
+        $emoticons_translations = new SimpleXMLElement($xml);
+        
+        $emoticons = array();
+        $archives = new DirectoryIterator($path);
+        foreach ($archives as $archive)
+        {
+            if ($archive->isFile() && $archive->getExtension() == 'png')
+            {
+                $name = $archive->getBasename('.' . $archive->getExtension());
+                $text = $emoticons_translations->xpath("//emoticon[@file='" . $name . "']");
+                $text = (string)$text[0]->string[0];
+                $emoticons[] = array(
+                    'name' => $name,
+                    'file' => $emoticons_path . '/' . $archive->getBasename(),
+                    'text' => $text
+                );
+            }
+        }
+        
+        return array(
+            'chatID'    => $_chatID,
+            'emoticons' => $emoticons
+        );
+    }
+    
 }

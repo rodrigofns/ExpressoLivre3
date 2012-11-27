@@ -67,7 +67,7 @@ Tine.Felamimail.ComposeEditor = Ext.extend(Ext.form.HtmlEditor, {
     initComponent: function() {
         
         this.plugins = [
-            new Ext.ux.HtmlEditor.ButtonImage(),  
+            new Ext.ux.form.HtmlEditor.UploadImage(),  
             new Ext.ux.form.HtmlEditor.IndentOutdent(),  
             new Ext.ux.form.HtmlEditor.RemoveFormat(),
             new Ext.ux.form.HtmlEditor.EndBlockquote(),

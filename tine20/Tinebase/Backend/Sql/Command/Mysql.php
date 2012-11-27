@@ -56,6 +56,16 @@ class Tinebase_Backend_Sql_Command_Mysql implements Tinebase_Backend_Sql_Command
     }   
     
     /**
+      * 
+      * @param Zend_Db_Adapter_Abstract $adapter
+      * @return string
+      */
+    public static function getLike($adapter)
+    {
+        return 'LIKE';
+    }
+    
+    /**
      *
      * @param Zend_Db_Adapter_Abstract $adapter
      * @param string $date

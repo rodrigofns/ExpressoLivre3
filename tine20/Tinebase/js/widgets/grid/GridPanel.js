@@ -403,7 +403,7 @@ Ext.extend(Tine.widgets.grid.GridPanel, Ext.Panel, {
             scope: this
         });
 
-        this.action_print = new Ext.Action({
+        this.actions_print = new Ext.Action({
             requiredGrant: 'readGrant',
             text: _('Print Page'),
             handler: function() {
