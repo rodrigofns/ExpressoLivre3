@@ -65,8 +65,6 @@ class Webconference_Backend_Sql extends Tinebase_Backend_Sql_Abstract
             ->where($this->_db->quoteInto($this->_db->quoteIdentifier('accounts_id'). ' = ? ', $_accountId))
 	    ->where($this->_db->quoteInto($this->_db->quoteIdentifier('status'). ' = ? ', 'A'))	
 	    ->limit();
-
-	$this->_traitGroup($select);
         
         $stmt = $this->_db->query($select);
 	
